@@ -1,24 +1,32 @@
-"use client";
-
 import { useQuery } from "@tanstack/react-query";
-import { getStudentRoutesQ } from "../../../../utilities/route/studentRoutingQueries";
+import {
+  getAlternateRoutesQ,
+  getStudentRoutesQ,
+} from "../../../../utilities/route/studentRoutingQueries";
 import { getRoutingHeatmapQ } from "../../../../utilities/route/routeQueries";
 import { useMemo, useState } from "react";
 import { getCongestionLevel } from "../../../../utilities/heatmaps/routeCongestion";
-import { RouteLine } from "./RouteLine";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { AlertTriangle } from "lucide-react";
 import { AlternateRouteDialog } from "./AlternateRoutesDialog";
+import { RouteLine } from "./RouteLine";
+import { getStudentRouteTransitionType } from "../../../../utilities/route/studentRoutingRequestBuilder";
 
-//whoever's reading this if you add more props create an interface
-export function StudentRoutes({ date, time }: { date: string; time?: string }) {
+export function StudentRouteAlerts({
+  date,
+  time,
+  selectedIndex,
+  setSelectedIndex,
+}: {
+  date: string;
+  time?: string;
+  selectedIndex: Record<string, number>;
+  setSelectedIndex: React.Dispatch<
+    React.SetStateAction<Record<string, number>>
+  >;
+}) {
   const { data: studentRoutes } = useQuery(getStudentRoutesQ({ date }));
   const { data: heatmapRoutes = [] } = useQuery(getRoutingHeatmapQ({ date }));
-
-  //resets on reload since we are doing this in the session
-  const [selectedIndex, setSelectedIndex] = useState<Record<string, number>>(
-    {},
-  );
   const [openKey, setOpenKey] = useState<string | null>(null);
 
   const buildingPairCongestion = useMemo(() => {
@@ -61,25 +69,15 @@ export function StudentRoutes({ date, time }: { date: string; time?: string }) {
 
         return (
           <div key={buildingPairKey}>
-            <RouteLine
-              path={transition.route.pathCoordinates}
-              colour={
-                selectedIndex[buildingPairKey] !== undefined
-                  ? "#3B82F6"
-                  : transition.route.displayColour
-              }
-            />
-
             {isBusy && selectedIndex[buildingPairKey] === undefined && (
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setOpenKey(buildingPairKey)}
+                className="ring-1 ring-(--text-primary) animate-pulse cursor-pointer"
               >
-                <AlertTriangle />
-                The route from {transition.originEvent.eventName} to{" "}
-                {transition.destinationEvent.eventName} is busy, it is advised
-                to take another route.
+                <AlertTriangle className="h-4 w-4" />
+                Busy Route
               </Button>
             )}
 
@@ -96,8 +94,89 @@ export function StudentRoutes({ date, time }: { date: string; time?: string }) {
                 }))
               }
               currentCongestion={congestion}
+              mainDistance={transition.route.distanceMetres}
             />
           </div>
+        );
+      })}
+    </>
+  );
+}
+
+function StudentRouteLineItem({
+  transition,
+  routeIndex,
+  date,
+}: {
+  transition: getStudentRouteTransitionType;
+  routeIndex?: number;
+  date: string;
+}) {
+  const isAlternative = routeIndex !== undefined && routeIndex !== 0;
+
+  const { data: alternativeRouteData } = useQuery({
+    ...getAlternateRoutesQ({
+      originEventId: transition.originEvent.eventId,
+      destinationEventId: transition.destinationEvent.eventId,
+      date,
+      routeIndex: routeIndex ?? 0,
+    }),
+    enabled: isAlternative,
+  });
+
+  const path =
+    isAlternative && alternativeRouteData?.route?.pathCoordinates
+      ? alternativeRouteData.route.pathCoordinates
+      : transition.route?.pathCoordinates;
+
+  if (!path) {
+    return null;
+  }
+
+  return (
+    <RouteLine
+      path={path}
+      colour={isAlternative ? "#3B82F6" : transition.route?.displayColour}
+    />
+  );
+}
+
+export function StudentRouteLines({
+  date,
+  time,
+  selectedIndex,
+}: {
+  date: string;
+  time?: string;
+  selectedIndex: Record<string, number>;
+}) {
+  const { data: studentRoutes } = useQuery(getStudentRoutesQ({ date }));
+
+  if (!studentRoutes) return null;
+
+  const visibleRoutes = time
+    ? studentRoutes.routes.filter(
+        (transition) =>
+          time >= transition.originEvent.endTime &&
+          time <= transition.destinationEvent.startTime,
+      )
+    : studentRoutes.routes;
+
+  return (
+    <>
+      {visibleRoutes.map((transition) => {
+        if (!transition.route || !transition.originEvent.buildingId)
+          return null;
+
+        const buildingPairKey = `${transition.originEvent.buildingId}:${transition.destinationEvent.buildingId}`;
+
+        return (
+          <StudentRouteLineItem
+            key={buildingPairKey}
+            transition={transition}
+            routeIndex={selectedIndex[buildingPairKey]}
+            date={date}
+          />
         );
       })}
     </>
