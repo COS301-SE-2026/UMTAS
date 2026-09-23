@@ -46,6 +46,7 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 import { BuildingSheet } from "@/components/organisms/map/BuildingSheet";
+import { StudentRoutes } from "@/components/organisms/map/StudentRoutes";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -369,16 +370,8 @@ export function UniMap() {
                 );
               })()}
 
-            {activeRoute?.status === "MOVING" && activeRoute.route && (
-              <RouteLine
-                path={
-                  activeRoute.route.pathCoordinates as unknown as {
-                    lat: number;
-                    lng: number;
-                  }[]
-                }
-                colour={activeRoute.route.displayColour}
-              />
+            {mapMode === "route" && (
+              <StudentRoutes date={selectedDate} time={selectedTime} />
             )}
           </MapScreen>
         </div>
