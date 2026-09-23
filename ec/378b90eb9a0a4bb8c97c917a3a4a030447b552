@@ -1,0 +1,14 @@
+apps/frontend/src/components/templates/VisionModel/SessionTemplate.tsx
+  h_2d4b3dca70a3d8 4-10,20-24,27-30,32,39,46,49,52-70,74-93,101-113,117,123,128,130,135,138-139,141-145,148,155-158,165-179,182-184,188-189,191-205,207-213,215-305,308,315-358
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ec378b90eb9a0a4bb8c97c917a3a4a030447b552",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
