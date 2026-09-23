@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 import { PIXEL_PAYLOAD, POSE_DATA_MESSAGE, POSE_MESSAGE } from "./messageTypes";
-import init, { slice_image_data_gpu } from "../../wasm-engine/pkg/wasm_engine";
+import init, { slice_image_data_gpu } from "@wasm/wasm_engine";
 import * as ort from "onnxruntime-web";
 
 let wasmLoaded = false;

@@ -6,8 +6,7 @@ import init, {
   analyze_frame,
   first_frame,
   analyse_session,
-} from "../../../wasm-engine/pkg/wasm_engine";
-
+} from "@wasm/wasm_engine";
 // if id is not found in a frame it draws them again
 export default class SessionStorePose {
   private frames: frameStore[] = [];

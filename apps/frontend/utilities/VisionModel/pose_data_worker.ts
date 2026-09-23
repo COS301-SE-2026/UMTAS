@@ -3,7 +3,7 @@ import {
   PROCESS_POSE_DATA_MESSAGE,
   RESULT_PROCESS_POSE_DATA,
 } from "./messageTypes";
-import init, { infer_pose_data } from "../../wasm-engine/pkg/wasm_engine";
+import init, { infer_pose_data } from "@wasm/wasm_engine";
 
 let wasmLoaded = false;
 

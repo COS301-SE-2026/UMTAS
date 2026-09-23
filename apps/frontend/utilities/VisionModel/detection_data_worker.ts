@@ -3,7 +3,7 @@ import {
   PROCESS_DETECT_DATA_MESSAGE,
   RESULT_PROCESS_DETECT_DATA,
 } from "./messageTypes";
-import init, { infer_detection_data } from "../../wasm-engine/pkg/wasm_engine";
+import init, { infer_detection_data } from "@wasm/wasm_engine";
 
 let wasmLoaded = false;
 

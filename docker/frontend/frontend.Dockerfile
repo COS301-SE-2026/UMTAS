@@ -13,7 +13,6 @@ RUN apt-get update && apt-get install -y \
 RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 WORKDIR /app
 
-
 COPY apps/frontend/public/models ./apps/frontend/public/models
 
 RUN if [ ! -f apps/frontend/public/models/yolo26n.onnx ] || [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ]; then \
