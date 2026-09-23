@@ -278,13 +278,13 @@ export default function VideoUploadComp() {
                   <Input
                     value={frameInterval}
                     onChange={(e) => {
-                      if (Number(e.target.value) > 0.5) {
+                      if (Number(e.target.value) >= 0.1) {
                         const val = Number(e.target.value);
                         setFrameInterval(val);
                         frameIntervalRef.current = val;
                       }
                     }}
-                    min={0.5}
+                    min={0.1}
                     max={100}
                     step={0.1}
                     type="number"
@@ -314,7 +314,7 @@ export default function VideoUploadComp() {
                 <Label className=" flex flex-col  w-full  text-md font-medium text-[var(--text-primary)] text-left pl-1">
                   Session Analysis
                   <p> {`Questions Asked : ${sessionRes.questions_asked}`}</p>
-                  <p>{`Restless detected : ${sessionRes.questions_asked}`}</p>
+                  <p>{`Restless detected : ${sessionRes.detected_restless}`}</p>
                 </Label>
               </div>
             </div>

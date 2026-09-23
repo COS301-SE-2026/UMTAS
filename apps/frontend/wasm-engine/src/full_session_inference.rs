@@ -1,6 +1,5 @@
 use serde::Serialize;
 use std::collections::HashMap;
-use std::num;
 use wasm_bindgen::prelude::*;
 
 use crate::pose_inference::Keypoint;
@@ -47,47 +46,54 @@ pub fn evaluate_restlessness(
     left_shoulder: &[Keypoint],
     right_shoulder: &[Keypoint],
 ) -> Option<usize> {
-    if centers.is_empty()
-        || centers.len() != left_shoulder.len()
-        || centers.len() != right_shoulder.len()
-    {
+    if left_shoulder.is_empty() || left_shoulder.len() != right_shoulder.len() {
         return None;
     }
 
-    // ratio of how many frames they are expected to be moving for
-    const R_RATIO: f32 = 0.2;
-
     let mut total_shoulder_width = 0.0;
-    for i in 0..centers.len() {
+    for i in 0..left_shoulder.len() {
         let dx = left_shoulder[i].x - right_shoulder[i].x;
         let dy = left_shoulder[i].y - right_shoulder[i].y;
         total_shoulder_width += (dx.powi(2) + dy.powi(2)).sqrt();
     }
-    let avg_shoulder_width = total_shoulder_width / centers.len() as f32;
-    let NOISE = avg_shoulder_width * 0.15;
+    let avg_shoulder_width = total_shoulder_width / left_shoulder.len() as f32;
 
-    let mut sumx = 0.0;
-    let mut sumy = 0.0;
-    for kp in centers {
-        sumx += kp.x;
-        sumy += kp.y;
+    let mut distances = Vec::new();
+    for i in 1..left_shoulder.len() {
+        let prev_mid_x = (left_shoulder[i - 1].x + right_shoulder[i - 1].x) / 2.0;
+        let prev_mid_y = (left_shoulder[i - 1].y + right_shoulder[i - 1].y) / 2.0;
+        let curr_mid_x = (left_shoulder[i].x + right_shoulder[i].x) / 2.0;
+        let curr_mid_y = (left_shoulder[i].y + right_shoulder[i].y) / 2.0;
+
+        let dx = curr_mid_x - prev_mid_x;
+        let dy = curr_mid_y - prev_mid_y;
+        let distance = (dx.powi(2) + dy.powi(2)).sqrt();
+        distances.push(distance);
     }
-    let len = centers.len() as f32;
-    let baseline_x = sumx / len;
-    let baseline_y = sumy / len;
 
+    if distances.is_empty() {
+        return None;
+    }
+
+    distances.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
+
+    let p90_idx = ((distances.len() as f32) * 0.90) as usize;
+    let p90_distance = distances[p90_idx.min(distances.len() - 1)];
+    if p90_distance < avg_shoulder_width * 0.04 {
+        return None;
+    }
+
+    const R_RATIO: f32 = 0.20;
+    let substantial_move = avg_shoulder_width * 0.06;
     let mut restless_frame_count = 0;
 
-    for kp in centers {
-        let dx = kp.x - baseline_x;
-        let dy = kp.y - baseline_y;
-        let distance = (dx.powi(2) + dy.powi(2)).sqrt();
-
-        if distance > NOISE {
+    for &dist in &distances {
+        if dist > substantial_move {
             restless_frame_count += 1;
         }
     }
 
+    let len = distances.len() as f32;
     let restlessness_ratio = restless_frame_count as f32 / len;
 
     if restlessness_ratio > R_RATIO {
