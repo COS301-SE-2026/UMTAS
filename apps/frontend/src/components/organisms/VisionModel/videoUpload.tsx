@@ -9,6 +9,7 @@ import SessionStorePose, {
 } from "../../../../utilities/VisionModel/sessionStore/poseSessionStore";
 import { drawPoint, drawSegment } from "./CameraCanvas";
 import { Label } from "@/components/atoms/baseShadcn/label";
+import { SessionInferenceResult } from "../../../../utilities/VisionModel/messageTypes";
 
 export default function VideoUploadComp() {
   const [video, SetVideo] = useState<File | null>(null);
@@ -24,7 +25,11 @@ export default function VideoUploadComp() {
   const [eta, setEta] = useState<string>("Calculating...");
   const [currentTimeDisplay, setCurrentTimeDisplay] = useState<string>("0:00");
   const startTimeRef = useRef<number>(0);
-
+  const [sessionRes, SetSessionRes] = useState<SessionInferenceResult>({
+    detected_restless: 0,
+    questions_asked: 0,
+    restless_ids: [],
+  });
   useEffect(() => {
     return () => {
       isProcessingRef.current = false;
@@ -183,6 +188,27 @@ export default function VideoUploadComp() {
     console.log(results);
   }
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    if (isProcessing) {
+      interval = setInterval(async () => {
+        if (frameStore.current) {
+          const result = await frameStore.current.analyseAllFrames();
+          if (result) {
+            SetSessionRes(result);
+          }
+        }
+      }, 5 * 1000);
+    } else {
+      if (interval) clearInterval(interval);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isProcessing]);
+
   return (
     <div className="h-3/4 w-1/2  items-center flex flex-col   px-2 ">
       <div className="w-full h-full max-w-7xl overflow-auto border border-[var(--border)] bg-[var(--bg-surface)] rounded-xl shadow-sm flex flex-col">
@@ -208,8 +234,9 @@ export default function VideoUploadComp() {
                 height={640}
                 className="object-scale-down w-full h-3/4 rounded-2xl border "
               ></canvas>
-              <div className="h-1/4 justify-around flex items-end  w-full ">
+              <div className="h-1/4 justify-around grid grid-cols-2 items-end  w-full ">
                 <Input
+                  hidden
                   ref={uploadVideoRef}
                   type="file"
                   accept="video/mp4"
@@ -265,10 +292,31 @@ export default function VideoUploadComp() {
                     className="h-8 w-40 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
                   />
                 </Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={async () => {
+                    if (isProcessing) {
+                      const result =
+                        await frameStore.current?.analyseAllFrames();
+                      if (result) SetSessionRes(result);
+                    }
+                  }}
+                  size="default"
+                  className="h-8 w-40  cursor-pointer"
+                >
+                  Run Session Inference
+                </Button>
               </div>
             </div>
             <div className="w-full h-full  p-2">
-              <div className="border w-full h-full rounded-2xl"></div>
+              <div className="border w-full h-full rounded-2xl">
+                <Label className=" flex flex-col  w-full  text-md font-medium text-[var(--text-primary)] text-left pl-1">
+                  Session Analysis
+                  <p> {`Questions Asked : ${sessionRes.questions_asked}`}</p>
+                  <p>{`Restless detected : ${sessionRes.questions_asked}`}</p>
+                </Label>
+              </div>
             </div>
           </div>
         </div>
