@@ -157,13 +157,13 @@ describe('AttendanceSessionService', () => {
     expect(mockDb.update.mock.calls).toHaveLength(1);
   });
 
-  it('replaces the camera headcount during the event window', async () => {
+  it('replaces the barcode count during the event window', async () => {
     const session = currentSession();
     const attendance = createSessionAttendance({
       SessionID: session.SessionID,
       UserID: null,
       guestCount: 7,
-      captureMethod: 'CAMERA',
+      captureMethod: 'BARCODE',
     });
     mockTransaction(mockDb, {
       select: [[session], ...operatorChecks(), []],
@@ -172,10 +172,34 @@ describe('AttendanceSessionService', () => {
 
     const result = await service.setGuestCount(actor, session.SessionID, {
       guestCount: 7,
-      captureMethod: 'CAMERA',
+      captureMethod: 'BARCODE',
     });
 
     expect(result).toEqual(attendance);
+  });
+
+  it('keeps a higher barcode count when an older request arrives', async () => {
+    const session = currentSession();
+    const existing = createSessionAttendance({
+      SessionID: session.SessionID,
+      UserID: null,
+      guestCount: 5,
+      captureMethod: 'BARCODE',
+    });
+    mockTransaction(mockDb, {
+      select: [[session], ...operatorChecks(), [existing]],
+      update: [[existing]],
+    });
+    await service.setGuestCount(actor, session.SessionID, {
+      guestCount: 3,
+      captureMethod: 'BARCODE',
+    });
+    const updateChain = (mockDb.update as jest.Mock).mock.results[0]?.value as {
+      set: jest.Mock;
+    };
+    expect(updateChain.set).toHaveBeenCalledWith(
+      expect.objectContaining({ guestCount: 5 }),
+    );
   });
 
   it('allows a manual historical count correction', async () => {
@@ -212,6 +236,7 @@ describe('AttendanceSessionService', () => {
       [session],
       ...operatorChecks(),
       rows,
+      [],
     ]);
 
     const result = await service.getSession(actor, session.SessionID, mockDb);
@@ -219,5 +244,30 @@ describe('AttendanceSessionService', () => {
     expect(result.identifiedCount).toBe(1);
     expect(result.guestCount).toBe(4);
     expect(result.attendedCount).toBe(5);
+  });
+
+  it('lists sessions with guest totals', async () => {
+    const session = currentSession();
+    const guest = createSessionAttendance({
+      SessionID: session.SessionID,
+      UserID: null,
+      guestCount: 2,
+      captureMethod: 'NFC',
+    });
+    mockSequentialResults(mockDb.select, [
+      [{ eventID: session.eventID }],
+      [session],
+      [guest],
+    ]);
+    const result = await service.listSessions(
+      { ...actor, uniRole: 'uni_admin' },
+      {},
+      mockDb,
+    );
+    expect(result.sessionList[0]).toMatchObject({
+      identifiedCount: 0,
+      guestCount: 2,
+      attendedCount: 2,
+    });
   });
 });

@@ -25,7 +25,7 @@ import { AttendanceSessionService } from './attendance-session.service';
 import {
   AttendanceRecordStatus,
   type AttendanceRecordResponseDto,
-  type RecordCameraAttendanceDto,
+  type RecordBarcodeAttendanceDto,
   type RecordAttendanceDto,
   type SessionAttendanceResponseDto,
 } from './dto/attendance-session.dto';
@@ -367,14 +367,14 @@ export class AttendanceCaptureService {
     };
   }
 
-  async recordCameraAttendance(
+  async recordBarcodeAttendance(
     actor: AttendanceActor,
-    dto: RecordCameraAttendanceDto,
+    dto: RecordBarcodeAttendanceDto,
     tx?: AppDatabase,
   ): Promise<SessionAttendanceResponseDto> {
     if (!tx) {
       return this.dbService.db.transaction((transaction: AppDatabase) =>
-        this.recordCameraAttendance(actor, dto, transaction),
+        this.recordBarcodeAttendance(actor, dto, transaction),
       );
     }
     const occurrence = await this.getAvailableOperatorOccurrence(
@@ -392,7 +392,7 @@ export class AttendanceCaptureService {
     return this.attendanceSessionService.setGuestCount(
       actor,
       session.SessionID,
-      { guestCount: dto.guestCount, captureMethod: 'CAMERA' },
+      { guestCount: dto.guestCount, captureMethod: 'BARCODE' },
       tx,
     );
   }

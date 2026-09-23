@@ -36,7 +36,7 @@ import {
   AttendanceSessionResponseDto,
   CreateAttendanceSessionDto,
   DeleteAttendanceSessionResponseDto,
-  RecordCameraAttendanceDto,
+  RecordBarcodeAttendanceDto,
   RecordAttendanceDto,
   SessionAttendanceResponseDto,
   SetGuestCountDto,
@@ -182,17 +182,20 @@ export class AttendanceController {
     );
   }
 
-  @Put('records/camera')
+  @Put('records/barcode')
   @Roles('lecturer', 'uni_admin')
   @ApiOperation({
-    summary: 'Replace the anonymous headcount for the current slot',
-    operationId: 'recordCameraAttendance',
+    summary: 'Update the barcode guest count for the current slot',
+    operationId: 'recordBarcodeAttendance',
   })
-  recordCameraAttendance(
+  recordBarcodeAttendance(
     @CurrentSession() session: SessionData,
-    @Body() dto: RecordCameraAttendanceDto,
+    @Body() dto: RecordBarcodeAttendanceDto,
   ): Promise<SessionAttendanceResponseDto> {
-    return this.captureService.recordCameraAttendance(this.actor(session), dto);
+    return this.captureService.recordBarcodeAttendance(
+      this.actor(session),
+      dto,
+    );
   }
 
   @Post('sessions')

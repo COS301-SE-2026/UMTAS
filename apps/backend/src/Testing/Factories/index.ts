@@ -17,6 +17,7 @@ export * from './university.factory';
 export * from './attendance.factory';
 export * from './attendance-session.factory';
 export * from './attendance-preference.factory';
+export * from './nfc-tag.factory';
 export * from './timetable.factory';
 export * from './building.factory';
 export * from './venue.factory';

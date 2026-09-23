@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { createHash } from 'node:crypto';
+import { createHash, createHmac } from 'node:crypto';
 import { and, eq, inArray } from 'drizzle-orm';
 import {
   Event,
   ModuleTeaches,
+  ModuleEnrollment,
   NfcTag,
   UniversityEvent,
   modules,
@@ -107,78 +108,119 @@ export class EventsSeedService extends BaseSeedService {
       )
       .onConflictDoNothing();
 
-    await db
-      .insert(NfcTag)
-      .values({
-        tagId: '00000000-0000-4000-8000-0000000000a1',
-        ownerUserId: lecturer.id,
-        universityId,
-        tokenHash: createHash('sha256')
-          .update('attendance-conflict-demo-token')
-          .digest('hex'),
-      })
-      .onConflictDoNothing();
+    const [student] = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.email, this.constants.UserEmails[0]))
+      .limit(1);
+    if (student) {
+      await db
+        .insert(ModuleEnrollment)
+        .values(
+          demoModules.map((module) => ({
+            ModuleID: module.id,
+            UserID: student.id,
+          })),
+        )
+        .onConflictDoNothing();
+    }
+
+    const secret = process.env.BETTER_AUTH_SECRET;
+    if (secret) {
+      const tokenHash = createHmac('sha256', secret)
+        .update('attendance-conflict-demo-token-2026')
+        .digest('hex');
+      await db
+        .insert(NfcTag)
+        .values({
+          tagId: '00000000-0000-4000-8000-0000000000a1',
+          ownerUserId: lecturer.id,
+          universityId,
+          tokenHash,
+        })
+        .onConflictDoUpdate({
+          target: NfcTag.ownerUserId,
+          set: {
+            tagId: '00000000-0000-4000-8000-0000000000a1',
+            tokenHash,
+            universityId,
+            updatedAt: new Date(),
+          },
+        });
+    }
 
     const date = localDateAt(
       new Date(),
       process.env.ATTENDANCE_TIME_ZONE ?? DEFAULT_ATTENDANCE_TIME_ZONE,
     );
 
+    const weekdays = [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ] as const;
     for (const [index, module] of demoModules.entries()) {
-      const importFingerprint = EventsSeedService.fingerprint(
-        'attendance-conflict-demo',
-        String(index + 1),
-      );
-      const eventName = `Attendance demo ${index + 1}`;
-      const criteria: UniversityEventCriteria = {
-        eventSource: EventSource.UNIVERSITY,
-        moduleId: module.id,
-        activityType: 'lecture',
-        date,
-        startTime: '00:00',
-        endTime: '23:59',
-      };
+      for (const dayOfWeek of weekdays) {
+        const importFingerprint = EventsSeedService.fingerprint(
+          'attendance-conflict-demo',
+          String(index + 1),
+          ...(dayOfWeek === 'monday' ? [] : [dayOfWeek]),
+        );
+        const eventName = `Attendance demo ${index + 1}`;
+        const criteria: UniversityEventCriteria = {
+          eventSource: EventSource.UNIVERSITY,
+          moduleId: module.id,
+          activityType: 'lecture',
+          dayOfWeek,
+          startTime: '00:00',
+          endTime: '23:59',
+        };
 
-      const [existing] = await db
-        .select({ id: Event.eventID })
-        .from(Event)
-        .where(eq(Event.importFingerprint, importFingerprint))
-        .limit(1);
-      const eventId = existing
-        ? existing.id
-        : (
-            await this.persistence.insertEvents(db, [
-              {
-                eventName,
-                activityCode: module.code,
-                activityType: 'lecture',
-                eventCriteria: criteria,
-                isRecurring: false,
-                validated: true,
-                importFingerprint,
-              },
-            ])
-          )[0]?.eventID;
+        const [existing] = await db
+          .select({ id: Event.eventID })
+          .from(Event)
+          .where(eq(Event.importFingerprint, importFingerprint))
+          .limit(1);
+        const eventId = existing
+          ? existing.id
+          : (
+              await this.persistence.insertEvents(db, [
+                {
+                  eventName,
+                  activityCode: module.code,
+                  activityType: 'lecture',
+                  eventCriteria: criteria,
+                  isRecurring: true,
+                  validated: true,
+                  importFingerprint,
+                },
+              ])
+            )[0]?.eventID;
 
-      if (!eventId) continue;
-      if (existing) {
-        await db
-          .update(Event)
-          .set({
-            eventName,
-            activityCode: module.code,
-            activityType: 'lecture',
-            eventCriteria: criteria,
-            isRecurring: false,
-            validated: true,
-          })
-          .where(eq(Event.eventID, eventId));
+        if (!eventId) continue;
+        if (existing) {
+          await db
+            .update(Event)
+            .set({
+              eventName,
+              activityCode: module.code,
+              activityType: 'lecture',
+              eventCriteria: criteria,
+              isRecurring: true,
+              validated: true,
+            })
+            .where(eq(Event.eventID, eventId));
+        }
+        await this.ensureModuleEventRelationship(db, eventId, module.id);
       }
-      await this.ensureModuleEventRelationship(db, eventId, module.id);
     }
 
     this.logger.log(
-      `Seeded attendance conflict demo for ${lecturerEmail} on ${date}`,
+      `Seeded recurring attendance conflict demo for ${lecturerEmail}; active on ${date}`,
     );
   }
 

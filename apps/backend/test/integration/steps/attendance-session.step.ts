@@ -10,6 +10,7 @@ import {
   Event,
   GroupModules,
   ModuleEnrollment,
+  ModuleTeaches,
   ModuleGrouping,
   modules,
   SessionAttendance,
@@ -262,6 +263,28 @@ export function attendanceSessionLifecycleStep<TPlan>(
       assert.equal(registeredTag.tagId, firstTagId);
       assert.equal('token' in registeredTag, false);
       assert.equal('tokenHash' in registeredTag, false);
+      const testedTag = await operatorActor.request.post(
+        '/attendance/nfc-tags/test',
+        {
+          json: { tagId: firstTagId, token: firstToken },
+        },
+      );
+      expectStatus(testedTag, 201, 'test registered NFC tag');
+      expectObject(testedTag.body, 'test registered NFC tag');
+      assert.equal(testedTag.body.valid, true);
+      const tamperedTicket = await operatorActor.request.post(
+        '/attendance/nfc-tags/registration/confirm',
+        {
+          json: {
+            activationTicket: `${preparedTag.body.activationTicket}tampered`,
+          },
+        },
+      );
+      expectStatus(
+        tamperedTicket,
+        400,
+        'reject tampered NFC registration ticket',
+      );
 
       const operatorSlots = await operatorActor.request.get(
         `/attendance/operator/slots?date=${localDate}`,
@@ -402,33 +425,41 @@ export function attendanceSessionLifecycleStep<TPlan>(
       expectStatus(guestCheckIn, 201, 'record anonymous NFC attendance');
       expectObject(guestCheckIn.body, 'record anonymous NFC attendance');
       assert.equal(guestCheckIn.body.status, 'RECORDED');
+      const barcodeCount = await operatorActor.request.put(
+        '/attendance/records/barcode',
+        {
+          json: { eventID: eventId, guestCount: 2 },
+        },
+      );
+      expectStatus(barcodeCount, 200, 'set barcode guest count');
+      const staleBarcodeCount = await operatorActor.request.put(
+        '/attendance/records/barcode',
+        { json: { eventID: eventId, guestCount: 1 } },
+      );
+      expectStatus(staleBarcodeCount, 200, 'ignore stale barcode count');
+      expectObject(staleBarcodeCount.body, 'ignore stale barcode count');
+      assert.equal(staleBarcodeCount.body.guestCount, 2);
+      const mixedSummary = await operatorActor.request.get(
+        `/attendance/sessions/${nfcSessionId}`,
+      );
+      expectStatus(mixedSummary, 200, 'read mixed capture totals');
+      expectObject(mixedSummary.body, 'read mixed capture totals');
+      assert.equal(mixedSummary.body.identifiedCount, 1);
+      assert.equal(mixedSummary.body.guestCount, 3);
+      assert.equal(mixedSummary.body.attendedCount, 4);
 
-      const recorded = await operatorActor.request.post(
-        `/attendance/sessions/${identifiedSessionId}/records`,
-        { json: { UserID: operator.userId, captureMethod: 'MANUAL' } },
-      );
-      expectStatus(recorded, 201, 'record identified attendance');
-      expectObject(recorded.body, 'record identified attendance');
-      assert.equal(recorded.body.status, 'RECORDED');
-      const repeated = await operatorActor.request.post(
-        `/attendance/sessions/${identifiedSessionId}/records`,
-        { json: { UserID: operator.userId, captureMethod: 'MANUAL' } },
-      );
-      expectStatus(repeated, 201, 'repeat identified attendance');
-      expectObject(repeated.body, 'repeat identified attendance');
-      assert.equal(repeated.body.status, 'ALREADY_RECORDED');
       const identifiedSummary = await operatorActor.request.get(
         `/attendance/sessions/${identifiedSessionId}`,
       );
       expectStatus(identifiedSummary, 200, 'read identified totals');
       expectObject(identifiedSummary.body, 'read identified totals');
-      assert.equal(identifiedSummary.body.identifiedCount, 1);
-      assert.equal(identifiedSummary.body.attendedCount, 1);
+      assert.equal(identifiedSummary.body.identifiedCount, 0);
+      assert.equal(identifiedSummary.body.attendedCount, 0);
       assert.equal('attendanceList' in identifiedSummary.body, false);
       assert.equal('attendance' in identifiedSummary.body, false);
       assert.equal('UserID' in identifiedSummary.body, false);
 
-      const ownHistory = await operatorActor.request.get(
+      const ownHistory = await student.request.get(
         '/attendance/me/verified-history',
       );
       expectStatus(ownHistory, 200, 'read own verified history');
@@ -437,7 +468,7 @@ export function attendanceSessionLifecycleStep<TPlan>(
       assert.equal(ownHistory.body.attendanceList.length, 1);
       assert.equal(
         (ownHistory.body.attendanceList[0] as Record<string, unknown>).UserID,
-        operator.userId,
+        studentUser.id,
       );
 
       const outsider = context.actor('attendance-outsider');
@@ -524,6 +555,29 @@ export function attendanceSessionLifecycleStep<TPlan>(
         { json: { scheduledEndAt: date(-3_000_000) } },
       );
       expectStatus(unrelatedUpdate, 403, 'reject unrelated lecturer operation');
+      await db.insert(ModuleTeaches).values({
+        ModuleID: moduleId,
+        UserID: outsiderUser.id,
+      });
+      const lecturerSlots = await outsider.request.get(
+        `/attendance/operator/slots?date=${localDate}`,
+      );
+      expectStatus(lecturerSlots, 200, 'lecturer sees taught attendance slots');
+      expectObject(lecturerSlots.body, 'lecturer sees taught attendance slots');
+      assert.ok((lecturerSlots.body.slotList as unknown[]).length >= 2);
+      const clearedPreference = await operatorActor.request.delete(
+        '/attendance/operator/preferred-event',
+      );
+      expectStatus(
+        clearedPreference,
+        [200, 204],
+        'clear preferred attendance event',
+      );
+      const selectedAgain = await operatorActor.request.put(
+        '/attendance/operator/preferred-event',
+        { json: { eventID: eventId } },
+      );
+      expectStatus(selectedAgain, 200, 'restore preferred attendance event');
 
       const corrected = await operatorActor.request.patch(
         `/attendance/sessions/${sessionId}`,
@@ -549,6 +603,15 @@ export function attendanceSessionLifecycleStep<TPlan>(
         .where(eq(SessionAttendance.SessionID, sessionId));
       assert.equal(rows.length, 1);
       assert.equal(rows[0].guestCount, 7);
+      const deleted = await operatorActor.request.delete(
+        `/attendance/sessions/${identifiedSessionId}`,
+      );
+      expectStatus(deleted, 200, 'delete identified attendance session');
+      const missingSession = await db
+        .select()
+        .from(AttendanceSession)
+        .where(eq(AttendanceSession.SessionID, identifiedSessionId));
+      assert.equal(missingSession.length, 0);
 
       return { sessionId, finalState: 'PERSISTED' };
     },

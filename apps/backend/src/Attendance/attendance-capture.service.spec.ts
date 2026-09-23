@@ -6,7 +6,10 @@ import {
   createAttendanceSession,
   createSessionAttendance,
 } from '../Testing/Factories';
-import { mockTransaction } from '../Testing/Mocks/database.helpers';
+import {
+  mockDbResult,
+  mockTransaction,
+} from '../Testing/Mocks/database.helpers';
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
 import { AttendanceCaptureService } from './attendance-capture.service';
 import { AttendancePreferenceService } from './attendance-preference.service';
@@ -166,19 +169,39 @@ describe('AttendanceCaptureService', () => {
     expect(sessionService.createOrGetOccurrenceSession).not.toHaveBeenCalled();
   });
 
-  it('replaces the camera count for the automatically resolved session', async () => {
+  it('replaces the barcode count for the automatically resolved session', async () => {
     const session = createAttendanceSession({ eventID: occurrence.eventID });
     const attendance = createSessionAttendance({
       UserID: null,
       guestCount: 21,
-      captureMethod: 'CAMERA',
+      captureMethod: 'BARCODE',
     });
     sessionService.createOrGetOccurrenceSession.mockResolvedValue(session);
     sessionService.setGuestCount.mockResolvedValue(attendance);
 
     await expect(
-      service.recordCameraAttendance(operator, { guestCount: 21 }),
+      service.recordBarcodeAttendance(operator, { guestCount: 21 }),
     ).resolves.toEqual(attendance);
+  });
+
+  it('lists the current operator occurrence and clears its preference', async () => {
+    mockDbResult(mockDb.select as jest.Mock, []);
+    const date = new Intl.DateTimeFormat('en-CA', {
+      timeZone: process.env.ATTENDANCE_TIME_ZONE ?? 'Africa/Johannesburg',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
+    const slots = await service.getOperatorSlots(operator, date, mockDb);
+    expect(slots.slotList).toHaveLength(1);
+    expect(slots.currentSlot?.eventID).toBe(occurrence.eventID);
+    expect(slots.currentSlot?.attendanceCount).toBe(0);
+    await service.clearPreferredEvent(operator, mockDb);
+    expect(preferenceService.clearPreference).toHaveBeenCalledWith(
+      operator.userId,
+      operator.uniId,
+      mockDb,
+    );
   });
 
   it('returns AMBIGUOUS_EVENT when two occurrences are available without a preference', async () => {

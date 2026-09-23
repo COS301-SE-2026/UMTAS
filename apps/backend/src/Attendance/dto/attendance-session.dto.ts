@@ -63,9 +63,9 @@ export class AttendanceSessionFiltersDto {
   eventID?: string;
 }
 
-export class RecordCameraAttendanceDto {
+export class RecordBarcodeAttendanceDto {
   @ApiProperty({
-    description: 'Current anonymous headcount observed by the camera',
+    description: 'Current guest headcount observed by the scanner',
     minimum: 0,
     example: 42,
   })
@@ -164,11 +164,11 @@ export class SetGuestCountDto {
 
   @ApiProperty({
     description: 'Source of the replacement count',
-    enum: ['CAMERA', 'MANUAL'],
-    example: 'CAMERA',
+    enum: ['BARCODE', 'MANUAL'],
+    example: 'BARCODE',
   })
-  @IsIn(['CAMERA', 'MANUAL'])
-  captureMethod!: 'CAMERA' | 'MANUAL';
+  @IsIn(['BARCODE', 'MANUAL'])
+  captureMethod!: 'BARCODE' | 'MANUAL';
 }
 
 export class AttendanceSessionResponseDto {

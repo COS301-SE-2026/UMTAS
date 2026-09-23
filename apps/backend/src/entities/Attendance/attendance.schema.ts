@@ -14,13 +14,12 @@ import { Event } from '../Events';
 
 export const SessionAttendanceCaptureMethod = pgEnum(
   'SessionAttendanceCaptureMethod',
-  ['NFC', 'BARCODE', 'CAMERA', 'MANUAL'],
+  ['NFC', 'BARCODE', 'MANUAL'],
 );
 
 export enum SessionAttendanceCaptureMethodEnum {
   NFC = 'NFC',
   BARCODE = 'BARCODE',
-  CAMERA = 'CAMERA',
   MANUAL = 'MANUAL',
 }
 
@@ -83,7 +82,7 @@ export const SessionAttendance = pgTable(
       .on(table.SessionID, table.UserID)
       .where(sql`${table.UserID} IS NOT NULL`),
     uniqueIndex('session_attendance_session_aggregate_unique')
-      .on(table.SessionID)
+      .on(table.SessionID, table.captureMethod)
       .where(sql`${table.UserID} IS NULL`),
     index('session_attendance_user_idx').on(table.UserID),
     index('session_attendance_session_idx').on(table.SessionID),
