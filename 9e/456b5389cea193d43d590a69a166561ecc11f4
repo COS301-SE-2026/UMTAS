@@ -1,0 +1,16 @@
+apps/frontend/src/app/VisionModel/setup/page.tsx
+  h_2d4b3dca70a3d8 302
+apps/frontend/src/types/Nav.ts
+  h_2d4b3dca70a3d8 200,307-318
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9e456b5389cea193d43d590a69a166561ecc11f4",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
