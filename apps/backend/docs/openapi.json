@@ -5706,59 +5706,6 @@
         "description": "Record identified or guest attendance from an NFC sticker. This Attendance operation is part of the versioned UMTAS HTTP contract."
       }
     },
-    "/api/attendance/records/barcode": {
-      "post": {
-        "operationId": "recordBarcodeAttendance",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecordBarcodeAttendanceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "HTTP 201 response.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AttendanceCaptureResultDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
-          "409": {
-            "$ref": "#/components/responses/ConflictError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          }
-        },
-        "summary": "Record the user resolved from a barcode in the current slot",
-        "tags": [
-          "Attendance"
-        ],
-        "description": "Record the user resolved from a barcode in the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.",
-        "security": [
-          {
-            "cookie": []
-          }
-        ]
-      }
-    },
     "/api/attendance/records/camera": {
       "put": {
         "operationId": "recordCameraAttendance",
@@ -6073,71 +6020,6 @@
           "Attendance"
         ],
         "description": "Delete an attendance session and its records. This Attendance operation is part of the versioned UMTAS HTTP contract.",
-        "security": [
-          {
-            "cookie": []
-          }
-        ]
-      }
-    },
-    "/api/attendance/sessions/{sessionId}/records": {
-      "post": {
-        "operationId": "recordIdentifiedAttendance",
-        "parameters": [
-          {
-            "name": "sessionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecordIdentifiedAttendanceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "HTTP 201 response.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AttendanceCaptureResultDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "409": {
-            "$ref": "#/components/responses/ConflictError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          }
-        },
-        "summary": "Record one identified attendee",
-        "tags": [
-          "Attendance"
-        ],
-        "description": "Record one identified attendee. This Attendance operation is part of the versioned UMTAS HTTP contract.",
         "security": [
           {
             "cookie": []
@@ -13092,18 +12974,24 @@
           "message"
         ]
       },
-      "RecordBarcodeAttendanceDto": {
+      "RecordCameraAttendanceDto": {
         "type": "object",
         "properties": {
-          "UserID": {
+          "guestCount": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Current anonymous headcount observed by the camera",
+            "example": 42
+          },
+          "eventID": {
             "type": "string",
             "format": "uuid",
-            "description": "University user resolved from the scanned barcode",
-            "example": "00000000-0000-4000-8000-000000000001"
+            "description": "Event to record attendance against when selecting a slot",
+            "example": "00000000-0000-4000-8000-000000000000"
           }
         },
         "required": [
-          "UserID"
+          "guestCount"
         ]
       },
       "SessionAttendanceResponseDto": {
@@ -13160,46 +13048,6 @@
           "captureMethod",
           "recordedAt",
           "updatedAt"
-        ]
-      },
-      "AttendanceCaptureResultDto": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "description": "Whether a new identified record was inserted",
-            "enum": [
-              "RECORDED",
-              "ALREADY_RECORDED"
-            ]
-          },
-          "attendance": {
-            "$ref": "#/components/schemas/SessionAttendanceResponseDto"
-          }
-        },
-        "required": [
-          "status",
-          "attendance"
-        ]
-      },
-      "RecordCameraAttendanceDto": {
-        "type": "object",
-        "properties": {
-          "guestCount": {
-            "minimum": 0,
-            "type": "number",
-            "description": "Current anonymous headcount observed by the camera",
-            "example": 42
-          },
-          "eventID": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Event to record attendance against when selecting a slot",
-            "example": "00000000-0000-4000-8000-000000000000"
-          }
-        },
-        "required": [
-          "guestCount"
         ]
       },
       "CreateAttendanceSessionDto": {
@@ -13340,30 +13188,6 @@
         },
         "required": [
           "success"
-        ]
-      },
-      "RecordIdentifiedAttendanceDto": {
-        "type": "object",
-        "properties": {
-          "UserID": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Existing university user to record",
-            "example": "00000000-0000-4000-8000-000000000001"
-          },
-          "captureMethod": {
-            "type": "string",
-            "enum": [
-              "BARCODE",
-              "MANUAL"
-            ],
-            "description": "How the attendee was identified",
-            "example": "BARCODE"
-          }
-        },
-        "required": [
-          "UserID",
-          "captureMethod"
         ]
       },
       "SetGuestCountDto": {
