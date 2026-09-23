@@ -60,6 +60,9 @@ jobs:
       - name: Run Linter
         run: pnpm run lint
 
+      - name: Build WASM package
+        run: wasm-pack build apps/frontend/wasm-engine --target web --release
+
       - name: Run Build
         run: pnpm run build
 
