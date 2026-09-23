@@ -299,7 +299,7 @@ export default function VisionModelSetupPage() {
           )}
         </CardContent>
 
-        <CardFooter className="flex justify-end">
+        <CardFooter className="flex justify-center">
           {status === "ready" ? (
             <Button onClick={() => router.push("/VisionModel")}>
               Continue

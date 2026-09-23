@@ -197,17 +197,7 @@ export const navigationItems: NavigationItem[] = [
     showInNavbar: true,
     showInCommandPalette: true,
   },
-  {
-    id: "brand-style",
-    label: "Brand Style",
-    href: "/brand-style",
-    section: "admin",
-    icon: "SwatchIcon",
-    tourContent: "View the application's brand and design system.",
-    keywords: ["brand", "style", "design", "theme"],
-    showInNavbar: true,
-    showInCommandPalette: true,
-  },
+
   {
     id: "attendance",
     label: "Attendance",
@@ -313,6 +303,18 @@ export const navigationItems: NavigationItem[] = [
     tourContent: "Reset your account password.",
     keywords: ["reset password", "password"],
     showInNavbar: false,
+    showInCommandPalette: true,
+  },
+
+  {
+    id: "brand-style",
+    label: "Brand Style",
+    href: "/brand-style",
+    section: "admin",
+    icon: "SwatchIcon",
+    tourContent: "View the application's brand and design system.",
+    keywords: ["brand", "style", "design", "theme"],
+    showInNavbar: true,
     showInCommandPalette: true,
   },
 ];
