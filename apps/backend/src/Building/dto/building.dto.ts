@@ -31,6 +31,7 @@ export class LatLngDto {
   @ApiProperty({
     example: -25.7545,
     description: 'Latitude in decimal degrees',
+    type: Number,
   })
   @IsLatitude()
   lat!: number;
@@ -38,6 +39,7 @@ export class LatLngDto {
   @ApiProperty({
     example: 28.2314,
     description: 'Longitude in decimal degrees',
+    type: Number,
   })
   @IsLongitude()
   lng!: number;

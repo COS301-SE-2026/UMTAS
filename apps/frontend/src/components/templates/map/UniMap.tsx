@@ -46,6 +46,10 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 import { BuildingSheet } from "@/components/organisms/map/BuildingSheet";
+import {
+  StudentRouteAlerts,
+  StudentRouteLines,
+} from "@/components/organisms/map/StudentRoutes";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -100,6 +104,11 @@ export function UniMap() {
   const [toHour, setToHour] = useState(15);
   const [metricMode, setMetricMode] = useState<"projected" | "worstCase">(
     "projected",
+  );
+
+  //alternate route stuff
+  const [selectedIndex, setSelectedIndex] = useState<Record<string, number>>(
+    {},
   );
 
   //this needs to be in a very specific format. Looks super complicated, but the backend cries when I don't send the request in this format
@@ -265,6 +274,15 @@ export function UniMap() {
                   {activeRoute.toEventName}
                 </span>
               )}
+
+              <div className="ml-auto flex items-center justify-end">
+                <StudentRouteAlerts
+                  date={selectedDate}
+                  time={selectedTime}
+                  selectedIndex={selectedIndex}
+                  setSelectedIndex={setSelectedIndex}
+                />
+              </div>
             </>
           )}
 
@@ -327,6 +345,14 @@ export function UniMap() {
               />
             )}
 
+            {mapMode === "route" && (
+              <StudentRouteLines
+                date={selectedDate}
+                time={selectedTime}
+                selectedIndex={selectedIndex}
+              />
+            )}
+
             {buildings.map((building) => (
               <div key={building.BuildingID}>
                 {building.location && (
@@ -369,7 +395,7 @@ export function UniMap() {
                 );
               })()}
 
-            {activeRoute?.status === "MOVING" && activeRoute.route && (
+            {/* {activeRoute?.status === "MOVING" && activeRoute.route && (
               <RouteLine
                 path={
                   activeRoute.route.pathCoordinates as unknown as {
@@ -379,7 +405,7 @@ export function UniMap() {
                 }
                 colour={activeRoute.route.displayColour}
               />
-            )}
+            )} */}
           </MapScreen>
         </div>
 

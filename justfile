@@ -1,6 +1,12 @@
 default:
     @just --list
 
+#dev for aidan ;)
+devClean:
+    just dockerClean
+    just sync
+    just dev
+
 # combine dev into easy to use profile
 dev:
     just dev-infra

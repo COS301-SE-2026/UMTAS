@@ -6,95 +6,257 @@ export interface UpHatfieldBuildingSeed {
 
 export const UP_HATFIELD_BUILDINGS: readonly UpHatfieldBuildingSeed[] = [
   {
-    name: 'Thuto Building',
-    latitude: -25.752932877052245,
-    longitude: 28.23145960192486,
+    //-25.75290645778599, 28.231380554103286
+    name: 'Thuto ',
+    latitude: -25.75290645778599,
+    longitude: 28.231380554103286,
   },
   {
-    name: 'IT Building',
-    latitude: -25.755334709611287,
-    longitude: 28.232579768596462,
+    //-25.755107505450813, 28.231995269015147
+    name: 'Economic and Management Sciences (EMS) ',
+    latitude: -25.755107505450813,
+    longitude: 28.231995269015147,
   },
   {
-    name: 'Centenary/Eeufees Building',
-    latitude: -25.75382056792293,
-    longitude: 28.233478481562628,
+    //-25.755547625735343, 28.231236002376423
+    name: 'Human Sciences',
+    latitude: -25.755547625735343,
+    longitude: 28.231236002376423,
   },
   {
-    name: 'Engineering 1 Building',
-    latitude: -25.752032648778318,
-    longitude: 28.22904682574297,
+    //-25.756657349235898, 28.233236903007278
+    name: 'Drama ',
+    latitude: -25.756657349235898,
+    longitude: 28.233236903007278,
   },
   {
-    name: 'Chancellors Building',
-    latitude: -25.754243030429393,
-    longitude: 28.23051010413832,
+    //-25.755669313403676, 28.23260122884689
+    name: 'IT ',
+    latitude: -25.755669313403676,
+    longitude: 28.23260122884689,
   },
   {
+    //-25.753946399782546, 28.23297137395245
+    name: 'Centenary ',
+    latitude: -25.753946399782546,
+    longitude: 28.23297137395245,
+  },
+  {
+    //-25.753116052466588, 28.228555471126686
+    name: 'Engineering 1 ',
+    latitude: -25.753116052466588,
+    longitude: 28.228555471126686,
+  },
+  {
+    //-25.753451847853626, 28.228123635483065
+    name: 'Engineering 2 ',
+    latitude: -25.753451847853626,
+    longitude: 28.228123635483065,
+  },
+  {
+    //-25.75443723513201, 28.228239231171823
+    name: 'Engineering 3 ',
+    latitude: -25.75443723513201,
+    longitude: 28.228239231171823,
+  },
+  {
+    //-25.75506601567293, 28.22955024841498
+    name: 'Theology ',
+    latitude: -25.75506601567293,
+    longitude: 28.22955024841498,
+  },
+  {
+    //-25.75427044226286, 28.230482070075503
+    name: 'Chancellors ',
+    latitude: -25.75427044226286,
+    longitude: 28.230482070075503,
+  },
+  {
+    //-25.755267224739498, 28.230443856569398
     name: 'Merensky Library',
-    latitude: -25.755122709513454,
-    longitude: 28.23046714644736,
+    latitude: -25.755267224739498,
+    longitude: 28.230443856569398,
   },
   {
-    name: 'Humanities Building',
-    latitude: -25.75535702140905,
-    longitude: 28.231503793202357,
-  },
-  { name: 'Aula', latitude: -25.754344, longitude: 28.229694 },
-  {
-    name: 'Natural Sciences 1 Building',
-    latitude: -25.754756,
-    longitude: 28.232087,
-  },
-  { name: 'Chemistry Building', latitude: -25.754314, longitude: 28.232989 },
-  {
-    name: 'Agricultural Sciences Building',
-    latitude: -25.756267,
-    longitude: 28.229734,
+    //-25.755359886700475, 28.23079806638894
+    name: 'Humanities ',
+    latitude: -25.755359886700475,
+    longitude: 28.23079806638894,
   },
   {
-    name: 'Botany and Zoology Building',
-    latitude: -25.757031,
-    longitude: 28.231225,
+    //-25.754009662455104, 28.228784508526793
+    name: 'Aula',
+    latitude: -25.754009662455104,
+    longitude: 28.228784508526793,
   },
-  { name: 'Admin Building', latitude: -25.75358, longitude: 28.229968 },
-  { name: 'Musaion', latitude: -25.754064, longitude: 28.23028 },
-  { name: 'Old Merensky Building', latitude: -25.75565, longitude: 28.230175 },
-  { name: 'Old Arts Building', latitude: -25.75417, longitude: 28.23028 },
-  { name: 'Amphitheatre', latitude: -25.7542, longitude: 28.2299 },
-  { name: 'Rautenbach Hall', latitude: -25.7543, longitude: 28.22965 },
-  { name: 'Engineering 2 Building', latitude: -25.7516, longitude: 28.2293 },
-  { name: 'Engineering 3 Building', latitude: -25.7512, longitude: 28.22945 },
-  { name: 'Mathematics Building', latitude: -25.7544, longitude: 28.2318 },
-  { name: 'Geography Building', latitude: -25.7547, longitude: 28.2323 },
   {
-    name: 'Natural Sciences 2 Building',
-    latitude: -25.7545,
-    longitude: 28.2325,
+    //-25.75301286941638, 28.230063191249336
+    name: 'Natural Sciences 1',
+    latitude: -25.75301286941638,
+    longitude: 28.230063191249336,
   },
-  { name: 'Zoology Building', latitude: -25.7574, longitude: 28.2314 },
-  { name: 'Old Chemistry Building', latitude: -25.7547, longitude: 28.2326 },
-  { name: 'Law Building', latitude: -25.7533, longitude: 28.2328 },
   {
-    name: 'Economic and Management Sciences (EMS) Building',
-    latitude: -25.7529,
-    longitude: 28.233,
+    //-25.752935643038853, 28.22898619445874
+    name: 'Natural Sciences 2',
+    latitude: -25.752935643038853,
+    longitude: 28.22898619445874,
   },
-  { name: 'Theology Building', latitude: -25.7525, longitude: 28.2307 },
-  { name: 'Drama Building', latitude: -25.7544, longitude: 28.2301 },
-  { name: 'Visual Arts Building', latitude: -25.7546, longitude: 28.2299 },
-  { name: 'Music Building', latitude: -25.754, longitude: 28.23 },
-  { name: 'Javett-UP Art Centre', latitude: -25.7533, longitude: 28.2299 },
-  { name: 'Conference Centre', latitude: -25.7529, longitude: 28.2294 },
-  { name: 'Graduate Centre', latitude: -25.753, longitude: 28.2296 },
-  { name: 'Student Centre Building', latitude: -25.7536, longitude: 28.2315 },
-  { name: 'Sci-Enza Centre', latitude: -25.756, longitude: 28.23 },
   {
-    name: 'Building Sciences Building',
-    latitude: -25.7558,
-    longitude: 28.2296,
+    //-25.753181005223713, 28.2309812240187
+    name: 'Chemistry ',
+    latitude: -25.753181005223713,
+    longitude: 28.2309812240187,
   },
-  { name: 'Mineral Sciences Building', latitude: -25.7564, longitude: 28.2299 },
-  { name: 'Van der Graaf Accelerator', latitude: -25.7566, longitude: 28.2301 },
-  { name: 'CEFIM Building', latitude: -25.7532, longitude: 28.2301 },
+  {
+    //-25.75448945646919, 28.23088907523821
+    name: 'Old Chemistry ',
+    latitude: -25.75448945646919,
+    longitude: 28.23088907523821,
+  },
+  {
+    //-25.7563263302631, 28.23481141849449
+    name: 'Natural & Agricultural Sciences',
+    latitude: -25.7563263302631,
+    longitude: 28.23481141849449,
+  },
+  {
+    //-25.75511604223969, 28.23569118306837
+    name: 'Plant Science Complex',
+    latitude: -25.75511604223969,
+    longitude: 28.23569118306837,
+  },
+  {
+    //-25.753915015801823, 28.230692967319428
+    name: 'Zoology',
+    latitude: -25.753915015801823,
+    longitude: 28.230692967319428,
+  },
+  {
+    //-25.754308441088952, 28.23435475854601
+    name: 'Law',
+    latitude: -25.754308441088952,
+    longitude: 28.23435475854601,
+  },
+  {
+    //-25.751678900649967, 28.231415533747082
+    name: 'Sci-Enza',
+    latitude: -25.751678900649967,
+    longitude: 28.231415533747082,
+  },
+  {
+    //-25.75124009255149, 28.23142790687472
+    name: 'AIM IT Labs',
+    latitude: -25.75124009255149,
+    longitude: 28.23142790687472,
+  },
+  {
+    //-25.75192282186461, 28.229836482699124
+    name: 'Mathematics',
+    latitude: -25.75192282186461,
+    longitude: 28.229836482699124,
+  },
+  {
+    //-25.751629135974596, 28.22962274373978
+    name: 'Botnay',
+    latitude: -25.751629135974596,
+    longitude: 28.22962274373978,
+  },
+  {
+    //-25.75219840230161, 28.228526048461386
+    name: 'A E Du Toit Auditorium',
+    latitude: -25.75219840230161,
+    longitude: 28.228526048461386,
+  },
+  {
+    //-25.753019776977045, 28.228322200597887
+    name: 'Mining Science',
+    latitude: -25.753019776977045,
+    longitude: 28.228322200597887,
+  },
+  {
+    //-25.754534480426006, 28.229026500576854
+    name: 'Amphitheater',
+    latitude: -25.754534480426006,
+    longitude: 28.229026500576854,
+  },
+  {
+    //-25.755938031299937, 28.229233155161097
+    name: 'Boukunde',
+    latitude: -25.755938031299937,
+    longitude: 28.229233155161097,
+  },
+  {
+    //-25.755763468558136, 28.22801021769822
+    name: 'Visual Arts',
+    latitude: -25.755763468558136,
+    longitude: 28.22801021769822,
+  },
+
+  ///Auxiliry
+  {
+    //-25.753758042111574, 28.228596136091777
+    name: 'Steers',
+    latitude: -25.753758042111574,
+    longitude: 28.228596136091777,
+  },
+  {
+    //-25.754050163003654, 28.229167242895812
+    name: 'Artisan Coffee Bar',
+    latitude: -25.754050163003654,
+    longitude: 28.229167242895812,
+  },
+  {
+    //-25.754310680561396, 28.229260424021835
+    name: 'Club Hall',
+    latitude: -25.754310680561396,
+    longitude: 28.229260424021835,
+  },
+  {
+    //-25.753181302526524, 28.228530713901645
+    name: 'Haloa Coffee',
+    latitude: -25.753181302526524,
+    longitude: 28.228530713901645,
+  },
+  {
+    //-25.75551108227713, 28.234388602785927
+    name: 'Adlers Restaurant',
+    latitude: -25.75551108227713,
+    longitude: 28.234388602785927,
+  },
+  {
+    //-25.755784686567317, 28.234612478350943
+    name: 'Tenz Express',
+    latitude: -25.755784686567317,
+    longitude: 28.234612478350943,
+  },
+  {
+    //-25.755520391399358, 28.23420630789477
+    name: 'Vida E Cafe',
+    latitude: -25.755520391399358,
+    longitude: 28.23420630789477,
+  },
+  {
+    //-25.75438305860872, 28.231787424134634
+    name: 'Student Center',
+    latitude: -25.75438305860872,
+    longitude: 28.231787424134634,
+  },
+  {
+    //-25.754214031824286, 28.231824318941367
+    name: 'Piazza',
+    latitude: -25.754214031824286,
+    longitude: 28.231824318941367,
+  },
+  {
+    //-25.755847593782477, 28.23298080948818
+    name: 'Cozy Coffee',
+    latitude: -25.755847593782477,
+    longitude: 28.23298080948818,
+  },
+  {
+    //-25.75651493425819, 28.228410466348375
+    name: 'Javett Museum',
+    latitude: -25.75651493425819,
+    longitude: 28.228410466348375,
+  },
 ] as const;

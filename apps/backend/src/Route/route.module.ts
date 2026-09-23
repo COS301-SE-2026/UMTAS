@@ -7,6 +7,8 @@ import { StudentRoutingService } from './student-routing.service';
 import { OrsService } from './ors.service';
 import { RouteHeatmapService } from './route.heatmap.service';
 import { RouteDiversionService } from './route.diversion.service';
+import { RouteHelperService } from './route.helper.service';
+import { RouteStopService } from './route.stop.service';
 
 @Module({
   imports: [EventModule],
@@ -17,6 +19,8 @@ import { RouteDiversionService } from './route.diversion.service';
     OrsService,
     RouteHeatmapService,
     RouteDiversionService,
+    RouteHelperService,
+    RouteStopService,
   ],
   providers: [
     RouteService,
@@ -24,6 +28,8 @@ import { RouteDiversionService } from './route.diversion.service';
     OrsService,
     RouteHeatmapService,
     RouteDiversionService,
+    RouteHelperService,
+    RouteStopService,
   ],
 })
 export class RouteModule {}

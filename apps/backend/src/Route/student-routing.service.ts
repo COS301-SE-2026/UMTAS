@@ -7,19 +7,19 @@ import { and, asc, eq } from 'drizzle-orm';
 
 import { DatabaseService, type AppDatabase } from 'src/db/database.service';
 import { Event, EventAttendance, EventVenue, Venue } from 'src/entities';
-import { RecurringEventService } from 'src/Events/recurring-event.service';
 import type { EventCriteria } from 'src/Events/dto/event.types';
 
-import { RouteService } from './route.service';
 import {
+  AlternativeRouteDto,
   AlternativeRoutesQueryDto,
   AlternativeRoutesResponseDto,
-  AlternativeRouteDto,
   RouteEventContextDto,
   StudentRoutesQueryDto,
   StudentRoutesResponseDto,
   StudentRouteTransitionDto,
 } from './dto/';
+import { RouteHelperService } from './route.helper.service';
+import { RouteService } from './route.service';
 
 export interface StudentEventRow {
   eventId: string;
@@ -43,7 +43,7 @@ export class StudentRoutingService {
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly routeService: RouteService,
-    private readonly recurringEventService: RecurringEventService,
+    private readonly routeHelperService: RouteHelperService,
   ) {}
 
   async getRoutesForDate(
@@ -55,7 +55,7 @@ export class StudentRoutingService {
     const db = tx ?? this.databaseService.db;
 
     //Get events for the date
-    const events = await this.getStudentEventsForDate(
+    const events = await this.routeHelperService.getStudentEventsForDate(
       userId,
       uniId,
       query.date,
@@ -64,8 +64,8 @@ export class StudentRoutingService {
 
     //map tevents to route context
     const eventContexts = events
-      .map((event) => this.toEventContext(event, query.date))
-      .sort(this.compareEventContexts);
+      .map((event) => this.routeHelperService.toEventContext(event, query.date))
+      .sort(this.routeHelperService.compareEventContexts);
 
     //Build routes
     const routes: StudentRouteTransitionDto[] = [];
@@ -120,8 +120,11 @@ export class StudentRoutingService {
       ),
     ]);
 
-    const originContext = this.toEventContext(originEvent, query.date);
-    const destinationContext = this.toEventContext(
+    const originContext = this.routeHelperService.toEventContext(
+      originEvent,
+      query.date,
+    );
+    const destinationContext = this.routeHelperService.toEventContext(
       destinationEvent,
       query.date,
     );
@@ -219,57 +222,6 @@ export class StudentRoutingService {
   } //END_buildTransistion
 
   /**
-   * Fetches all student events for a specific date.
-   *
-   * @param userId - Student's user ID
-   * @param uniId - University to scope the query to
-   * @param date - Date the events occur on
-   * @param tx - transaction
-   * @returns Deduplicated event rows occurring on the date.
-   */
-  private async getStudentEventsForDate(
-    userId: string,
-    uniId: string,
-    date: string,
-    tx: AppDatabase,
-  ): Promise<StudentEventRow[]> {
-    const rows = await tx
-      .select({
-        eventId: Event.eventID,
-        eventName: Event.eventName,
-        eventCriteria: Event.eventCriteria,
-        isRecurring: Event.isRecurring,
-        venueId: Venue.VenueID,
-        buildingId: Venue.BuildingID,
-      })
-      .from(EventAttendance)
-      .innerJoin(Event, eq(Event.eventID, EventAttendance.eventID))
-      .leftJoin(EventVenue, eq(EventVenue.EventID, Event.eventID))
-      .leftJoin(Venue, eq(Venue.VenueID, EventVenue.VenueID))
-      .where(
-        and(
-          eq(EventAttendance.UserID, userId),
-          eq(EventAttendance.eventDate, date),
-          eq(EventAttendance.state, 'ATTENDING'),
-          eq(Venue.UniversityID, uniId),
-        ),
-      )
-      .orderBy(asc(EventVenue.VenueID));
-
-    return this.selectFirstVenuePerEvent(
-      rows.map((row) => ({
-        eventId: row.eventId,
-        eventName: row.eventName,
-        eventCriteria: row.eventCriteria,
-        isRecurring: row.isRecurring,
-        venueId: row.venueId,
-        buildingId: row.buildingId,
-      })),
-      date,
-    );
-  } //END_getStudentEventsForDate
-
-  /**
    * Fetches a single student event for a specific date.
    *
    * @param userId - Student's user ID
@@ -311,7 +263,7 @@ export class StudentRoutingService {
       )
       .orderBy(asc(EventVenue.VenueID));
 
-    const [event] = this.selectFirstVenuePerEvent(
+    const [event] = this.routeHelperService.selectFirstVenuePerEvent(
       events.map((row) => ({
         eventId: row.eventId,
         eventName: row.eventName,
@@ -331,83 +283,4 @@ export class StudentRoutingService {
 
     return event;
   } //END_getStudentEventForDate
-
-  /**
-   * Filters events to those occurring on the requested date, keeping one per event ID.
-   *
-   * @param events - Student event rows to filter
-   * @param requestedDate - Date to check occurrence against
-   * @returns Events that occur on the date, deduplicated by event ID
-   */
-  private selectFirstVenuePerEvent(
-    events: StudentEventRow[],
-    requestedDate: string,
-  ): StudentEventRow[] {
-    const eventsById = new Map<string, StudentEventRow>();
-
-    for (const event of events) {
-      const occursOnDate = this.recurringEventService.occursOnDate(
-        {
-          eventId: event.eventId,
-          eventCriteria: event.eventCriteria,
-          isRecurring: event.isRecurring,
-        },
-        requestedDate,
-      );
-
-      if (!occursOnDate) {
-        continue;
-      }
-
-      if (!eventsById.has(event.eventId)) {
-        eventsById.set(event.eventId, event);
-      }
-    } //END_event
-
-    return [...eventsById.values()];
-  } //END_selectFirstVenuePerEvent
-
-  /**
-   * Maps a student event row to a route event context
-   *
-   * @param event - Student event row to map
-   * @param occurrenceDate - Date of the occurrence to attach
-   * @returns The route event context
-   */
-  private toEventContext(
-    event: StudentEventRow,
-    occurrenceDate: string,
-  ): RouteEventContextDto {
-    return {
-      eventId: event.eventId,
-      eventName: event.eventName,
-      occurrenceDate,
-      startTime: event.eventCriteria.startTime,
-      endTime: event.eventCriteria.endTime,
-      venueId: event.venueId,
-      buildingId: event.buildingId,
-    };
-  } //END_toEventContext
-
-  /**
-   * Compares two event contexts for sorting
-   *
-   * Orders by startTime, then by eventId.
-   *
-   * @param l - Left
-   * @param r - Right
-   * @returns Negative if l sorts first, positive if r sorts first, 0 if equal
-   */
-  private compareEventContexts(
-    l: RouteEventContextDto,
-    r: RouteEventContextDto,
-  ): number {
-    const startTimeComparison = l.startTime.localeCompare(r.startTime);
-
-    if (startTimeComparison !== 0) {
-      return startTimeComparison;
-    }
-
-    return l.eventId.localeCompare(r.eventId);
-  } //END_compareEventContexts
 } //END_StudentRoutingService
