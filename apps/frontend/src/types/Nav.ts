@@ -184,7 +184,19 @@ export const navigationItems: NavigationItem[] = [
     showInNavbar: true,
     showInCommandPalette: true,
   },
-
+  {
+    id: "VisionModel",
+    label: "Lecture Watch",
+    href: "/VisionModel",
+    section: "actions",
+    icon: "ChartBarIcon",
+    tourContent: "Gain lecture insights live",
+    keywords: ["statistics", "stats", "analytics", "insights"],
+    roles: ["LECTURER", "UNIVERSITY_ADMIN"],
+    requiresUniversity: true,
+    showInNavbar: true,
+    showInCommandPalette: true,
+  },
   {
     id: "brand-style",
     label: "Brand Style",
