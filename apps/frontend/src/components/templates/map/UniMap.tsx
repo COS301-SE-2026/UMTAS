@@ -275,12 +275,14 @@ export function UniMap() {
                 </span>
               )}
 
-              <StudentRouteAlerts
-                date={selectedDate}
-                time={selectedTime}
-                selectedIndex={selectedIndex}
-                setSelectedIndex={setSelectedIndex}
-              />
+              <div className="ml-auto flex items-center justify-end">
+                <StudentRouteAlerts
+                  date={selectedDate}
+                  time={selectedTime}
+                  selectedIndex={selectedIndex}
+                  setSelectedIndex={setSelectedIndex}
+                />
+              </div>
             </>
           )}
 

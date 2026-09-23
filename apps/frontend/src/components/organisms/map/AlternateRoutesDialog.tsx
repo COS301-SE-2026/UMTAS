@@ -75,7 +75,7 @@ function AlternativeOption({
     <Button
       type="button"
       variant="outline"
-      className="flex justify-between items-center w-full py-3 h-auto"
+      className="flex justify-between items-center w-full py-2 h-auto cursor-pointer"
       onClick={() => onSelect(routeIndex)}
     >
       <div className="text-left">
@@ -161,6 +161,7 @@ export function AlternateRouteDialog(props: AlternateRoutesDialogProps) {
             type="button"
             variant="ghost"
             onClick={() => props.onOpenChange(false)}
+            className="cursor-pointer"
           >
             Keep the main route
           </Button>
