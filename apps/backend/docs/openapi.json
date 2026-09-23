@@ -7587,6 +7587,81 @@
         ]
       }
     },
+    "/api/routes/stop-route": {
+      "get": {
+        "description": "Returns the route from the student's current event to a stop building and from the stop to the next event, based on the requested time or the largest gap.",
+        "operationId": "getRouteViaBuilding",
+        "parameters": [
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "description": "Date whose attended events should be used.",
+            "schema": {
+              "format": "date",
+              "example": "2026-09-21",
+              "type": "string"
+            }
+          },
+          {
+            "name": "buildingId",
+            "required": true,
+            "in": "query",
+            "description": "Building the student wants to visit before their next class.",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "time",
+            "required": false,
+            "in": "query",
+            "description": "Optional time in HH:mm. When omitted, the largest gap between scheduled events is selected.",
+            "schema": {
+              "example": "10:30",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stop route returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentStopRouteResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid stop route query parameters"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "No university selected or insufficient permissions"
+          },
+          "404": {
+            "description": "No attended events found for the date, or no route could be determined for the stop"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Get a stop-via route for a student on a date",
+        "tags": [
+          "Routes"
+        ]
+      }
+    },
     "/api/routes/student": {
       "get": {
         "description": "Returns the students attended events for the requested date and the routes between events.",
@@ -14588,8 +14663,8 @@
             "description": "Destination route UUID."
           },
           "toRouteIndex": {
-            "type": "number",
             "minimum": 0,
+            "type": "number",
             "example": 0,
             "description": "Destination route index."
           },
@@ -14667,6 +14742,86 @@
           "occurrenceDate",
           "startTime",
           "endTime"
+        ]
+      },
+      "StudentStopRouteLegDto": {
+        "type": "object",
+        "properties": {
+          "direction": {
+            "type": "string",
+            "enum": [
+              "TO_STOP",
+              "FROM_STOP"
+            ]
+          },
+          "originEvent": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RouteEventContextDto"
+              }
+            ]
+          },
+          "destinationEvent": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RouteEventContextDto"
+              }
+            ]
+          },
+          "route": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RouteDto"
+              }
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "direction"
+        ]
+      },
+      "StudentStopRouteResponseDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "buildingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "time": {
+            "type": "string",
+            "nullable": true,
+            "example": "10:30"
+          },
+          "selectedWindow": {
+            "type": "string",
+            "description": "The gap or event interval selected for the temporary stop."
+          },
+          "legs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StudentStopRouteLegDto"
+            }
+          }
+        },
+        "required": [
+          "date",
+          "buildingId",
+          "selectedWindow",
+          "legs"
         ]
       },
       "StudentRouteTransitionDto": {
