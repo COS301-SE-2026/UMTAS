@@ -1,3 +1,5 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
 import {
   CONGESTION_LABELS,
@@ -84,41 +86,43 @@ function AlternativeOption({
 }
 
 export function AlternateRouteDialog(props: AlternateRoutesDialogProps) {
-  <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-    <DialogContent>
-      <DialogHeader>Your usual route is busy</DialogHeader>
+  return (
+    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
+      <DialogContent>
+        <DialogHeader>Your usual route is busy</DialogHeader>
 
-      <p className="text-xs text-(--text-secondary)">
-        The main route is currently
-        <span className="font-semibold">
-          {CONGESTION_LABELS[props.currentCongestion]}
-        </span>
-        . Here are some other routes you can take instead.
-      </p>
+        <p className="text-xs text-(--text-secondary)">
+          The main route is currently
+          <span className="font-semibold">
+            {CONGESTION_LABELS[props.currentCongestion]}
+          </span>
+          . Here are some other routes you can take instead.
+        </p>
 
-      <div className="flex flex-col gap-2">
-        {ALTERNATE_ROUTE_INDEXES.map((alternateIndex) => (
-          <AlternativeOption
-            key={alternateIndex}
-            routeIndex={alternateIndex}
-            originEventId={props.originEventId}
-            destinationEventId={props.destinationEventId}
-            date={props.date}
-            onSelect={(routeIndex) => {
-              props.onSelect(routeIndex);
-              props.onOpenChange(false);
-            }}
-          />
-        ))}
+        <div className="flex flex-col gap-2">
+          {ALTERNATE_ROUTE_INDEXES.map((alternateIndex) => (
+            <AlternativeOption
+              key={alternateIndex}
+              routeIndex={alternateIndex}
+              originEventId={props.originEventId}
+              destinationEventId={props.destinationEventId}
+              date={props.date}
+              onSelect={(routeIndex) => {
+                props.onSelect(routeIndex);
+                props.onOpenChange(false);
+              }}
+            />
+          ))}
 
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => props.onOpenChange(false)}
-        >
-          Keep the main route
-        </Button>
-      </div>
-    </DialogContent>
-  </Dialog>;
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => props.onOpenChange(false)}
+          >
+            Keep the main route
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
