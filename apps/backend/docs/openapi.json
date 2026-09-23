@@ -7531,6 +7531,62 @@
         ]
       }
     },
+    "/api/routes/diversion": {
+      "put": {
+        "description": "University administrators can divert a proportion of traffic from one route to another.",
+        "operationId": "routeDiversion",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiversionRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Diversion successfully created or updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiversionRouteResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request. Diversion must be between 0 and 1 and either toRoute or toRouteIndex must be supplied."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "The source route, destination route, or requested alternative route could not be found."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Create or update a route diversion",
+        "tags": [
+          "Routes"
+        ]
+      }
+    },
     "/api/routes/student": {
       "get": {
         "description": "Returns the students attended events for the requested date and the routes between events.",
@@ -14516,6 +14572,56 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "DiversionRequestDto": {
+        "type": "object",
+        "properties": {
+          "fromRoute": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Origin route UUID"
+          },
+          "toRoute": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Destination route UUID."
+          },
+          "toRouteIndex": {
+            "type": "number",
+            "minimum": 0,
+            "example": 0,
+            "description": "Destination route index."
+          },
+          "diversion": {
+            "type": "number",
+            "example": 25,
+            "description": "Divert x amount of fromRoute -> toRoute"
+          }
+        },
+        "required": [
+          "fromRoute",
+          "diversion"
+        ]
+      },
+      "DiversionRouteResponseDto": {
+        "type": "object",
+        "properties": {
+          "fromRoute": {
+            "$ref": "#/components/schemas/RouteDto"
+          },
+          "toRoute": {
+            "$ref": "#/components/schemas/RouteDto"
+          },
+          "diversion": {
+            "type": "number",
+            "example": 25
+          }
+        },
+        "required": [
+          "fromRoute",
+          "toRoute",
+          "diversion"
         ]
       },
       "RouteEventContextDto": {
