@@ -60,6 +60,11 @@ jobs:
       - name: Run Linter
         run: pnpm run lint
 
+      - name: Install wasm-pack
+        run: |
+          curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
       - name: Build WASM package
         run: wasm-pack build apps/frontend/wasm-engine --target web --release
 
@@ -93,7 +98,6 @@ jobs:
         run: pnpm test:e2e
 
       - name: Upload Playwright report
-
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
