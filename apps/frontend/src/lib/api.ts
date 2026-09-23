@@ -5272,7 +5272,7 @@ export interface components {
        */
       routeIndex: number;
       /** @description List of latitude/longitude coordinates for the route path. */
-      pathCoordinates: Record<string, never>[][];
+      pathCoordinates: components["schemas"]["LatLngDto"][];
       /**
        * @description The route distance in metres.
        * @example 67
@@ -5405,7 +5405,7 @@ export interface components {
        * @example 0
        */
       routeIndex: number;
-      pathCoordinates: Record<string, never>[][];
+      pathCoordinates: components["schemas"]["LatLngDto"][];
       /**
        * @description The route distance in metres.
        * @example 820

@@ -14556,13 +14556,10 @@
           },
           "pathCoordinates": {
             "description": "List of latitude/longitude coordinates for the route path.",
+            "type": "array",
             "items": {
-              "type": "array",
-              "items": {
-                "type": "latLngDto"
-              }
-            },
-            "type": "array"
+              "$ref": "#/components/schemas/LatLngDto"
+            }
           },
           "distanceMetres": {
             "minimum": 1,
@@ -14895,13 +14892,10 @@
             "example": 0
           },
           "pathCoordinates": {
+            "type": "array",
             "items": {
-              "type": "array",
-              "items": {
-                "type": "latLngDto"
-              }
-            },
-            "type": "array"
+              "$ref": "#/components/schemas/LatLngDto"
+            }
           },
           "distanceMetres": {
             "minimum": 0,

@@ -218,7 +218,6 @@ export class AlternativeRoutesQueryDto {
 export class AlternativeRouteDto extends RouteVariantDto {
   @ApiProperty({
     type: [LatLngDto],
-    isArray: true,
   })
   @IsArray()
   @ValidateNested({ each: true })
