@@ -14,6 +14,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
+  DialogTitle,
 } from "@/components/atoms/baseShadcn/dialog";
 
 interface AlternateRoutesDialogProps {
@@ -24,9 +25,11 @@ interface AlternateRoutesDialogProps {
   currentCongestion: CongestionLevel;
   onOpenChange: (open: boolean) => void;
   onSelect: (routeIndex: number) => void;
+  mainDistance?: number;
 }
 
 interface AlternateOptionsProps {
+  open: boolean;
   routeIndex: number;
   originEventId: string;
   destinationEventId: string;
@@ -39,25 +42,27 @@ interface AlternateOptionsProps {
 const ALTERNATE_ROUTE_INDEXES = [1, 2];
 
 function AlternativeOption({
+  open,
   routeIndex,
   originEventId,
   destinationEventId,
   date,
   onSelect,
 }: AlternateOptionsProps) {
-  const { data, isLoading, isError } = useQuery(
-    getAlternateRoutesQ({
+  const { data, isPending, isError } = useQuery({
+    ...getAlternateRoutesQ({
       originEventId,
       destinationEventId,
       date,
       routeIndex,
     }),
-  );
+    enabled: open && Boolean(originEventId && destinationEventId && date),
+  });
 
-  if (isLoading) {
+  if (isPending) {
     return (
-      <Skeleton className="h-8 w-20">
-        <Loader />
+      <Skeleton className="h-12 w-full flex items-center justify-center">
+        <Loader className="h-4 w-4 animate-spin text-[var(--text-secondary)]" />
       </Skeleton>
     );
   }
@@ -69,40 +74,72 @@ function AlternativeOption({
   return (
     <Button
       type="button"
-      variant="default"
+      variant="outline"
+      className="flex justify-between items-center w-full py-3 h-auto"
       onClick={() => onSelect(routeIndex)}
     >
-      <div>
-        <p className="text-sm text-(--text-primary)">
+      <div className="text-left">
+        <p className="text-sm text-[var(--text-primary)]">
           Route Option {routeIndex + 1}
         </p>
-        <p className="text-sm text-(--text-secondary)">
+        <p className="text-sm text-[var(--text-secondary)]">
           {data.route.distanceMetres}m
         </p>
       </div>
-      <Badge variant="secondary">Not Measured</Badge>
+      <Badge variant="secondary">Alternative</Badge>
     </Button>
   );
 }
 
 export function AlternateRouteDialog(props: AlternateRoutesDialogProps) {
+  const query1 = useQuery({
+    ...getAlternateRoutesQ({
+      originEventId: props.originEventId,
+      destinationEventId: props.destinationEventId,
+      date: props.date,
+      routeIndex: 1,
+    }),
+    enabled:
+      props.open &&
+      Boolean(props.originEventId && props.destinationEventId && props.date),
+  });
+
+  const query2 = useQuery({
+    ...getAlternateRoutesQ({
+      originEventId: props.originEventId,
+      destinationEventId: props.destinationEventId,
+      date: props.date,
+      routeIndex: 2,
+    }),
+    enabled:
+      props.open &&
+      Boolean(props.originEventId && props.destinationEventId && props.date),
+  });
+
+  const isChecking = props.open && (query1.isFetching || query2.isFetching);
+  const hasAnyAlternative = Boolean(query1.data || query2.data);
+
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent>
-        <DialogHeader>Your usual route is busy</DialogHeader>
+      <DialogContent className="bg-(--bg-surface)">
+        <DialogHeader>
+          <DialogTitle>Your usual route is busy</DialogTitle>
+        </DialogHeader>
 
-        <p className="text-xs text-(--text-secondary)">
-          The main route is currently
+        <p className="text-xs text-[var(--text-secondary)]">
+          The main route {props.mainDistance ? `(${props.mainDistance}m)` : ""}{" "}
+          is currently{" "}
           <span className="font-semibold">
             {CONGESTION_LABELS[props.currentCongestion]}
           </span>
-          . Here are some other routes you can take instead.
+          .
         </p>
 
         <div className="flex flex-col gap-2">
           {ALTERNATE_ROUTE_INDEXES.map((alternateIndex) => (
             <AlternativeOption
               key={alternateIndex}
+              open={props.open}
               routeIndex={alternateIndex}
               originEventId={props.originEventId}
               destinationEventId={props.destinationEventId}
@@ -113,6 +150,12 @@ export function AlternateRouteDialog(props: AlternateRoutesDialogProps) {
               }}
             />
           ))}
+
+          {!isChecking && !hasAnyAlternative && (
+            <p className="text-xs text-[var(--text-secondary)] py-2 text-center">
+              No alternate walking paths were found between these buildings.
+            </p>
+          )}
 
           <Button
             type="button"
