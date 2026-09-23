@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { DatabaseService } from '../db/database.service';
 import { EventService } from '../Events/event.service';
@@ -223,19 +219,5 @@ describe('AttendanceSessionService', () => {
     expect(result.identifiedCount).toBe(1);
     expect(result.guestCount).toBe(4);
     expect(result.attendedCount).toBe(5);
-  });
-
-  it('rejects manual recording by an unrelated lecturer', async () => {
-    const session = createAttendanceSession();
-    mockTransaction(mockDb, {
-      select: [[session], [{ moduleID: moduleId }], []],
-    });
-
-    await expect(
-      service.recordIdentifiedAttendance(actor, session.SessionID, {
-        UserID: actor.userId,
-        captureMethod: 'MANUAL',
-      }),
-    ).rejects.toThrow(ForbiddenException);
   });
 });

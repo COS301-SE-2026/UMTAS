@@ -25,10 +25,8 @@ import { AttendanceSessionService } from './attendance-session.service';
 import {
   AttendanceRecordStatus,
   type AttendanceRecordResponseDto,
-  type RecordBarcodeAttendanceDto,
   type RecordCameraAttendanceDto,
   type RecordAttendanceDto,
-  type AttendanceCaptureResultDto,
   type SessionAttendanceResponseDto,
 } from './dto/attendance-session.dto';
 import type {
@@ -367,32 +365,6 @@ export class AttendanceCaptureService {
       sessionId: session.SessionID,
       recordedAt: result.attendance.recordedAt,
     };
-  }
-
-  async recordBarcodeAttendance(
-    actor: AttendanceActor,
-    dto: RecordBarcodeAttendanceDto,
-    tx?: AppDatabase,
-  ): Promise<AttendanceCaptureResultDto> {
-    if (!tx) {
-      return this.dbService.db.transaction((transaction: AppDatabase) =>
-        this.recordBarcodeAttendance(actor, dto, transaction),
-      );
-    }
-    const occurrence = await this.getAvailableOperatorOccurrence(actor, tx);
-    const session =
-      await this.attendanceSessionService.createOrGetOccurrenceSession(
-        actor,
-        occurrence.eventID,
-        occurrence,
-        tx,
-      );
-    return this.attendanceSessionService.recordIdentifiedAttendance(
-      actor,
-      session.SessionID,
-      { UserID: dto.UserID, captureMethod: 'BARCODE' },
-      tx,
-    );
   }
 
   async recordCameraAttendance(

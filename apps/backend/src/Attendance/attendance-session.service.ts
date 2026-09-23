@@ -30,7 +30,6 @@ import {
   type AttendanceSessionResponseDto,
   type CreateAttendanceSessionDto,
   type DeleteAttendanceSessionResponseDto,
-  type RecordIdentifiedAttendanceDto,
   type SessionAttendanceResponseDto,
   type SetGuestCountDto,
   type UpdateAttendanceSessionDto,
@@ -234,28 +233,6 @@ export class AttendanceSessionService {
       .values({ eventID, ...occurrence })
       .returning();
     return this.requireSession(session);
-  }
-
-  async recordIdentifiedAttendance(
-    actor: AttendanceActor,
-    sessionId: string,
-    dto: RecordIdentifiedAttendanceDto,
-    tx?: AppDatabase,
-  ): Promise<AttendanceCaptureResultDto> {
-    if (!tx) {
-      return this.dbService.db.transaction((transaction: AppDatabase) =>
-        this.recordIdentifiedAttendance(actor, sessionId, dto, transaction),
-      );
-    }
-    const session = await this.getLockedSession(sessionId, tx);
-    await this.assertOperatorForEvent(actor, session.eventID, tx);
-    await this.assertUserEnrolled(dto.UserID, session.eventID, tx);
-    return this.insertIdentifiedAttendance(
-      sessionId,
-      dto.UserID,
-      dto.captureMethod,
-      tx,
-    );
   }
 
   async recordAuthenticatedAttendance(

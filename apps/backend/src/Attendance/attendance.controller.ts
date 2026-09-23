@@ -30,15 +30,12 @@ import { AttendanceSessionService } from './attendance-session.service';
 import { NfcAttendanceService } from './nfc-attendance.service';
 import { AttendanceCaptureService } from './attendance-capture.service';
 import {
-  AttendanceCaptureResultDto,
   AttendanceSessionFiltersDto,
   AttendanceSessionListResponseDto,
   AttendanceRecordResponseDto,
   AttendanceSessionResponseDto,
   CreateAttendanceSessionDto,
   DeleteAttendanceSessionResponseDto,
-  RecordIdentifiedAttendanceDto,
-  RecordBarcodeAttendanceDto,
   RecordCameraAttendanceDto,
   RecordAttendanceDto,
   SessionAttendanceResponseDto,
@@ -185,22 +182,6 @@ export class AttendanceController {
     );
   }
 
-  @Post('records/barcode')
-  @Roles('lecturer', 'uni_admin')
-  @ApiOperation({
-    summary: 'Record the user resolved from a barcode in the current slot',
-    operationId: 'recordBarcodeAttendance',
-  })
-  recordBarcodeAttendance(
-    @CurrentSession() session: SessionData,
-    @Body() dto: RecordBarcodeAttendanceDto,
-  ): Promise<AttendanceCaptureResultDto> {
-    return this.captureService.recordBarcodeAttendance(
-      this.actor(session),
-      dto,
-    );
-  }
-
   @Put('records/camera')
   @Roles('lecturer', 'uni_admin')
   @ApiOperation({
@@ -282,24 +263,6 @@ export class AttendanceController {
     @Param('sessionId', ParseUUIDPipe) sessionId: string,
   ): Promise<DeleteAttendanceSessionResponseDto> {
     return this.sessionService.deleteSession(this.actor(session), sessionId);
-  }
-
-  @Post('sessions/:sessionId/records')
-  @Roles('lecturer', 'uni_admin')
-  @ApiOperation({
-    summary: 'Record one identified attendee',
-    operationId: 'recordIdentifiedAttendance',
-  })
-  recordIdentifiedAttendance(
-    @CurrentSession() session: SessionData,
-    @Param('sessionId', ParseUUIDPipe) sessionId: string,
-    @Body() dto: RecordIdentifiedAttendanceDto,
-  ): Promise<AttendanceCaptureResultDto> {
-    return this.sessionService.recordIdentifiedAttendance(
-      this.actor(session),
-      sessionId,
-      dto,
-    );
   }
 
   @Put('sessions/:sessionId/attendance/count')

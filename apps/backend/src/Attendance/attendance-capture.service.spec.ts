@@ -20,7 +20,6 @@ describe('AttendanceCaptureService', () => {
     createOrGetOccurrenceSession: jest.fn(),
     incrementGuestAttendance: jest.fn(),
     recordAuthenticatedAttendance: jest.fn(),
-    recordIdentifiedAttendance: jest.fn(),
     setGuestCount: jest.fn(),
   };
   const nfcService = {
@@ -165,22 +164,6 @@ describe('AttendanceCaptureService', () => {
       ),
     ).rejects.toThrow(ForbiddenException);
     expect(sessionService.createOrGetOccurrenceSession).not.toHaveBeenCalled();
-  });
-
-  it('records a barcode against the automatically resolved session', async () => {
-    const session = createAttendanceSession({ eventID: occurrence.eventID });
-    const result = {
-      status: 'RECORDED',
-      attendance: createSessionAttendance({ captureMethod: 'BARCODE' }),
-    };
-    sessionService.createOrGetOccurrenceSession.mockResolvedValue(session);
-    sessionService.recordIdentifiedAttendance.mockResolvedValue(result);
-
-    await expect(
-      service.recordBarcodeAttendance(operator, {
-        UserID: '66666666-6666-4666-8666-666666666666',
-      }),
-    ).resolves.toEqual(result);
   });
 
   it('replaces the camera count for the automatically resolved session', async () => {
