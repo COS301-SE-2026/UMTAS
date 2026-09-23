@@ -203,6 +203,7 @@ export class AlternativeRoutesQueryDto {
     example: 1,
     minimum: 0,
     default: 0,
+    type: Number,
   })
   @IsOptional()
   @Type(() => Number)

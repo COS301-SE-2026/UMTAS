@@ -7762,11 +7762,7 @@
               "minimum": 0,
               "default": 0,
               "example": 1,
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Object"
-                }
-              ]
+              "type": "number"
             }
           }
         ],

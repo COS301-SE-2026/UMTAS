@@ -11092,7 +11092,7 @@ export interface operations {
         /** @description Calendar date on which both events occur. */
         date: string;
         /** @description Zero-based route index. Index 0 is the shortest/default route. */
-        routeIndex?: components["schemas"]["Object"];
+        routeIndex?: number;
       };
       header?: never;
       path?: never;
