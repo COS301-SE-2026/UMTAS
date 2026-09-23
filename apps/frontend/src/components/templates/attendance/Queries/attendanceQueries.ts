@@ -29,6 +29,8 @@ export class GetAttendanceSlots extends RequestBuilder<
 export function getAttendanceSlotsQ() {
   return queryOptions({
     queryKey: ["attendance-slots"] as const,
+    staleTime: 0,
+    refetchOnMount: "always",
 
     queryFn: async () => {
       return new GetAttendanceSlots().send({});

@@ -1726,26 +1726,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/attendance/records/barcode": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Record the user resolved from a barcode in the current slot
-     * @description Record the user resolved from a barcode in the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.
-     */
-    post: operations["recordBarcodeAttendance"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/api/attendance/records/camera": {
     parameters: {
       query?: never;
@@ -1816,26 +1796,6 @@ export interface paths {
      * @description Correct an attendance session. This Attendance operation is part of the versioned UMTAS HTTP contract.
      */
     patch: operations["updateAttendanceSession"];
-    trace?: never;
-  };
-  "/api/attendance/sessions/{sessionId}/records": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Record one identified attendee
-     * @description Record one identified attendee. This Attendance operation is part of the versioned UMTAS HTTP contract.
-     */
-    post: operations["recordIdentifiedAttendance"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
     trace?: never;
   };
   "/api/attendance/sessions/{sessionId}/attendance/count": {
@@ -4458,13 +4418,18 @@ export interface components {
        */
       recordedAt?: string | null;
     };
-    RecordBarcodeAttendanceDto: {
+    RecordCameraAttendanceDto: {
+      /**
+       * @description Current anonymous headcount observed by the camera
+       * @example 42
+       */
+      guestCount: number;
       /**
        * Format: uuid
-       * @description University user resolved from the scanned barcode
-       * @example 00000000-0000-4000-8000-000000000001
+       * @description Event to record attendance against when selecting a slot
+       * @example 00000000-0000-4000-8000-000000000000
        */
-      UserID: string;
+      eventID?: string;
     };
     SessionAttendanceResponseDto: {
       /**
@@ -4499,27 +4464,6 @@ export interface components {
        * @description Last update time
        */
       updatedAt: string;
-    };
-    AttendanceCaptureResultDto: {
-      /**
-       * @description Whether a new identified record was inserted
-       * @enum {string}
-       */
-      status: "RECORDED" | "ALREADY_RECORDED";
-      attendance: components["schemas"]["SessionAttendanceResponseDto"];
-    };
-    RecordCameraAttendanceDto: {
-      /**
-       * @description Current anonymous headcount observed by the camera
-       * @example 42
-       */
-      guestCount: number;
-      /**
-       * Format: uuid
-       * @description Event to record attendance against when selecting a slot
-       * @example 00000000-0000-4000-8000-000000000000
-       */
-      eventID?: string;
     };
     CreateAttendanceSessionDto: {
       /**
@@ -4618,20 +4562,6 @@ export interface components {
        * @example true
        */
       success: Record<string, never>;
-    };
-    RecordIdentifiedAttendanceDto: {
-      /**
-       * Format: uuid
-       * @description Existing university user to record
-       * @example 00000000-0000-4000-8000-000000000001
-       */
-      UserID: string;
-      /**
-       * @description How the attendee was identified
-       * @example BARCODE
-       * @enum {string}
-       */
-      captureMethod: "BARCODE" | "MANUAL";
     };
     SetGuestCountDto: {
       /**
@@ -9766,35 +9696,6 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
-  recordBarcodeAttendance: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RecordBarcodeAttendanceDto"];
-      };
-    };
-    responses: {
-      /** @description HTTP 201 response. */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AttendanceCaptureResultDto"];
-        };
-      };
-      400: components["responses"]["BadRequestError"];
-      401: components["responses"]["UnauthorizedError"];
-      403: components["responses"]["ForbiddenError"];
-      409: components["responses"]["ConflictError"];
-      500: components["responses"]["InternalError"];
-    };
-  };
   recordCameraAttendance: {
     parameters: {
       query?: never;
@@ -9956,38 +9857,6 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["AttendanceSessionResponseDto"];
-        };
-      };
-      400: components["responses"]["BadRequestError"];
-      401: components["responses"]["UnauthorizedError"];
-      403: components["responses"]["ForbiddenError"];
-      404: components["responses"]["NotFoundError"];
-      409: components["responses"]["ConflictError"];
-      500: components["responses"]["InternalError"];
-    };
-  };
-  recordIdentifiedAttendance: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        sessionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RecordIdentifiedAttendanceDto"];
-      };
-    };
-    responses: {
-      /** @description HTTP 201 response. */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AttendanceCaptureResultDto"];
         };
       };
       400: components["responses"]["BadRequestError"];
