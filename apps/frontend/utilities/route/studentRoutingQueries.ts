@@ -32,6 +32,12 @@ export function getAlternateRoutesQ(query: getAlternateRoutesQuery) {
       const result = new getAlternateRoutesBuilder().send({ query });
       return result;
     },
-    enabled: query.routeIndex !== undefined,
+    retry: false,
+    enabled: Boolean(
+      query.routeIndex !== undefined &&
+      query.originEventId &&
+      query.destinationEventId &&
+      query.date,
+    ),
   });
 }
