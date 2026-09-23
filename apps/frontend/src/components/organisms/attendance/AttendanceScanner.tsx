@@ -40,16 +40,16 @@ export default function AttendanceScanner() {
   const [sessionStarted, setSessionStarted] = useState(false);
   const [sessionEnded, setSessionEnded] = useState(false);
 
-  const [selectedSlotOverride, setSelectedSlotOverride] =
-    useState<AttendanceSlot | null>(null);
   const [conflictOpen, setConflictOpen] = useState(false);
   const [selectingSlot, setSelectingSlot] = useState(false);
 
   const {
-    data: slotData,
+    data: fetchedSlotData,
     isLoading: slotsLoading,
+    isFetchedAfterMount,
     refetch,
   } = useQuery(getAttendanceSlotsQ());
+  const slotData = isFetchedAfterMount ? fetchedSlotData : undefined;
   const slots: AttendanceSlot[] = (slotData?.slotList ?? []).map((slot) => ({
     id: `${slot.eventID}:${slot.scheduledStartAt}`,
     eventID: slot.eventID,
@@ -70,7 +70,7 @@ export default function AttendanceScanner() {
           slot.scheduledStartAt === slotData.currentSlot.scheduledStartAt,
       ) ?? null)
     : null;
-  const selectedSlot = selectedSlotOverride ?? currentSlot;
+  const selectedSlot = currentSlot;
   const selectedEventID = selectedSlot?.eventID ?? "";
 
   const { mutate: updateAttendanceCount } = useMutation(
@@ -87,7 +87,7 @@ export default function AttendanceScanner() {
   const handleSlotSelect = async (slot: AttendanceSlot) => {
     setSelectingSlot(true);
     try {
-      setSelectedSlotOverride(await selectPreferredEvent(slot));
+      await selectPreferredEvent(slot);
       setConflictOpen(false);
       await refetch();
     } catch {
@@ -247,7 +247,7 @@ export default function AttendanceScanner() {
 
         <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
           <Label>Current class</Label>
-          {slotsLoading ? (
+          {slotsLoading || !isFetchedAfterMount ? (
             <p className="mt-2 text-sm text-[var(--text-secondary)]">
               Resolving current class…
             </p>

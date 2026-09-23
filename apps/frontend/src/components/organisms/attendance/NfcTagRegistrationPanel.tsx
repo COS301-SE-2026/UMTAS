@@ -1,12 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/atoms/baseShadcn/button";
 import { CapabilityBadge } from "@/components/molecules/attendance/CapabilityBadge";
-import { AttendancePageHeader } from "@/components/molecules/attendance/AttendancePageHeader";
 import { NfcRegistrationTutorial } from "@/components/molecules/attendance/NfcRegistrationTutorial";
 import { NfcTagStatusCard } from "@/components/molecules/attendance/NfcTagStatusCard";
 import { NfcTagTestResult } from "@/components/molecules/attendance/NfcTagTestResult";
@@ -167,17 +163,10 @@ export function NfcTagRegistrationPanel() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-4 px-4 py-5 sm:px-6">
-      <Button asChild variant="ghost" size="sm">
-        <Link href="/attendance">
-          <ArrowLeft size={14} aria-hidden="true" /> Back to attendance
-        </Link>
-      </Button>
-      <AttendancePageHeader
-        title="Register NFC sticker"
-        description="Register, replace, and test the sticker students use to check in."
-        action={<CapabilityBadge capabilities={capabilities} />}
-      />
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <CapabilityBadge capabilities={capabilities} />
+      </div>
 
       <NfcTagStatusCard
         tag={tag}
