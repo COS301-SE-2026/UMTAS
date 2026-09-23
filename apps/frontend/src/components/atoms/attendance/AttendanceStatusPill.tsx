@@ -6,14 +6,20 @@ import type {
   RegistrationStage,
 } from "@/lib/nfc_attendance/types";
 
-type Status =
+export type AttendanceStatus =
   | AttendanceSlotState
   | CheckInState
   | NfcCapabilityState
   | RegistrationStage
-  | "NOT_REGISTERED";
+  | "NOT_REGISTERED"
+  | "IN_PROGRESS"
+  | "CONFLICT"
+  | "PREFERRED"
+  | "COMPLETE";
 
-const labels: Record<string, string> = {
+type StatusTone = "positive" | "negative" | "warning" | "neutral";
+
+export const attendanceStatusLabels: Record<AttendanceStatus, string> = {
   SUPPORTED: "Available",
   UNSUPPORTED: "Unavailable",
   PERMISSION_DENIED: "Permission denied",
@@ -24,6 +30,7 @@ const labels: Record<string, string> = {
   PREPARING: "Preparing",
   PREPARED: "Prepared",
   WRITING_WEB_NFC: "Writing",
+  WRITTEN: "Written",
   CONFIRMING: "Confirming",
   PREPARE_FAILED: "Prepare failed",
   WRITE_FAILED: "Write failed",
@@ -31,7 +38,6 @@ const labels: Record<string, string> = {
   EXPIRED: "Expired",
   UPCOMING: "Upcoming",
   AVAILABLE: "Available",
-  ENDING: "Ending soon",
   ENDED: "Ended",
   READY_TO_SCAN: "Ready to scan",
   SCANNING: "Scanning",
@@ -43,43 +49,58 @@ const labels: Record<string, string> = {
   NOT_ENROLLED: "Not enrolled",
   INVALID_TAG: "Invalid sticker",
   FAILED: "Try again",
+  IN_PROGRESS: "In progress",
+  CONFLICT: "Conflict",
+  PREFERRED: "Preferred",
+  COMPLETE: "Complete",
+};
+
+const attendanceStatusTones: Partial<
+  Record<AttendanceStatus, Exclude<StatusTone, "neutral">>
+> = {
+  READY: "positive",
+  RECORDED: "positive",
+  AVAILABLE: "positive",
+  SUPPORTED: "positive",
+  IN_PROGRESS: "positive",
+  COMPLETE: "positive",
+  CONFLICT: "warning",
+  WRITE_FAILED: "negative",
+  PREPARE_FAILED: "negative",
+  CONFIRM_FAILED: "negative",
+  EXPIRED: "negative",
+  FAILED: "negative",
+  INVALID_TAG: "negative",
+  NOT_ENROLLED: "negative",
+  UNSUPPORTED: "negative",
+  PERMISSION_DENIED: "negative",
+  DISABLED: "negative",
+};
+
+const toneClasses: Record<StatusTone, string> = {
+  positive: "border-[var(--success-text)]/30 text-[var(--success-text)]",
+  negative: "border-[var(--error-text)]/30 text-[var(--error-text)]",
+  warning: "border-[var(--warning-text)]/30 text-[var(--warning-text)]",
+  neutral: "border-[var(--border)] text-[var(--text-secondary)]",
 };
 
 export function AttendanceStatusPill({
   status,
+  label,
   className = "",
 }: {
-  status: Status;
+  status: AttendanceStatus;
+  label?: string;
   className?: string;
 }) {
-  const positive = ["READY", "RECORDED", "AVAILABLE", "SUPPORTED"].includes(
-    status,
-  );
-  const negative = [
-    "WRITE_FAILED",
-    "PREPARE_FAILED",
-    "CONFIRM_FAILED",
-    "EXPIRED",
-    "FAILED",
-    "INVALID_TAG",
-    "NOT_ENROLLED",
-    "UNSUPPORTED",
-    "PERMISSION_DENIED",
-    "DISABLED",
-  ].includes(status);
+  const tone = attendanceStatusTones[status] ?? "neutral";
 
   return (
     <Badge
       variant="outline"
-      className={`font-normal ${
-        positive
-          ? "border-[var(--success-text)]/30 text-[var(--success-text)]"
-          : negative
-            ? "border-[var(--error-text)]/30 text-[var(--error-text)]"
-            : "border-[var(--border)] text-[var(--text-secondary)]"
-      } ${className}`}
+      className={`h-5 font-normal ${toneClasses[tone]} ${className}`}
     >
-      {labels[status] ?? status}
+      {label ?? attendanceStatusLabels[status]}
     </Badge>
   );
 }
