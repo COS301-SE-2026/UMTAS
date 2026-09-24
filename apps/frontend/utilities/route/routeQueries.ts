@@ -18,8 +18,7 @@ export function getRouteQ(query: getRouteQuery) {
       query.destinationBuildingId,
     ] as const,
     queryFn: async () => {
-      const result = (await new getRouterBuilder().send({ paths: query }))
-        .route;
+      const result = (await new getRouterBuilder().send({ query })).route;
 
       return result;
     },
