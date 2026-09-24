@@ -1,4 +1,4 @@
-import { CheckCircle2, Nfc, XCircle } from "lucide-react";
+import { Nfc } from "lucide-react";
 import {
   Alert,
   AlertDescription,
@@ -25,9 +25,12 @@ export function NfcTagTestResult({
     return (
       <Alert>
         <Nfc aria-hidden="true" />
-        <AlertTitle>Ready to scan</AlertTitle>
+
+        <AlertTitle>Waiting for sticker</AlertTitle>
+
         <AlertDescription className="space-y-3">
-          <p>Hold this phone near your registered sticker.</p>
+          <p>Hold this phone near the NFC sticker until it is detected.</p>
+
           <Button variant="outline" size="sm" onClick={onCancel}>
             Cancel
           </Button>
@@ -37,23 +40,29 @@ export function NfcTagTestResult({
   }
 
   const valid = state === "VALID";
+
   return (
     <Alert variant={valid ? "success" : "destructive"}>
-      {valid ? (
-        <CheckCircle2 aria-hidden="true" />
-      ) : (
-        <XCircle aria-hidden="true" />
-      )}
-      <AlertTitle>{valid ? "Tag works" : "Tag test failed"}</AlertTitle>
+      <AlertTitle>
+        {valid ? "Sticker verified" : "Sticker could not be verified"}
+      </AlertTitle>
+
       <AlertDescription className="space-y-3">
-        <p>{result?.message ?? "The sticker could not be verified."}</p>
+        <p>{result?.message ?? "UMTAS could not verify this sticker."}</p>
+
         {valid && result?.displayId && (
-          <p className="font-mono text-xs">{result.displayId}</p>
+          <div className="rounded-lg border border-current/20 p-3">
+            <p className="text-xs opacity-80">Sticker ID</p>
+
+            <p className="mt-1 font-mono text-xs">{result.displayId}</p>
+          </div>
         )}
-        <div className="flex gap-2">
+
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={onRetry}>
             Test again
           </Button>
+
           <Button variant="ghost" size="sm" onClick={onCancel}>
             Close
           </Button>

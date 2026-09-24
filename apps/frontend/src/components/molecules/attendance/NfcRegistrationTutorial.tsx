@@ -30,91 +30,76 @@ export function NfcRegistrationTutorial({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="h-dvh max-w-none overflow-y-auto rounded-none sm:h-auto sm:max-h-[85vh] sm:max-w-2xl sm:rounded-xl">
         <DialogHeader>
-          <DialogTitle>How to write an NFC sticker</DialogTitle>
+          <DialogTitle>Set up an NFC sticker</DialogTitle>
+
           <DialogDescription>
-            Use NFC Tools to write the attendance link, then verify it before
-            activating the sticker in UMTAS.
+            Follow these steps to write the attendance link and activate the
+            sticker in UMTAS.
           </DialogDescription>
         </DialogHeader>
 
-        <ol className="space-y-4 text-sm text-[var(--text-secondary)]">
-          <li>
-            <strong className="text-[var(--text-primary)]">
-              1. Install NFC Tools.
-            </strong>{" "}
-            Install NFC Tools by wakdev. UMTAS uses it only to write the
-            provided attendance link to your sticker. The App Store listing
-            supports iPhone 7 or later.
-            <div className="mt-2">
-              <Button asChild variant="outline" size="sm">
-                <a href={APP_STORE_URL} target="_blank" rel="noreferrer">
-                  Open in the App Store <ExternalLink aria-hidden="true" />
-                </a>
-              </Button>
-            </div>
-          </li>
-          <li>
-            <strong className="text-[var(--text-primary)]">
-              2. Generate the URL.
-            </strong>{" "}
-            It is valid for about ten minutes. Generating it does not replace
-            your current sticker.
+        <div className="space-y-3">
+          <TutorialStep number={1} title="Install NFC Tools">
+            <p>
+              Install NFC Tools by wakdev. You will use it to write the UMTAS
+              attendance link to the sticker.
+            </p>
+
+            <Button asChild variant="outline" size="sm" className="mt-3">
+              <a href={APP_STORE_URL} target="_blank" rel="noreferrer">
+                Open App Store
+                <ExternalLink size={16} aria-hidden="true" />
+              </a>
+            </Button>
+          </TutorialStep>
+
+          <TutorialStep number={2} title="Generate the registration link">
+            <p>
+              Generate the link when you are ready to write the sticker. The
+              link is temporary and does not replace your current sticker.
+            </p>
+
             {!prepared && (
-              <div className="mt-2">
-                <Button onClick={onPrepare} disabled={preparing}>
-                  {preparing ? "Generating…" : "Generate registration URL"}
-                </Button>
-              </div>
+              <Button className="mt-3" onClick={onPrepare} disabled={preparing}>
+                {preparing ? "Generating…" : "Generate registration link"}
+              </Button>
             )}
+
             {prepared && (
-              <p className="mt-2 font-medium text-[var(--success-text)]">
-                The URL is ready in the registration panel.
+              <p className="mt-3 font-medium text-[var(--text-primary)]">
+                The registration link is ready.
               </p>
             )}
-          </li>
-          <li>
-            <strong className="text-[var(--text-primary)]">
-              3. Copy the full URL.
-            </strong>{" "}
-            Close this guide and use Copy URL in UMTAS.
-          </li>
-          <li>
-            <strong className="text-[var(--text-primary)]">
-              4. Add a URL record.
-            </strong>{" "}
-            In NFC Tools, open Write, choose Add a record, select the URL/URI
-            record type, paste the link, save the record, then choose Write.
-            Labels can vary slightly between app versions.
-          </li>
-          <li>
-            <strong className="text-[var(--text-primary)]">
-              5. Write the sticker.
-            </strong>{" "}
-            Hold the top of the iPhone near the sticker until NFC Tools reports
-            that the write succeeded.
-          </li>
-          <li>
-            <strong className="text-[var(--text-primary)]">
-              6. Read it back.
-            </strong>{" "}
-            Use Read in NFC Tools and check that the saved URL exactly matches
-            the complete URL shown in UMTAS.
-          </li>
-          <li>
-            <strong className="text-[var(--text-primary)]">
-              7. Activate it.
-            </strong>{" "}
-            Return to UMTAS, acknowledge that you verified the readback, and
-            activate. This is the step that replaces the previous sticker.
-          </li>
-          <li>
-            <strong className="text-[var(--text-primary)]">
-              8. Test a normal tap.
-            </strong>{" "}
-            Tap the sticker normally and confirm that it opens the attendance
-            check-in page on the public HTTPS address.
-          </li>
-        </ol>
+          </TutorialStep>
+
+          <TutorialStep number={3} title="Add the link in NFC Tools">
+            <p>
+              Copy the full UMTAS link. In NFC Tools open Write, add a URL or
+              URI record, and paste the complete link.
+            </p>
+          </TutorialStep>
+
+          <TutorialStep number={4} title="Write the sticker">
+            <p>
+              Choose Write in NFC Tools and hold the phone near the sticker
+              until the app confirms that writing finished.
+            </p>
+          </TutorialStep>
+
+          <TutorialStep number={5} title="Read and verify">
+            <p>
+              Open Read in NFC Tools and scan the sticker again. Confirm that
+              the saved link exactly matches the link shown in UMTAS.
+            </p>
+          </TutorialStep>
+
+          <TutorialStep number={6} title="Activate and test">
+            <p>
+              Return to UMTAS and activate the sticker. Then tap the sticker
+              normally and confirm that it opens the attendance check-in page.
+            </p>
+          </TutorialStep>
+        </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -123,5 +108,33 @@ export function NfcRegistrationTutorial({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function TutorialStep({
+  number,
+  title,
+  children,
+}: {
+  number: number;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="grid grid-cols-[2.25rem_minmax(0,1fr)] gap-3 rounded-lg border border-[var(--border)] p-4">
+      <div className="flex size-9 items-center justify-center rounded-lg bg-[var(--bg-elevated)] text-sm font-semibold text-[var(--text-primary)]">
+        {number}
+      </div>
+
+      <div>
+        <h3 className="text-sm font-medium text-[var(--text-primary)]">
+          {title}
+        </h3>
+
+        <div className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+          {children}
+        </div>
+      </div>
+    </section>
   );
 }
