@@ -64,7 +64,7 @@ services:
       - "traefik.http.services.minio-prod.loadbalancer.server.port=9000"
 
   minio-init:
-    image: amazon/aws-cli:latest
+    image: amazon/aws-cli:2.27.50
     networks:
       - data-internal
     depends_on:

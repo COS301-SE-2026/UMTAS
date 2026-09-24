@@ -65,7 +65,7 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
 
   minio-init:
-    image: amazon/aws-cli:latest
+    image: amazon/aws-cli:2.27.50
     networks:
       - internal
     depends_on:
