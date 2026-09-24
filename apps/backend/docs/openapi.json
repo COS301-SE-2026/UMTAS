@@ -5568,6 +5568,90 @@
         ]
       }
     },
+    "/api/attendance/operator/preferred-event": {
+      "put": {
+        "operationId": "selectPreferredAttendanceEvent",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelectPreferredEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "HTTP 200 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorAttendanceSlotDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Select the operator preferred attendance event",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Select the operator preferred attendance event. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "clearPreferredAttendanceEvent",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "HTTP 200 response."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Clear the operator preferred attendance event",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Clear the operator preferred attendance event. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
     "/api/attendance/records": {
       "post": {
         "operationId": "recordAttendance",
@@ -5623,7 +5707,7 @@
       }
     },
     "/api/attendance/records/barcode": {
-      "post": {
+      "put": {
         "operationId": "recordBarcodeAttendance",
         "parameters": [],
         "requestBody": {
@@ -5632,59 +5716,6 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/RecordBarcodeAttendanceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "HTTP 201 response.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AttendanceCaptureResultDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
-          "409": {
-            "$ref": "#/components/responses/ConflictError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          }
-        },
-        "summary": "Record the user resolved from a barcode in the current slot",
-        "tags": [
-          "Attendance"
-        ],
-        "description": "Record the user resolved from a barcode in the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.",
-        "security": [
-          {
-            "cookie": []
-          }
-        ]
-      }
-    },
-    "/api/attendance/records/camera": {
-      "put": {
-        "operationId": "recordCameraAttendance",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecordCameraAttendanceDto"
               }
             }
           }
@@ -5716,11 +5747,11 @@
             "$ref": "#/components/responses/InternalError"
           }
         },
-        "summary": "Replace the anonymous headcount for the current slot",
+        "summary": "Update the barcode guest count for the current slot",
         "tags": [
           "Attendance"
         ],
-        "description": "Replace the anonymous headcount for the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "description": "Update the barcode guest count for the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.",
         "security": [
           {
             "cookie": []
@@ -5989,71 +6020,6 @@
           "Attendance"
         ],
         "description": "Delete an attendance session and its records. This Attendance operation is part of the versioned UMTAS HTTP contract.",
-        "security": [
-          {
-            "cookie": []
-          }
-        ]
-      }
-    },
-    "/api/attendance/sessions/{sessionId}/records": {
-      "post": {
-        "operationId": "recordIdentifiedAttendance",
-        "parameters": [
-          {
-            "name": "sessionId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecordIdentifiedAttendanceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "HTTP 201 response.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AttendanceCaptureResultDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          },
-          "409": {
-            "$ref": "#/components/responses/ConflictError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          }
-        },
-        "summary": "Record one identified attendee",
-        "tags": [
-          "Attendance"
-        ],
-        "description": "Record one identified attendee. This Attendance operation is part of the versioned UMTAS HTTP contract.",
         "security": [
           {
             "cookie": []
@@ -13098,9 +13064,6 @@
               "$ref": "#/components/schemas/OperatorAttendanceSlotDto"
             }
           },
-          "ambiguous": {
-            "type": "boolean"
-          },
           "currentSlot": {
             "nullable": true,
             "type": "object",
@@ -13109,11 +13072,32 @@
                 "$ref": "#/components/schemas/OperatorAttendanceSlotDto"
               }
             ]
+          },
+          "preferredEventId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "requiresSelection": {
+            "type": "boolean"
           }
         },
         "required": [
           "slotList",
-          "ambiguous"
+          "preferredEventId",
+          "requiresSelection"
+        ]
+      },
+      "SelectPreferredEventDto": {
+        "type": "object",
+        "properties": {
+          "eventID": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "eventID"
         ]
       },
       "RecordAttendanceDto": {
@@ -13189,15 +13173,21 @@
       "RecordBarcodeAttendanceDto": {
         "type": "object",
         "properties": {
-          "UserID": {
+          "guestCount": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Current guest headcount observed by the scanner",
+            "example": 42
+          },
+          "eventID": {
             "type": "string",
             "format": "uuid",
-            "description": "University user resolved from the scanned barcode",
-            "example": "00000000-0000-4000-8000-000000000001"
+            "description": "Event to record attendance against when selecting a slot",
+            "example": "00000000-0000-4000-8000-000000000000"
           }
         },
         "required": [
-          "UserID"
+          "guestCount"
         ]
       },
       "SessionAttendanceResponseDto": {
@@ -13231,7 +13221,6 @@
             "enum": [
               "NFC",
               "BARCODE",
-              "CAMERA",
               "MANUAL"
             ]
           },
@@ -13254,46 +13243,6 @@
           "captureMethod",
           "recordedAt",
           "updatedAt"
-        ]
-      },
-      "AttendanceCaptureResultDto": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "description": "Whether a new identified record was inserted",
-            "enum": [
-              "RECORDED",
-              "ALREADY_RECORDED"
-            ]
-          },
-          "attendance": {
-            "$ref": "#/components/schemas/SessionAttendanceResponseDto"
-          }
-        },
-        "required": [
-          "status",
-          "attendance"
-        ]
-      },
-      "RecordCameraAttendanceDto": {
-        "type": "object",
-        "properties": {
-          "guestCount": {
-            "minimum": 0,
-            "type": "number",
-            "description": "Current anonymous headcount observed by the camera",
-            "example": 42
-          },
-          "eventID": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Event to record attendance against when selecting a slot",
-            "example": "00000000-0000-4000-8000-000000000000"
-          }
-        },
-        "required": [
-          "guestCount"
         ]
       },
       "CreateAttendanceSessionDto": {
@@ -13436,30 +13385,6 @@
           "success"
         ]
       },
-      "RecordIdentifiedAttendanceDto": {
-        "type": "object",
-        "properties": {
-          "UserID": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Existing university user to record",
-            "example": "00000000-0000-4000-8000-000000000001"
-          },
-          "captureMethod": {
-            "type": "string",
-            "enum": [
-              "BARCODE",
-              "MANUAL"
-            ],
-            "description": "How the attendee was identified",
-            "example": "BARCODE"
-          }
-        },
-        "required": [
-          "UserID",
-          "captureMethod"
-        ]
-      },
       "SetGuestCountDto": {
         "type": "object",
         "properties": {
@@ -13472,11 +13397,11 @@
           "captureMethod": {
             "type": "string",
             "enum": [
-              "CAMERA",
+              "BARCODE",
               "MANUAL"
             ],
             "description": "Source of the replacement count",
-            "example": "CAMERA"
+            "example": "BARCODE"
           }
         },
         "required": [

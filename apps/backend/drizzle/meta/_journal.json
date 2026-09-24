@@ -57,6 +57,20 @@
       "when": 1790006851886,
       "tag": "0007_boring_synch",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790118301343,
+      "tag": "0008_attendance_entities",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790244216124,
+      "tag": "0009_attendance",
+      "breakpoints": true
     }
   ]
 }

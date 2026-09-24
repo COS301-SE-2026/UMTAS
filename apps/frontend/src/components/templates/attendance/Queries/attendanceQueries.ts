@@ -29,6 +29,8 @@ export class GetAttendanceSlots extends RequestBuilder<
 export function getAttendanceSlotsQ() {
   return queryOptions({
     queryKey: ["attendance-slots"] as const,
+    staleTime: 0,
+    refetchOnMount: "always",
 
     queryFn: async () => {
       return new GetAttendanceSlots().send({});
@@ -37,7 +39,7 @@ export function getAttendanceSlotsQ() {
 }
 
 export type AttendanceCountEndpoint =
-  paths["/api/attendance/records/camera"]["put"];
+  paths["/api/attendance/records/barcode"]["put"];
 
 export type AttendanceCountBody =
   AttendanceCountEndpoint["requestBody"]["content"]["application/json"];
@@ -53,7 +55,7 @@ export class UpdateAttendanceCount extends RequestBuilder<
   constructor() {
     super();
 
-    this.setUrl("/attendance/records/camera").setMethod(RequestMethod.PUT);
+    this.setUrl("/attendance/records/barcode").setMethod(RequestMethod.PUT);
   }
 }
 

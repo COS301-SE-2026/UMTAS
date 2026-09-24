@@ -1,7 +1,5 @@
-"use client";
+import AttendanceTemplate from "@/components/templates/attendance/AttendanceTemplate";
 
-import ScannerTemplate from "@/components/templates/attendance/ScannerTemplate";
-
-export default function ScannerPage() {
-  return <ScannerTemplate />;
+export default function AttendancePage() {
+  return <AttendanceTemplate />;
 }

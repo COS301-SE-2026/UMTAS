@@ -166,6 +166,18 @@ export class NfcAttendanceService {
     return tag && this.matchesToken(dto.token, tag.tokenHash) ? tag : null;
   }
 
+  async getTagByOwner(
+    ownerUserId: string,
+    tx: AppDatabase = this.dbService.db,
+  ): Promise<NfcTagEntity | null> {
+    const [tag] = await tx
+      .select()
+      .from(NfcTag)
+      .where(eq(NfcTag.ownerUserId, ownerUserId))
+      .limit(1);
+    return tag ?? null;
+  }
+
   private assertOperator(actor: AttendanceActor): void {
     if (actor.uniRole !== 'lecturer' && actor.uniRole !== 'uni_admin') {
       throw new ForbiddenException(

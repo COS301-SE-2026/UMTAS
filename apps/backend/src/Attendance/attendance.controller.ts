@@ -30,16 +30,13 @@ import { AttendanceSessionService } from './attendance-session.service';
 import { NfcAttendanceService } from './nfc-attendance.service';
 import { AttendanceCaptureService } from './attendance-capture.service';
 import {
-  AttendanceCaptureResultDto,
   AttendanceSessionFiltersDto,
   AttendanceSessionListResponseDto,
   AttendanceRecordResponseDto,
   AttendanceSessionResponseDto,
   CreateAttendanceSessionDto,
   DeleteAttendanceSessionResponseDto,
-  RecordIdentifiedAttendanceDto,
   RecordBarcodeAttendanceDto,
-  RecordCameraAttendanceDto,
   RecordAttendanceDto,
   SessionAttendanceResponseDto,
   SetGuestCountDto,
@@ -55,6 +52,8 @@ import {
   OperatorSlotsQueryDto,
   RegisteredNfcTagDto,
   RegisteredNfcTagStatusDto,
+  SelectPreferredEventDto,
+  OperatorAttendanceSlotDto,
 } from './dto/nfc-attendance.dto';
 
 @ApiTags('Attendance')
@@ -141,6 +140,31 @@ export class AttendanceController {
     );
   }
 
+  @Put('operator/preferred-event')
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Select the operator preferred attendance event',
+    operationId: 'selectPreferredAttendanceEvent',
+  })
+  selectPreferredAttendanceEvent(
+    @CurrentSession() session: SessionData,
+    @Body() dto: SelectPreferredEventDto,
+  ): Promise<OperatorAttendanceSlotDto> {
+    return this.captureService.selectPreferredEvent(this.actor(session), dto);
+  }
+
+  @Delete('operator/preferred-event')
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Clear the operator preferred attendance event',
+    operationId: 'clearPreferredAttendanceEvent',
+  })
+  clearPreferredAttendanceEvent(
+    @CurrentSession() session: SessionData,
+  ): Promise<void> {
+    return this.captureService.clearPreferredEvent(this.actor(session));
+  }
+
   @Post('records')
   @OptionalAuth()
   @ApiOperation({
@@ -158,33 +182,20 @@ export class AttendanceController {
     );
   }
 
-  @Post('records/barcode')
+  @Put('records/barcode')
   @Roles('lecturer', 'uni_admin')
   @ApiOperation({
-    summary: 'Record the user resolved from a barcode in the current slot',
+    summary: 'Update the barcode guest count for the current slot',
     operationId: 'recordBarcodeAttendance',
   })
   recordBarcodeAttendance(
     @CurrentSession() session: SessionData,
     @Body() dto: RecordBarcodeAttendanceDto,
-  ): Promise<AttendanceCaptureResultDto> {
+  ): Promise<SessionAttendanceResponseDto> {
     return this.captureService.recordBarcodeAttendance(
       this.actor(session),
       dto,
     );
-  }
-
-  @Put('records/camera')
-  @Roles('lecturer', 'uni_admin')
-  @ApiOperation({
-    summary: 'Replace the anonymous headcount for the current slot',
-    operationId: 'recordCameraAttendance',
-  })
-  recordCameraAttendance(
-    @CurrentSession() session: SessionData,
-    @Body() dto: RecordCameraAttendanceDto,
-  ): Promise<SessionAttendanceResponseDto> {
-    return this.captureService.recordCameraAttendance(this.actor(session), dto);
   }
 
   @Post('sessions')
@@ -255,24 +266,6 @@ export class AttendanceController {
     @Param('sessionId', ParseUUIDPipe) sessionId: string,
   ): Promise<DeleteAttendanceSessionResponseDto> {
     return this.sessionService.deleteSession(this.actor(session), sessionId);
-  }
-
-  @Post('sessions/:sessionId/records')
-  @Roles('lecturer', 'uni_admin')
-  @ApiOperation({
-    summary: 'Record one identified attendee',
-    operationId: 'recordIdentifiedAttendance',
-  })
-  recordIdentifiedAttendance(
-    @CurrentSession() session: SessionData,
-    @Param('sessionId', ParseUUIDPipe) sessionId: string,
-    @Body() dto: RecordIdentifiedAttendanceDto,
-  ): Promise<AttendanceCaptureResultDto> {
-    return this.sessionService.recordIdentifiedAttendance(
-      this.actor(session),
-      sessionId,
-      dto,
-    );
   }
 
   @Put('sessions/:sessionId/attendance/count')

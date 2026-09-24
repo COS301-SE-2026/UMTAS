@@ -12,6 +12,35 @@ dev:
     just dev-infra
     just both
 
+# dev over an ngrok tunnel for phone testing (camera needs https)
+dev-mobile: dev-infra rebuild-packages
+    #!/usr/bin/env bash
+    set -euo pipefail
+    tunnel_url() {
+      curl -s http://localhost:4040/api/tunnels 2>/dev/null \
+        | grep -o '"public_url":"https://[^"]*' | head -1 | cut -d'"' -f4 || true
+    }
+    url=$(tunnel_url)
+    if [ -z "$url" ]; then
+      ngrok http 3001 --log=stdout > /dev/null &
+      ngrok_pid=$!
+      trap 'kill $ngrok_pid 2>/dev/null' EXIT
+      for _ in $(seq 1 20); do
+        url=$(tunnel_url)
+        [ -n "$url" ] && break
+        sleep 0.5
+      done
+    fi
+    if [ -z "$url" ]; then
+      echo "Could not get an ngrok URL from http://localhost:4040" >&2
+      exit 1
+    fi
+    echo "Open on your phone: $url"
+    # phase runs its command through a shell, so pass it as one string.
+    # Relative API URL makes the browser go through the Next /api rewrite
+    # instead of calling localhost:3000, which the phone can't reach.
+    NGROK_URL="$url" phase run 'BETTER_AUTH_TRUSTED_ORIGINS="$BETTER_AUTH_TRUSTED_ORIGINS,$NGROK_URL" NEXT_PUBLIC_API_URL=/api pnpm --parallel --filter backend --filter frontend run dev'
+
 # Umtas local dev commands
 
 compile-wasm-dev:
