@@ -9,6 +9,7 @@ import { PdfParseSubmission } from './pdf-parse-submission';
 import { PdfParserController } from './pdf-parser.controller';
 import { PdfParserFingerprintService } from './pdf-parser-fingerprint.service';
 import { PdfParserJobStoreService } from './pdf-parser-job-store.service';
+import { VenueResolver } from './venue-resolver.service';
 
 @Module({
   imports: [JobsModule, StorageModule],
@@ -17,6 +18,7 @@ import { PdfParserJobStoreService } from './pdf-parser-job-store.service';
     EventImportFingerprintService,
     EventImporter,
     ModuleResolver,
+    VenueResolver,
     ParserResultImporter,
     PdfParseSubmission,
     PdfParserFingerprintService,
