@@ -332,7 +332,10 @@ export function UniMap() {
           )}
         </div>
 
-        <div id="university-map" className="flex-1 overflow-hidden">
+        <div
+          id="university-map"
+          className="flex-1 min-h-[75vh] overflow-hidden"
+        >
           <MapScreen
             onRequestMapSetup={() => router.push("/mapping/config")}
             adminMode={adminMode}
