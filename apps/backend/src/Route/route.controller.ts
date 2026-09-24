@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Put, Query } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
@@ -12,20 +12,24 @@ import { Roles } from 'src/auth/roles.guard';
 import {
   ActiveRouteQueryDto,
   ActiveRouteResponseDto,
+  DiversionRequestDto,
+  DiversionRouteResponseDto,
   RouteQueryDto,
   RouteSingleResponseDto,
-} from './dto/route.dto';
+  RoutingHeatmapQueryDto,
+  RoutingHeatmapResponseDto,
+  StudentStopRouteQueryDto,
+  StudentStopRouteResponseDto,
+} from './dto';
 import {
   CurrentSession,
   CurrentUniId,
   type SessionData,
 } from 'src/auth/session.decorator';
 import { RouteService } from './route.service';
-import {
-  RoutingHeatmapQueryDto,
-  RoutingHeatmapResponseDto,
-} from './dto/route.heatmap.dto';
 import { RouteHeatmapService } from './route.heatmap.service';
+import { RouteDiversionService } from './route.diversion.service';
+import { RouteStopService } from './route.stop.service';
 
 @ApiTags('Routes')
 @ApiSecurity('umtas-session')
@@ -34,6 +38,8 @@ export class RouteController {
   constructor(
     private readonly routeService: RouteService,
     private readonly routeHeatmapService: RouteHeatmapService,
+    private readonly diversionService: RouteDiversionService,
+    private readonly routeStopService: RouteStopService,
   ) {}
 
   @Get('heatmap')
@@ -117,6 +123,67 @@ export class RouteController {
       uniId,
       query.date,
       query.time,
+    );
+  }
+
+  @Put('diversion')
+  @Roles('uni_admin')
+  @ApiOperation({
+    summary: 'Create or update a route diversion',
+    description:
+      'University administrators can divert a proportion of traffic from one route to another.',
+    operationId: 'routeDiversion',
+  })
+  @ApiOkResponse({
+    description: 'Diversion successfully created or updated.',
+    type: DiversionRouteResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Invalid request. Diversion must be between 0 and 1 and either toRoute or toRouteIndex must be supplied.',
+  })
+  @ApiNotFoundResponse({
+    description:
+      'The source route, destination route, or requested alternative route could not be found.',
+  })
+  async divertRoute(
+    @CurrentUniId() uniId: string,
+    @Body() dto: DiversionRequestDto,
+  ): Promise<DiversionRouteResponseDto> {
+    return this.diversionService.divertRoute(uniId, dto);
+  }
+
+  @Get('stop-route')
+  @Roles('student')
+  @ApiOperation({
+    summary: 'Get a stop-via route for a student on a date',
+    description:
+      "Returns the route from the student's current event to a stop building and from the stop to the next event, based on the requested time or the largest gap.",
+    operationId: 'getRouteViaBuilding',
+  })
+  @ApiOkResponse({
+    description: 'Stop route returned successfully',
+    type: StudentStopRouteResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid stop route query parameters',
+  })
+  @ApiNotFoundResponse({
+    description:
+      'No attended events found for the date, or no route could be determined for the stop',
+  })
+  @ApiForbiddenResponse({
+    description: 'No university selected or insufficient permissions',
+  })
+  getRouteViaBuilding(
+    @CurrentSession() session: SessionData,
+    @CurrentUniId() uniId: string,
+    @Query() query: StudentStopRouteQueryDto,
+  ): Promise<StudentStopRouteResponseDto> {
+    return this.routeStopService.getRouteViaBuilding(
+      session.user.id,
+      uniId,
+      query,
     );
   }
 }

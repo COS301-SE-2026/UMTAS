@@ -5,6 +5,7 @@ import {
   DiversionRequestDto,
   DiversionRouteResponseDto,
   RouteDto,
+  StudentStopRouteQueryDto,
 } from 'src/Route/dto';
 import {
   RouteHeatmapDto,
@@ -205,6 +206,17 @@ export function createDiversionRouteResponseDto(
     fromRoute: createRouteDto(),
     toRoute: createRouteDto(),
     diversion: 0.5,
+    ...overrides,
+  };
+}
+
+export function createStopRouteQueryDto(
+  overrides: Partial<StudentStopRouteQueryDto> = {},
+): StudentStopRouteQueryDto {
+  return {
+    date: '2026-01-02',
+    buildingId: 'stop-building',
+    time: '08:30',
     ...overrides,
   };
 }

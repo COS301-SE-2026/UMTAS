@@ -71,7 +71,6 @@ export class RouteDto {
 
   @ApiProperty({
     type: [LatLngDto],
-    isArray: true,
     description: 'List of latitude/longitude coordinates for the route path.',
   })
   @IsArray()

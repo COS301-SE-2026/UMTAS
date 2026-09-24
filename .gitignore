@@ -156,7 +156,15 @@ infra/database/seeds.sql/
 
 # Api docs
 # The committed OpenAPI document is the local source for reproducible client generation.
-apps/frontend/public/models/
+
+
+
+# Rust wasm
+apps/frontend/wasm-engine/target/
+
+*.onnx
+*.pt
+apps/frontend/public/wasm/
 apps/frontend/public/wasm/
 apps/frontend/wasm-engine/target/
 apps/backend/docs/openapi.json

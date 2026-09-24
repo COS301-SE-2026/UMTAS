@@ -2138,6 +2138,46 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/routes/diversion": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Create or update a route diversion
+     * @description University administrators can divert a proportion of traffic from one route to another.
+     */
+    put: operations["routeDiversion"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/routes/stop-route": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a stop-via route for a student on a date
+     * @description Returns the route from the student's current event to a stop building and from the stop to the next event, based on the requested time or the largest gap.
+     */
+    get: operations["getRouteViaBuilding"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/routes/student": {
     parameters: {
       query?: never;
@@ -5192,7 +5232,7 @@ export interface components {
        */
       routeIndex: number;
       /** @description List of latitude/longitude coordinates for the route path. */
-      pathCoordinates: Record<string, never>[][];
+      pathCoordinates: components["schemas"]["LatLngDto"][];
       /**
        * @description The route distance in metres.
        * @example 67
@@ -5223,6 +5263,34 @@ export interface components {
       /** @example Lecture 2 */
       toEventName?: string;
     };
+    DiversionRequestDto: {
+      /**
+       * Format: uuid
+       * @description Origin route UUID
+       */
+      fromRoute: string;
+      /**
+       * Format: uuid
+       * @description Destination route UUID.
+       */
+      toRoute?: string;
+      /**
+       * @description Destination route index.
+       * @example 0
+       */
+      toRouteIndex?: number;
+      /**
+       * @description Divert x amount of fromRoute -> toRoute
+       * @example 25
+       */
+      diversion: number;
+    };
+    DiversionRouteResponseDto: {
+      fromRoute: components["schemas"]["RouteDto"];
+      toRoute: components["schemas"]["RouteDto"];
+      /** @example 25 */
+      diversion: number;
+    };
     RouteEventContextDto: {
       /**
        * Format: uuid
@@ -5245,6 +5313,25 @@ export interface components {
       venueId?: string | null;
       /** Format: uuid */
       buildingId?: string | null;
+    };
+    StudentStopRouteLegDto: {
+      /** @enum {string} */
+      direction: "TO_STOP" | "FROM_STOP";
+      originEvent?: components["schemas"]["RouteEventContextDto"] | null;
+      destinationEvent?: components["schemas"]["RouteEventContextDto"] | null;
+      route?: components["schemas"]["RouteDto"] | null;
+      reason?: string | null;
+    };
+    StudentStopRouteResponseDto: {
+      /** Format: date */
+      date: string;
+      /** Format: uuid */
+      buildingId: string;
+      /** @example 10:30 */
+      time?: string | null;
+      /** @description The gap or event interval selected for the temporary stop. */
+      selectedWindow: string;
+      legs: components["schemas"]["StudentStopRouteLegDto"][];
     };
     StudentRouteTransitionDto: {
       originEvent: components["schemas"]["RouteEventContextDto"];
@@ -5278,7 +5365,7 @@ export interface components {
        * @example 0
        */
       routeIndex: number;
-      pathCoordinates: Record<string, never>[][];
+      pathCoordinates: components["schemas"]["LatLngDto"][];
       /**
        * @description The route distance in metres.
        * @example 820
@@ -10813,6 +10900,98 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
+  routeDiversion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DiversionRequestDto"];
+      };
+    };
+    responses: {
+      /** @description Diversion successfully created or updated. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DiversionRouteResponseDto"];
+        };
+      };
+      /** @description Invalid request. Diversion must be between 0 and 1 and either toRoute or toRouteIndex must be supplied. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description The source route, destination route, or requested alternative route could not be found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getRouteViaBuilding: {
+    parameters: {
+      query: {
+        /** @description Date whose attended events should be used. */
+        date: string;
+        /** @description Building the student wants to visit before their next class. */
+        buildingId: string;
+        /** @description Optional time in HH:mm. When omitted, the largest gap between scheduled events is selected. */
+        time?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Stop route returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StudentStopRouteResponseDto"];
+        };
+      };
+      /** @description Invalid stop route query parameters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description No university selected or insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No attended events found for the date, or no route could be determined for the stop */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
   getStudentRoutesForDate: {
     parameters: {
       query: {
@@ -10863,7 +11042,7 @@ export interface operations {
         /** @description Calendar date on which both events occur. */
         date: string;
         /** @description Zero-based route index. Index 0 is the shortest/default route. */
-        routeIndex?: components["schemas"]["Object"];
+        routeIndex?: number;
       };
       header?: never;
       path?: never;

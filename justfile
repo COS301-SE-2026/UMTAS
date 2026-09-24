@@ -1,6 +1,12 @@
 default:
     @just --list
 
+#dev for aidan ;)
+devClean:
+    just dockerClean
+    just sync
+    just dev
+
 # combine dev into easy to use profile
 dev:
     just dev-infra
@@ -37,6 +43,24 @@ dev-mobile: dev-infra rebuild-packages
 
 # Umtas local dev commands
 
+compile-wasm-dev:
+    phase run -- pnpm --filter frontend build:wasm:dev
+
+VisionModel:
+    @if [ ! -f apps/frontend/public/models/yolo26n.onnx ] || [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ]; then \
+        python3 -m venv .venv; \
+        .venv/bin/pip install --no-cache-dir ultralytics onnx onnxruntime; \
+        mkdir -p apps/frontend/public/models; \
+        if [ ! -f apps/frontend/public/models/yolo26n.onnx ]; then \
+            .venv/bin/yolo export model=yolo26n.pt format=onnx imgsz=640; \
+            mv yolo26n.onnx apps/frontend/public/models/yolo26n.onnx; \
+    fi; \
+        if [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ]; then \
+            .venv/bin/yolo export model=yolo26n-pose.pt format=onnx imgsz=640; \
+            mv yolo26n-pose.onnx apps/frontend/public/models/yolo26n-pose.onnx; \
+        fi; \
+        rm -rf .venv; \
+    fi
 
 # SimService
 simservInit:
@@ -54,11 +78,11 @@ back: rebuild-packages
     phase run -- pnpm --filter backend run start:dev
 
 # frontend + phase injection
-front: rebuild-packages
+front: rebuild-packages compile-wasm-dev
     phase run -- pnpm --filter frontend run dev
 
 # both + phase
-both: rebuild-packages
+both: rebuild-packages compile-wasm-dev
     phase run -- pnpm --parallel --filter backend --filter frontend run dev
 
 # spin up local versions
@@ -84,13 +108,13 @@ reset-volumes:
 
 # shared proxy stack
 proxy-up:
-  phase run --env staging -- docker compose -p umtas-proxy -f docker-compose.traefik.yml up 
+    phase run --env staging -- docker compose -p umtas-proxy -f docker-compose.traefik.yml up
 
 proxy-down:
-   phase run --env staging  -- docker compose -p umtas-proxy -f docker-compose.traefik.yml down
+    phase run --env staging  -- docker compose -p umtas-proxy -f docker-compose.traefik.yml down
 
 staging-up:
-    phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml up -d --remove-orphans 
+    phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml up -d --remove-orphans
 
 staging-down:
     phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml down
@@ -138,8 +162,7 @@ prod-up release_tag:
     IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -p umtas-prod -f docker-compose.prod.yml up -d --remove-orphans
 
 prod-down release_tag:
-     IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -p umtas-prod -f docker-compose.prod.yml down
-
+    IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -p umtas-prod -f docker-compose.prod.yml down
 
 # manual prod deployment
 
@@ -249,7 +272,7 @@ resetBack:
     just sync
     just back
 
-#lint-staged
+# lint-staged
 lintBack:
     pnpm run lint-staged
 
@@ -277,18 +300,14 @@ db_sql:
 # DROP SCHEMA public CASCADE; CREATE SCHEMA public; then quite
 # then you can delete all migrations and meta from drizzle and regenerate and migrate
 
-
 runsim:
     cd apps/simulation-service && phase run --env development -- docker compose up
-
 
 nfr-start:
     cd apps/NFR && phase run --env development -- docker compose up -d nfr-tester
 
 nfr-stop:
     cd apps/NFR && phase run --env development -- docker compose stop nfr-tester
-
-
 
 nfr-upload:
     cd apps/NFR && phase run --env development -- docker compose exec nfr-tester \
@@ -299,14 +318,11 @@ nfr-upload:
         --run-time 2m \
         --headless \
 
-
 staging-migrate:
     phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml run --rm backend node dist/db/migrate.js
 
 prod-migrate:
     phase run --env production -- docker compose -p umtas-production -f docker-compose.prod.yml run --rm backend node dist/db/migrate.js
-
-
 
 # Backend testing
 # unit test

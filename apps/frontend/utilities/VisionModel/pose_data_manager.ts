@@ -1,0 +1,62 @@
+import {
+  DetectedPersonPose,
+  PROCESS_POSE_DATA_MESSAGE,
+  RESULT_PROCESS_POSE_DATA,
+} from "./messageTypes";
+
+class Pose_Data_Manager {
+  private worker: Worker | null = null;
+  private isProcessing = false;
+
+  constructor() {}
+  public start() {
+    if (typeof window === "undefined") return;
+
+    if (!this.worker) {
+      this.worker = new Worker(
+        new URL("./pose_data_worker.ts", import.meta.url),
+        {
+          type: "module",
+        },
+      );
+      this.isProcessing = false;
+    }
+  }
+  public run(sliced_results: Float32Array[]): Promise<DetectedPersonPose[]> {
+    if (this.isProcessing || !this.worker) {
+      return Promise.resolve([]);
+    }
+    this.isProcessing = true;
+    const startTime = performance.now();
+
+    return new Promise((resolve) => {
+      const handleMessage = (event: MessageEvent) => {
+        const message = event.data as RESULT_PROCESS_POSE_DATA;
+        if (message.eventType === "POSE_DATA_PARSED") {
+          this.worker?.removeEventListener("message", handleMessage);
+          this.isProcessing = false;
+
+          resolve(message.payload); // TODO
+        }
+      };
+      this.worker?.addEventListener("message", handleMessage);
+
+      const poseMessage: PROCESS_POSE_DATA_MESSAGE = {
+        eventType: "PROCESS_POSE_DATA",
+        payload: {
+          sliced_results: sliced_results,
+        },
+      };
+
+      const transferBuffers = sliced_results.map((arr) => arr.buffer);
+      this.worker?.postMessage(poseMessage, transferBuffers);
+    });
+  }
+
+  public terminate() {
+    this.worker?.terminate();
+    this.worker = null;
+  }
+}
+
+export const pose_data_manager = new Pose_Data_Manager();
