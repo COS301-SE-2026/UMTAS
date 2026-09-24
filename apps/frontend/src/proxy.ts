@@ -31,7 +31,9 @@ export function proxy(request: NextRequest) {
   if (pathname === "/") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
-  const isPublicPath = PUBLIC_PATHS.some((path) => pathname.startsWith(path));
+  const isPublicPath =
+    pathname === "/attendance/check-in" ||
+    PUBLIC_PATHS.some((path) => pathname.startsWith(path));
   const isAuthApiPath = pathname.startsWith("/api/auth");
   const isHealthApiPath = pathname.startsWith("/api/health");
   const isApiRoute = pathname.startsWith("/api");
@@ -43,7 +45,7 @@ export function proxy(request: NextRequest) {
 
   if (!sessionCookie?.value) {
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("next", pathname);
+    loginUrl.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(loginUrl);
   }
 

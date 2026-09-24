@@ -1682,6 +1682,30 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/attendance/operator/preferred-event": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Select the operator preferred attendance event
+     * @description Select the operator preferred attendance event. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    put: operations["selectPreferredAttendanceEvent"];
+    post?: never;
+    /**
+     * Clear the operator preferred attendance event
+     * @description Clear the operator preferred attendance event. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    delete: operations["clearPreferredAttendanceEvent"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/attendance/records": {
     parameters: {
       query?: never;
@@ -1710,31 +1734,11 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    put?: never;
     /**
-     * Record the user resolved from a barcode in the current slot
-     * @description Record the user resolved from a barcode in the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     * Update the barcode guest count for the current slot
+     * @description Update the barcode guest count for the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.
      */
-    post: operations["recordBarcodeAttendance"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/attendance/records/camera": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /**
-     * Replace the anonymous headcount for the current slot
-     * @description Replace the anonymous headcount for the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.
-     */
-    put: operations["recordCameraAttendance"];
+    put: operations["recordBarcodeAttendance"];
     post?: never;
     delete?: never;
     options?: never;
@@ -1792,26 +1796,6 @@ export interface paths {
      * @description Correct an attendance session. This Attendance operation is part of the versioned UMTAS HTTP contract.
      */
     patch: operations["updateAttendanceSession"];
-    trace?: never;
-  };
-  "/api/attendance/sessions/{sessionId}/records": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Record one identified attendee
-     * @description Record one identified attendee. This Attendance operation is part of the versioned UMTAS HTTP contract.
-     */
-    post: operations["recordIdentifiedAttendance"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
     trace?: never;
   };
   "/api/attendance/sessions/{sessionId}/attendance/count": {
@@ -4418,8 +4402,14 @@ export interface components {
     };
     OperatorAttendanceSlotsResponseDto: {
       slotList: components["schemas"]["OperatorAttendanceSlotDto"][];
-      ambiguous: boolean;
       currentSlot?: components["schemas"]["OperatorAttendanceSlotDto"] | null;
+      /** Format: uuid */
+      preferredEventId: string | null;
+      requiresSelection: boolean;
+    };
+    SelectPreferredEventDto: {
+      /** Format: uuid */
+      eventID: string;
     };
     RecordAttendanceDto: {
       /**
@@ -4470,11 +4460,16 @@ export interface components {
     };
     RecordBarcodeAttendanceDto: {
       /**
-       * Format: uuid
-       * @description University user resolved from the scanned barcode
-       * @example 00000000-0000-4000-8000-000000000001
+       * @description Current guest headcount observed by the scanner
+       * @example 42
        */
-      UserID: string;
+      guestCount: number;
+      /**
+       * Format: uuid
+       * @description Event to record attendance against when selecting a slot
+       * @example 00000000-0000-4000-8000-000000000000
+       */
+      eventID?: string;
     };
     SessionAttendanceResponseDto: {
       /**
@@ -4498,7 +4493,7 @@ export interface components {
        * @description Most recent capture method for this record
        * @enum {string}
        */
-      captureMethod: "NFC" | "BARCODE" | "CAMERA" | "MANUAL";
+      captureMethod: "NFC" | "BARCODE" | "MANUAL";
       /**
        * Format: date-time
        * @description Initial recording time
@@ -4509,27 +4504,6 @@ export interface components {
        * @description Last update time
        */
       updatedAt: string;
-    };
-    AttendanceCaptureResultDto: {
-      /**
-       * @description Whether a new identified record was inserted
-       * @enum {string}
-       */
-      status: "RECORDED" | "ALREADY_RECORDED";
-      attendance: components["schemas"]["SessionAttendanceResponseDto"];
-    };
-    RecordCameraAttendanceDto: {
-      /**
-       * @description Current anonymous headcount observed by the camera
-       * @example 42
-       */
-      guestCount: number;
-      /**
-       * Format: uuid
-       * @description Event to record attendance against when selecting a slot
-       * @example 00000000-0000-4000-8000-000000000000
-       */
-      eventID?: string;
     };
     CreateAttendanceSessionDto: {
       /**
@@ -4629,20 +4603,6 @@ export interface components {
        */
       success: Record<string, never>;
     };
-    RecordIdentifiedAttendanceDto: {
-      /**
-       * Format: uuid
-       * @description Existing university user to record
-       * @example 00000000-0000-4000-8000-000000000001
-       */
-      UserID: string;
-      /**
-       * @description How the attendee was identified
-       * @example BARCODE
-       * @enum {string}
-       */
-      captureMethod: "BARCODE" | "MANUAL";
-    };
     SetGuestCountDto: {
       /**
        * @description Anonymous attendance total replacing the current value
@@ -4651,10 +4611,10 @@ export interface components {
       guestCount: number;
       /**
        * @description Source of the replacement count
-       * @example CAMERA
+       * @example BARCODE
        * @enum {string}
        */
-      captureMethod: "CAMERA" | "MANUAL";
+      captureMethod: "BARCODE" | "MANUAL";
     };
     VerifiedAttendanceHistoryResponseDto: {
       /** @description Identified attendance belonging to the current user */
@@ -9743,6 +9703,57 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
+  selectPreferredAttendanceEvent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SelectPreferredEventDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperatorAttendanceSlotDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  clearPreferredAttendanceEvent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
   recordAttendance: {
     parameters: {
       query?: never;
@@ -9782,35 +9793,6 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["RecordBarcodeAttendanceDto"];
-      };
-    };
-    responses: {
-      /** @description HTTP 201 response. */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AttendanceCaptureResultDto"];
-        };
-      };
-      400: components["responses"]["BadRequestError"];
-      401: components["responses"]["UnauthorizedError"];
-      403: components["responses"]["ForbiddenError"];
-      409: components["responses"]["ConflictError"];
-      500: components["responses"]["InternalError"];
-    };
-  };
-  recordCameraAttendance: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RecordCameraAttendanceDto"];
       };
     };
     responses: {
@@ -9962,38 +9944,6 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["AttendanceSessionResponseDto"];
-        };
-      };
-      400: components["responses"]["BadRequestError"];
-      401: components["responses"]["UnauthorizedError"];
-      403: components["responses"]["ForbiddenError"];
-      404: components["responses"]["NotFoundError"];
-      409: components["responses"]["ConflictError"];
-      500: components["responses"]["InternalError"];
-    };
-  };
-  recordIdentifiedAttendance: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        sessionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RecordIdentifiedAttendanceDto"];
-      };
-    };
-    responses: {
-      /** @description HTTP 201 response. */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AttendanceCaptureResultDto"];
         };
       };
       400: components["responses"]["BadRequestError"];
