@@ -82,7 +82,7 @@ services:
     command:
       - |
         set -eu
-        aws --endpoint-url http://minio-staging:9000 s3 mb "s3://$${MINIO_BUCKET}" \vert{}\vert{} true         aws --endpoint-url http://minio-staging:9000 s3 cp /seed/LECTURES_S1.pdf "s3://$${MINIO_BUCKET}/demo/pdf-parser/up/LECTURES_S1.pdf"
+        aws --endpoint-url http://minio-staging:9000 s3 mb "s3://$${MINIO_BUCKET}" || true         aws --endpoint-url http://minio-staging:9000 s3 cp /seed/LECTURES_S1.pdf "s3://$${MINIO_BUCKET}/demo/pdf-parser/up/LECTURES_S1.pdf"
 
   pdf-parser-worker:
     image: ${DOCKER_REGISTRY:-vigilcs/umtas}:pdf-parser-worker-staging-${IMAGE_TAG:-latest}
