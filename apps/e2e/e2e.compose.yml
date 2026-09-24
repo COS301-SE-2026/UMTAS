@@ -54,8 +54,7 @@ services:
       retries: 30
 
   minio:
-    image: quay.io/minio/minio:RELEASE.2023-10-25T06-33-25Z
-    command: server /data
+    image: rustfs/rustfs:latest
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-e2e-minio}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-e2e-minio-password}
@@ -64,7 +63,7 @@ services:
     networks:
       - e2e
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/ready"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
       interval: 2s
       timeout: 3s
       retries: 30
