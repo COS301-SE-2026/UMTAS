@@ -310,7 +310,7 @@ export const navigationItems: NavigationItem[] = [
     id: "brand-style",
     label: "Brand Style",
     href: "/brand-style",
-    section: "admin",
+    section: "help",
     icon: "SwatchIcon",
     tourContent: "View the application's brand and design system.",
     keywords: ["brand", "style", "design", "theme"],
