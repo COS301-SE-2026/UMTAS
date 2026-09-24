@@ -1,19 +1,18 @@
 import { ConflictException } from '@nestjs/common';
-
 import { EventImportFingerprintService } from '../Events/event-import-fingerprint.service';
-
 import {
   createEvent,
   createModule,
   createParsedEventCandidate,
+  createVenue,
 } from '../Testing/Factories';
-
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
-
-import { createDbChain, mockDbResult } from '../Testing/Mocks/database.helpers';
-
+import {
+  createDbChain,
+  mockDbResult,
+  mockSequentialResults,
+} from '../Testing/Mocks/database.helpers';
 import { EventImporter } from './event-importer.service';
-import { VenueResolver } from './venue-resolver.service';
 
 describe('EventImporter', () => {
   const module = createModule({
@@ -25,17 +24,10 @@ describe('EventImporter', () => {
     const fingerprint = {
       buildForModuleEvent: jest.fn().mockReturnValue('fingerprint-1'),
     };
-
-    const venueResolver = {
-      resolveForUniversity: jest.fn().mockResolvedValue([]),
-    };
-
     return {
       fingerprint,
-      venueResolver,
       service: new EventImporter(
         fingerprint as unknown as EventImportFingerprintService,
-        venueResolver as unknown as VenueResolver,
       ),
     };
   }
@@ -43,33 +35,26 @@ describe('EventImporter', () => {
   it('skips events whose normalized module code cannot be resolved', async () => {
     const h = harness();
     const { mockDb } = createMockDatabase();
-
     await h.service.createMissingEvents(
       mockDb,
       'uni-1',
       [createParsedEventCandidate({ moduleCode: 'unknown' })],
       new Map([['COS101', module]]),
     );
-
     expect(mockDb.select).not.toHaveBeenCalled();
     expect(mockDb.insert).not.toHaveBeenCalled();
-
     expect(h.fingerprint.buildForModuleEvent).not.toHaveBeenCalled();
-    expect(h.venueResolver.resolveForUniversity).not.toHaveBeenCalled();
   });
 
   it('creates a non-recurring event and university link without venue links', async () => {
     const h = harness();
     const { mockDb } = createMockDatabase();
-
     const event = createEvent(undefined, {
       eventID: 'event-1',
       importFingerprint: 'fingerprint-1',
     });
-
     const eventInsert = createDbChain([event]);
     const universityLink = createDbChain([]);
-
     (mockDb.insert as jest.Mock)
       .mockReturnValueOnce(eventInsert)
       .mockReturnValueOnce(universityLink);
@@ -91,12 +76,6 @@ describe('EventImporter', () => {
       new Map([['COS101', module]]),
     );
 
-    expect(h.venueResolver.resolveForUniversity).toHaveBeenCalledWith(
-      mockDb,
-      'uni-1',
-      [],
-    );
-
     expect(eventInsert.values).toHaveBeenCalledWith(
       expect.objectContaining({
         eventName: 'COS101 tutorial',
@@ -109,21 +88,16 @@ describe('EventImporter', () => {
         }),
       }),
     );
-
     expect(universityLink.values).toHaveBeenCalledWith({
       moduleID: 'module-1',
       eventID: 'event-1',
     });
-
     expect(mockDb.insert).toHaveBeenCalledTimes(2);
-
     expect(h.fingerprint.buildForModuleEvent).toHaveBeenCalledWith({
       moduleId: 'module-1',
       activityType: 'tutorial',
       activityCode: 'tutorial',
-      eventCriteria: expect.objectContaining({
-        date: '2026-08-03',
-      }),
+      eventCriteria: expect.objectContaining({ date: '2026-08-03' }),
       venueNames: [],
     });
   });
@@ -149,9 +123,7 @@ describe('EventImporter', () => {
   ])('normalizes weekday alias %s to %s', async (day, expected) => {
     const h = harness();
     const { mockDb } = createMockDatabase();
-
     const eventInsert = createDbChain([createEvent()]);
-
     (mockDb.insert as jest.Mock)
       .mockReturnValueOnce(eventInsert)
       .mockReturnValueOnce(createDbChain([]));
@@ -166,12 +138,9 @@ describe('EventImporter', () => {
       ],
       new Map([['COS101', module]]),
     );
-
     expect(eventInsert.values).toHaveBeenCalledWith(
       expect.objectContaining({
-        eventCriteria: expect.objectContaining({
-          dayOfWeek: expected,
-        }),
+        eventCriteria: expect.objectContaining({ dayOfWeek: expected }),
       }),
     );
   });
@@ -181,7 +150,6 @@ describe('EventImporter', () => {
     async (day) => {
       const h = harness();
       const { mockDb } = createMockDatabase();
-
       await expect(
         h.service.createMissingEvents(
           mockDb,
@@ -190,7 +158,6 @@ describe('EventImporter', () => {
           new Map([['COS101', module]]),
         ),
       ).rejects.toThrow(ConflictException);
-
       expect(mockDb.insert).not.toHaveBeenCalled();
     },
   );
@@ -198,13 +165,9 @@ describe('EventImporter', () => {
   it('falls back to an existing event after an insertion conflict', async () => {
     const h = harness();
     const { mockDb } = createMockDatabase();
-
     mockDbResult(mockDb.select as jest.Mock, [
-      createEvent(undefined, {
-        eventID: 'existing-event',
-      }),
+      createEvent(undefined, { eventID: 'existing-event' }),
     ]);
-
     (mockDb.insert as jest.Mock)
       .mockReturnValueOnce(createDbChain([]))
       .mockReturnValueOnce(createDbChain([]));
@@ -215,7 +178,6 @@ describe('EventImporter', () => {
       [createParsedEventCandidate({ venues: [] })],
       new Map([['COS101', module]]),
     );
-
     expect(
       (mockDb.insert as jest.Mock).mock.results[1]?.value.values,
     ).toHaveBeenCalledWith({
@@ -227,10 +189,8 @@ describe('EventImporter', () => {
   it('rejects an unresolvable event insertion conflict', async () => {
     const h = harness();
     const { mockDb } = createMockDatabase();
-
     mockDbResult(mockDb.select as jest.Mock, []);
     mockDbResult(mockDb.insert as jest.Mock, []);
-
     await expect(
       h.service.createMissingEvents(
         mockDb,
@@ -241,158 +201,75 @@ describe('EventImporter', () => {
     ).rejects.toThrow('PDF parser event could not be resolved');
   });
 
-  it('resolves existing venues and creates event venue links', async () => {
+  it('reuses, creates, deduplicates, truncates, and race-resolves venues', async () => {
     const h = harness();
     const { mockDb } = createMockDatabase();
-
-    h.venueResolver.resolveForUniversity.mockResolvedValue([
-      'venue-1',
-      'venue-2',
-    ]);
-
-    const eventInsert = createDbChain([
-      createEvent(undefined, {
-        eventID: 'event-1',
-      }),
-    ]);
-
-    const universityLink = createDbChain([]);
-    const venueLinkOne = createDbChain([]);
-    const venueLinkTwo = createDbChain([]);
-
-    (mockDb.insert as jest.Mock)
-      .mockReturnValueOnce(eventInsert)
-      .mockReturnValueOnce(universityLink)
-      .mockReturnValueOnce(venueLinkOne)
-      .mockReturnValueOnce(venueLinkTwo);
-
-    await h.service.createMissingEvents(
-      mockDb,
-      'uni-1',
-      [
-        createParsedEventCandidate({
-          venues: ['IT 4-1', 'Centenary 6'],
-        }),
-      ],
-      new Map([['COS101', module]]),
-    );
-
-    expect(h.venueResolver.resolveForUniversity).toHaveBeenCalledTimes(1);
-
-    expect(h.venueResolver.resolveForUniversity).toHaveBeenCalledWith(
-      mockDb,
-      'uni-1',
-      ['IT 4-1', 'Centenary 6'],
-    );
-
-    expect(venueLinkOne.values).toHaveBeenCalledWith({
-      EventID: 'event-1',
-      VenueID: 'venue-1',
+    const existing = createVenue({ VenueID: 'venue-existing' });
+    const created = createVenue({ VenueID: 'venue-created' });
+    const truncated = createVenue({
+      VenueID: 'venue-truncated',
+      VenueName: 'L'.repeat(30),
     });
-
-    expect(venueLinkTwo.values).toHaveBeenCalledWith({
-      EventID: 'event-1',
-      VenueID: 'venue-2',
-    });
-
-    expect(mockDb.insert).toHaveBeenCalledTimes(4);
-  });
-
-  it('does not create venue links when venue resolver cannot resolve the parsed venues', async () => {
-    const h = harness();
-    const { mockDb } = createMockDatabase();
-
-    h.venueResolver.resolveForUniversity.mockResolvedValue([]);
-
-    const eventInsert = createDbChain([
-      createEvent(undefined, {
-        eventID: 'event-1',
-      }),
+    const raced = createVenue({ VenueID: 'venue-raced' });
+    mockSequentialResults(mockDb.select as jest.Mock, [
+      [existing],
+      [],
+      [],
+      [],
+      [raced],
     ]);
-
+    const venueCreate = createDbChain([created]);
+    const longVenueCreate = createDbChain([truncated]);
+    const racedVenueCreate = createDbChain([]);
+    const eventInsert = createDbChain([
+      createEvent(undefined, { eventID: 'event-1' }),
+    ]);
     const universityLink = createDbChain([]);
-
+    const venueLinks = [0, 1, 2, 3].map(() => createDbChain([]));
     (mockDb.insert as jest.Mock)
+      .mockReturnValueOnce(venueCreate)
+      .mockReturnValueOnce(longVenueCreate)
+      .mockReturnValueOnce(racedVenueCreate)
       .mockReturnValueOnce(eventInsert)
       .mockReturnValueOnce(universityLink);
+    for (const link of venueLinks) {
+      (mockDb.insert as jest.Mock).mockReturnValueOnce(link);
+    }
 
     await h.service.createMissingEvents(
       mockDb,
       'uni-1',
       [
         createParsedEventCandidate({
-          venues: ['Unknown Venue'],
+          venues: [' Existing ', 'New', 'New', ' ', 'L'.repeat(40), 'Race'],
         }),
       ],
       new Map([['COS101', module]]),
     );
 
-    expect(h.venueResolver.resolveForUniversity).toHaveBeenCalledWith(
-      mockDb,
-      'uni-1',
-      ['Unknown Venue'],
-    );
-
-    expect(mockDb.insert).toHaveBeenCalledTimes(2);
-  });
-
-  it('deduplicates venue links returned by the resolver', async () => {
-    const h = harness();
-    const { mockDb } = createMockDatabase();
-
-    h.venueResolver.resolveForUniversity.mockResolvedValue([
-      'venue-1',
-      'venue-2',
-    ]);
-
-    const eventInsert = createDbChain([
-      createEvent(undefined, {
-        eventID: 'event-1',
-      }),
-    ]);
-
-    const universityLink = createDbChain([]);
-    const venueLinkOne = createDbChain([]);
-    const venueLinkTwo = createDbChain([]);
-
-    (mockDb.insert as jest.Mock)
-      .mockReturnValueOnce(eventInsert)
-      .mockReturnValueOnce(universityLink)
-      .mockReturnValueOnce(venueLinkOne)
-      .mockReturnValueOnce(venueLinkTwo);
-
-    await h.service.createMissingEvents(
-      mockDb,
-      'uni-1',
-      [
-        createParsedEventCandidate({
-          venues: ['IT 4-1', 'IT4-1'],
-        }),
-      ],
-      new Map([['COS101', module]]),
-    );
-
-    expect(venueLinkOne.values).toHaveBeenCalledWith({
-      EventID: 'event-1',
-      VenueID: 'venue-1',
+    expect(venueCreate.values).toHaveBeenCalledWith({
+      VenueName: 'New',
+      UniversityID: 'uni-1',
     });
-
-    expect(venueLinkTwo.values).toHaveBeenCalledWith({
-      EventID: 'event-1',
-      VenueID: 'venue-2',
+    expect(longVenueCreate.values).toHaveBeenCalledWith({
+      VenueName: 'L'.repeat(30),
+      UniversityID: 'uni-1',
     });
+    expect(venueLinks.map((link) => link.values.mock.calls[0]?.[0])).toEqual([
+      { EventID: 'event-1', VenueID: 'venue-existing' },
+      { EventID: 'event-1', VenueID: 'venue-created' },
+      { EventID: 'event-1', VenueID: 'venue-truncated' },
+      { EventID: 'event-1', VenueID: 'venue-raced' },
+    ]);
   });
 
   it('truncates explicit event names and activity codes', async () => {
     const h = harness();
     const { mockDb } = createMockDatabase();
-
     const eventInsert = createDbChain([createEvent()]);
-
     (mockDb.insert as jest.Mock)
       .mockReturnValueOnce(eventInsert)
       .mockReturnValueOnce(createDbChain([]));
-
     await h.service.createMissingEvents(
       mockDb,
       'uni-1',
@@ -405,7 +282,6 @@ describe('EventImporter', () => {
       ],
       new Map([['COS101', module]]),
     );
-
     expect(eventInsert.values).toHaveBeenCalledWith(
       expect.objectContaining({
         eventName: 'T'.repeat(32),
