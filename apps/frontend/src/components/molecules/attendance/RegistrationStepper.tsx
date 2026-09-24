@@ -193,7 +193,7 @@ export function RegistrationStepper({
                   </span>
                 </label>
                 <Button onClick={onConfirm} disabled={!manuallyVerified}>
-                  I verified the URL and wrote the sticker — activate it
+                  I verified the URL and wrote the sticker - activate it
                 </Button>
                 {hasCurrentTag && (
                   <p className="text-xs text-[var(--text-secondary)]">
