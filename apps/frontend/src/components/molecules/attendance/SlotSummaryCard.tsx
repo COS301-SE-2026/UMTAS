@@ -7,7 +7,10 @@ export function formatSlotTime(startAt: string, endAt: string) {
     hour: "2-digit",
     minute: "2-digit",
   });
-  return `${formatter.format(new Date(startAt))} – ${formatter.format(new Date(endAt))}`;
+
+  return `${formatter.format(new Date(startAt))} – ${formatter.format(
+    new Date(endAt),
+  )}`;
 }
 
 export function SlotSummaryCard({
@@ -26,58 +29,69 @@ export function SlotSummaryCard({
   if (variant === "current") {
     return (
       <div
-        className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-base)] px-4 py-3"
+        className="rounded-lg border border-[var(--border)] bg-[var(--bg-base)] p-4"
         aria-label="Current class"
       >
-        <div className="min-w-0">
-          <p className="text-[15px] font-medium text-[var(--text-primary)]">
-            {slot.moduleCode} · {slot.moduleName}
-          </p>
-          <p className="mt-0.5 text-xs text-[var(--text-secondary)]">
-            {formatSlotTime(slot.startAt, slot.endAt)} · {slot.venue}
-          </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)]">
+              Current class
+            </p>
+
+            <p className="mt-1 text-[15px] font-medium text-[var(--text-primary)]">
+              {slot.moduleCode} · {slot.moduleName}
+            </p>
+
+            <div className="mt-2 grid gap-1 text-xs text-[var(--text-secondary)]">
+              <p>{formatSlotTime(slot.startAt, slot.endAt)}</p>
+              <p>{slot.venue}</p>
+            </div>
+          </div>
+
+          <AttendanceStatusPill status="IN_PROGRESS" />
         </div>
-        <AttendanceStatusPill status="IN_PROGRESS" />
       </div>
     );
   }
 
   return (
     <div
-      className={`flex flex-col gap-3 border-b py-3 sm:flex-row sm:items-center sm:justify-between ${
-        selected ? "border-[var(--text-primary)]" : "border-[var(--border)]"
+      className={`rounded-lg border p-4 ${
+        selected
+          ? "border-[var(--text-primary)] bg-[var(--bg-elevated)]"
+          : "border-[var(--border)] bg-[var(--bg-base)]"
       }`}
     >
-      <div className="flex min-w-0 items-start justify-between gap-4 sm:block">
-        <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <p className="text-sm font-medium text-[var(--text-primary)]">
             {slot.moduleCode} · {slot.moduleName}
           </p>
-          <p className="mt-1 text-xs text-[var(--text-secondary)]">
-            {formatSlotTime(slot.startAt, slot.endAt)} · {slot.venue}
-          </p>
+
+          <div className="mt-1 grid gap-0.5 text-xs text-[var(--text-secondary)]">
+            <p>{formatSlotTime(slot.startAt, slot.endAt)}</p>
+            <p>{slot.venue}</p>
+          </div>
         </div>
-        <AttendanceStatusPill status={slot.state} className="sm:hidden" />
-      </div>
-      <div className="flex shrink-0 items-center gap-3">
-        <AttendanceStatusPill
-          status={slot.state}
-          className="hidden sm:inline-flex"
-        />
-        {onSelect && !selected && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onSelect}
-            disabled={busy}
-          >
-            {busy
-              ? "Selecting…"
-              : slot.state === "AVAILABLE"
-                ? "Use for attendance"
-                : "Set as preferred"}
-          </Button>
-        )}
+
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <AttendanceStatusPill status={slot.state} />
+
+          {onSelect && !selected && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onSelect}
+              disabled={busy}
+            >
+              {busy
+                ? "Selecting…"
+                : slot.state === "AVAILABLE"
+                  ? "Use this class"
+                  : "Set preference"}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
