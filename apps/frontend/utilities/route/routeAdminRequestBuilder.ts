@@ -6,6 +6,11 @@ export type divertRouteBody =
 export type divertRouteRes =
   paths["/api/routes/diversion"]["put"]["responses"]["200"]["content"]["application/json"];
 
+export type getRouteVariantQuery =
+  paths["/api/routes/variant"]["get"]["parameters"]["query"];
+export type getRouteVariantRes =
+  paths["/api/routes/variant"]["get"]["responses"]["200"]["content"]["application/json"];
+
 export class diverRouteBuilder extends RequestBuilder<
   undefined,
   divertRouteBody,
@@ -14,5 +19,17 @@ export class diverRouteBuilder extends RequestBuilder<
   constructor() {
     super();
     this.setUrl("/routes/diversion").setMethod(RequestMethod.PUT);
+  }
+}
+
+export class getRouteVariantBuilder extends RequestBuilder<
+  undefined,
+  undefined,
+  getRouteVariantRes,
+  getRouteVariantQuery
+> {
+  constructor() {
+    super();
+    this.setUrl("/routes/variant").setMethod(RequestMethod.GET);
   }
 }
