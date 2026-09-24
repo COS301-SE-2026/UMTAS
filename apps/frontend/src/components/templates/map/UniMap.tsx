@@ -50,6 +50,7 @@ import {
   StudentRouteAlerts,
   StudentRouteLines,
 } from "@/components/organisms/map/StudentRoutes";
+import { AdminRouteDiversion } from "@/components/organisms/map/AdminRouteDiversion";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -331,7 +332,10 @@ export function UniMap() {
           )}
         </div>
 
-        <div id="university-map" className="flex-1 overflow-hidden">
+        <div
+          id="university-map"
+          className="flex-1 min-h-[75vh] overflow-hidden"
+        >
           <MapScreen
             onRequestMapSetup={() => router.push("/mapping/config")}
             adminMode={adminMode}
@@ -410,12 +414,13 @@ export function UniMap() {
         </div>
 
         {canUserDraw && (
-          <div id="admin-map-controls">
+          <div id="admin-map-controls" className="flex flex-col gap-4">
             <AdminDrawControls
               buildings={buildings}
               onModeChange={setAdminMode}
               drawingState={buildingDraw}
-            />{" "}
+            />
+            <AdminRouteDiversion buildings={buildings} />
           </div>
         )}
 

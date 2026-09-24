@@ -14,8 +14,10 @@ import {
   ActiveRouteResponseDto,
   DiversionRequestDto,
   DiversionRouteResponseDto,
+  RouteDto,
   RouteQueryDto,
   RouteSingleResponseDto,
+  RouteVariantQueryDto,
   RoutingHeatmapQueryDto,
   RoutingHeatmapResponseDto,
   StudentStopRouteQueryDto,
@@ -71,7 +73,7 @@ export class RouteController {
   }
 
   @Get()
-  @Roles('student')
+  @Roles('student', 'uni_admin')
   @ApiOperation({
     summary: 'Get a walking route between an origin and a destination building',
     description:
@@ -151,6 +153,21 @@ export class RouteController {
     @Body() dto: DiversionRequestDto,
   ): Promise<DiversionRouteResponseDto> {
     return this.diversionService.divertRoute(uniId, dto);
+  }
+
+  @Get('variant')
+  @Roles('uni_admin')
+  @ApiOkResponse({ type: RouteDto })
+  getVariant(
+    @CurrentUniId() uniId: string,
+    @Query() query: RouteVariantQueryDto,
+  ): Promise<RouteDto | null> {
+    return this.routeService.getVariantOrNull(
+      uniId,
+      query.originBuildingId,
+      query.destinationBuildingId,
+      query.routeIndex,
+    );
   }
 
   @Get('stop-route')

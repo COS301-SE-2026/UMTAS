@@ -30,7 +30,6 @@ import {
   type AttendanceSessionResponseDto,
   type CreateAttendanceSessionDto,
   type DeleteAttendanceSessionResponseDto,
-  type RecordIdentifiedAttendanceDto,
   type SessionAttendanceResponseDto,
   type SetGuestCountDto,
   type UpdateAttendanceSessionDto,
@@ -236,32 +235,10 @@ export class AttendanceSessionService {
     return this.requireSession(session);
   }
 
-  async recordIdentifiedAttendance(
-    actor: AttendanceActor,
-    sessionId: string,
-    dto: RecordIdentifiedAttendanceDto,
-    tx?: AppDatabase,
-  ): Promise<AttendanceCaptureResultDto> {
-    if (!tx) {
-      return this.dbService.db.transaction((transaction: AppDatabase) =>
-        this.recordIdentifiedAttendance(actor, sessionId, dto, transaction),
-      );
-    }
-    const session = await this.getLockedSession(sessionId, tx);
-    await this.assertOperatorForEvent(actor, session.eventID, tx);
-    await this.assertUserEnrolled(dto.UserID, session.eventID, tx);
-    return this.insertIdentifiedAttendance(
-      sessionId,
-      dto.UserID,
-      dto.captureMethod,
-      tx,
-    );
-  }
-
   async recordAuthenticatedAttendance(
     actor: AttendanceActor,
     sessionId: string,
-    captureMethod: Exclude<SessionAttendanceCaptureMethodType, 'CAMERA'>,
+    captureMethod: SessionAttendanceCaptureMethodType,
     tx?: AppDatabase,
   ): Promise<AttendanceCaptureResultDto> {
     if (!tx) {
@@ -287,7 +264,7 @@ export class AttendanceSessionService {
 
   async incrementGuestAttendance(
     sessionId: string,
-    captureMethod: Exclude<SessionAttendanceCaptureMethodType, 'CAMERA'>,
+    captureMethod: SessionAttendanceCaptureMethodType,
     tx?: AppDatabase,
   ): Promise<SessionAttendanceResponseDto> {
     if (!tx) {
@@ -297,7 +274,11 @@ export class AttendanceSessionService {
     }
     const session = await this.getLockedSession(sessionId, tx);
     this.assertCaptureAvailable(session);
-    const existing = await this.getGuestAttendance(sessionId, tx);
+    const existing = await this.getGuestAttendance(
+      sessionId,
+      captureMethod,
+      tx,
+    );
     const [attendance] = existing
       ? await tx
           .update(SessionAttendance)
@@ -333,13 +314,19 @@ export class AttendanceSessionService {
     }
     const session = await this.getLockedSession(sessionId, tx);
     await this.assertOperatorForEvent(actor, session.eventID, tx);
-    if (dto.captureMethod === 'CAMERA') this.assertCaptureAvailable(session);
-    const existing = await this.getGuestAttendance(sessionId, tx);
+    const existing = await this.getGuestAttendance(
+      sessionId,
+      dto.captureMethod,
+      tx,
+    );
     const [attendance] = existing
       ? await tx
           .update(SessionAttendance)
           .set({
-            guestCount: dto.guestCount,
+            guestCount:
+              dto.captureMethod === 'BARCODE'
+                ? Math.max(existing.guestCount ?? 0, dto.guestCount)
+                : dto.guestCount,
             captureMethod: dto.captureMethod,
             updatedAt: new Date(),
           })
@@ -380,7 +367,7 @@ export class AttendanceSessionService {
   private async insertIdentifiedAttendance(
     sessionId: string,
     userId: string,
-    captureMethod: Exclude<SessionAttendanceCaptureMethodType, 'CAMERA'>,
+    captureMethod: SessionAttendanceCaptureMethodType,
     tx: AppDatabase,
   ): Promise<AttendanceCaptureResultDto> {
     const [existing] = await tx
@@ -631,6 +618,7 @@ export class AttendanceSessionService {
 
   private async getGuestAttendance(
     sessionId: string,
+    captureMethod: SessionAttendanceCaptureMethodType,
     tx: AppDatabase,
   ): Promise<SessionAttendanceEntity | undefined> {
     const [attendance] = await tx
@@ -640,6 +628,7 @@ export class AttendanceSessionService {
         and(
           eq(SessionAttendance.SessionID, sessionId),
           isNull(SessionAttendance.UserID),
+          eq(SessionAttendance.captureMethod, captureMethod),
         ),
       )
       .limit(1);
@@ -651,7 +640,10 @@ export class AttendanceSessionService {
     rows: SessionAttendanceEntity[],
   ): AttendanceSessionResponseDto {
     const identifiedCount = rows.filter((row) => row.UserID !== null).length;
-    const guestCount = rows.find((row) => row.UserID === null)?.guestCount ?? 0;
+    const guestCount = rows.reduce(
+      (count, row) => count + (row.UserID === null ? (row.guestCount ?? 0) : 0),
+      0,
+    );
     return {
       ...session,
       identifiedCount,

@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  allowedDevOrigins: ["*.ngrok-free.dev", "*.ngrok-free.app"],
   async rewrites() {
     const target = process.env.API_URL || "http://backend:8003";
     console.log(

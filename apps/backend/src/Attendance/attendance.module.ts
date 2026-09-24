@@ -5,6 +5,7 @@ import { AttendanceService } from './attendance.service';
 import { AttendanceSessionService } from './attendance-session.service';
 import { NfcAttendanceService } from './nfc-attendance.service';
 import { AttendanceCaptureService } from './attendance-capture.service';
+import { AttendancePreferenceService } from './attendance-preference.service';
 
 import { EventModule } from '../Events/event.module';
 
@@ -15,12 +16,14 @@ import { EventModule } from '../Events/event.module';
     AttendanceService,
     AttendanceSessionService,
     AttendanceCaptureService,
+    AttendancePreferenceService,
     NfcAttendanceService,
   ],
   exports: [
     AttendanceService,
     AttendanceSessionService,
     AttendanceCaptureService,
+    AttendancePreferenceService,
     NfcAttendanceService,
   ],
 })

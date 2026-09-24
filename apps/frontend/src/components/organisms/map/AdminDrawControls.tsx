@@ -69,7 +69,7 @@ export function AdminDrawControls({
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-4 shadow-md">
       <p className="text-sm font-medium text-[var(--text-primary)]">
-        Admin: pin or outline a building
+        Admin: pin a building
       </p>
 
       <Select value={selectedBuildingId} onValueChange={setSelectedBuildingId}>
@@ -98,7 +98,7 @@ export function AdminDrawControls({
           Drop pin
         </Button>
 
-        <Button
+        {/* <Button
           variant={mode === "draw" ? "default" : "outline"}
           size="sm"
           disabled={!selectedBuildingId}
@@ -110,7 +110,7 @@ export function AdminDrawControls({
           {mode === "draw"
             ? `Drawing (${polygonPath.length} points)`
             : "Draw outline"}
-        </Button>
+        </Button> */}
 
         <CreateBuilding />
       </div>
