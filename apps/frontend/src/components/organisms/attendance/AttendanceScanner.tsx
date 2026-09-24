@@ -7,6 +7,7 @@ import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Upload } from "lucide-react";
 
+import { BarcodeCamera } from "@/components/molecules/attendance/BarcodeCamera";
 import { ScannerBadge } from "@/components/molecules/attendance/ScannerBadge";
 import { StudentNumberInput } from "@/components/molecules/attendance/USBBarcodeScanner";
 
@@ -18,6 +19,8 @@ import { ConflictingEventDialog } from "./ConflictingEventDialog";
 import { selectPreferredEvent } from "@/lib/nfc_attendance/nfc_api";
 import type { AttendanceSlot } from "@/lib/nfc_attendance/types";
 
+import { Switch } from "@/components/atoms/baseShadcn/switch";
+import { Label } from "@/components/atoms/baseShadcn/label";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
 export default function AttendanceScanner() {
@@ -33,6 +36,8 @@ export default function AttendanceScanner() {
   const [lastScan, setLastScan] = useState<string | null>(null);
 
   const [status, setStatus] = useState<"READY" | "SUCCESS" | "ERROR">("READY");
+
+  const [useCamera, setUseCamera] = useState(true);
 
   const [sessionStarted, setSessionStarted] = useState(false);
   const [sessionEnded, setSessionEnded] = useState(false);
@@ -376,10 +381,38 @@ export default function AttendanceScanner() {
     <div className="flex w-full flex-col gap-4">
       <div className="flex items-center justify-between">
         <ScannerBadge status={status} />
+
+        <div className="flex items-center gap-2">
+          <Label
+            htmlFor="scanner-mode"
+            className="text-sm text-[var(--text-secondary)]"
+          >
+            Scanner / Manual
+          </Label>
+
+          <Switch
+            id="scanner-mode"
+            checked={useCamera}
+            onCheckedChange={setUseCamera}
+          />
+
+          <Label
+            htmlFor="scanner-mode"
+            className="text-sm text-[var(--text-secondary)]"
+          >
+            Camera
+          </Label>
+        </div>
       </div>
 
       <div className="w-full">
-        <StudentNumberInput onScan={handleScan} />
+        {useCamera ? (
+          <div className="aspect-video w-full rounded-xl border-2 border-[var(--border)]">
+            <BarcodeCamera onScan={handleScan} />
+          </div>
+        ) : (
+          <StudentNumberInput onScan={handleScan} />
+        )}
       </div>
 
       <div className="w-full">
