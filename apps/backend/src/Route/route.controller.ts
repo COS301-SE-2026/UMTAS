@@ -71,7 +71,7 @@ export class RouteController {
   }
 
   @Get()
-  @Roles('student')
+  @Roles('student', 'uni_admin')
   @ApiOperation({
     summary: 'Get a walking route between an origin and a destination building',
     description:
