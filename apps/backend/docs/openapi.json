@@ -7587,6 +7587,75 @@
         ]
       }
     },
+    "/api/routes/variant": {
+      "get": {
+        "operationId": "RouteController_getVariant",
+        "parameters": [
+          {
+            "name": "originBuildingId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "destinationBuildingId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "routeIndex",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "tags": [
+          "Routes"
+        ],
+        "summary": "GET /api/routes/variant",
+        "description": "GET /api/routes/variant. This Routes operation is part of the versioned UMTAS HTTP contract."
+      }
+    },
     "/api/routes/stop-route": {
       "get": {
         "description": "Returns the route from the student's current event to a stop building and from the stop to the next event, based on the requested time or the largest gap.",

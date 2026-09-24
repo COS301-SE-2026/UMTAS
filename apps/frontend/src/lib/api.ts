@@ -2174,6 +2174,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/routes/variant": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * GET /api/routes/variant
+     * @description GET /api/routes/variant. This Routes operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["RouteController_getVariant"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/routes/stop-route": {
     parameters: {
       query?: never;
@@ -10989,6 +11009,34 @@ export interface operations {
         content?: never;
       };
       409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  RouteController_getVariant: {
+    parameters: {
+      query: {
+        originBuildingId: string;
+        destinationBuildingId: string;
+        routeIndex: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RouteDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       500: components["responses"]["InternalError"];
     };
   };
