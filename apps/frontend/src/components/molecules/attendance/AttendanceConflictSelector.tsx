@@ -1,7 +1,11 @@
 "use client";
 
 import { AlertCircle } from "lucide-react";
-import { Alert } from "@/components/atoms/baseShadcn/alert";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/atoms/baseShadcn/alert";
 import {
   Select,
   SelectContent,
@@ -21,45 +25,47 @@ export function AttendanceConflictSelector({
   onSelect: (slot: AttendanceSlot) => void;
 }) {
   return (
-    <Alert className="mt-5 flex flex-wrap items-center gap-3 border-[var(--border)] bg-[var(--bg-base)] px-4 py-3 md:gap-6">
-      <div className="flex min-w-[15rem] flex-1 items-center gap-2">
-        <AlertCircle
-          size={16}
-          className="shrink-0 text-[var(--warning-text)]"
-          aria-hidden="true"
-        />
-        <p className="font-medium text-[var(--text-primary)]">
-          {slots.length} classes overlap now
-        </p>
-      </div>
+    <Alert className="mt-5 border-[var(--border)] bg-[var(--bg-base)]">
+      <AlertCircle size={16} aria-hidden="true" />
 
-      <div className="grid min-w-[16rem] flex-1 gap-1 sm:max-w-[29rem]">
-        <span className="text-xs font-medium text-[var(--text-secondary)]">
-          Class for attendance
-        </span>
-        <Select
-          value=""
-          onValueChange={(slotId) => {
-            const slot = slots.find((candidate) => candidate.id === slotId);
-            if (slot) onSelect(slot);
-          }}
-          disabled={busy}
-        >
-          <SelectTrigger
-            className="h-9 w-full"
-            aria-label="Class for attendance"
+      <AlertTitle>Choose the class you are attending</AlertTitle>
+
+      <AlertDescription className="space-y-4">
+        <p>
+          {slots.length} classes are happening at the same time. Attendance will
+          be recorded against the class you select.
+        </p>
+
+        <div className="grid gap-2 sm:max-w-md">
+          <span className="text-xs font-medium text-[var(--text-primary)]">
+            Current class
+          </span>
+
+          <Select
+            value=""
+            onValueChange={(slotId) => {
+              const slot = slots.find((candidate) => candidate.id === slotId);
+
+              if (slot) {
+                onSelect(slot);
+              }
+            }}
+            disabled={busy}
           >
-            <SelectValue placeholder="Choose a class…" />
-          </SelectTrigger>
-          <SelectContent position="popper" align="end">
-            {slots.map((slot) => (
-              <SelectItem key={slot.id} value={slot.id}>
-                {slot.moduleCode} · {slot.moduleName}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+            <SelectTrigger className="h-9 w-full" aria-label="Current class">
+              <SelectValue placeholder="Select a class" />
+            </SelectTrigger>
+
+            <SelectContent position="popper" align="start">
+              {slots.map((slot) => (
+                <SelectItem key={slot.id} value={slot.id}>
+                  {slot.moduleCode} · {slot.moduleName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </AlertDescription>
     </Alert>
   );
 }

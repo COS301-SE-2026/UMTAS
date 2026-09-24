@@ -18,23 +18,26 @@ export function AttendanceMethodCard({
     <Button
       asChild
       variant="outline"
-      className="h-auto min-h-20 w-full justify-start gap-3 rounded-xl border-[var(--border)] bg-[var(--bg-base)] p-4 text-left whitespace-normal transition duration-[var(--duration-fast)] hover:-translate-y-px hover:border-[var(--text-disabled)] hover:bg-[var(--bg-elevated)]/50 motion-reduce:transform-none"
+      className="h-auto min-h-24 w-full justify-start gap-4 rounded-lg border-[var(--border)] bg-[var(--bg-surface)] p-4 text-left whitespace-normal transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)]"
     >
       <Link href={href}>
         <AttendanceMethodIcon icon={icon} />
+
         <span className="min-w-0 flex-1">
-          <span className="block font-medium text-[var(--text-primary)]">
+          <span className="block text-[15px] font-medium text-[var(--text-primary)]">
             {title}
           </span>
+
           {description && (
-            <span className="mt-0.5 block text-xs font-normal text-[var(--text-secondary)]">
+            <span className="mt-1 block text-xs font-normal leading-5 text-[var(--text-secondary)]">
               {description}
             </span>
           )}
         </span>
+
         <ChevronRight
           size={16}
-          className="text-[var(--text-secondary)]"
+          className="shrink-0 text-[var(--text-secondary)]"
           aria-hidden="true"
         />
       </Link>
