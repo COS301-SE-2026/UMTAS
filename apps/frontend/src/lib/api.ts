@@ -1682,6 +1682,30 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/attendance/operator/preferred-event": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Select the operator preferred attendance event
+     * @description Select the operator preferred attendance event. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    put: operations["selectPreferredAttendanceEvent"];
+    post?: never;
+    /**
+     * Clear the operator preferred attendance event
+     * @description Clear the operator preferred attendance event. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    delete: operations["clearPreferredAttendanceEvent"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/attendance/records": {
     parameters: {
       query?: never;
@@ -1710,31 +1734,11 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    put?: never;
     /**
-     * Record the user resolved from a barcode in the current slot
-     * @description Record the user resolved from a barcode in the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     * Update the barcode guest count for the current slot
+     * @description Update the barcode guest count for the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.
      */
-    post: operations["recordBarcodeAttendance"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/attendance/records/camera": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /**
-     * Replace the anonymous headcount for the current slot
-     * @description Replace the anonymous headcount for the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.
-     */
-    put: operations["recordCameraAttendance"];
+    put: operations["recordBarcodeAttendance"];
     post?: never;
     delete?: never;
     options?: never;
@@ -1792,26 +1796,6 @@ export interface paths {
      * @description Correct an attendance session. This Attendance operation is part of the versioned UMTAS HTTP contract.
      */
     patch: operations["updateAttendanceSession"];
-    trace?: never;
-  };
-  "/api/attendance/sessions/{sessionId}/records": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Record one identified attendee
-     * @description Record one identified attendee. This Attendance operation is part of the versioned UMTAS HTTP contract.
-     */
-    post: operations["recordIdentifiedAttendance"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
     trace?: never;
   };
   "/api/attendance/sessions/{sessionId}/attendance/count": {
@@ -2146,6 +2130,66 @@ export interface paths {
      * @description Returns whether the student as at a venue, moving between two venues, or has no planned event in that time
      */
     get: operations["RouteController_getActiveRoute"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/routes/diversion": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Create or update a route diversion
+     * @description University administrators can divert a proportion of traffic from one route to another.
+     */
+    put: operations["routeDiversion"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/routes/variant": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * GET /api/routes/variant
+     * @description GET /api/routes/variant. This Routes operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["RouteController_getVariant"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/routes/stop-route": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a stop-via route for a student on a date
+     * @description Returns the route from the student's current event to a stop building and from the stop to the next event, based on the requested time or the largest gap.
+     */
+    get: operations["getRouteViaBuilding"];
     put?: never;
     post?: never;
     delete?: never;
@@ -4378,8 +4422,14 @@ export interface components {
     };
     OperatorAttendanceSlotsResponseDto: {
       slotList: components["schemas"]["OperatorAttendanceSlotDto"][];
-      ambiguous: boolean;
       currentSlot?: components["schemas"]["OperatorAttendanceSlotDto"] | null;
+      /** Format: uuid */
+      preferredEventId: string | null;
+      requiresSelection: boolean;
+    };
+    SelectPreferredEventDto: {
+      /** Format: uuid */
+      eventID: string;
     };
     RecordAttendanceDto: {
       /**
@@ -4430,11 +4480,16 @@ export interface components {
     };
     RecordBarcodeAttendanceDto: {
       /**
-       * Format: uuid
-       * @description University user resolved from the scanned barcode
-       * @example 00000000-0000-4000-8000-000000000001
+       * @description Current guest headcount observed by the scanner
+       * @example 42
        */
-      UserID: string;
+      guestCount: number;
+      /**
+       * Format: uuid
+       * @description Event to record attendance against when selecting a slot
+       * @example 00000000-0000-4000-8000-000000000000
+       */
+      eventID?: string;
     };
     SessionAttendanceResponseDto: {
       /**
@@ -4458,7 +4513,7 @@ export interface components {
        * @description Most recent capture method for this record
        * @enum {string}
        */
-      captureMethod: "NFC" | "BARCODE" | "CAMERA" | "MANUAL";
+      captureMethod: "NFC" | "BARCODE" | "MANUAL";
       /**
        * Format: date-time
        * @description Initial recording time
@@ -4469,27 +4524,6 @@ export interface components {
        * @description Last update time
        */
       updatedAt: string;
-    };
-    AttendanceCaptureResultDto: {
-      /**
-       * @description Whether a new identified record was inserted
-       * @enum {string}
-       */
-      status: "RECORDED" | "ALREADY_RECORDED";
-      attendance: components["schemas"]["SessionAttendanceResponseDto"];
-    };
-    RecordCameraAttendanceDto: {
-      /**
-       * @description Current anonymous headcount observed by the camera
-       * @example 42
-       */
-      guestCount: number;
-      /**
-       * Format: uuid
-       * @description Event to record attendance against when selecting a slot
-       * @example 00000000-0000-4000-8000-000000000000
-       */
-      eventID?: string;
     };
     CreateAttendanceSessionDto: {
       /**
@@ -4589,20 +4623,6 @@ export interface components {
        */
       success: Record<string, never>;
     };
-    RecordIdentifiedAttendanceDto: {
-      /**
-       * Format: uuid
-       * @description Existing university user to record
-       * @example 00000000-0000-4000-8000-000000000001
-       */
-      UserID: string;
-      /**
-       * @description How the attendee was identified
-       * @example BARCODE
-       * @enum {string}
-       */
-      captureMethod: "BARCODE" | "MANUAL";
-    };
     SetGuestCountDto: {
       /**
        * @description Anonymous attendance total replacing the current value
@@ -4611,10 +4631,10 @@ export interface components {
       guestCount: number;
       /**
        * @description Source of the replacement count
-       * @example CAMERA
+       * @example BARCODE
        * @enum {string}
        */
-      captureMethod: "CAMERA" | "MANUAL";
+      captureMethod: "BARCODE" | "MANUAL";
     };
     VerifiedAttendanceHistoryResponseDto: {
       /** @description Identified attendance belonging to the current user */
@@ -5232,7 +5252,7 @@ export interface components {
        */
       routeIndex: number;
       /** @description List of latitude/longitude coordinates for the route path. */
-      pathCoordinates: Record<string, never>[][];
+      pathCoordinates: components["schemas"]["LatLngDto"][];
       /**
        * @description The route distance in metres.
        * @example 67
@@ -5263,6 +5283,34 @@ export interface components {
       /** @example Lecture 2 */
       toEventName?: string;
     };
+    DiversionRequestDto: {
+      /**
+       * Format: uuid
+       * @description Origin route UUID
+       */
+      fromRoute: string;
+      /**
+       * Format: uuid
+       * @description Destination route UUID.
+       */
+      toRoute?: string;
+      /**
+       * @description Destination route index.
+       * @example 0
+       */
+      toRouteIndex?: number;
+      /**
+       * @description Divert x amount of fromRoute -> toRoute
+       * @example 25
+       */
+      diversion: number;
+    };
+    DiversionRouteResponseDto: {
+      fromRoute: components["schemas"]["RouteDto"];
+      toRoute: components["schemas"]["RouteDto"];
+      /** @example 25 */
+      diversion: number;
+    };
     RouteEventContextDto: {
       /**
        * Format: uuid
@@ -5285,6 +5333,25 @@ export interface components {
       venueId?: string | null;
       /** Format: uuid */
       buildingId?: string | null;
+    };
+    StudentStopRouteLegDto: {
+      /** @enum {string} */
+      direction: "TO_STOP" | "FROM_STOP";
+      originEvent?: components["schemas"]["RouteEventContextDto"] | null;
+      destinationEvent?: components["schemas"]["RouteEventContextDto"] | null;
+      route?: components["schemas"]["RouteDto"] | null;
+      reason?: string | null;
+    };
+    StudentStopRouteResponseDto: {
+      /** Format: date */
+      date: string;
+      /** Format: uuid */
+      buildingId: string;
+      /** @example 10:30 */
+      time?: string | null;
+      /** @description The gap or event interval selected for the temporary stop. */
+      selectedWindow: string;
+      legs: components["schemas"]["StudentStopRouteLegDto"][];
     };
     StudentRouteTransitionDto: {
       originEvent: components["schemas"]["RouteEventContextDto"];
@@ -5318,7 +5385,7 @@ export interface components {
        * @example 0
        */
       routeIndex: number;
-      pathCoordinates: Record<string, never>[][];
+      pathCoordinates: components["schemas"]["LatLngDto"][];
       /**
        * @description The route distance in metres.
        * @example 820
@@ -9656,6 +9723,57 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
+  selectPreferredAttendanceEvent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SelectPreferredEventDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperatorAttendanceSlotDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  clearPreferredAttendanceEvent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
   recordAttendance: {
     parameters: {
       query?: never;
@@ -9695,35 +9813,6 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["RecordBarcodeAttendanceDto"];
-      };
-    };
-    responses: {
-      /** @description HTTP 201 response. */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AttendanceCaptureResultDto"];
-        };
-      };
-      400: components["responses"]["BadRequestError"];
-      401: components["responses"]["UnauthorizedError"];
-      403: components["responses"]["ForbiddenError"];
-      409: components["responses"]["ConflictError"];
-      500: components["responses"]["InternalError"];
-    };
-  };
-  recordCameraAttendance: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RecordCameraAttendanceDto"];
       };
     };
     responses: {
@@ -9875,38 +9964,6 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["AttendanceSessionResponseDto"];
-        };
-      };
-      400: components["responses"]["BadRequestError"];
-      401: components["responses"]["UnauthorizedError"];
-      403: components["responses"]["ForbiddenError"];
-      404: components["responses"]["NotFoundError"];
-      409: components["responses"]["ConflictError"];
-      500: components["responses"]["InternalError"];
-    };
-  };
-  recordIdentifiedAttendance: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        sessionId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RecordIdentifiedAttendanceDto"];
-      };
-    };
-    responses: {
-      /** @description HTTP 201 response. */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AttendanceCaptureResultDto"];
         };
       };
       400: components["responses"]["BadRequestError"];
@@ -10863,6 +10920,126 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
+  routeDiversion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DiversionRequestDto"];
+      };
+    };
+    responses: {
+      /** @description Diversion successfully created or updated. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DiversionRouteResponseDto"];
+        };
+      };
+      /** @description Invalid request. Diversion must be between 0 and 1 and either toRoute or toRouteIndex must be supplied. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description The source route, destination route, or requested alternative route could not be found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  RouteController_getVariant: {
+    parameters: {
+      query: {
+        originBuildingId: string;
+        destinationBuildingId: string;
+        routeIndex: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RouteDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getRouteViaBuilding: {
+    parameters: {
+      query: {
+        /** @description Date whose attended events should be used. */
+        date: string;
+        /** @description Building the student wants to visit before their next class. */
+        buildingId: string;
+        /** @description Optional time in HH:mm. When omitted, the largest gap between scheduled events is selected. */
+        time?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Stop route returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StudentStopRouteResponseDto"];
+        };
+      };
+      /** @description Invalid stop route query parameters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description No university selected or insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No attended events found for the date, or no route could be determined for the stop */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
   getStudentRoutesForDate: {
     parameters: {
       query: {
@@ -10913,7 +11090,7 @@ export interface operations {
         /** @description Calendar date on which both events occur. */
         date: string;
         /** @description Zero-based route index. Index 0 is the shortest/default route. */
-        routeIndex?: components["schemas"]["Object"];
+        routeIndex?: number;
       };
       header?: never;
       path?: never;

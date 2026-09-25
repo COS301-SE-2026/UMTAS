@@ -188,6 +188,30 @@ export class RouteService {
     return this.routeDtoAdapter(requestedRoute);
   } //END_getRouteVariant
 
+  async getVariantOrNull(
+    uniId: string,
+    originBuildingId: string,
+    destinationBuildingId: string,
+    routeIndex: number,
+    tx?: AppDatabase,
+  ): Promise<RouteDto | null> {
+    try {
+      return await this.getRouteVariant(
+        uniId,
+        originBuildingId,
+        destinationBuildingId,
+        routeIndex,
+        tx,
+      );
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return null;
+      }
+
+      throw error;
+    }
+  }
+
   async getOrCreateRoute(
     uniId: string,
     originBuildingId: string,

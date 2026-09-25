@@ -22,9 +22,10 @@ export type getStudentRoutesRes =
   paths["/api/routes/student"]["get"]["responses"]["200"]["content"]["application/json"];
 
 export class getRouterBuilder extends RequestBuilder<
-  getRouteQuery,
   undefined,
-  getRouteRes
+  undefined,
+  getRouteRes,
+  getRouteQuery
 > {
   constructor() {
     super();

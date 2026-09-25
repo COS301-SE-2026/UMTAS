@@ -9,26 +9,27 @@ from collections import Counter
 from locust import HttpUser, task, between
 from locust.exception import StopUser
 
+
 PROFILES_PATH = os.environ.get("PROFILES_PATH")
 PROFILES = []
 if PROFILES_PATH and os.path.exists(PROFILES_PATH):
     with open(PROFILES_PATH, "r", encoding="utf-8") as f:
         PROFILES = json.load(f)
-
 pdf_dir = os.environ.get("PDF_DIR", "/app/adapters/umtas/pdfs")
 files_pdf = []
 if os.path.exists(pdf_dir):
     files_pdf = [
         os.path.join(pdf_dir, f) for f in os.listdir(pdf_dir) if f.endswith(".pdf")
     ]
-
 print(f"Loaded {len(PROFILES)} profiles from {PROFILES_PATH}")
 print(f"Found {len(files_pdf)} PDF files in {pdf_dir}")
-
 max_modules = 10
 max_tt_events = 40
-h_keys = "module,activity,location"
-
+h_keys = ["module", "activity", "location"]
+PDF_USERS_PER_FILE = int(os.environ.get("PDF_USERS_PER_FILE", "10"))
+PDF_ATTENDANCE_DAYS = int(os.environ.get("PDF_ATTENDANCE_DAYS", "7"))
+pdf_assignment_lock = threading.Lock()
+pdf_assignment_counts = Counter()
 names_of_days = [
     "monday",
     "tuesday",
@@ -67,6 +68,42 @@ def event_date_checker(event: dict) -> str:
     return datetime.date.today().isoformat()
 
 
+def normalize_module_code(value) -> str:
+    return str(value or "").strip().upper().replace(" ", "")
+
+
+def reserve_pdf_for_user():
+    if not files_pdf or PDF_USERS_PER_FILE <= 0:
+        return None
+    with pdf_assignment_lock:
+        available = [
+            path
+            for path in files_pdf
+            if pdf_assignment_counts[path] < PDF_USERS_PER_FILE
+        ]
+        if not available:
+            return None
+        lowest_count = min(pdf_assignment_counts[path] for path in available)
+        candidates = [
+            path
+            for path in available
+            if pdf_assignment_counts[path] == lowest_count
+        ]
+        selected = random.choice(candidates)
+        pdf_assignment_counts[selected] += 1
+        return selected
+
+
+def is_date_in_pdf_attendance_window(date_value: str) -> bool:
+    try:
+        event_date = datetime.date.fromisoformat(date_value)
+    except (TypeError, ValueError):
+        return False
+    today = datetime.date.today()
+    end_date = today + datetime.timedelta(days=PDF_ATTENDANCE_DAYS)
+    return today <= event_date <= end_date
+
+
 class DomainUser(HttpUser):
     wait_time = between(0.5, 1)
 
@@ -74,6 +111,12 @@ class DomainUser(HttpUser):
         self.profile = random.choice(PROFILES) if PROFILES else {}
         self.pdf_id = None
         self.pdf_result_ready = False
+        self.pdf_uploaded = False
+        self.pdf_attendance_seeded = False
+        self.assigned_pdf_path = None
+        self.pdf_module_codes = set()
+        self.pdf_attendance_ids = []
+        self.pdf_attended_keys = set()
         self.browsed_module_ids = []
         self.enrolled_module_ids = set()
         self.known_events = {}
@@ -82,26 +125,20 @@ class DomainUser(HttpUser):
         self.solver_id = None
         self.solver_result_ready = False
         self.attendance_ids = []
-
         admin_token = os.environ.get("SIMULATION_API_KEY")
         if not admin_token:
             raise ValueError("SIMULATION_API_KEY environment variable is not set!")
-
         admin_headers = {"Authorization": f"Bearer {admin_token}"}
-
         worker_id = str(uuid.uuid4())[:6]
         base_email = self.profile.get(
             "email", f"fallback_{random.randint(1,9999)}@simulation.com"
         )
-
         if "@" in base_email:
             name, domain = base_email.split("@", 1)
             unique_email = f"{name}+{worker_id}@{domain}"
         else:
             unique_email = f"{base_email}_{worker_id}@simulation.com"
-
         password = self.profile.get("password", "password123!")
-
         payload = {
             "email": unique_email,
             "name": self.profile.get("name", "Test User"),
@@ -109,7 +146,6 @@ class DomainUser(HttpUser):
             "role": "STUDENT",
             "uniId": self.profile.get("uniId", "default_uni"),
         }
-
         with self.client.post(
             "/api/auth/admin/create-mock-user",
             json=payload,
@@ -123,7 +159,6 @@ class DomainUser(HttpUser):
                 raise StopUser()
             response.success()
             self.uni_id = response.json().get("uniId")
-
         login_payload = {"email": unique_email, "password": password}
         self.client.headers.pop("Authorization", None)
         with self.client.post(
@@ -136,10 +171,8 @@ class DomainUser(HttpUser):
             token = (login_res.json().get("session") or {}).get("token")
             if token:
                 self.client.headers.update({"Authorization": f"Bearer {token}"})
-
         if not self.uni_id:
             return
-
         with self.client.post(
             "/api/auth/select-university",
             json={"uniId": self.uni_id},
@@ -156,6 +189,7 @@ class DomainUser(HttpUser):
             select_token = (select_data.get("session") or {}).get("token")
             if select_token:
                 self.client.headers.update({"Authorization": f"Bearer {select_token}"})
+        self.assigned_pdf_path = reserve_pdf_for_user()
 
     @task(3)
     def browse_modules(self):
@@ -187,7 +221,6 @@ class DomainUser(HttpUser):
         if not candidates:
             return
         module_id = random.choice(candidates)
-
         with self.client.get(
             f"/api/modules/enroll/{module_id}",
             name="/api/modules/enroll/[moduleId]",
@@ -204,14 +237,21 @@ class DomainUser(HttpUser):
 
     @task(2)
     def upload_timetable_pdf(self):
-        if not files_pdf or not getattr(self, "uni_id", None) or self.pdf_id:
+        if (
+            not self.assigned_pdf_path
+            or not getattr(self, "uni_id", None)
+            or self.pdf_uploaded
+            or self.pdf_id
+        ):
             return
-
-        random_pdf_path = random.choice(files_pdf)
         data = {"universityId": self.uni_id, "adapterKey": "up"}
-        with open(random_pdf_path, "rb") as pdf_file:
+        with open(self.assigned_pdf_path, "rb") as pdf_file:
             files = {
-                "file": (os.path.basename(random_pdf_path), pdf_file, "application/pdf")
+                "file": (
+                    os.path.basename(self.assigned_pdf_path),
+                    pdf_file,
+                    "application/pdf",
+                )
             }
             with self.client.post(
                 "/api/pdf-parser/jobs/upload",
@@ -223,6 +263,7 @@ class DomainUser(HttpUser):
                     response.success()
                     self.pdf_id = response.json().get("jobId")
                     self.pdf_result_ready = False
+                    self.pdf_uploaded = True
                 else:
                     response.failure(f"upload rejected [{response.status_code}]")
 
@@ -245,7 +286,6 @@ class DomainUser(HttpUser):
                 response.failure(f"auth error viewing events: {response.status_code}")
             else:
                 response.success()
-
 
     @task(1)
     def view_timetable_detail(self):
@@ -272,7 +312,6 @@ class DomainUser(HttpUser):
         candidate_ids = [
             eid for eid in self.known_events if eid not in self.timetable_event_ids
         ]
-
         if self.timetable_id is None:
             if not candidate_ids:
                 return
@@ -294,7 +333,6 @@ class DomainUser(HttpUser):
                         f"timetable create failed [{response.status_code}]: {response.text}"
                     )
             return
-
         if len(self.timetable_event_ids) >= max_tt_events or not candidate_ids:
             return
         picks = random.sample(candidate_ids, k=min(2, len(candidate_ids)))
@@ -336,7 +374,7 @@ class DomainUser(HttpUser):
     @task(1)
     def get_active_session(self):
         self.client.get("/api/auth/get-session")
-        
+
     @task(1)
     def fetch_and_apply_solver_result(self):
         if not (self.solver_id and self.solver_result_ready):
@@ -351,7 +389,6 @@ class DomainUser(HttpUser):
                 return
             response.success()
             selected = response.json().get("timetableSolution", {}).get("selectedEventIds", [])
-
         if self.timetable_id and selected:
             to_add = [eid for eid in selected if eid not in self.timetable_event_ids]
             if to_add:
@@ -370,10 +407,8 @@ class DomainUser(HttpUser):
                         self.timetable_event_ids = set()
                     else:
                         patch_response.failure(f"failed to apply solver result [{patch_response.status_code}]")
-
         self.solver_id = None
         self.solver_result_ready = False
-
 
     @task(1)
     def view_attendance(self):
@@ -382,17 +417,26 @@ class DomainUser(HttpUser):
                 response.success()
             else:
                 response.failure(f"view attendance failed [{response.status_code}]")
-               
-               
+
     @task(2)
     def mark_attendance(self):
-        pool = list(self.timetable_event_ids & set(self.known_events)) or list(self.known_events)
+        if self.assigned_pdf_path and not self.pdf_attendance_seeded:
+            return
+        base_pool = (
+            list(self.timetable_event_ids & set(self.known_events))
+            or list(self.known_events)
+        )
+        pool = []
+        for event_id in base_pool:
+            event = self.known_events.get(event_id, {})
+            event_date = event_date_checker(event)
+            if (event_id, event_date) not in self.pdf_attended_keys:
+                pool.append(event_id)
         if not pool:
             return
         event_id = random.choice(pool)
         event = self.known_events.get(event_id, {})
         state = random.choices(["ATTENDING", "NOT_ATTENDING"], weights=[8, 2])[0]
-
         payload = {
             "eventID": event_id,
             "eventDate": event_date_checker(event),
@@ -407,55 +451,82 @@ class DomainUser(HttpUser):
             else:
                 response.failure(f"attendance create failed [{response.status_code}]: {response.text}")
 
-
-    
-    
     @task(2)
     def submit_solver_job(self):
         if self.solver_id is not None:
             return
 
-        event_ids = [eid for eid in self.timetable_event_ids if is_valid_checker(eid)]
-        if not event_ids:
-            event_ids = [eid for eid in self.known_events if is_valid_checker(eid)]
+        event_ids = [
+            eid
+            for eid in self.timetable_event_ids
+            if is_valid_checker(eid)
+        ]
+
         if not event_ids:
             event_ids = [
-                eid for eid in self.profile.get("eventIds", []) if is_valid_checker(eid)
+                eid
+                for eid in self.known_events
+                if is_valid_checker(eid)
             ]
+
+        if not event_ids:
+            event_ids = [
+                eid
+                for eid in self.profile.get("eventIds", [])
+                if is_valid_checker(eid)
+            ]
+
         if not event_ids:
             return
 
-        solve_mode = random.choices(["feasibility", "optimization"], weights=[7, 3])[0]
-        engine = random.choices(["auto", "cp-sat", "ga"], weights=[6, 2, 2])[0]
-        heuristics = []
-        if solve_mode == "optimization":
-            heuristics = [
-                {"key": k, "weight": round(random.uniform(0.1, 1.0), 2)}
-                for k in h_keys
-            ]
+        solve_mode = random.choices(
+            ["feasibility", "optimization"],
+            weights=[7, 3],
+        )[0]
+
+        engine = random.choices(
+            ["auto", "cp-sat", "ga"],
+            weights=[6, 2, 2],
+        )[0]
 
         payload = {
             "eventIds": event_ids,
             "solveMode": solve_mode,
             "engine": engine,
-            "preferences": {"heuristics": heuristics},
         }
 
+        if solve_mode == "optimization":
+            payload["preferences"] = {
+                "heuristics": [
+                    {
+                        "key": key,
+                        "weight": round(random.uniform(0.1, 1.0), 2),
+                    }
+                    for key in h_keys
+                ]
+            }
+
         with self.client.post(
-            "/api/solver/jobs", json=payload, catch_response=True
+            "/api/solver/jobs",
+            json=payload,
+            catch_response=True,
         ) as response:
             if response.status_code != 202:
-                response.failure(f"solver rejected [{response.status_code}]")
+                response.failure(
+                    f"solver rejected [{response.status_code}]: "
+                    f"{response.text} | payload={payload}"
+                )
                 return
+
             response.success()
+
             data = response.json()
             self.solver_id = data.get("jobId")
             self.solver_result_ready = False
+
             if data.get("status") == "completed" and data.get("result"):
                 self.solver_result_ready = True
-                
-                
-    
+
     @task(1)
     def view_attendance_for_event(self):
         if not self.known_events:
@@ -491,7 +562,6 @@ class DomainUser(HttpUser):
             else:
                 response.failure(f"attendance update failed [{response.status_code}]")
 
-
     @task(2)
     def check_solver_status(self):
         if not self.solver_id or self.solver_result_ready:
@@ -505,14 +575,12 @@ class DomainUser(HttpUser):
             response.success()
             data = response.json()
             status = data.get("status")
-
             if status == "completed":
                 self.solver_result_ready = True
             elif status == "failed":
                 self.solver_id = None
                 self.solver_result_ready = False
-                
-    
+
     @task(1)
     def check_pdf_parser_status(self):
         if not self.pdf_id or self.pdf_result_ready:
@@ -546,9 +614,94 @@ class DomainUser(HttpUser):
         ) as response:
             if response.status_code == 200:
                 response.success()
+                result = response.json()
+                self.seed_pdf_attendance(result)
+                self.pdf_attendance_seeded = True
             else:
                 response.failure(f"pdf result fetch failed [{response.status_code}]")
             self.pdf_id = None
             self.pdf_result_ready = False
 
-
+    def seed_pdf_attendance(self, result):
+        module_codes = {
+            normalize_module_code(module.get("code"))
+            for module in result.get("modules", [])
+            if normalize_module_code(module.get("code"))
+        }
+        module_codes.update(
+            normalize_module_code(event.get("moduleCode"))
+            for event in result.get("events", [])
+            if normalize_module_code(event.get("moduleCode"))
+        )
+        self.pdf_module_codes = module_codes
+        if not module_codes:
+            return
+        with self.client.get(
+            f"/api/modules?universityId={self.uni_id}",
+            name="/api/modules?universityId=[id] [pdf attendance]",
+            catch_response=True,
+        ) as response:
+            if response.status_code != 200:
+                response.failure(
+                    f"failed to resolve PDF modules [{response.status_code}]"
+                )
+                return
+            response.success()
+            modules = response.json().get("modules", [])
+        module_ids = {
+            module.get("moduleID")
+            for module in modules
+            if module.get("moduleID")
+            and normalize_module_code(module.get("moduleCode")) in module_codes
+        }
+        pdf_events = {}
+        for module_id in module_ids:
+            with self.client.get(
+                f"/api/events?moduleId={module_id}",
+                name="/api/events?moduleId=[id] [pdf attendance]",
+                catch_response=True,
+            ) as response:
+                if response.status_code != 200:
+                    response.failure(
+                        f"failed to fetch PDF module events [{response.status_code}]"
+                    )
+                    continue
+                response.success()
+                for event in response.json().get("events", []):
+                    event_id = event.get("eventId")
+                    if event_id:
+                        pdf_events[event_id] = event
+                        self.known_events[event_id] = event
+        for event_id, event in pdf_events.items():
+            event_date = event_date_checker(event)
+            if not is_date_in_pdf_attendance_window(event_date):
+                continue
+            attendance_key = (event_id, event_date)
+            if attendance_key in self.pdf_attended_keys:
+                continue
+            payload = {
+                "eventID": event_id,
+                "eventDate": event_date,
+                "state": "ATTENDING",
+            }
+            with self.client.post(
+                "/api/attendance",
+                json=payload,
+                name="/api/attendance [pdf auto-attend]",
+                catch_response=True,
+            ) as response:
+                if response.status_code in (200, 201):
+                    response.success()
+                    data = response.json()
+                    attendance_id = data.get("AttendanceID")
+                    if attendance_id:
+                        self.pdf_attendance_ids.append(attendance_id)
+                    self.pdf_attended_keys.add(attendance_key)
+                elif response.status_code == 409:
+                    response.success()
+                    self.pdf_attended_keys.add(attendance_key)
+                else:
+                    response.failure(
+                        "PDF auto-attendance failed "
+                        f"[{response.status_code}]: {response.text}"
+                    )

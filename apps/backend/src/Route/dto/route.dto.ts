@@ -71,7 +71,6 @@ export class RouteDto {
 
   @ApiProperty({
     type: [LatLngDto],
-    isArray: true,
     description: 'List of latitude/longitude coordinates for the route path.',
   })
   @IsArray()
@@ -203,3 +202,19 @@ export class ActiveRouteResponseDto {
   @IsOptional()
   toEventName?: string;
 } //END_ActiveRouteResponseDto
+
+export class RouteVariantQueryDto {
+  @ApiProperty({ format: 'uuid' })
+  @IsUUID()
+  originBuildingId!: string;
+
+  @ApiProperty({ format: 'uuid' })
+  @IsUUID()
+  destinationBuildingId!: string;
+
+  @ApiProperty({ example: 1, minimum: 0, type: Number })
+  @IsInt()
+  @Min(0)
+  @Type(() => Number)
+  routeIndex!: number;
+}

@@ -203,6 +203,7 @@ export class AlternativeRoutesQueryDto {
     example: 1,
     minimum: 0,
     default: 0,
+    type: Number,
   })
   @IsOptional()
   @Type(() => Number)
@@ -217,7 +218,6 @@ export class AlternativeRoutesQueryDto {
 export class AlternativeRouteDto extends RouteVariantDto {
   @ApiProperty({
     type: [LatLngDto],
-    isArray: true,
   })
   @IsArray()
   @ValidateNested({ each: true })
@@ -284,3 +284,115 @@ export class AlternativeRoutesResponseDto {
   @Type(() => AlternativeRouteDto)
   route!: AlternativeRouteDto;
 } //END_AlternativeRoutesResponseDto
+
+// ROute stop
+/**
+ * Request a temporary stop between a student's scheduled events.
+ */
+export class StudentStopRouteQueryDto {
+  @ApiProperty({
+    format: 'date',
+    example: '2026-09-21',
+    description: 'Date whose attended events should be used.',
+  })
+  @IsDateString()
+  date!: string;
+
+  @ApiProperty({
+    format: 'uuid',
+    description: 'Building the student wants to visit before their next class.',
+  })
+  @IsUUID()
+  buildingId!: string;
+
+  @ApiPropertyOptional({
+    example: '10:30',
+    description:
+      'Optional time in HH:mm. When omitted, the largest gap between scheduled events is selected.',
+  })
+  @IsOptional()
+  @Matches(TIME_ONLY_PATTERN, {
+    message: 'time must be in the format HH:mm',
+  })
+  time?: string;
+} //END_StudentStopRouteQueryDto
+
+/**
+ * A route leg for a temporary student stop.
+ */
+export class StudentStopRouteLegDto {
+  @ApiProperty({
+    enum: ['TO_STOP', 'FROM_STOP'],
+  })
+  @IsString()
+  direction!: 'TO_STOP' | 'FROM_STOP';
+
+  @ApiPropertyOptional({
+    type: RouteEventContextDto,
+    nullable: true,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => RouteEventContextDto)
+  originEvent?: RouteEventContextDto | null;
+
+  @ApiPropertyOptional({
+    type: RouteEventContextDto,
+    nullable: true,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => RouteEventContextDto)
+  destinationEvent?: RouteEventContextDto | null;
+
+  @ApiPropertyOptional({
+    type: RouteDto,
+    nullable: true,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => RouteDto)
+  route?: RouteDto | null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+  })
+  @IsOptional()
+  @IsString()
+  reason?: string;
+} //END_StudentStopRouteLegDto
+
+/**
+ * Routes for visiting a temporary building before the next class.
+ */
+export class StudentStopRouteResponseDto {
+  @ApiProperty({ format: 'date' })
+  @IsDateString()
+  date!: string;
+
+  @ApiProperty({ format: 'uuid' })
+  @IsUUID()
+  buildingId!: string;
+
+  @ApiPropertyOptional({
+    example: '10:30',
+    nullable: true,
+  })
+  @IsOptional()
+  @Matches(TIME_ONLY_PATTERN)
+  time?: string | null;
+
+  @ApiProperty({
+    description: 'The gap or event interval selected for the temporary stop.',
+  })
+  @IsString()
+  selectedWindow!: string;
+
+  @ApiProperty({
+    type: [StudentStopRouteLegDto],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => StudentStopRouteLegDto)
+  legs!: StudentStopRouteLegDto[];
+} //END_StudentStopRouteResponseDto

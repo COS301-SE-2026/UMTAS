@@ -46,6 +46,11 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 import { BuildingSheet } from "@/components/organisms/map/BuildingSheet";
+import {
+  StudentRouteAlerts,
+  StudentRouteLines,
+} from "@/components/organisms/map/StudentRoutes";
+import { AdminRouteDiversion } from "@/components/organisms/map/AdminRouteDiversion";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -100,6 +105,11 @@ export function UniMap() {
   const [toHour, setToHour] = useState(15);
   const [metricMode, setMetricMode] = useState<"projected" | "worstCase">(
     "projected",
+  );
+
+  //alternate route stuff
+  const [selectedIndex, setSelectedIndex] = useState<Record<string, number>>(
+    {},
   );
 
   //this needs to be in a very specific format. Looks super complicated, but the backend cries when I don't send the request in this format
@@ -265,6 +275,15 @@ export function UniMap() {
                   {activeRoute.toEventName}
                 </span>
               )}
+
+              <div className="ml-auto flex items-center justify-end">
+                <StudentRouteAlerts
+                  date={selectedDate}
+                  time={selectedTime}
+                  selectedIndex={selectedIndex}
+                  setSelectedIndex={setSelectedIndex}
+                />
+              </div>
             </>
           )}
 
@@ -313,7 +332,10 @@ export function UniMap() {
           )}
         </div>
 
-        <div id="university-map" className="flex-1 overflow-hidden">
+        <div
+          id="university-map"
+          className="flex-1 min-h-[75vh] overflow-hidden"
+        >
           <MapScreen
             onRequestMapSetup={() => router.push("/mapping/config")}
             adminMode={adminMode}
@@ -324,6 +346,14 @@ export function UniMap() {
               <HeatmapOverlay
                 buildingPoints={buildingHeatmapPoints}
                 routePoints={routeHeatmapPoints}
+              />
+            )}
+
+            {mapMode === "route" && (
+              <StudentRouteLines
+                date={selectedDate}
+                time={selectedTime}
+                selectedIndex={selectedIndex}
               />
             )}
 
@@ -369,7 +399,7 @@ export function UniMap() {
                 );
               })()}
 
-            {activeRoute?.status === "MOVING" && activeRoute.route && (
+            {/* {activeRoute?.status === "MOVING" && activeRoute.route && (
               <RouteLine
                 path={
                   activeRoute.route.pathCoordinates as unknown as {
@@ -379,17 +409,18 @@ export function UniMap() {
                 }
                 colour={activeRoute.route.displayColour}
               />
-            )}
+            )} */}
           </MapScreen>
         </div>
 
         {canUserDraw && (
-          <div id="admin-map-controls">
+          <div id="admin-map-controls" className="flex flex-col gap-4">
             <AdminDrawControls
               buildings={buildings}
               onModeChange={setAdminMode}
               drawingState={buildingDraw}
-            />{" "}
+            />
+            <AdminRouteDiversion buildings={buildings} />
           </div>
         )}
 

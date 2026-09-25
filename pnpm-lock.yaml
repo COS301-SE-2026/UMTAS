@@ -63,6 +63,7 @@ overrides:
   undici@<6.28.0: ">=6.28.0"
   uuid@<11.1.1: ">=11.1.1"
   ws@>=8.0.0 <8.21.0: ">=8.21.0"
+  drizzle-orm: 0.45.2
 
 importers:
   .:
@@ -180,7 +181,7 @@ importers:
         specifier: ^0.15.1
         version: 0.15.1
       drizzle-orm:
-        specifier: ^0.45.2
+        specifier: 0.45.2
         version: 0.45.2(@electric-sql/pglite@0.4.6)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(kysely@0.29.5)(pg@8.23.0)(postgres@3.4.9)
       fast-json-stable-stringify:
         specifier: ^2.1.0
@@ -1207,7 +1208,7 @@ packages:
     peerDependencies:
       "@better-auth/core": ^1.6.27
       "@better-auth/utils": 0.4.2
-      drizzle-orm: ^0.45.2
+      drizzle-orm: 0.45.2
     peerDependenciesMeta:
       drizzle-orm:
         optional: true
@@ -7070,7 +7071,7 @@ packages:
       "@tanstack/solid-start": ^1.0.0
       better-sqlite3: ^12.0.0
       drizzle-kit: ">=0.31.4"
-      drizzle-orm: ^0.45.2
+      drizzle-orm: 0.45.2
       mongodb: ^6.0.0 || ^7.0.0
       mysql2: ^3.0.0
       next: ">=16.2.11"

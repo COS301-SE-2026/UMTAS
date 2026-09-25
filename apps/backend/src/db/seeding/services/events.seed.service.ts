@@ -1,7 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { createHash } from 'node:crypto';
+import { createHash, createHmac } from 'node:crypto';
 import { and, eq, inArray } from 'drizzle-orm';
-import { Event, UniversityEvent, modules } from '../../../entities';
+import {
+  Event,
+  ModuleTeaches,
+  ModuleEnrollment,
+  NfcTag,
+  UniversityEvent,
+  modules,
+  usersTable,
+} from '../../../entities';
 import type { AppDatabase } from '../../database.service';
 import { BaseSeedService } from '../base.seed.service';
 import { SeedPersistenceService } from '../seed-persistence.service';
@@ -11,6 +19,10 @@ import {
 } from '../../../Events/dto/event.types';
 import { SeedQueryService } from './seed-query.service';
 import { getDeterministicPatterns } from '../Constants';
+import {
+  DEFAULT_ATTENDANCE_TIME_ZONE,
+  localDateAt,
+} from '../../../Attendance/attendance-occurrence';
 
 @Injectable()
 export class EventsSeedService extends BaseSeedService {
@@ -52,10 +64,165 @@ export class EventsSeedService extends BaseSeedService {
       relationshipsCreated += result.relationshipsCreated;
     }
 
+    await this.seedAttendanceConflictDemo(db, modulesByCode, codes, university);
+
     this.logResult('Hatfield recurring module events', eventsCreated);
     this.logResult('module event relationships', relationshipsCreated);
     this.logger.debug(`Module events scoped to university ${university}`);
   } //END_seed
+
+  private async seedAttendanceConflictDemo(
+    db: AppDatabase,
+    modulesByCode: Map<string, { id: string; code: string }>,
+    codes: string[],
+    universityId: string,
+  ): Promise<void> {
+    const lecturerEmail = this.constants.UserEmails[1];
+    const [lecturer] = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.email, lecturerEmail))
+      .limit(1);
+    const demoModules = codes
+      .map((code) => modulesByCode.get(code))
+      .filter(
+        (module): module is { id: string; code: string } =>
+          module !== undefined,
+      )
+      .slice(0, 2);
+
+    if (!lecturer || demoModules.length < 2) {
+      this.logger.warn(
+        'Attendance conflict demo requires the seeded lecturer and two modules',
+      );
+      return;
+    }
+
+    await db
+      .insert(ModuleTeaches)
+      .values(
+        demoModules.map((module) => ({
+          ModuleID: module.id,
+          UserID: lecturer.id,
+        })),
+      )
+      .onConflictDoNothing();
+
+    const [student] = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.email, this.constants.UserEmails[0]))
+      .limit(1);
+    if (student) {
+      await db
+        .insert(ModuleEnrollment)
+        .values(
+          demoModules.map((module) => ({
+            ModuleID: module.id,
+            UserID: student.id,
+          })),
+        )
+        .onConflictDoNothing();
+    }
+
+    const secret = process.env.BETTER_AUTH_SECRET;
+    if (secret) {
+      const tokenHash = createHmac('sha256', secret)
+        .update('attendance-conflict-demo-token-2026')
+        .digest('hex');
+      await db
+        .insert(NfcTag)
+        .values({
+          tagId: '00000000-0000-4000-8000-0000000000a1',
+          ownerUserId: lecturer.id,
+          universityId,
+          tokenHash,
+        })
+        .onConflictDoUpdate({
+          target: NfcTag.ownerUserId,
+          set: {
+            tagId: '00000000-0000-4000-8000-0000000000a1',
+            tokenHash,
+            universityId,
+            updatedAt: new Date(),
+          },
+        });
+    }
+
+    const date = localDateAt(
+      new Date(),
+      process.env.ATTENDANCE_TIME_ZONE ?? DEFAULT_ATTENDANCE_TIME_ZONE,
+    );
+
+    const weekdays = [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ] as const;
+    for (const [index, module] of demoModules.entries()) {
+      for (const dayOfWeek of weekdays) {
+        const importFingerprint = EventsSeedService.fingerprint(
+          'attendance-conflict-demo',
+          String(index + 1),
+          ...(dayOfWeek === 'monday' ? [] : [dayOfWeek]),
+        );
+        const eventName = `Attendance demo ${index + 1}`;
+        const criteria: UniversityEventCriteria = {
+          eventSource: EventSource.UNIVERSITY,
+          moduleId: module.id,
+          activityType: 'lecture',
+          dayOfWeek,
+          startTime: '00:00',
+          endTime: '23:59',
+        };
+
+        const [existing] = await db
+          .select({ id: Event.eventID })
+          .from(Event)
+          .where(eq(Event.importFingerprint, importFingerprint))
+          .limit(1);
+        const eventId = existing
+          ? existing.id
+          : (
+              await this.persistence.insertEvents(db, [
+                {
+                  eventName,
+                  activityCode: module.code,
+                  activityType: 'lecture',
+                  eventCriteria: criteria,
+                  isRecurring: true,
+                  validated: true,
+                  importFingerprint,
+                },
+              ])
+            )[0]?.eventID;
+
+        if (!eventId) continue;
+        if (existing) {
+          await db
+            .update(Event)
+            .set({
+              eventName,
+              activityCode: module.code,
+              activityType: 'lecture',
+              eventCriteria: criteria,
+              isRecurring: true,
+              validated: true,
+            })
+            .where(eq(Event.eventID, eventId));
+        }
+        await this.ensureModuleEventRelationship(db, eventId, module.id);
+      }
+    }
+
+    this.logger.log(
+      `Seeded recurring attendance conflict demo for ${lecturerEmail}; active on ${date}`,
+    );
+  }
 
   private async seedModuleEvents(
     db: AppDatabase,
