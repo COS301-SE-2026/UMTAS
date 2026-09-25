@@ -301,10 +301,12 @@ function CanvasWebcam({
             for (const frameOfPeople of frameStore.current?.getLastFrame()
               ?.people ?? []) {
               const data = frameOfPeople.pose_data;
+              const gaze = frameOfPeople.gaze;
 
               if (frameCounterRef.current - frameOfPeople.last_seen_frame > 5) {
                 continue;
               }
+
               context.fillStyle = "#00ff00";
               context.font = "14px sans-serif";
               context.fillText(
@@ -341,6 +343,36 @@ function CanvasWebcam({
               drawPoint(context, data.right_shoulder);
               drawPoint(context, rightElbow);
               drawPoint(context, rightWrist);
+
+              if (gaze) {
+                const noseX = data.nose.x;
+                const noseY = data.nose.y;
+
+                if (gaze.looking_straight) {
+                  const xSize = 5;
+                  context.beginPath();
+                  context.strokeStyle = "#ff3333";
+                  context.lineWidth = 2;
+                  context.moveTo(noseX - xSize, noseY - xSize);
+                  context.lineTo(noseX + xSize, noseY + xSize);
+                  context.moveTo(noseX - xSize, noseY + xSize);
+                  context.lineTo(noseX + xSize, noseY - xSize);
+                  context.stroke();
+                } else if (gaze.looking_left || gaze.looking_right) {
+                  const lineLength = 25;
+                  const directionMultiplier = gaze.looking_left ? -1 : 1;
+
+                  context.beginPath();
+                  context.strokeStyle = "#ffcc00";
+                  context.lineWidth = 3;
+                  context.moveTo(noseX, noseY);
+                  context.lineTo(
+                    noseX + lineLength * directionMultiplier,
+                    noseY,
+                  );
+                  context.stroke();
+                }
+              }
             }
           }
         }
