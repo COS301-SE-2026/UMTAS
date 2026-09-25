@@ -1,0 +1,20 @@
+apps/backend/src/pdf-parser/event-importer.service.spec.ts
+  h_2d4b3dca70a3d8 2,4,10,12-14,16,28-32,35,38,46,53,56,58,64,69,72,94-99,112,117,119,124-126,152,154,169,172-174,184,193,201,203-205,207,218,230,233,244,247-250,252,254-256,258,260-262,265-267,274,280-290,292-295,297-351,353-383,389,391,395,408
+apps/backend/src/pdf-parser/event-importer.service.ts
+  h_2d4b3dca70a3d8 2,8,14,33,46,52-53,58,75-84,136,141,154,157,172,174-176,186,207-208,212-213
+apps/backend/src/pdf-parser/pdf-parser.module.ts
+  h_2d4b3dca70a3d8 12,21
+apps/backend/src/pdf-parser/venue-resolver.service.ts
+  h_2d4b3dca70a3d8 1-96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d48befc4f2a4ad3d34e78f21862fbd7e2575b9be",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
