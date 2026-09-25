@@ -36,6 +36,7 @@ pub fn attach_id_first(
             last_seen_frame: frame,
             last_seen_timestamp: timestamp,
             hand_up: is_hands_up(&new_person),
+            gaze: analyze_gaze(&new_person),
         });
     }
 
@@ -116,6 +117,7 @@ pub fn attach_id(
                     last_seen_frame: frame,
                     last_seen_timestamp: timestamp,
                     hand_up: is_hands_up(new_person),
+                    gaze: analyze_gaze(new_person),
                 });
             }
         }
@@ -131,7 +133,12 @@ pub fn attach_id(
                 last_seen_frame: prev_person.last_seen_frame,
                 last_seen_timestamp: prev_person.last_seen_timestamp,
                 hand_up: false,
-                // we do not look at hands up of inferred frames
+                gaze: GazeDirection {
+                    looking_left: false,
+                    looking_right: false,
+                    looking_straight: false,
+                },
+                // we do not look at hands up or gaze of inferred frames
             });
         }
     }
@@ -149,6 +156,7 @@ pub fn attach_id(
                 last_seen_frame: frame,
                 last_seen_timestamp: timestamp,
                 hand_up: is_hands_up(new_person),
+                gaze: analyze_gaze(new_person),
             });
         }
     }
@@ -171,17 +179,69 @@ pub fn is_hands_up(new_person: &DetectedPersonPose) -> bool {
     right_hand_up || left_hand_up
 }
 
-pub fn gaze_direction(new_person: &DetectedPersonPose) -> GazeDirection {
+pub fn analyze_gaze(person: &DetectedPersonPose) -> GazeDirection {
     const CONF_THRESHOLD: f32 = 0.1;
-    let nose_x = new_person.nose.x;
-    
+    const EAR_MOTIVATION: f32 = 0.2;
+
+    let has_left_eye = person.left_eye.score > CONF_THRESHOLD;
+    let has_right_eye = person.right_eye.score > CONF_THRESHOLD;
+    let has_nose = person.nose.score > CONF_THRESHOLD;
+
+    let has_left_ear = person.left_ear.score > CONF_THRESHOLD;
+    let has_right_ear = person.right_ear.score > CONF_THRESHOLD;
+
+    let mut score_left: f32 = 0.0;
+    let mut score_right: f32 = 0.0;
+    let mut score_forward: f32 = 1.0;
+
+    if has_nose && has_left_eye && has_right_eye {
+        let right_eye_x = person.right_eye.x;
+        let left_eye_x = person.left_eye.x;
+        let nose_x = person.nose.x;
+
+        let eye_span = left_eye_x - right_eye_x;
+        if eye_span > 1.0 {
+            let nose_ratio = (nose_x - right_eye_x) / eye_span;
+            let deviation = nose_ratio - 0.5;
+
+            if deviation < -0.15 {
+                score_left += deviation.abs() * 2.0;
+                score_forward -= deviation.abs();
+            } else if deviation > 0.15 {
+                score_right += deviation.abs() * 2.0;
+                score_forward -= deviation.abs();
+            } else {
+                score_forward += 0.5;
+            }
+        }
+    }
+
+    if has_left_ear && !has_right_ear {
+        score_right += EAR_MOTIVATION;
+    } else if has_right_ear && !has_left_ear {
+        score_left += EAR_MOTIVATION;
+    }
+
+    score_left = score_left.max(0.0);
+    score_right = score_right.max(0.0);
+    score_forward = score_forward.max(0.0);
+
+    let looking_left = score_left > score_right && score_left > score_forward;
+    let looking_right = score_right > score_left && score_right > score_forward;
+    let looking_straight = !looking_left && !looking_right;
+
+    return GazeDirection {
+        looking_left,
+        looking_right,
+        looking_straight,
+    };
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct GazeDirection {
-    pub looking_left: f32,
-    pub looking_right: f32,
-    pub looking_straight: f32,
+    pub looking_left: bool,
+    pub looking_right: bool,
+    pub looking_straight: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
