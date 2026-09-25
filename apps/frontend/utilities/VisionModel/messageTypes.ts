@@ -98,4 +98,7 @@ export interface SessionInferenceResult {
   questions_asked: number;
   detected_restless: number;
   restless_ids: number[];
+  total_paying_attention: number;
+  total_no_attention: number;
+  total_frames: number;
 }

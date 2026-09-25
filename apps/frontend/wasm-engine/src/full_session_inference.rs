@@ -18,6 +18,8 @@ pub fn analyse_session(frames: JsValue) -> Result<String, JsValue> {
 pub fn group_data(full_session: HashMap<usize, SessionPerson>) -> SessionAnalysis {
     let mut total_restless: usize = 0;
     let mut total_question: usize = 0;
+    let mut total_paying_attention: usize = 0;
+    let mut total_no_attention: usize = 0;
     let mut restless_ids: Vec<usize> = Vec::new();
 
     for (&id, session) in &full_session {
@@ -31,12 +33,19 @@ pub fn group_data(full_session: HashMap<usize, SessionPerson>) -> SessionAnalysi
             restless_ids.push(restless_id);
         }
         total_question += session.count_hand_up;
+        total_paying_attention += session.gaze_paying_attention_count;
+        total_no_attention += session.gaze_no_attention_count;
     }
+
+    let total_frames = total_paying_attention + total_no_attention;
 
     return SessionAnalysis {
         detected_restless: total_restless,
         questions_asked: total_question,
         restless_ids: restless_ids,
+        total_paying_attention,
+        total_no_attention,
+        total_frames,
     };
 }
 
@@ -138,6 +147,9 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
                 continue;
             }
 
+            let is_paying = person.gaze.looking_straight;
+            let is_no_attention = person.gaze.looking_left || person.gaze.looking_right;
+
             if let Some(stored_person) = all_session_people.get_mut(&id) {
                 if !person.is_inferred {
                     stored_person
@@ -150,9 +162,23 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
                         .right_shoulder
                         .push(person.pose_data.right_shoulder);
                 }
+                if !person.is_inferred && person.pose_data.nose.y > stored_person.highest_nose.y {
+                    stored_person.highest_nose = person.pose_data.nose;
+                }
+
+                // Accumulate gaze frame counts directly
+                if !person.is_inferred {
+                    if is_paying {
+                        stored_person.gaze_paying_attention_count += 1;
+                    }
+                    if is_no_attention {
+                        stored_person.gaze_no_attention_count += 1;
+                    }
+                }
+
                 // question logic
 
-                if person.hand_up {
+                if person.hand_up && !person.is_inferred {
                     if let Some(first_frame_up) = stored_person.first_frame_hand_up
                         && let Some(last_frame_up) = stored_person.last_frame_hand_up
                     {
@@ -205,6 +231,7 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
                 all_session_people.insert(
                     person.assigned_id,
                     SessionPerson {
+                        highest_nose: person.pose_data.nose,
                         count_hand_up: if person.hand_up { 1 } else { 0 },
                         first_frame_hand_up: if person.hand_up {
                             Some(frame.frame_number)
@@ -217,6 +244,16 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
                             None
                         },
                         frame_hand_down: None,
+                        gaze_paying_attention_count: if is_paying && !person.is_inferred {
+                            1
+                        } else {
+                            0
+                        },
+                        gaze_no_attention_count: if is_no_attention && !person.is_inferred {
+                            1
+                        } else {
+                            0
+                        },
                         assigned_id: person.assigned_id,
                         all_center_mass: [person.pose_data.center_mass].to_vec(),
                         left_shoulder: [person.pose_data.left_shoulder].to_vec(),
@@ -235,6 +272,9 @@ pub struct SessionAnalysis {
     // a measure of everyones center and the average movement of that point
     detected_restless: usize,
     restless_ids: Vec<usize>,
+    total_paying_attention: usize,
+    total_no_attention: usize,
+    total_frames: usize,
 }
 
 #[derive(Clone)]
@@ -243,7 +283,10 @@ pub struct SessionPerson {
     first_frame_hand_up: Option<usize>,
     last_frame_hand_up: Option<usize>,
     frame_hand_down: Option<usize>,
+    gaze_paying_attention_count: usize,
+    gaze_no_attention_count: usize,
     assigned_id: usize,
+    highest_nose: Keypoint,
     all_center_mass: Vec<Keypoint>,
     left_shoulder: Vec<Keypoint>,
     right_shoulder: Vec<Keypoint>,

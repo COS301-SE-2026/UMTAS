@@ -38,6 +38,9 @@ export default function VideoUploadComp() {
     detected_restless: 0,
     questions_asked: 0,
     restless_ids: [],
+    total_frames: 0,
+    total_no_attention: 0,
+    total_paying_attention: 0,
   });
   useEffect(() => {
     return () => {
@@ -91,6 +94,9 @@ export default function VideoUploadComp() {
 
     try {
       while (currentTime < duration && isProcessingRef.current) {
+        const resultsloop = await frameStore.current.analyseAllFrames();
+        console.log(resultsloop);
+
         const timestamp = currentTime * 1000;
 
         videoElement.currentTime = currentTime;
