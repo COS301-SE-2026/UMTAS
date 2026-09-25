@@ -1,4 +1,4 @@
-use crate::pose_inference::{DetectedPersonPose, Keypoint};
+use crate::pose_inference::DetectedPersonPose;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -171,6 +171,19 @@ pub fn is_hands_up(new_person: &DetectedPersonPose) -> bool {
     right_hand_up || left_hand_up
 }
 
+pub fn gaze_direction(new_person: &DetectedPersonPose) -> GazeDirection {
+    const CONF_THRESHOLD: f32 = 0.1;
+    let nose_x = new_person.nose.x;
+    
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct GazeDirection {
+    pub looking_left: f32,
+    pub looking_right: f32,
+    pub looking_straight: f32,
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct SinglePersonSessionData {
     pub pose_data: DetectedPersonPose,
@@ -179,6 +192,7 @@ pub struct SinglePersonSessionData {
     pub last_seen_frame: usize,
     pub last_seen_timestamp: f64,
     pub hand_up: bool,
+    pub gaze: GazeDirection,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

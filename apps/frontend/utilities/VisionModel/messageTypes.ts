@@ -88,6 +88,10 @@ export interface DetectedPersonPose {
   left_arm: Keypoint[]; // [left_elbow, left_wrist]
   right_shoulder: Keypoint;
   right_arm: Keypoint[]; // [right_elbow, right_wrist]
+  left_eye: Keypoint;
+  right_eye: Keypoint;
+  left_ear: Keypoint;
+  right_ear: Keypoint;
 }
 
 export interface SessionInferenceResult {
