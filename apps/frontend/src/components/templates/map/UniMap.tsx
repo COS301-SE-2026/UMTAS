@@ -1,12 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AdvancedMarker, Pin } from "@vis.gl/react-google-maps";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { MapScreen } from "@/components/organisms/map/MapScreen";
 import { useShapeCreator } from "@/hooks/useShapeCreator";
 import { Badge } from "@/components/atoms/baseShadcn/badge";
-import { getAllBuildingsQ } from "../../../../utilities/building/buildingQueries";
+import {
+  getAllBuildingsHeatmapQ,
+  getAllBuildingsQ,
+} from "../../../../utilities/building/buildingQueries";
 import { BuildingType } from "../../../../utilities/building/buildingRequestBuilder";
 import {
   Sheet,
@@ -17,11 +20,37 @@ import {
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 import { AdminDrawControls } from "@/components/organisms/map/AdminDrawControls";
 import { RouteLine } from "@/components/organisms/map/RouteLine";
-import { getActiveRouteQ } from "../../../../utilities/route/routeQueries";
+import {
+  getActiveRouteQ,
+  getRoutingHeatmapQ,
+} from "../../../../utilities/route/routeQueries";
 import {
   UniversityStateLoading,
   useUniversityState,
 } from "@/hooks/useUniversityState";
+import Tutorial from "@/components/organisms/nav/Tutorial";
+import { useBuildingDraw } from "@/hooks/useBuildingDraw";
+import {
+  buildingHeatmapRangeToPoints,
+  routeHeatmapRangeToPoints,
+  WeightedPoint,
+} from "../../../../utilities/heatmaps/heatmapAdapter";
+import { HourRangeSelect } from "@/components/molecules/heatmaps/HourRangeSelect";
+import { HeatmapOverlay } from "@/components/organisms/heatmaps/HeatmapOverlay";
+import { Button } from "@/components/atoms/baseShadcn/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/baseShadcn/select";
+import { BuildingSheet } from "@/components/organisms/map/BuildingSheet";
+import {
+  StudentRouteAlerts,
+  StudentRouteLines,
+} from "@/components/organisms/map/StudentRoutes";
+import { AdminRouteDiversion } from "@/components/organisms/map/AdminRouteDiversion";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -64,9 +93,25 @@ export function UniMap() {
     null,
   );
   const [adminMode, setAdminMode] = useState<"none" | "draw" | "pin">("none");
+  const buildingDraw = useBuildingDraw();
+  const { polygonPath, pinLocation } = buildingDraw;
   const [selectedDate, setSelectedDate] = useState(() =>
     new Date().toISOString().slice(0, 10),
   );
+
+  //heatmap use state stuff
+  const [mapMode, setMapMode] = useState<"route" | "heatmap">("route");
+  const [fromHour, setFromHour] = useState(8);
+  const [toHour, setToHour] = useState(15);
+  const [metricMode, setMetricMode] = useState<"projected" | "worstCase">(
+    "projected",
+  );
+
+  //alternate route stuff
+  const [selectedIndex, setSelectedIndex] = useState<Record<string, number>>(
+    {},
+  );
+
   //this needs to be in a very specific format. Looks super complicated, but the backend cries when I don't send the request in this format
   const [selectedTime, setSelectedTime] = useState(() => {
     const now = new Date();
@@ -81,12 +126,72 @@ export function UniMap() {
   //console.log("active route query:", { selectedDate, selectedTime });
   const { data: activeRoute } = useQuery({
     ...getActiveRouteQ({ date: selectedDate, time: selectedTime }),
-    enabled: !isLoading && university != null,
+    enabled: !isLoading && university != null && mapMode === "route",
   });
+
+  //heatmap queries
+  const { data: buildingHeatmaps = [] } = useQuery({
+    ...getAllBuildingsHeatmapQ({ date: selectedDate }),
+    enabled: !isLoading && university != null && mapMode === "heatmap",
+  });
+
+  const { data: routeHeatmaps = [] } = useQuery({
+    ...getRoutingHeatmapQ({ date: selectedDate }),
+    enabled: !isLoading && university != null && mapMode === "heatmap",
+  });
+
+  const buildingHeatmapPoints: WeightedPoint[] = useMemo(() => {
+    if (mapMode !== "heatmap") {
+      return [];
+    }
+
+    return buildingHeatmapRangeToPoints(
+      buildingHeatmaps,
+      fromHour,
+      toHour,
+      metricMode,
+    );
+  }, [mapMode, buildingHeatmaps, fromHour, toHour, metricMode]);
+
+  const routeHeatmapPoints: WeightedPoint[] = useMemo(() => {
+    if (mapMode !== "heatmap") {
+      return [];
+    }
+
+    return routeHeatmapRangeToPoints(
+      routeHeatmaps,
+      fromHour,
+      toHour,
+      metricMode,
+    );
+  }, [mapMode, routeHeatmaps, fromHour, toHour, metricMode]);
+
   const role = university?.role;
   const isAssignedRole = role != null;
 
   const canUserDraw = role === "UNIVERSITY_ADMIN";
+
+  const steps = [
+    {
+      target: "#map-date-time",
+      content:
+        "Select a date and time to view routes between events on your schedule.",
+    },
+    {
+      target: "#university-map",
+      content:
+        "View buildings and routes on the map. Click a building marker to view its details.",
+    },
+    ...(canUserDraw
+      ? [
+          {
+            target: "#admin-map-controls",
+            content:
+              "Use these controls to select buildings, place pins, and manage building areas on the map.",
+          },
+        ]
+      : []),
+  ];
 
   //new system for admins so that they don't do multiple things with one click
   function handleMarkerClick(building: BuildingType) {
@@ -103,93 +208,229 @@ export function UniMap() {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-[var(--bg-base)] mx-4 gap-4">
-      <div className="flex items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-4">
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-        />
-        <input
-          type="time"
-          value={selectedTime}
-          onChange={(e) => setSelectedTime(e.target.value)}
-          className="text-sm"
-        />
-        {activeRoute?.status === "NONE" && (
-          <span className="text-sm text-[var(--text-secondary)]">
-            Select a Time and Date. All Attending Events From Your Schedule Will
-            Display Routes Between Your Events On The Map.
-          </span>
-        )}
-        {activeRoute?.status === "AT_VENUE" && (
-          <span className="text-sm text-[var(--text-secondary)]">
-            At {activeRoute.fromEventName}
-          </span>
-        )}
-        {activeRoute?.status === "MOVING" && (
-          <span className="text-sm text-[var(--text-secondary)]">
-            Walking from {activeRoute.fromEventName} to{" "}
-            {activeRoute.toEventName}
-          </span>
-        )}
-      </div>
-      <div className="flex-1 overflow-hidden">
-        <MapScreen onRequestMapSetup={() => router.push("/mapping/config")}>
-          {buildings.map((building) => (
-            <div key={building.buildingId}>
-              {building.location && (
-                <AdvancedMarker
-                  position={building.location}
-                  title={building.buildingName}
-                  onClick={() => handleMarkerClick(building)}
-                >
-                  <Pin
-                    background={
-                      building.buildingId === activeRoute?.currentBuildingId
-                        ? "var(--success-text)"
-                        : building.displayColour || "var(--btn-primary-bg)"
-                    }
-                    scale={building.venueCount === 0 ? 0.85 : 1}
-                  />
-                </AdvancedMarker>
-              )}
-              {building.footprint && <BuildingFootprint building={building} />}
-            </div>
-          ))}
-          {/* Ugly as can be, fix this */}
-          {activeRoute?.status === "MOVING" && activeRoute.route && (
-            <RouteLine
-              path={
-                activeRoute.route.pathCoordinates as unknown as {
-                  lat: number;
-                  lng: number;
-                }[]
-              }
-              colour={activeRoute.route.displayColour}
-            />
-          )}
-        </MapScreen>
-      </div>
-      {canUserDraw && (
-        <AdminDrawControls buildings={buildings} onModeChange={setAdminMode} />
-      )}
+    <>
+      <Tutorial steps={steps} wait={true} />
 
-      <Sheet
-        open={!!selectedBuilding}
-        onOpenChange={(open) => !open && setSelectedBuilding(null)}
-      >
-        <SheetContent side="right">
-          <SheetHeader>
-            <SheetTitle className="flex items-center gap-2">
-              {selectedBuilding?.buildingName}
-              <Badge variant="secondary">
-                {selectedBuilding?.venueCount ?? 0} venues
-              </Badge>
-            </SheetTitle>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
-    </div>
+      <div className="flex-1 flex flex-col bg-[var(--bg-base)] mx-4 gap-4">
+        <div
+          id="map-date-time"
+          className="flex items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-4"
+        >
+          <div className="flex rounded-lg border border-[var(--border)] overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setMapMode("route")}
+              className={`px-2 py-1 text-sm cursor-pointer ${
+                mapMode === "route"
+                  ? ""
+                  : "bg-bg-elevated text-(--text-secondary)"
+              }`}
+            >
+              Route
+            </button>
+            <button
+              type="button"
+              onClick={() => setMapMode("heatmap")}
+              className={`px-2 py-1 text-sm cursor-pointer ${
+                mapMode === "heatmap"
+                  ? ""
+                  : "bg-bg-elevated text-(--text-secondary) "
+              }`}
+            >
+              Heatmap
+            </button>
+          </div>
+
+          <input
+            type="date"
+            value={selectedDate}
+            className="text-sm"
+            onChange={(e) => setSelectedDate(e.target.value)}
+          />
+
+          {mapMode === "route" && (
+            <>
+              <input
+                type="time"
+                value={selectedTime}
+                onChange={(e) => setSelectedTime(e.target.value)}
+                className="text-sm"
+              />
+
+              {activeRoute?.status === "NONE" && (
+                <span className="text-sm text-[var(--text-secondary)]">
+                  Select a Time and Date to View Attending Event Routes
+                </span>
+              )}
+
+              {activeRoute?.status === "AT_VENUE" && (
+                <span className="text-sm text-[var(--text-secondary)]">
+                  At {activeRoute.fromEventName}
+                </span>
+              )}
+
+              {activeRoute?.status === "MOVING" && (
+                <span className="text-sm text-[var(--text-secondary)]">
+                  Walking from {activeRoute.fromEventName} to{" "}
+                  {activeRoute.toEventName}
+                </span>
+              )}
+
+              <div className="ml-auto flex items-center justify-end">
+                <StudentRouteAlerts
+                  date={selectedDate}
+                  time={selectedTime}
+                  selectedIndex={selectedIndex}
+                  setSelectedIndex={setSelectedIndex}
+                />
+              </div>
+            </>
+          )}
+
+          {mapMode === "heatmap" && (
+            <>
+              <Select
+                value={metricMode}
+                onValueChange={(value: "projected" | "worstCase") =>
+                  setMetricMode(value)
+                }
+              >
+                <SelectTrigger
+                  id="select-metric-mode"
+                  className="bg-[var(--bg-surface)] border-[var(--border)] cursor-pointer"
+                  title="Select Metric"
+                >
+                  <SelectValue placeholder="Select Metric" />
+                </SelectTrigger>
+                <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+                  <SelectItem
+                    value="projected"
+                    className="text-[var(--text-primary)]"
+                  >
+                    Best Case
+                  </SelectItem>
+                  <SelectItem
+                    value="worstCase"
+                    className="text-[var(--text-primary)]"
+                  >
+                    Worst Case
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+
+              <HourRangeSelect
+                value={{
+                  startTime: `${String(fromHour).padStart(2, "0")}:00`,
+                  endTime: `${String(toHour).padStart(2, "0")}:00`,
+                }}
+                onChange={(slot) => {
+                  setFromHour(parseInt(slot.startTime.split(":")[0], 10));
+                  setToHour(parseInt(slot.endTime.split(":")[0], 10));
+                }}
+              />
+            </>
+          )}
+        </div>
+
+        <div
+          id="university-map"
+          className="flex-1 min-h-[75vh] overflow-hidden"
+        >
+          <MapScreen
+            onRequestMapSetup={() => router.push("/mapping/config")}
+            adminMode={adminMode}
+            polygonPath={polygonPath}
+            pinLocation={pinLocation}
+          >
+            {mapMode === "heatmap" && (
+              <HeatmapOverlay
+                buildingPoints={buildingHeatmapPoints}
+                routePoints={routeHeatmapPoints}
+              />
+            )}
+
+            {mapMode === "route" && (
+              <StudentRouteLines
+                date={selectedDate}
+                time={selectedTime}
+                selectedIndex={selectedIndex}
+              />
+            )}
+
+            {buildings.map((building) => (
+              <div key={building.BuildingID}>
+                {building.location && (
+                  <AdvancedMarker
+                    position={building.location}
+                    title={building.BuildingName}
+                    onClick={() => handleMarkerClick(building)}
+                  >
+                    <Pin
+                      background={building.displayColour}
+                      scale={building.venueCount === 0 ? 0.85 : 1}
+                    />
+                  </AdvancedMarker>
+                )}
+
+                {building.footprint && (
+                  <BuildingFootprint building={building} />
+                )}
+              </div>
+            ))}
+
+            {activeRoute?.currentBuildingId &&
+              (() => {
+                const currentBuilding = buildings.find(
+                  (building) =>
+                    building.BuildingID === activeRoute.currentBuildingId,
+                );
+
+                if (!currentBuilding?.location) {
+                  return null;
+                }
+
+                return (
+                  <AdvancedMarker position={currentBuilding.location}>
+                    <div className="relative flex items-center justify-center">
+                      <span className="absolute h-8 w-8 rounded-full bg-green-500 opacity-70 animate-ping" />
+                      <div className="h-4 w-4 rounded-full bg-green-500 border-2 border-white" />
+                    </div>
+                  </AdvancedMarker>
+                );
+              })()}
+
+            {/* {activeRoute?.status === "MOVING" && activeRoute.route && (
+              <RouteLine
+                path={
+                  activeRoute.route.pathCoordinates as unknown as {
+                    lat: number;
+                    lng: number;
+                  }[]
+                }
+                colour={activeRoute.route.displayColour}
+              />
+            )} */}
+          </MapScreen>
+        </div>
+
+        {canUserDraw && (
+          <div id="admin-map-controls" className="flex flex-col gap-4">
+            <AdminDrawControls
+              buildings={buildings}
+              onModeChange={setAdminMode}
+              drawingState={buildingDraw}
+            />
+            <AdminRouteDiversion buildings={buildings} />
+          </div>
+        )}
+
+        <BuildingSheet
+          building={selectedBuilding}
+          buildings={buildings}
+          open={!!selectedBuilding}
+          onOpenChange={(open) => !open && setSelectedBuilding(null)}
+        />
+      </div>
+    </>
   );
 }

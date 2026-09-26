@@ -15,7 +15,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d${DB_NAME}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -37,21 +37,20 @@ services:
       retries: 5
 
   minio:
-    image: minio/minio:RELEASE.2023-10-25T06-33-25Z
+    image: rustfs/rustfs:latest
     restart: unless-stopped
     networks:
       gateway:
       data-internal:
         aliases:
           - minio-prod
-    command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
       - minio_data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/ready"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -62,8 +61,28 @@ services:
       - "traefik.http.routers.minio-prod.entrypoints=websecure"
       - "traefik.http.routers.minio-prod.tls=true"
       - "traefik.http.routers.minio-prod.tls.certresolver=myresolver"
-      - "traefik.http.services.minio-prod.loadbalancer.server.port=9001"
+      - "traefik.http.services.minio-prod.loadbalancer.server.port=9000"
 
+  minio-init:
+    image: amazon/aws-cli:2.27.50
+    networks:
+      - data-internal
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      AWS_EC2_METADATA_DISABLED: "true"
+      MINIO_BUCKET: ${MINIO_BUCKET:-umtas-uploads}
+    volumes:
+      - ./apps/pdf_parser/up_test_pdfs/LECTURES_S1.pdf:/seed/LECTURES_S1.pdf:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        aws --endpoint-url http://minio-prod:9000 s3 mb "s3://$${MINIO_BUCKET}" || true
+        aws --endpoint-url http://minio-prod:9000 s3 cp /seed/LECTURES_S1.pdf "s3://$${MINIO_BUCKET}/demo/pdf-parser/up/LECTURES_S1.pdf"
   pdf-parser-worker:
     image: ${DOCKER_REGISTRY:-vigilcs/umtas}:pdf-parser-worker-${IMAGE_TAG:?IMAGE_TAG is required}
     restart: unless-stopped
@@ -143,6 +162,8 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
     environment:
       - PORT=${BACKEND_PORT}
       - NODE_ENV=production

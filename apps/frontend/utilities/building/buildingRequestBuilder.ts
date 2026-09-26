@@ -23,6 +23,30 @@ export type updateBuildingLocationPath =
 export type updateBuildingLocationRes =
   paths["/api/buildings/{buildingId}"]["patch"]["responses"]["200"]["content"]["application/json"];
 
+export type getBuildingHeatmapPath =
+  paths["/api/buildings/{buildingId}/heatmap"]["get"]["parameters"]["path"];
+export type getBuildingHeatmapQuery =
+  paths["/api/buildings/{buildingId}/heatmap"]["get"]["parameters"]["query"];
+export type getBuildingHeatmapRes =
+  paths["/api/buildings/{buildingId}/heatmap"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type getAllBuildingsHeatmapQuery =
+  paths["/api/buildings/heatmap"]["get"]["parameters"]["query"];
+export type getAllBuildingsHeatmapRes =
+  paths["/api/buildings/heatmap"]["get"]["responses"]["200"]["content"]["application/json"];
+export type BuildingHeatmapType =
+  getAllBuildingsHeatmapRes["buildings"][number];
+
+export type getBuildingByIDPath =
+  paths["/api/buildings/{buildingId}"]["get"]["parameters"]["path"];
+export type getBuildingByIDRes =
+  paths["/api/buildings/{buildingId}"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type deleteBuildingPath =
+  paths["/api/buildings/{buildingId}"]["delete"]["parameters"]["path"];
+export type deleteBuildingRes =
+  paths["/api/buildings/{buildingId}"]["delete"]["responses"]["200"]["content"]["application/json"];
+
 export class getAllBuildingsBuilder extends RequestBuilder<
   getAllBuildingsQuery,
   undefined,
@@ -53,5 +77,51 @@ export class updateBuildingLocationBuilder extends RequestBuilder<
   constructor() {
     super();
     this.setUrl("/buildings/{buildingId}").setMethod(RequestMethod.PATCH);
+  }
+}
+
+export class getBuildingHeatmapBuilder extends RequestBuilder<
+  getBuildingHeatmapPath,
+  undefined,
+  getBuildingHeatmapRes,
+  getBuildingHeatmapQuery
+> {
+  constructor() {
+    super();
+    this.setUrl("/buildings/{buildingId}/heatmap").setMethod(RequestMethod.GET);
+  }
+}
+
+export class getAllBuildingsHeatmapBuilder extends RequestBuilder<
+  undefined,
+  undefined,
+  getAllBuildingsHeatmapRes,
+  getAllBuildingsHeatmapQuery
+> {
+  constructor() {
+    super();
+    this.setUrl("/buildings/heatmap").setMethod(RequestMethod.GET);
+  }
+}
+
+export class getBuildingByIdBuilder extends RequestBuilder<
+  getBuildingByIDPath,
+  undefined,
+  getBuildingByIDRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/buildings/{buildingId}").setMethod(RequestMethod.GET);
+  }
+}
+
+export class deleteBuildingBuilder extends RequestBuilder<
+  deleteBuildingPath,
+  undefined,
+  deleteBuildingRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/buildings/{buildingId}").setMethod(RequestMethod.DELETE);
   }
 }

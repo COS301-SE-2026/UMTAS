@@ -8,6 +8,7 @@ export interface HelpPageItem {
   action?: () => void;
   closeOnSelect?: boolean;
   "data-tour"?: string;
+  roles?: string[];
 }
 
 export interface HelpPageGroup {

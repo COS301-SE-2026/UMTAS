@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dev
     tags:
       - "v*"
   pull_request:
@@ -31,10 +32,16 @@ jobs:
     env:
       NEXT_TELEMETRY_DISABLED: 1
       NEXT_PUBLIC_API_URL: ${{ startsWith(github.ref, 'refs/tags/v') && format('https://{0}/api', secrets.PROD_DOMAIN) || format('https://staging.{0}/api', secrets.STAGING_DOMAIN) }}
+      CI_BACKEND_IMAGE: umtas-ci-backend:${{ github.sha }}
+      CI_PDF_PARSER_IMAGE: umtas-ci-pdf-parser:${{ github.sha }}
+      CI_SOLVER_IMAGE: umtas-ci-solver:${{ github.sha }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
 
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
@@ -53,6 +60,14 @@ jobs:
       - name: Run Linter
         run: pnpm run lint
 
+      - name: Install wasm-pack
+        run: |
+          curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Build WASM package
+        run: wasm-pack build apps/frontend/wasm-engine --target web --release
+
       - name: Run Build
         run: pnpm run build
 
@@ -67,6 +82,15 @@ jobs:
           pnpm --filter pdf-parser-worker test
           pnpm --filter backend exec jest --coverage --runInBand
 
+      - name: Typecheck Full-Stack Integration Tests
+        run: pnpm --filter backend test:integration:typecheck
+
+      - name: Build integration images in parallel
+        uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
+        with:
+          files: ./docker-bake.hcl
+          load: true
+
       - name: Run Full-Stack Integration Tests
         run: pnpm test:integration
 
@@ -74,7 +98,6 @@ jobs:
         run: pnpm test:e2e
 
       - name: Upload Playwright report
-
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -84,12 +107,22 @@ jobs:
             apps/e2e/test-results
           retention-days: 30
 
-      - name: Upload coverage reports to Codecov
+      - name: Upload unit coverage to Codecov
         uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: apps/backend/coverage/lcov.info,apps/backend/coverage/integration/lcov.info
+          files: apps/backend/coverage/lcov.info
           disable_search: true
+          flags: unit
+
+      #When Integration tests actually contribut to coverage
+      # - name: Upload integration coverage to Codecov
+      #   uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     files: apps/backend/coverage/integration/lcov.info
+      #     disable_search: true
+      #     flags: integration
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
@@ -98,69 +131,11 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: "**/junit.xml"
 
-  docker-check:
-    name: Validate Docker Builds (PR)
-    runs-on: ubuntu-latest
-    needs: ci
-    if: github.event_name == 'pull_request'
-    permissions:
-      contents: read
-
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: ci
-          POSTGRES_PASSWORD: ci
-          POSTGRES_DB: umtas_ci
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-
-      redis:
-        image: redis:7-alpine
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
-
-      - name: Build backend image
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
-        with:
-          context: .
-          file: docker/backend/backend.Dockerfile
-          push: false
-          load: true
-          tags: umtas-backend:ci
-          cache-from: type=gha,scope=backend-main
-
-      - name: Build frontend image
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
-        with:
-          context: .
-          file: docker/frontend/frontend.Dockerfile
-          push: false
-          load: true
-          build-args: |
-            NEXT_PUBLIC_API_URL=https://staging.${{ secrets.STAGING_DOMAIN }}/api
-          tags: umtas-frontend:ci
-          cache-from: type=gha,scope=frontend-main
-
   docker-staging:
     name: Build & Push Staging Images
     runs-on: ubuntu-latest
     needs: ci
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     environment:
       name: staging
     permissions:
@@ -247,7 +222,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy to Staging
     needs: docker-staging
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     environment:
       name: production
     permissions: {}

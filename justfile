@@ -1,13 +1,66 @@
 default:
     @just --list
 
+#dev for aidan ;)
+devClean:
+    just dockerClean
+    just sync
+    just dev
+
 # combine dev into easy to use profile
 dev:
     just dev-infra
     just both
 
+# dev over an ngrok tunnel for phone testing (camera needs https)
+dev-mobile: dev-infra rebuild-packages
+    #!/usr/bin/env bash
+    set -euo pipefail
+    tunnel_url() {
+      curl -s http://localhost:4040/api/tunnels 2>/dev/null \
+        | grep -o '"public_url":"https://[^"]*' | head -1 | cut -d'"' -f4 || true
+    }
+    url=$(tunnel_url)
+    if [ -z "$url" ]; then
+      ngrok http 3001 --log=stdout > /dev/null &
+      ngrok_pid=$!
+      trap 'kill $ngrok_pid 2>/dev/null' EXIT
+      for _ in $(seq 1 20); do
+        url=$(tunnel_url)
+        [ -n "$url" ] && break
+        sleep 0.5
+      done
+    fi
+    if [ -z "$url" ]; then
+      echo "Could not get an ngrok URL from http://localhost:4040" >&2
+      exit 1
+    fi
+    echo "Open on your phone: $url"
+    # phase runs its command through a shell, so pass it as one string.
+    # Relative API URL makes the browser go through the Next /api rewrite
+    # instead of calling localhost:3000, which the phone can't reach.
+    NGROK_URL="$url" phase run 'BETTER_AUTH_TRUSTED_ORIGINS="$BETTER_AUTH_TRUSTED_ORIGINS,$NGROK_URL" NEXT_PUBLIC_API_URL=/api pnpm --parallel --filter backend --filter frontend run dev'
+
 # Umtas local dev commands
 
+compile-wasm-dev:
+    phase run -- pnpm --filter frontend build:wasm:dev
+
+VisionModel:
+    @if [ ! -f apps/frontend/public/models/yolo26n.onnx ] || [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ]; then \
+        python3 -m venv .venv; \
+        .venv/bin/pip install --no-cache-dir ultralytics onnx onnxruntime; \
+        mkdir -p apps/frontend/public/models; \
+        if [ ! -f apps/frontend/public/models/yolo26n.onnx ]; then \
+            .venv/bin/yolo export model=yolo26n.pt format=onnx imgsz=640; \
+            mv yolo26n.onnx apps/frontend/public/models/yolo26n.onnx; \
+    fi; \
+        if [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ]; then \
+            .venv/bin/yolo export model=yolo26n-pose.pt format=onnx imgsz=640; \
+            mv yolo26n-pose.onnx apps/frontend/public/models/yolo26n-pose.onnx; \
+        fi; \
+        rm -rf .venv; \
+    fi
 
 # SimService
 simservInit:
@@ -25,16 +78,17 @@ back: rebuild-packages
     phase run -- pnpm --filter backend run start:dev
 
 # frontend + phase injection
-front: rebuild-packages
+front: rebuild-packages compile-wasm-dev
     phase run -- pnpm --filter frontend run dev
 
 # both + phase
-both: rebuild-packages
+both: rebuild-packages compile-wasm-dev
     phase run -- pnpm --parallel --filter backend --filter frontend run dev
 
 # spin up local versions
 dev-infra:
-    WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose --profile dev-infra up -d --build postgres redis minio mailhog pdf-parser-worker solver-worker
+    phase run -- docker compose --profile dev-infra up -d postgres redis minio minio-init mailhog
+    WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose --profile dev-infra up -d --build pdf-parser-worker solver-worker
 
 # compelete reset
 sync:
@@ -54,13 +108,13 @@ reset-volumes:
 
 # shared proxy stack
 proxy-up:
-  phase run --env staging -- docker compose -p umtas-proxy -f docker-compose.traefik.yml up 
+    phase run --env staging -- docker compose -p umtas-proxy -f docker-compose.traefik.yml up
 
 proxy-down:
-   phase run --env staging  -- docker compose -p umtas-proxy -f docker-compose.traefik.yml down
+    phase run --env staging  -- docker compose -p umtas-proxy -f docker-compose.traefik.yml down
 
 staging-up:
-    phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml up -d --remove-orphans 
+    phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml up -d --remove-orphans
 
 staging-down:
     phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml down
@@ -108,8 +162,7 @@ prod-up release_tag:
     IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -p umtas-prod -f docker-compose.prod.yml up -d --remove-orphans
 
 prod-down release_tag:
-     IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -p umtas-prod -f docker-compose.prod.yml down
-
+    IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -p umtas-prod -f docker-compose.prod.yml down
 
 # manual prod deployment
 
@@ -209,13 +262,17 @@ docker-build-multiarch image_tag registry="vigilcs/umtas":
 
 ############################## Backend specific
 
+#FOr local integration tests
+testInt:
+    phase run -- pnpm --filter backend run test:integration:local
+
 #Complete restart of backend, I'm getting lazy
 resetBack:
     just dockerClean
     just sync
     just back
 
-#lint-staged
+# lint-staged
 lintBack:
     pnpm run lint-staged
 
@@ -243,18 +300,14 @@ db_sql:
 # DROP SCHEMA public CASCADE; CREATE SCHEMA public; then quite
 # then you can delete all migrations and meta from drizzle and regenerate and migrate
 
-
 runsim:
     cd apps/simulation-service && phase run --env development -- docker compose up
-
 
 nfr-start:
     cd apps/NFR && phase run --env development -- docker compose up -d nfr-tester
 
 nfr-stop:
     cd apps/NFR && phase run --env development -- docker compose stop nfr-tester
-
-
 
 nfr-upload:
     cd apps/NFR && phase run --env development -- docker compose exec nfr-tester \
@@ -265,14 +318,11 @@ nfr-upload:
         --run-time 2m \
         --headless \
 
-
 staging-migrate:
     phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml run --rm backend node dist/db/migrate.js
 
 prod-migrate:
     phase run --env production -- docker compose -p umtas-production -f docker-compose.prod.yml run --rm backend node dist/db/migrate.js
-
-
 
 # Backend testing
 # unit test

@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -11,28 +11,32 @@ import {
   IsString,
   IsUUID,
   Matches,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import { LatLngDto } from 'src/Building/dto/building.dto';
 
-export class RouteQueryDto {
-  @ApiProperty({
-    format: 'uuid',
-    description: 'The origin building that the student is walking from',
-    example: '00000000-0000-0000-0000-000000000000',
-  })
-  @IsUUID()
-  originBuildingId!: string;
+export const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+export const TIME_ONLY_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
+/**
+ * Index of route - 0 for shortest, 5 for 4th alternative
+ */
+export class RouteVariantDto {
   @ApiProperty({
-    format: 'uuid',
-    description: 'The destination building that the student is walking to',
-    example: '00000000-0000-0000-0000-000000000000',
+    description:
+      'Zero-based route index. Index 0 is the recommended shortest route.',
+    example: 0,
+    minimum: 0,
   })
-  @IsUUID()
-  destinationBuildingId!: string;
-}
+  @IsInt()
+  @Min(0)
+  routeIndex!: number;
+} //END_RouteVariantDto
 
+/**
+ * Db walking route between two buildings
+ */
 export class RouteDto {
   @ApiProperty({
     format: 'uuid',
@@ -56,9 +60,18 @@ export class RouteDto {
   destinationBuildingId!: string;
 
   @ApiProperty({
+    example: 0,
+    minimum: 0,
+    description:
+      'Index of route | 0 for shortest, incrementally for alternatives.',
+  })
+  @IsInt()
+  @Min(0)
+  routeIndex!: number;
+
+  @ApiProperty({
     type: [LatLngDto],
-    isArray: true,
-    description: 'List of lat/long coordinates for the route path',
+    description: 'List of latitude/longitude coordinates for the route path.',
   })
   @IsArray()
   @ValidateNested({ each: true })
@@ -67,7 +80,7 @@ export class RouteDto {
 
   @ApiProperty({
     example: 67,
-    description: 'The route distance in metres',
+    description: 'The route distance in metres.',
   })
   @IsInt()
   @IsPositive()
@@ -75,36 +88,36 @@ export class RouteDto {
 
   @ApiProperty({
     example: '#0000FF',
-    description: 'The hex colour for the polyline (path)',
+    description: 'The hex colour for the route polyline.',
   })
   @IsHexColor()
   displayColour!: string;
-}
+} //END_RouteDto
 
-export enum ActiveRouteStatus {
-  AT_VENUE = 'AT_VENUE',
-  MOVING = 'MOVING',
-  NONE = 'NONE',
-}
-
-export class ActiveRouteQueryDto {
+/**
+ * Direct building-to-building route request.
+ */
+export class RouteQueryDto {
   @ApiProperty({
-    description: 'Calendar date that matches the EventAttendance date',
-    example: '2026-10-12',
+    format: 'uuid',
+    description: 'The building the student is walking from.',
+    example: '00000000-0000-0000-0000-000000000000',
   })
-  @IsDateString()
-  date!: string;
+  @IsUUID()
+  originBuildingId!: string;
 
   @ApiProperty({
-    description: 'Time in hh:mm',
-    example: '10:12',
+    format: 'uuid',
+    description: 'The building the student is walking to.',
+    example: '00000000-0000-0000-0000-000000000000',
   })
-  @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
-    message: 'time must be in the format HH:mm',
-  })
-  time!: string;
-}
+  @IsUUID()
+  destinationBuildingId!: string;
+} //END_RouteQueryDto
 
+/**
+ * Response wrapper for a direct building route.
+ */
 export class RouteSingleResponseDto {
   @ApiProperty({
     type: RouteDto,
@@ -112,8 +125,42 @@ export class RouteSingleResponseDto {
   @ValidateNested()
   @Type(() => RouteDto)
   route!: RouteDto;
-}
+} //END_RouteSingleResponseDto
 
+/**
+ * Existing active-route status values.
+ */
+export enum ActiveRouteStatus {
+  AT_VENUE = 'AT_VENUE',
+  MOVING = 'MOVING',
+  NONE = 'NONE',
+} //END_ActiveRouteStatus
+
+/**
+ * Active-route date and time request.
+ */
+export class ActiveRouteQueryDto {
+  @ApiProperty({
+    description: 'Calendar date matching the EventAttendance date.',
+    example: '2026-10-12',
+    format: 'date',
+  })
+  @IsDateString()
+  date!: string;
+
+  @ApiProperty({
+    description: 'Time in HH:mm format.',
+    example: '10:12',
+  })
+  @Matches(TIME_ONLY_PATTERN, {
+    message: 'time must be in the format HH:mm',
+  })
+  time!: string;
+} //END_ActiveRouteQueryDto
+
+/**
+ * Existing active-route response.
+ */
 export class ActiveRouteResponseDto {
   @ApiProperty({
     enum: ActiveRouteStatus,
@@ -123,37 +170,51 @@ export class ActiveRouteResponseDto {
   @IsEnum(ActiveRouteStatus)
   status!: ActiveRouteStatus;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     format: 'uuid',
-    required: false,
+    nullable: true,
     example: '00000000-0000-0000-0000-000000000000',
   })
   @IsUUID()
   @IsOptional()
   currentBuildingId?: string | null;
 
-  @ApiProperty({
-    type: () => RouteDto,
-    required: false,
+  @ApiPropertyOptional({
+    type: RouteDto,
+    nullable: true,
   })
   @ValidateNested()
   @IsOptional()
   @Type(() => RouteDto)
-  route?: RouteDto;
+  route?: RouteDto | null;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'Lecture 1',
-    required: false,
   })
   @IsString()
   @IsOptional()
   fromEventName?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'Lecture 2',
-    required: false,
   })
-  @IsOptional()
   @IsString()
+  @IsOptional()
   toEventName?: string;
+} //END_ActiveRouteResponseDto
+
+export class RouteVariantQueryDto {
+  @ApiProperty({ format: 'uuid' })
+  @IsUUID()
+  originBuildingId!: string;
+
+  @ApiProperty({ format: 'uuid' })
+  @IsUUID()
+  destinationBuildingId!: string;
+
+  @ApiProperty({ example: 1, minimum: 0, type: Number })
+  @IsInt()
+  @Min(0)
+  @Type(() => Number)
+  routeIndex!: number;
 }

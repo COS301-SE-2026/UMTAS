@@ -106,7 +106,6 @@ export function ModulesStep({ modules }: ModulesStepProps) {
     value: ModuleResponseDto[K],
   ) {
     setIsDirty(true);
-    console.log(id, field, value);
 
     getQueryClient().setQueryData(
       getAllModulesQ().queryKey,
@@ -258,7 +257,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
 
         {/* inline edit form */}
         {isSelected && (
-          <div className="flex flex-col gap-2 pl-2">
+          <div className="flex flex-col gap-2 mr-12">
             <ModuleCard
               module={module}
               onUpdate={handleModuleUpdate}

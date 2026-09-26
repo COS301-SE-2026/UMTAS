@@ -1,17 +1,26 @@
-import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  PartialType,
+  PickType,
+} from '@nestjs/swagger';
 import {
   IsBoolean,
   IsHexColor,
   IsLatitude,
   IsLongitude,
+  IsNotEmpty,
   IsObject,
   IsOptional,
   IsString,
+  IsUUID,
   Length,
+  MaxLength,
   ValidateNested,
 } from 'class-validator';
 
 import { Transform, Type } from 'class-transformer';
+import { BaseVenueDto } from 'src/Venue/dto/venue.dto';
 
 export interface GeoJsonPolygon {
   type: 'Polygon';
@@ -22,6 +31,7 @@ export class LatLngDto {
   @ApiProperty({
     example: -25.7545,
     description: 'Latitude in decimal degrees',
+    type: Number,
   })
   @IsLatitude()
   lat!: number;
@@ -29,28 +39,44 @@ export class LatLngDto {
   @ApiProperty({
     example: 28.2314,
     description: 'Longitude in decimal degrees',
+    type: Number,
   })
   @IsLongitude()
   lng!: number;
 }
 
-//building requests
-export class CreateBuildingDto {
+//Base building dto
+export class BaseBuildingDto {
   @ApiProperty({
-    minLength: 1,
+    description: 'Unique building identifier.',
+    format: 'uuid',
+    example: '00000000-0000-0000-0000-000000000000',
+  })
+  @IsUUID()
+  BuildingID!: string;
+
+  @ApiProperty({
+    description: 'Building name. Unique per university. Max 100 chars.',
     maxLength: 100,
     example: 'Information Technology Building',
-    description: 'Name of the building. Must be unique within the university.',
   })
   @IsString()
-  @Length(1, 100)
-  buildingName!: string;
+  @IsNotEmpty()
+  @MaxLength(100)
+  BuildingName!: string;
+
+  @ApiProperty({
+    description: 'Owning university. Required.',
+    format: 'uuid',
+  })
+  @IsUUID()
+  UniversityID!: string;
 
   @ApiPropertyOptional({
-    nullable: true,
-    type: LatLngDto,
     description:
-      'Map position. Omit to create the building unpinned. Admin places it then later.',
+      'Map position. Omit if the building has not been placed on the map yet.',
+    type: LatLngDto,
+    nullable: true,
   })
   @IsOptional()
   @ValidateNested()
@@ -58,33 +84,21 @@ export class CreateBuildingDto {
   location?: LatLngDto | null;
 
   @ApiPropertyOptional({
+    description:
+      'GeoJSON Polygon outlining the building. Positions are [long, lat]. Send null to clear.',
     nullable: true,
     type: 'object',
     additionalProperties: true,
-    example: {
-      type: 'Polygon',
-      coordinates: [
-        [
-          [28.2314, -25.7545],
-          [28.2318, -25.7545],
-          [28.2318, -25.7549],
-          [28.2314, -25.7549],
-          [28.2314, -25.7545],
-        ],
-      ],
-    },
-    description:
-      'GeoJSON Polygon outlining the building. Positions are [long, lat]. The ring must be closed...',
   })
   @IsOptional()
   @IsObject()
   footprint?: GeoJsonPolygon | null;
 
   @ApiPropertyOptional({
-    nullable: true,
+    description: 'Icon key used when rendering the building marker.',
     maxLength: 64,
-    example: 'uni',
-    description: 'Icon key used when rendering the building marker',
+    nullable: true,
+    example: 'school',
   })
   @IsOptional()
   @IsString()
@@ -92,17 +106,71 @@ export class CreateBuildingDto {
   icon?: string | null;
 
   @ApiPropertyOptional({
+    description: 'Hex colour used when rendering the building.',
     nullable: true,
     example: '#4A5548',
-    description: 'Hex colour used when rendering the building',
   })
   @IsOptional()
   @IsHexColor()
   displayColour?: string | null;
-}
+} //END_BaseBuildingDto
 
-export class UpdateBuildingDto extends PartialType(CreateBuildingDto) {}
+export class BuildingDto extends BaseBuildingDto {
+  @ApiProperty({ example: 12 })
+  venueCount!: number;
+} //END_BuildingDto
 
+//Create Dto
+export class CreateBuildingDto extends PickType(BaseBuildingDto, [
+  'BuildingName',
+  'location',
+  'footprint',
+  'icon',
+  'displayColour',
+] as const) {}
+
+//Create service input
+export class CreateBuildingInput extends CreateBuildingDto {
+  UniversityID!: string;
+  CreatedBy?: string | null;
+} //END_CreateBuildingInput
+
+export class UpdateBuildingDto extends PartialType(
+  PickType(BaseBuildingDto, [
+    'BuildingName',
+    'location',
+    'footprint',
+    'icon',
+    'displayColour',
+  ] as const),
+) {}
+
+export class UpdateBuildingInput extends UpdateBuildingDto {} //END_UpdateBuildingInput
+
+//Responses
+export class BuildingSingleResponseDto {
+  @ApiProperty({ type: BuildingDto })
+  building!: BuildingDto;
+
+  venues?: BaseVenueDto[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  message?: string;
+} //END_BuildingSingleResponseDto
+
+export class BuildingListResponseDto {
+  @ApiProperty({ type: [BuildingDto] })
+  buildings!: BuildingDto[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  message?: string;
+} //END_BuildingListResponseDto
+
+// Query
 export class BuildingQueryDto {
   @ApiPropertyOptional({
     example: true,
@@ -124,78 +192,10 @@ export class BuildingQueryDto {
   search?: string;
 }
 
-//responses for building requests
-
-export class BuildingDto {
-  @ApiProperty({
-    format: 'uuid',
-    example: '00000000-0000-0000-0000-000000000000',
-  })
-  buildingId!: string;
-
-  @ApiProperty({ example: 'IT Building' })
-  buildingName!: string;
-
-  @ApiProperty({
-    nullable: true,
-    type: LatLngDto,
-    description: 'null when the building has not been placed on the map yet',
-  })
-  location!: LatLngDto | null;
-
-  @ApiProperty({ nullable: true, type: 'object', additionalProperties: true })
-  footprint!: GeoJsonPolygon | null;
-
-  @ApiProperty({ nullable: true, example: 'school' })
-  icon!: string | null;
-
-  @ApiProperty({ nullable: true, example: '#4A5468' })
-  displayColour!: string | null;
-
-  @ApiProperty({
-    example: 12,
-    description: 'Number of venues assigned to this building (current count)',
-  })
-  venueCount!: number;
-}
-
-export class BuildingSingleResponseDto {
-  @ApiProperty({ type: BuildingDto })
-  building!: BuildingDto;
-}
-
-export class BuildingListResponseDto {
-  @ApiProperty({ type: [BuildingDto], description: 'List of buildings' })
-  buildings!: BuildingDto[];
-}
-
-export class UpdateBuildingLocationDto {
-  @ApiPropertyOptional({
-    description: 'The location of the building pin. Sending null will unpin',
-    type: () => LatLngDto,
-    nullable: true,
-  })
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => LatLngDto)
-  location?: LatLngDto | null;
-
-  @ApiPropertyOptional({
-    description:
-      'GeoJSON polygon outline for the building. Send null to clear the polygon.',
-    nullable: true,
-    type: 'object',
-    additionalProperties: true,
-  })
-  @IsOptional()
-  @IsObject()
-  footprint?: GeoJsonPolygon | null;
-}
-
 export class DeleteBuildingResponseDto {
   @ApiProperty({ example: 'IT Building' })
   buildingName!: string;
 
   @ApiProperty({ example: true })
   success!: boolean;
-}
+} //END_DeleteBuildingResponseDto

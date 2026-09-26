@@ -1,0 +1,36 @@
+import { ApiProperty } from '@nestjs/swagger';
+
+class BaseCourseEnrollmentResponseDto {
+  @ApiProperty({
+    description: 'Unique identifier of the enrolled student',
+    example: '00000000-0000-0000-0000-000000000000',
+    format: 'uuid',
+  })
+  UserID!: string;
+
+  @ApiProperty({
+    description: 'Unique identifier of the course the student enrolled in',
+    example: '00000000-0000-0000-0000-000000000000',
+    format: 'uuid',
+  })
+  CourseID!: string;
+} //END_BaseCourseEnrollmentResponseDto
+
+export class EnrollStudentToCourseResponseDto extends BaseCourseEnrollmentResponseDto {
+  @ApiProperty({
+    description:
+      'Timestamp when the student enrolled in the course (UTC, ISO 8601)',
+    example: '2026-09-11T14:32:07.000Z',
+    type: 'string',
+    format: 'date-time',
+  })
+  EnrolledAt!: Date;
+} //END_EnrollStudentToCourseResponseDto
+
+export class UnenrollStudentFromCourseResponseDto extends BaseCourseEnrollmentResponseDto {
+  @ApiProperty({
+    description: 'Message indicating success of unenrollment',
+    example: 'Succesfully unenrolled student from course',
+  })
+  message?: string;
+} //END_UnenrollStudentFromCourseResponseDto

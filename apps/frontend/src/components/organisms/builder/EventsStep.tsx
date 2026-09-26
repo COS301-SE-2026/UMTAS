@@ -212,11 +212,11 @@ export function EventsStep({
         }),
       );
     } else {
-      console.log(
-        result.event.eventId,
-        "created event",
-        createdEvent?.event.eventId,
-      );
+      // console.log(
+      //   result.event.eventId,
+      //   "created event",
+      //   createdEvent?.event.eventId,
+      // );
       setCreatedEvent(result);
     }
   }
@@ -526,7 +526,7 @@ export function EventsStep({
 
         {/* inline edit form */}
         {isSelected && (
-          <div className="flex flex-col gap-2 pl-2">
+          <div className="flex flex-col gap-2 mr-12">
             <EventCard
               event={event}
               modules={modules}

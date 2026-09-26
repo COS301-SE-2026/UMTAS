@@ -1,4 +1,8 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import {
+  createParamDecorator,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import type { RequestWithSession } from './auth.guard';
 import type { UniRole, AppRole } from './roles';
 
@@ -38,5 +42,14 @@ export const currentSessionFactory = (
   const req = ctx.switchToHttp().getRequest<RequestWithSession>();
   return req.session;
 };
+
+export const CurrentUniId = createParamDecorator(
+  (_: unknown, ctx: ExecutionContext): string => {
+    const request = ctx.switchToHttp().getRequest();
+    const uniId = request.session?.uniId;
+    if (!uniId) throw new ForbiddenException('No university selected');
+    return uniId;
+  },
+);
 
 export const CurrentSession = createParamDecorator(currentSessionFactory);

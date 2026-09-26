@@ -54,25 +54,50 @@ services:
       retries: 5
 
   minio:
-    image: minio/minio:RELEASE.2023-10-25T06-33-25Z
+    image: rustfs/rustfs:latest
     restart: unless-stopped
     networks:
       - gateway
       - internal
     ports:
       - "9000:9000"
-      - "9001:9001"
-    command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
       - minio_data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/ready"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  minio-init:
+    image: amazon/aws-cli:latest
+    networks:
+      - internal
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      AWS_EC2_METADATA_DISABLED: "true"
+      MINIO_BUCKET: ${MINIO_BUCKET:-umtas-uploads}
+    volumes:
+      - ./apps/pdf_parser/up_test_pdfs/LECTURES_S1.pdf:/seed/LECTURES_S1.pdf:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        aws --endpoint-url http://minio:9000 s3 mb "s3://$${MINIO_BUCKET}" || true
+        aws --endpoint-url http://minio:9000 s3 cp /seed/LECTURES_S1.pdf "s3://$${MINIO_BUCKET}/demo/pdf-parser/up/LECTURES_S1.pdf"
+    profiles:
+      - dev-docker
+      - dev-infra
+      - dev-pglite
+      - server
+
   mailhog:
     image: mailhog/mailhog:v1.0.1
     networks:
@@ -155,6 +180,11 @@ services:
     networks:
       - gateway
       - internal
+    depends_on:
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
     environment:
       - PORT=${BACKEND_PORT}
       - NODE_ENV=production

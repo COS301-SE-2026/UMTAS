@@ -1,4 +1,5 @@
 "use client";
+
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
 import { Label } from "@/components/atoms/baseShadcn/label";
@@ -9,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
+import Tutorial from "@/components/organisms/nav/Tutorial";
 import createRestrictionHandlers from "@/components/molecules/Calendar-management/handlerCreator";
 
 import { useState } from "react";
@@ -39,12 +41,14 @@ const endYear = 2040;
 function generateYears() {
   const length = endYear - startYear;
   const years = [String(startYear)];
+
   for (let i = 1; i < length; i++) {
     years.push(String(startYear + i));
   }
 
   return years;
 }
+
 const ResTypes: RestrictionTypes[] = [
   "SEMESTER_1_START",
   "SEMESTER_1_END",
@@ -59,10 +63,40 @@ const ResTypes: RestrictionTypes[] = [
   "SUPP_WEEK",
   "DAY_SWAP",
 ];
+
 function toRead(str: string) {
   str = str.toLocaleLowerCase().replaceAll("_", " ");
   return str;
 }
+
+const steps = [
+  {
+    target: "#calendar-management",
+    content:
+      "Manage your university's academic calendars, public holidays, and calendar restrictions here.",
+  },
+  {
+    target: "#select-calendar-year",
+    content:
+      "Select the academic year you want to manage. A calendar will be created automatically if one does not already exist.",
+  },
+  {
+    target: "#include-public-holidays",
+    content:
+      "Choose whether the public holiday calendar should be included for the selected academic year.",
+  },
+  {
+    target: "#create-restriction",
+    content:
+      "Create a new calendar restriction and choose its type, such as a semester period, recess, test week, or exam period.",
+  },
+  {
+    target: "#calendar-restrictions",
+    content:
+      "View and manage all restrictions for the selected academic year here.",
+  },
+];
+
 export default function CalTemplate() {
   const years = generateYears();
   const yearsWithAC: number[] = [];
@@ -75,10 +109,11 @@ export default function CalTemplate() {
     ...getAllAcQuery(),
     select: (data) => {
       data.map((ac) => {
-        if (!yearsWithAC.includes(ac.year)) yearsWithAC.push(ac.year);
+        if (!yearsWithAC.includes(ac.year)) {
+          yearsWithAC.push(ac.year);
+        }
       });
-      //   setTempRes(null);
-      //     setFlagTempRes(false);
+
       return data;
     },
   });
@@ -90,9 +125,11 @@ export default function CalTemplate() {
   const selectedAcID = currentAC?.id;
 
   const { data: publicCalendars = [] } = useQuery(getPublicAcQuery());
+
   const publicHolidayCalendar = publicCalendars.find(
     (calendar) => calendar.year === Number(selectedYear),
   );
+
   const includePublicHolidays = Boolean(
     publicHolidayCalendar &&
     currentAC?.subscriptions.includes(publicHolidayCalendar.id),
@@ -104,54 +141,85 @@ export default function CalTemplate() {
   });
 
   const { mutateAsync: createACmut } = useMutation(CreateAcMutation);
+
   const { mutate: updateSubscriptions, isPending: isUpdatingSubscriptions } =
     useMutation(UpdateAcSubscriptionsMutation);
 
   const handlers = createRestrictionHandlers();
-  useErrorListener();
-  return (
-    <div className=" items-center flex flex-col gap-6 w-full px-6 capitalize">
-      <div className="w-full  h-full max-w-6xl bg-[var(--bg-surface)] overflow-auto border border-[var(--border)] rounded-xl  shadow-sm">
-        <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
-          Calendar Management
-        </h1>
-        <p className="text-sm text-[var(--text-secondary)] pl-4 pt-2 pb-2">
-          Update and manage calendars by year
-        </p>
-        <div className="flex flex-col md:flex-row gap-4 p-5  items-center justify-between ">
-          <div className="flex flex-wrap items-start gap-3 w-full md:w-auto">
-            <div className="flex flex-col gap-2">
-              <Select
-                value={selectedYear}
-                onValueChange={async (e) => {
-                  setSelectedYear(e);
-                  const year = Number(e);
 
-                  const AC = academicCalendars.find((ac) => year === ac.year);
-                  if (AC == undefined || AC == null || AC.id == "") {
-                    await createACmut({
-                      year: year,
-                    });
-                  }
-                }}
-              >
-                <SelectTrigger
-                  id="select-year"
-                  className="w-[180px] bg-[var(--background)]"
+  useErrorListener();
+
+  return (
+    <>
+      {/* <Tutorial steps={steps} wait={true} /> */}
+
+      <div className="flex w-full flex-col items-center gap-6 px-6 pt-6 capitalize">
+        <div
+          id="calendar-management"
+          className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm"
+        >
+          {/* Header */}
+          <div className="border-b border-[var(--border)] px-5 py-4">
+            <h1 className="text-lg font-semibold text-[var(--text-primary)]">
+              Calendar Management
+            </h1>
+
+            <p className="mt-1 text-sm normal-case text-[var(--text-secondary)]">
+              Manage academic periods, holidays, recesses and important
+              university dates.
+            </p>
+          </div>
+
+          {/* Controls */}
+          <div className="mx-5 mt-5 flex flex-col gap-4 rounded-lg border border-[var(--border)] bg-[var(--bg-base)] p-4 md:flex-row md:items-end md:justify-between">
+            <div className="flex flex-wrap items-end gap-4">
+              {/* Academic Year */}
+              <div className="flex flex-col gap-2">
+                <Label
+                  htmlFor="select-calendar-year"
+                  className="text-sm font-medium text-[var(--text-secondary)]"
                 >
-                  <SelectValue placeholder="Year" />
-                </SelectTrigger>
-                <SelectContent>
-                  {years.map((year, idx) => (
-                    <SelectItem key={idx} value={year}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  Academic Year
+                </Label>
+
+                <Select
+                  value={selectedYear}
+                  onValueChange={async (e) => {
+                    setSelectedYear(e);
+
+                    const year = Number(e);
+
+                    const AC = academicCalendars.find((ac) => year === ac.year);
+
+                    if (AC == undefined || AC == null || AC.id == "") {
+                      await createACmut({
+                        year: year,
+                      });
+                    }
+                  }}
+                >
+                  <SelectTrigger
+                    id="select-calendar-year"
+                    data-testid="SELECT_NEW_YEAR"
+                    className="w-[180px] bg-[var(--bg-surface)]"
+                  >
+                    <SelectValue placeholder="Year" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {years.map((year, idx) => (
+                      <SelectItem key={idx} value={year}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Public Holidays */}
               <Label
                 htmlFor="include-public-holidays"
-                className="cursor-pointer whitespace-nowrap flex items-center gap-2 pl-1 pt-2"
+                className="flex h-10 cursor-pointer items-center gap-2 whitespace-nowrap"
               >
                 <Checkbox
                   id="include-public-holidays"
@@ -162,10 +230,14 @@ export default function CalTemplate() {
                     isUpdatingSubscriptions
                   }
                   onCheckedChange={(checked) => {
-                    if (!selectedAcID || !publicHolidayCalendar) return;
+                    if (!selectedAcID || !publicHolidayCalendar) {
+                      return;
+                    }
 
                     updateSubscriptions({
-                      paths: { id: selectedAcID },
+                      paths: {
+                        id: selectedAcID,
+                      },
                       body: {
                         subscriptions: checked
                           ? [publicHolidayCalendar.id]
@@ -173,73 +245,110 @@ export default function CalTemplate() {
                       },
                     });
                   }}
+                  className="
+                  border
+                  border-[var(--text-secondary)]
+                  bg-[var(--bg-surface)]
+                  data-[state=checked]:border-[var(--btn-primary-bg)]
+                  data-[state=checked]:bg-[var(--btn-primary-bg)]
+                  data-[state=checked]:text-[var(--btn-primary-text)]
+                "
                 />
-                Include public holidays
+
+                <span className="text-sm text-[var(--text-primary)]">
+                  Include public holidays
+                </span>
               </Label>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button className="w-fit capitalize">create restriction</Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuGroup>
-                  {ResTypes.map((type, idx) => {
-                    return (
-                      <DropdownMenuItem
-                        className="capitalize"
-                        key={idx}
-                        onSelect={() => {
-                          setFlagTempRes(true);
-                          setTempRes(null);
-                          setTempRes({
-                            type: type as RestrictionTypes,
-                            description: "",
-                            id: "",
-                            startDate: "",
-                            endDate: "",
-                          });
-                        }}
-                      >
-                        {toRead(type)}
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Button
-              hidden={!flagtempRes}
-              variant={"destructive"}
-              onClick={() => {
-                setTempRes(null);
-                setFlagTempRes(false);
-              }}
-            >
-              Clear
-            </Button>
-          </div>
-        </div>
-        <div className="w-full h-full items-center flex flex-col p-4 px-10">
-          {flagtempRes && tempRes && selectedAcID && (
-            <div className="border-dashed border-2 rounded-2xl my-2  flex flex-col items-center p-3 h-1/4">
-              <div key={tempRes.type}>
-                {handlers.handle(tempRes, currentAC, () => {
-                  setFlagTempRes(false);
-                  setTempRes(null);
-                })}
-              </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    id="create-restriction"
+                    data-testid="CREATE_RESTRICTION"
+                    className="w-fit capitalize"
+                  >
+                    Create restriction
+                  </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent>
+                  <DropdownMenuGroup>
+                    {ResTypes.map((type, idx) => {
+                      return (
+                        <DropdownMenuItem
+                          data-testid={`MENU_ITEM_${type}`}
+                          className="capitalize"
+                          key={idx}
+                          onSelect={() => {
+                            setFlagTempRes(true);
+                            setTempRes(null);
+
+                            setTempRes({
+                              type: type as RestrictionTypes,
+                              description: "",
+                              id: "",
+                              startDate: "",
+                              endDate: "",
+                            });
+                          }}
+                        >
+                          {toRead(type)}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {flagtempRes && (
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    setTempRes(null);
+                    setFlagTempRes(false);
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
             </div>
-          )}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-20  gap-y-10 p-5 w-full h-auto  justify-items-center items-center ">
-            {selectedAcID &&
-              restrictions?.restrictions.map((res) => {
-                return (
-                  <div key={res.id}>{handlers.handle(res, currentAC)}</div>
-                );
-              })}
+          </div>
+
+          {/* Restrictions */}
+          <div id="calendar-restrictions" className="flex w-full flex-col p-5">
+            {flagtempRes && tempRes && selectedAcID && (
+              <div className="mb-5 w-full rounded-xl border-2 border-dashed border-[var(--border)] p-4">
+                <div
+                  data-testid="TEMP_CONTAINER"
+                  key={tempRes.type}
+                  className="w-full"
+                >
+                  {handlers.handle(tempRes, currentAC, () => {
+                    setFlagTempRes(false);
+                    setTempRes(null);
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-2">
+              {selectedAcID &&
+                restrictions?.restrictions.map((res) => (
+                  <div
+                    data-testid="ADDED_CONTAINER"
+                    key={res.id}
+                    className="w-full"
+                  >
+                    {handlers.handle(res, currentAC)}
+                  </div>
+                ))}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

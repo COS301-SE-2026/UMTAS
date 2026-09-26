@@ -64,6 +64,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/auth/sign-in/guest": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create and sign in as a University of Pretoria demo guest
+     * @description Create and sign in as a University of Pretoria demo guest. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["signInGuest"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/auth/sign-out": {
     parameters: {
       query?: never;
@@ -774,6 +794,46 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/Courses/course-enrollment/{CourseId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Enroll the current user/student into a course
+     * @description Enroll the current user/student into a course. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["enrollStudentToCourse"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/Courses/course-unenrollment/{CourseId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Enenroll the current user/student from a course
+     * @description Enenroll the current user/student from a course. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
+    delete: operations["UnenrollStudentFromCourse"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/universities": {
     parameters: {
       query?: never;
@@ -1302,6 +1362,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/pdf-parser/demo-pdf": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Download the configured University of Pretoria demo timetable PDF
+     * @description Download the configured University of Pretoria demo timetable PDF. This PDF Parser operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getDemoPdf"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/pdf-parser/jobs/lookup": {
     parameters: {
       query?: never;
@@ -1502,6 +1582,262 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/attendance/nfc-tags/me": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get the current operator NFC sticker status
+     * @description Get the current operator NFC sticker status. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getMyNfcTag"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/nfc-tags/registration": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Prepare a replacement NFC sticker credential
+     * @description Prepare a replacement NFC sticker credential. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["prepareNfcTagRegistration"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/nfc-tags/registration/confirm": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Confirm a written NFC sticker and activate it
+     * @description Confirm a written NFC sticker and activate it. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["confirmNfcTagRegistration"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/nfc-tags/test": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Validate the current operator NFC sticker without attendance
+     * @description Validate the current operator NFC sticker without attendance. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["testNfcTag"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/operator/slots": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List the current operator event occurrences for one date
+     * @description List the current operator event occurrences for one date. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getOperatorAttendanceSlots"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/operator/preferred-event": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Select the operator preferred attendance event
+     * @description Select the operator preferred attendance event. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    put: operations["selectPreferredAttendanceEvent"];
+    post?: never;
+    /**
+     * Clear the operator preferred attendance event
+     * @description Clear the operator preferred attendance event. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    delete: operations["clearPreferredAttendanceEvent"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/records": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Record identified or guest attendance from an NFC sticker
+     * @description Record identified or guest attendance from an NFC sticker. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["recordAttendance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/records/barcode": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Update the barcode guest count for the current slot
+     * @description Update the barcode guest count for the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    put: operations["recordBarcodeAttendance"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/sessions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List attendance sessions visible to the operator
+     * @description List attendance sessions visible to the operator. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["listAttendanceSessions"];
+    put?: never;
+    /**
+     * Create an attendance session for an event occurrence
+     * @description Create an attendance session for an event occurrence. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["createAttendanceSession"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/sessions/{sessionId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get an attendance session and role-safe totals
+     * @description Get an attendance session and role-safe totals. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getAttendanceSession"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete an attendance session and its records
+     * @description Delete an attendance session and its records. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    delete: operations["deleteAttendanceSession"];
+    options?: never;
+    head?: never;
+    /**
+     * Correct an attendance session
+     * @description Correct an attendance session. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    patch: operations["updateAttendanceSession"];
+    trace?: never;
+  };
+  "/api/attendance/sessions/{sessionId}/attendance/count": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Replace the aggregate attendance count
+     * @description Replace the aggregate attendance count. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    put: operations["setAttendanceCount"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/me/verified-history": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get only the current user’s identified attendance history
+     * @description Get only the current user’s identified attendance history. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getVerifiedAttendanceHistory"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/attendance": {
     parameters: {
       query?: never;
@@ -1565,33 +1901,45 @@ export interface paths {
      * Get all venues
      * @description Get all venues from current selected uni
      */
-    get: operations["VenueController_getAllVenues"];
+    get: operations["getAllVenues"];
     put?: never;
-    post?: never;
+    /**
+     * Create a venue
+     * @description Create a venue for the users university.
+     */
+    post: operations["createVenue"];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  "/api/venues/{venueId}/building": {
+  "/api/venues/{venueId}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /**
+     * Get a venue by ID
+     * @description Get a venue by ID. This Venues operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getVenueById"];
     put?: never;
     post?: never;
-    delete?: never;
+    /**
+     * Delete a venue by ID
+     * @description Delete a venue by ID. This Venues operation is part of the versioned UMTAS HTTP contract.
+     */
+    delete: operations["deleteVenue"];
     options?: never;
     head?: never;
     /**
-     * Assign a venue to a building
-     * @description Send buildingId to assign or null to unassign the venue
+     * Update a venue
+     * @description Update venue name, capacity and/or building assignment. Only fields present in the body are updated.
      */
-    patch: operations["VenueController_assignBuilding"];
+    patch: operations["updateVenue"];
     trace?: never;
   };
   "/api/venues/assign": {
@@ -1604,10 +1952,30 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Assign several venues to buildings in one request
-     * @description Used by the venue mapping screen for multiple selection assignment
+     * Assign venues to buildings
+     * @description Assign one or many venues to buildings in a single request.
      */
-    post: operations["VenueController_bulkAssign"];
+    post: operations["assignVenuesToBuildings"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/buildings/heatmap": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get occupancy heatmap for every building in the university
+     * @description Returns occupancy for every building and its venues for a single date
+     */
+    get: operations["getAllBuildingsHeatmap"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -1625,13 +1993,13 @@ export interface paths {
      * Get all buildings
      * @description Get all buildings from current selected uni
      */
-    get: operations["BuildingController_getAllBuildings"];
+    get: operations["getAllBuildings"];
     put?: never;
     /**
-     * Create a building as uni admin
-     * @description Create a building as uni admin. This Buildings operation is part of the versioned UMTAS HTTP contract.
+     * Create a building
+     * @description Create a building for the users university.
      */
-    post: operations["BuildingController_createBuilding"];
+    post: operations["createBuilding"];
     delete?: never;
     options?: never;
     head?: never;
@@ -1645,17 +2013,45 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /**
+     * Get a building by ID
+     * @description Get a building by ID. This Buildings operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getBuildingById"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete a building by ID
+     * @description Delete a building by ID. This Buildings operation is part of the versioned UMTAS HTTP contract.
+     */
+    delete: operations["deleteBuilding"];
+    options?: never;
+    head?: never;
+    /**
+     * Update a building
+     * @description Update building name, location, footprint, icon, and/or colour. Only fields present in the body are updated.
+     */
+    patch: operations["updateBuilding"];
+    trace?: never;
+  };
+  "/api/buildings/{buildingId}/heatmap": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get building occupancy heatmap
+     * @description Returns occupancy metrics for all venues assigned to a building.
+     */
+    get: operations["getBuildingHeatmap"];
     put?: never;
     post?: never;
     delete?: never;
     options?: never;
     head?: never;
-    /**
-     * Update a building pin and/or drawn polygon
-     * @description Only admins can do this. Send location and/or footprint, omitted fields are left unchanged. Send null to erase.
-     */
-    patch: operations["BuildingController_updateBuildingLocation"];
+    patch?: never;
     trace?: never;
   };
   "/api/map-config": {
@@ -1675,6 +2071,26 @@ export interface paths {
      * @description Set or update map settings for the selected university. This Map Config operation is part of the versioned UMTAS HTTP contract.
      */
     put: operations["MapConfigController_update"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/routes/heatmap": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get route demand heatmap
+     * @description Returns route demand metrics for all persisted route variants in the selected university for a single date.
+     */
+    get: operations["getRoutingHeatmap"];
+    put?: never;
     post?: never;
     delete?: never;
     options?: never;
@@ -1714,6 +2130,106 @@ export interface paths {
      * @description Returns whether the student as at a venue, moving between two venues, or has no planned event in that time
      */
     get: operations["RouteController_getActiveRoute"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/routes/diversion": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Create or update a route diversion
+     * @description University administrators can divert a proportion of traffic from one route to another.
+     */
+    put: operations["routeDiversion"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/routes/variant": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * GET /api/routes/variant
+     * @description GET /api/routes/variant. This Routes operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["RouteController_getVariant"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/routes/stop-route": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a stop-via route for a student on a date
+     * @description Returns the route from the student's current event to a stop building and from the stop to the next event, based on the requested time or the largest gap.
+     */
+    get: operations["getRouteViaBuilding"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/routes/student": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a students routes for a date
+     * @description Returns the students attended events for the requested date and the routes between events.
+     */
+    get: operations["getStudentRoutesForDate"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/routes/student/alternatives": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get an alternative route between two events
+     * @description Returns the selected indexed route between the buildings of two events on a requested date. Route index 0 is the default route.
+     */
+    get: operations["getAlternativeRouteBetweenEvents"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1972,6 +2488,50 @@ export interface paths {
     get: operations["ApiServiceController_getEvents"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/teaches": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Assign a lecturer to a module
+     * @description Assign a lecturer to a module. This Teaches operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["assignLecturer"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/teaches/me/modules": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get modules taught by the current lecturer
+     * @description Get modules taught by the current lecturer. This Teaches operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getLecturerModules"];
+    put?: never;
+    /**
+     * Assign the current lecturer or university admin to a module
+     * @description Assign the current lecturer or university admin to a module. This Teaches operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["assignMeToModule"];
     delete?: never;
     options?: never;
     head?: never;
@@ -2774,6 +3334,11 @@ export interface components {
        * @example 12345
        */
       ExternalID?: string | null;
+      /**
+       * @description true if the user is enrolled in this course false if not
+       * @example false
+       */
+      isEnrolled?: boolean;
     };
     CourseFilters: {
       /**
@@ -2829,6 +3394,11 @@ export interface components {
        * @example 12345
        */
       ExternalID?: string | null;
+      /**
+       * @description true if the user is enrolled in this course false if not
+       * @example false
+       */
+      isEnrolled?: boolean;
     };
     CourseListResponseDto: {
       /** @description List of courses */
@@ -2875,6 +3445,11 @@ export interface components {
        * @example 12345
        */
       ExternalID?: string | null;
+      /**
+       * @description true if the user is enrolled in this course false if not
+       * @example false
+       */
+      isEnrolled?: boolean;
     };
     DeleteCourseResponseDto: {
       /**
@@ -2894,6 +3469,45 @@ export interface components {
     };
     CourseModuleStatsResponseDto: {
       data: components["schemas"]["CourseModuleStatsDto"][];
+    };
+    EnrollStudentToCourseResponseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier of the enrolled student
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UserID: string;
+      /**
+       * Format: uuid
+       * @description Unique identifier of the course the student enrolled in
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when the student enrolled in the course (UTC, ISO 8601)
+       * @example 2026-09-11T14:32:07.000Z
+       */
+      EnrolledAt: string;
+    };
+    UnenrollStudentFromCourseResponseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier of the enrolled student
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UserID: string;
+      /**
+       * Format: uuid
+       * @description Unique identifier of the course the student enrolled in
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID: string;
+      /**
+       * @description Message indicating success of unenrollment
+       * @example Succesfully unenrolled student from course
+       */
+      message?: string;
     };
     CreateUniversityDto: {
       /**
@@ -3751,6 +4365,281 @@ export interface components {
       result?: components["schemas"]["SolverResultDto"];
       error?: components["schemas"]["WorkerCallbackErrorDto"];
     };
+    RegisteredNfcTagDto: {
+      /** Format: uuid */
+      tagId: string;
+      displayId: string;
+      /** Format: date-time */
+      registeredAt: string;
+    };
+    RegisteredNfcTagStatusDto: {
+      tag: components["schemas"]["RegisteredNfcTagDto"] | null;
+    };
+    NfcTagRegistrationResponseDto: {
+      /** Format: uuid */
+      tagId: string;
+      token: string;
+      /** Format: uri */
+      tagUrl: string;
+      activationTicket: string;
+      /** Format: date-time */
+      expiresAt: string;
+    };
+    ConfirmNfcTagRegistrationDto: {
+      activationTicket: string;
+    };
+    NfcCheckInDto: {
+      /** Format: uuid */
+      tagId: string;
+      token: string;
+    };
+    NfcTagTestResponseDto: {
+      valid: boolean;
+      message: string;
+      displayId?: string | null;
+    };
+    OperatorAttendanceSlotDto: {
+      /** Format: uuid */
+      eventID: string;
+      eventName: string;
+      /** Format: uuid */
+      moduleID: string;
+      moduleCode: string;
+      moduleName: string;
+      venue: string | null;
+      /** Format: date-time */
+      scheduledStartAt: string;
+      /** Format: date-time */
+      scheduledEndAt: string;
+      /** Format: uuid */
+      sessionId: string | null;
+      /**
+       * @description Availability derived from the event time and capture buffer
+       * @enum {string}
+       */
+      state: "UPCOMING" | "AVAILABLE" | "ENDED";
+      attendanceCount: number;
+    };
+    OperatorAttendanceSlotsResponseDto: {
+      slotList: components["schemas"]["OperatorAttendanceSlotDto"][];
+      currentSlot?: components["schemas"]["OperatorAttendanceSlotDto"] | null;
+      /** Format: uuid */
+      preferredEventId: string | null;
+      requiresSelection: boolean;
+    };
+    SelectPreferredEventDto: {
+      /** Format: uuid */
+      eventID: string;
+    };
+    RecordAttendanceDto: {
+      /**
+       * @description NFC is the capture adapter for this endpoint
+       * @example NFC
+       * @enum {string}
+       */
+      captureMethod: "NFC";
+      /**
+       * Format: uuid
+       * @description Registered NFC tag identifier
+       * @example 00000000-0000-4000-8000-000000000002
+       */
+      tagId: string;
+      /**
+       * @description Secret credential stored on the NFC tag
+       * @example abcdefghijklmnopqrstuvwxyz012345
+       */
+      token: string;
+    };
+    AttendanceRecordResponseDto: {
+      /**
+       * @description Outcome of the attendance capture
+       * @example RECORDED
+       * @enum {string}
+       */
+      status:
+        | "RECORDED"
+        | "ALREADY_RECORDED"
+        | "NO_CURRENT_EVENT"
+        | "AMBIGUOUS_EVENT"
+        | "INVALID_TAG";
+      /**
+       * @description Human-readable result suitable for a toast
+       * @example Attendance recorded.
+       */
+      message: string;
+      /**
+       * Format: uuid
+       * @description Resolved attendance session
+       */
+      sessionId?: string | null;
+      /**
+       * Format: date-time
+       * @description Time at which attendance was recorded
+       */
+      recordedAt?: string | null;
+    };
+    RecordBarcodeAttendanceDto: {
+      /**
+       * @description Current guest headcount observed by the scanner
+       * @example 42
+       */
+      guestCount: number;
+      /**
+       * Format: uuid
+       * @description Event to record attendance against when selecting a slot
+       * @example 00000000-0000-4000-8000-000000000000
+       */
+      eventID?: string;
+    };
+    SessionAttendanceResponseDto: {
+      /**
+       * Format: uuid
+       * @description Attendance record identifier
+       */
+      AttendanceID: string;
+      /**
+       * Format: uuid
+       * @description Parent attendance session
+       */
+      SessionID: string;
+      /**
+       * Format: uuid
+       * @description Identified attendee, or null for the anonymous count row
+       */
+      UserID: string | null;
+      /** @description Anonymous count, or null for an identified attendee */
+      guestCount: number | null;
+      /**
+       * @description Most recent capture method for this record
+       * @enum {string}
+       */
+      captureMethod: "NFC" | "BARCODE" | "MANUAL";
+      /**
+       * Format: date-time
+       * @description Initial recording time
+       */
+      recordedAt: string;
+      /**
+       * Format: date-time
+       * @description Last update time
+       */
+      updatedAt: string;
+    };
+    CreateAttendanceSessionDto: {
+      /**
+       * Format: uuid
+       * @description Event represented by this dated attendance session
+       * @example 00000000-0000-4000-8000-000000000000
+       */
+      eventID: string;
+      /**
+       * Format: date-time
+       * @description Scheduled occurrence start time
+       * @example 2026-09-15T08:00:00.000Z
+       */
+      scheduledStartAt: string;
+      /**
+       * Format: date-time
+       * @description Scheduled occurrence end time
+       * @example 2026-09-15T10:00:00.000Z
+       */
+      scheduledEndAt: string;
+    };
+    AttendanceSessionResponseDto: {
+      /**
+       * Format: uuid
+       * @description Attendance session identifier
+       */
+      SessionID: string;
+      /**
+       * Format: uuid
+       * @description Related event identifier
+       */
+      eventID: string;
+      /**
+       * Format: date-time
+       * @description Scheduled occurrence start
+       */
+      scheduledStartAt: string;
+      /**
+       * Format: date-time
+       * @description Scheduled occurrence end
+       */
+      scheduledEndAt: string;
+      /**
+       * Format: date-time
+       * @description Session creation time
+       */
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Last session update time
+       */
+      updatedAt: string;
+      /**
+       * @description Number of distinct identified attendees
+       * @example 8
+       */
+      identifiedCount: number;
+      /**
+       * @description Current anonymous attendance count
+       * @example 3
+       */
+      guestCount: number;
+      /**
+       * @description Identified plus anonymous attendance
+       * @example 11
+       */
+      attendedCount: number;
+    };
+    AttendanceSessionListResponseDto: {
+      /** @description Attendance sessions visible to the operator */
+      sessionList: components["schemas"]["AttendanceSessionResponseDto"][];
+    };
+    UpdateAttendanceSessionDto: {
+      /**
+       * Format: uuid
+       * @description Event represented by this dated attendance session
+       * @example 00000000-0000-4000-8000-000000000000
+       */
+      eventID?: string;
+      /**
+       * Format: date-time
+       * @description Scheduled occurrence start time
+       * @example 2026-09-15T08:00:00.000Z
+       */
+      scheduledStartAt?: string;
+      /**
+       * Format: date-time
+       * @description Scheduled occurrence end time
+       * @example 2026-09-15T10:00:00.000Z
+       */
+      scheduledEndAt?: string;
+    };
+    DeleteAttendanceSessionResponseDto: {
+      /**
+       * @description Whether the session was deleted
+       * @example true
+       */
+      success: Record<string, never>;
+    };
+    SetGuestCountDto: {
+      /**
+       * @description Anonymous attendance total replacing the current value
+       * @example 12
+       */
+      guestCount: number;
+      /**
+       * @description Source of the replacement count
+       * @example BARCODE
+       * @enum {string}
+       */
+      captureMethod: "BARCODE" | "MANUAL";
+    };
+    VerifiedAttendanceHistoryResponseDto: {
+      /** @description Identified attendance belonging to the current user */
+      attendanceList: components["schemas"]["SessionAttendanceResponseDto"][];
+    };
     CreateAttendanceDto: {
       /**
        * Format: uuid
@@ -3819,33 +4708,76 @@ export interface components {
        */
       success: boolean;
     };
+    CreateVenueDto: {
+      /**
+       * @description Venue name. Unique per university. Max 30 chars.
+       * @example Main Lecture Hall
+       */
+      VenueName: string;
+      /**
+       * Format: uuid
+       * @description Optional building identifier. Nulled if the building is deleted.
+       */
+      BuildingID?: string | null;
+      /**
+       * @description Maximum capacity of the venue. Defaults to 0 if not provided.
+       * @example 120
+       */
+      Capacity?: number;
+    };
+    BaseVenueDto: {
+      /**
+       * Format: uuid
+       * @description Unique venue identifier.
+       * @example 00000000-0000-4000-8000-000000000000
+       */
+      VenueID: string;
+      /**
+       * @description Venue name. Unique per university. Max 30 chars.
+       * @example Main Lecture Hall
+       */
+      VenueName: string;
+      /**
+       * Format: uuid
+       * @description Owning university. Required.
+       */
+      UniversityID: string;
+      /**
+       * Format: uuid
+       * @description Optional building identifier. Nulled if the building is deleted.
+       */
+      BuildingID?: string | null;
+      /**
+       * @description Maximum capacity of the venue.
+       * @example 120
+       */
+      Capacity: number;
+    };
+    VenueSingleResponseDto: {
+      venue: components["schemas"]["BaseVenueDto"];
+      message?: string;
+    };
     Object: Record<string, never>;
-    VenueMappingDto: {
-      /**
-       * Format: uuid
-       * @example 00000000-0000-0000-0000-000000000000
-       */
-      venueId: string;
-      /** @example IT-2-26 */
-      venueName: string | null;
-      /**
-       * Format: uuid
-       * @example 00000000-0000-0000-0000-000000000000
-       */
-      buildingId: string | null;
-      /** @example IT Building */
-      buildingName: string | null;
+    VenueListResponseDto: {
+      venues: components["schemas"]["BaseVenueDto"][];
+      message?: string;
     };
-    VenueMappingListResponseDto: {
-      /** @description List of venue mappings */
-      venues: components["schemas"]["VenueMappingDto"][];
-    };
-    AssignVenueBuildingDto: {
+    UpdateVenueDto: {
+      /**
+       * @description Venue name. Unique per university. Max 30 chars.
+       * @example Main Lecture Hall
+       */
+      VenueName?: string;
       /**
        * Format: uuid
-       * @description Assigns a venue to a building
+       * @description Optional building identifier. Nulled if the building is deleted.
        */
-      buildingId: string | null;
+      BuildingID?: string | null;
+      /**
+       * @description Maximum capacity of the venue.
+       * @example 120
+       */
+      Capacity?: number;
     };
     VenueAssignmentDto: {
       /** Format: uuid */
@@ -3874,95 +4806,259 @@ export interface components {
        */
       lng: number;
     };
-    BuildingDto: {
+    BaseBuildingDto: {
       /**
        * Format: uuid
+       * @description Unique building identifier.
        * @example 00000000-0000-0000-0000-000000000000
        */
-      buildingId: string;
-      /** @example IT Building */
-      buildingName: string;
-      /** @description null when the building has not been placed on the map yet */
-      location: components["schemas"]["LatLngDto"] | null;
-      footprint: {
-        [key: string]: unknown;
-      } | null;
-      /** @example school */
-      icon: string | null;
-      /** @example #4A5468 */
-      displayColour: string | null;
+      BuildingID: string;
       /**
-       * @description Number of venues assigned to this building (current count)
-       * @example 12
-       */
-      venueCount: number;
-    };
-    BuildingListResponseDto: {
-      /** @description List of buildings */
-      buildings: components["schemas"]["BuildingDto"][];
-    };
-    CreateBuildingDto: {
-      /**
-       * @description Name of the building. Must be unique within the university.
+       * @description Building name. Unique per university. Max 100 chars.
        * @example Information Technology Building
        */
-      buildingName: string;
-      /** @description Map position. Omit to create the building unpinned. Admin places it then later. */
-      location?: components["schemas"]["LatLngDto"] | null;
+      BuildingName: string;
       /**
-       * @description GeoJSON Polygon outlining the building. Positions are [long, lat]. The ring must be closed...
-       * @example {
-       *       "type": "Polygon",
-       *       "coordinates": [
-       *         [
-       *           [
-       *             28.2314,
-       *             -25.7545
-       *           ],
-       *           [
-       *             28.2318,
-       *             -25.7545
-       *           ],
-       *           [
-       *             28.2318,
-       *             -25.7549
-       *           ],
-       *           [
-       *             28.2314,
-       *             -25.7549
-       *           ],
-       *           [
-       *             28.2314,
-       *             -25.7545
-       *           ]
-       *         ]
-       *       ]
-       *     }
+       * Format: uuid
+       * @description Owning university. Required.
        */
+      UniversityID: string;
+      /** @description Map position. Omit if the building has not been placed on the map yet. */
+      location?: components["schemas"]["LatLngDto"] | null;
+      /** @description GeoJSON Polygon outlining the building. Positions are [long, lat]. Send null to clear. */
       footprint?: {
         [key: string]: unknown;
       } | null;
       /**
-       * @description Icon key used when rendering the building marker
-       * @example uni
+       * @description Icon key used when rendering the building marker.
+       * @example school
        */
       icon?: string | null;
       /**
-       * @description Hex colour used when rendering the building
+       * @description Hex colour used when rendering the building.
        * @example #4A5548
        */
       displayColour?: string | null;
     };
-    BuildingSingleResponseDto: {
-      building: components["schemas"]["BuildingDto"];
+    HourlyHeatmapBucketDto: {
+      /**
+       * @description Total capacity represented by this heatmap item.
+       * @example 120
+       */
+      Capacity: number;
+      /**
+       * @description Expected attendance based on attendance intent.
+       * @example 45
+       */
+      projected: number;
+      /**
+       * @description Maximum expected attendance based on module enrolments.
+       * @example 120
+       */
+      worstCase: number;
+      /**
+       * @description Actual attendance. Null until a check-in source is implemented.
+       * @example null
+       */
+      actual: number | null;
+      /**
+       * @description Projected attendance divided by capacity. Null when capacity is zero.
+       * @example 0.375
+       */
+      projectedUtilisation: number | null;
+      /**
+       * @description Worst-case attendance divided by capacity. Null when capacity is zero.
+       * @example 1
+       */
+      worstCaseUtilisation: number | null;
+      /**
+       * @description Hour of the day that the bucket represents
+       * @example 10
+       */
+      hour: number;
     };
-    UpdateBuildingLocationDto: {
-      /** @description The location of the building pin. Sending null will unpin */
+    BuildingHeatmapSummaryDto: {
+      /**
+       * @description Total capacity represented by this heatmap item.
+       * @example 120
+       */
+      Capacity: number;
+      /**
+       * @description Expected attendance based on attendance intent.
+       * @example 45
+       */
+      projected: number;
+      /**
+       * @description Maximum expected attendance based on module enrolments.
+       * @example 120
+       */
+      worstCase: number;
+      /**
+       * @description Actual attendance. Null until a check-in source is implemented.
+       * @example null
+       */
+      actual: number | null;
+      /**
+       * @description Projected attendance divided by capacity. Null when capacity is zero.
+       * @example 0.375
+       */
+      projectedUtilisation: number | null;
+      /**
+       * @description Worst-case attendance divided by capacity. Null when capacity is zero.
+       * @example 1
+       */
+      worstCaseUtilisation: number | null;
+    };
+    VenueHeatmapDto: {
+      /**
+       * Format: uuid
+       * @description Unique venue identifier.
+       * @example 00000000-0000-4000-8000-000000000000
+       */
+      VenueID: string;
+      /**
+       * @description Venue name. Unique per university. Max 30 chars.
+       * @example Main Lecture Hall
+       */
+      VenueName: string;
+      /**
+       * @description Total capacity represented by this heatmap item.
+       * @example 120
+       */
+      Capacity: number;
+      /**
+       * @description Expected attendance based on attendance intent.
+       * @example 45
+       */
+      projected: number;
+      /**
+       * @description Maximum expected attendance based on module enrolments.
+       * @example 120
+       */
+      worstCase: number;
+      /**
+       * @description Actual attendance. Null until a check-in source is implemented.
+       * @example null
+       */
+      actual: number | null;
+      /**
+       * @description Projected attendance divided by capacity. Null when capacity is zero.
+       * @example 0.375
+       */
+      projectedUtilisation: number | null;
+      /**
+       * @description Worst-case attendance divided by capacity. Null when capacity is zero.
+       * @example 1
+       */
+      worstCaseUtilisation: number | null;
+      /** @description The vnue splits into 24 hour buckets */
+      hourly: components["schemas"]["HourlyHeatmapBucketDto"][];
+    };
+    BuildingHeatmapResponseDto: {
+      building: components["schemas"]["BaseBuildingDto"];
+      /**
+       * Format: date
+       * @example 2026-10-12
+       */
+      date: string;
+      /** @description The building splits into 24 hour buckets, summed across all of its assigned venues */
+      hourly: components["schemas"]["HourlyHeatmapBucketDto"][];
+      summary: components["schemas"]["BuildingHeatmapSummaryDto"];
+      venues: components["schemas"]["VenueHeatmapDto"][];
+    };
+    AllBuildingsHeatmapResponseDto: {
+      buildings: components["schemas"]["BuildingHeatmapResponseDto"][];
+    };
+    CreateBuildingDto: {
+      /**
+       * @description Building name. Unique per university. Max 100 chars.
+       * @example Information Technology Building
+       */
+      BuildingName: string;
+      /** @description Map position. Omit if the building has not been placed on the map yet. */
       location?: components["schemas"]["LatLngDto"] | null;
-      /** @description GeoJSON polygon outline for the building. Send null to clear the polygon. */
+      /** @description GeoJSON Polygon outlining the building. Positions are [long, lat]. Send null to clear. */
       footprint?: {
         [key: string]: unknown;
       } | null;
+      /**
+       * @description Icon key used when rendering the building marker.
+       * @example school
+       */
+      icon?: string | null;
+      /**
+       * @description Hex colour used when rendering the building.
+       * @example #4A5548
+       */
+      displayColour?: string | null;
+    };
+    BuildingDto: {
+      /**
+       * Format: uuid
+       * @description Unique building identifier.
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      BuildingID: string;
+      /**
+       * @description Building name. Unique per university. Max 100 chars.
+       * @example Information Technology Building
+       */
+      BuildingName: string;
+      /**
+       * Format: uuid
+       * @description Owning university. Required.
+       */
+      UniversityID: string;
+      /** @description Map position. Omit if the building has not been placed on the map yet. */
+      location?: components["schemas"]["LatLngDto"] | null;
+      /** @description GeoJSON Polygon outlining the building. Positions are [long, lat]. Send null to clear. */
+      footprint?: {
+        [key: string]: unknown;
+      } | null;
+      /**
+       * @description Icon key used when rendering the building marker.
+       * @example school
+       */
+      icon?: string | null;
+      /**
+       * @description Hex colour used when rendering the building.
+       * @example #4A5548
+       */
+      displayColour?: string | null;
+      /** @example 12 */
+      venueCount: number;
+    };
+    BuildingSingleResponseDto: {
+      building: components["schemas"]["BuildingDto"];
+      message?: string;
+      venues?: components["schemas"]["BaseVenueDto"][];
+    };
+    BuildingListResponseDto: {
+      buildings: components["schemas"]["BuildingDto"][];
+      message?: string;
+    };
+    UpdateBuildingDto: {
+      /**
+       * @description Building name. Unique per university. Max 100 chars.
+       * @example Information Technology Building
+       */
+      BuildingName?: string;
+      /** @description Map position. Omit if the building has not been placed on the map yet. */
+      location?: components["schemas"]["LatLngDto"] | null;
+      /** @description GeoJSON Polygon outlining the building. Positions are [long, lat]. Send null to clear. */
+      footprint?: {
+        [key: string]: unknown;
+      } | null;
+      /**
+       * @description Icon key used when rendering the building marker.
+       * @example school
+       */
+      icon?: string | null;
+      /**
+       * @description Hex colour used when rendering the building.
+       * @example #4A5548
+       */
+      displayColour?: string | null;
     };
     MapConfigDto: {
       /**
@@ -4028,6 +5124,112 @@ export interface components {
        */
       GoogleMapID: string | null;
     };
+    RouteHeatmapBuildingDto: {
+      /** Format: uuid */
+      buildingId: string;
+      /** @example Information Technology Building */
+      buildingName: string;
+    };
+    RouteHeatmapHourlyBucketDto: {
+      /**
+       * @description Expected number of students projected to travel route
+       * @example 42
+       */
+      projected: number;
+      /**
+       * @description Maximum expected route demand based on enrollments.
+       * @example 85
+       */
+      worstCase: number;
+      /**
+       * @description Actual number of students recorded on the route
+       * @example null
+       */
+      actual: number | null;
+      /**
+       * @description Hour for this bucket | 0 - 23
+       * @example 9
+       */
+      hour: number;
+    };
+    RouteHeatmapTransitionDto: {
+      /** Format: uuid */
+      originEventId: string;
+      /** Format: uuid */
+      destinationEventId: string;
+      /** @example COS 301 Lecture */
+      originEventName: string;
+      /** @example COS 301 Tutorial */
+      destinationEventName: string;
+      /** @example 10:20 */
+      originEndTime: string;
+      /** @example 11:00 */
+      destinationStartTime: string;
+      /**
+       * @description Number of students projected to make this transition.
+       * @example 20
+       */
+      projected: number;
+      /**
+       * @description Maximum expected students for this transition.
+       * @example 35
+       */
+      worstCase: number;
+    };
+    RouteHeatmapDto: {
+      /**
+       * @description Expected number of students projected to travel route
+       * @example 42
+       */
+      projected: number;
+      /**
+       * @description Maximum expected route demand based on enrollments.
+       * @example 85
+       */
+      worstCase: number;
+      /**
+       * @description Actual number of students recorded on the route
+       * @example null
+       */
+      actual: number | null;
+      /** Format: uuid */
+      routeId: string;
+      /**
+       * @description Zero-based route variant index
+       * @example 0
+       */
+      routeIndex: number;
+      origin: components["schemas"]["RouteHeatmapBuildingDto"];
+      destination: components["schemas"]["RouteHeatmapBuildingDto"];
+      /**
+       * @description Walking distance in metres.
+       * @example 650
+       */
+      distanceMetres: number;
+      /**
+       * @description Colour assigned to the route for map rendering.
+       * @example #0000FF
+       */
+      displayColour: string;
+      /** @description Polyline coordinates for rendering the route. */
+      pathCoordinates: components["schemas"]["LatLngDto"][];
+      /** @description Demand split into 24 hourly buckets */
+      hourly: components["schemas"]["RouteHeatmapHourlyBucketDto"][];
+      /** @description Events contributing demand to this route */
+      transitions: components["schemas"]["RouteHeatmapTransitionDto"][];
+    };
+    RoutingHeatmapResponseDto: {
+      /** Format: uuid */
+      universityId: string;
+      /**
+       * Format: date
+       * @example 2026-09-18
+       */
+      date: string;
+      /** @enum {string} */
+      view: "projected" | "worstCase" | "all";
+      routes: components["schemas"]["RouteHeatmapDto"][];
+    };
     RouteDto: {
       /**
        * Format: uuid
@@ -4044,15 +5246,20 @@ export interface components {
        * @example 00000000-0000-0000-0000-000000000000
        */
       destinationBuildingId: string;
-      /** @description List of lat/long coordinates for the route path */
-      pathCoordinates: Record<string, never>[][];
       /**
-       * @description The route distance in metres
+       * @description Index of route | 0 for shortest, incrementally for alternatives.
+       * @example 0
+       */
+      routeIndex: number;
+      /** @description List of latitude/longitude coordinates for the route path. */
+      pathCoordinates: components["schemas"]["LatLngDto"][];
+      /**
+       * @description The route distance in metres.
        * @example 67
        */
       distanceMetres: number;
       /**
-       * @description The hex colour for the polyline (path)
+       * @description The hex colour for the route polyline.
        * @example #0000FF
        */
       displayColour: string;
@@ -4070,11 +5277,141 @@ export interface components {
        * @example 00000000-0000-0000-0000-000000000000
        */
       currentBuildingId?: string | null;
-      route?: components["schemas"]["RouteDto"];
+      route?: components["schemas"]["RouteDto"] | null;
       /** @example Lecture 1 */
       fromEventName?: string;
       /** @example Lecture 2 */
       toEventName?: string;
+    };
+    DiversionRequestDto: {
+      /**
+       * Format: uuid
+       * @description Origin route UUID
+       */
+      fromRoute: string;
+      /**
+       * Format: uuid
+       * @description Destination route UUID.
+       */
+      toRoute?: string;
+      /**
+       * @description Destination route index.
+       * @example 0
+       */
+      toRouteIndex?: number;
+      /**
+       * @description Divert x amount of fromRoute -> toRoute
+       * @example 25
+       */
+      diversion: number;
+    };
+    DiversionRouteResponseDto: {
+      fromRoute: components["schemas"]["RouteDto"];
+      toRoute: components["schemas"]["RouteDto"];
+      /** @example 25 */
+      diversion: number;
+    };
+    RouteEventContextDto: {
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      eventId: string;
+      /** @example COS 301 Lecture */
+      eventName: string;
+      /**
+       * Format: date
+       * @description Concrete occurrence date
+       * @example 2026-09-16
+       */
+      occurrenceDate: string;
+      /** @example 08:30 */
+      startTime: string;
+      /** @example 10:20 */
+      endTime: string;
+      /** Format: uuid */
+      venueId?: string | null;
+      /** Format: uuid */
+      buildingId?: string | null;
+    };
+    StudentStopRouteLegDto: {
+      /** @enum {string} */
+      direction: "TO_STOP" | "FROM_STOP";
+      originEvent?: components["schemas"]["RouteEventContextDto"] | null;
+      destinationEvent?: components["schemas"]["RouteEventContextDto"] | null;
+      route?: components["schemas"]["RouteDto"] | null;
+      reason?: string | null;
+    };
+    StudentStopRouteResponseDto: {
+      /** Format: date */
+      date: string;
+      /** Format: uuid */
+      buildingId: string;
+      /** @example 10:30 */
+      time?: string | null;
+      /** @description The gap or event interval selected for the temporary stop. */
+      selectedWindow: string;
+      legs: components["schemas"]["StudentStopRouteLegDto"][];
+    };
+    StudentRouteTransitionDto: {
+      originEvent: components["schemas"]["RouteEventContextDto"];
+      destinationEvent: components["schemas"]["RouteEventContextDto"];
+      /**
+       * @description True when both events resolve to the same building.
+       * @example false
+       */
+      sameBuilding: Record<string, never>;
+      /** @description Walking route, or null when the events share a building or routing is unavailable. */
+      route?: components["schemas"]["RouteDto"] | null;
+      /**
+       * @description Reason when a walking route cannot be returned.
+       * @example Destination venue has no building assigned.
+       */
+      reason?: string | null;
+    };
+    StudentRoutesResponseDto: {
+      /**
+       * Format: date
+       * @description Requested calendar date.
+       * @example 2026-09-16
+       */
+      date: string;
+      events: components["schemas"]["RouteEventContextDto"][];
+      routes: components["schemas"]["StudentRouteTransitionDto"][];
+    };
+    AlternativeRouteDto: {
+      /**
+       * @description Zero-based route index. Index 0 is the recommended shortest route.
+       * @example 0
+       */
+      routeIndex: number;
+      pathCoordinates: components["schemas"]["LatLngDto"][];
+      /**
+       * @description The route distance in metres.
+       * @example 820
+       */
+      distanceMetres: number;
+      /**
+       * @description True for route index 0, the provider-selected default route.
+       * @example true
+       */
+      isRecommended: Record<string, never>;
+    };
+    AlternativeRoutesResponseDto: {
+      /**
+       * Format: date
+       * @example 2026-09-16
+       */
+      date: string;
+      /** Format: uuid */
+      originEventId: string;
+      /** Format: uuid */
+      destinationEventId: string;
+      /** Format: uuid */
+      originBuildingId: string;
+      /** Format: uuid */
+      destinationBuildingId: string;
+      route: components["schemas"]["AlternativeRouteDto"];
     };
     GenerateCalendarDto: {
       /**
@@ -4382,6 +5719,44 @@ export interface components {
     EventListResponseDto: {
       events: components["schemas"]["EventDto"][];
       message?: string;
+    };
+    CreateTeachesDto: {
+      /**
+       * Format: uuid
+       * @description Module to assign the lecturer to
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      ModuleID: string;
+      /**
+       * Format: uuid
+       * @description Lecturer user to assign to the module
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UserID: string;
+    };
+    TeachesResponseDto: {
+      /**
+       * Format: uuid
+       * @description User ID of the assigned lecturer
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UserID: string;
+      /**
+       * Format: uuid
+       * @description Module ID of the teaching assignment
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      ModuleID: string;
+      /** @description Module assigned to the lecturer */
+      module: components["schemas"]["ModuleSingleResponseDto"];
+    };
+    SelfAssignTeachesDto: {
+      /**
+       * Format: uuid
+       * @description Module to assign the current user to
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      ModuleID: string;
     };
     /** @description Stable UMTAS error envelope. */
     ErrorResponse: {
@@ -4703,6 +6078,52 @@ export interface operations {
         };
       };
       500: components["responses"]["InternalError"];
+    };
+  };
+  signInGuest: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": Record<string, never>;
+      };
+    };
+    responses: {
+      /** @description Guest created and signed in. Sets the normal Better Auth session cookie and the University of Pretoria selection cookie. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
+        };
+      };
+      /** @description The guest request contains fields. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description An authenticated session already exists and was not replaced. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+      /** @description The University of Pretoria is unavailable. */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
   };
   signOut: {
@@ -6309,6 +7730,100 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
+  enrollStudentToCourse: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        CourseId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Student successfully enrolled into course */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrollStudentToCourseResponseDto"];
+        };
+      };
+      /** @description Invalid Course ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description Course not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Failed to enroll student to course. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+    };
+  };
+  UnenrollStudentFromCourse: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        CourseId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Student successfully unenrolled from course */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UnenrollStudentFromCourseResponseDto"];
+        };
+      };
+      /** @description Invalid Course ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description Course not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Failed to unenroll student from course. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+    };
+  };
   getUniversities: {
     parameters: {
       query?: never;
@@ -7728,6 +9243,30 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
+  getDemoPdf: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The configured demo PDF is returned as an attachment. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/pdf": string;
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
   PdfParserController_lookupDuplicate: {
     parameters: {
       query?: never;
@@ -8047,6 +9586,450 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
+  getMyNfcTag: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RegisteredNfcTagStatusDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  prepareNfcTagRegistration: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": Record<string, never>;
+      };
+    };
+    responses: {
+      /** @description HTTP 201 response. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["NfcTagRegistrationResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  confirmNfcTagRegistration: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ConfirmNfcTagRegistrationDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 201 response. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RegisteredNfcTagDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  testNfcTag: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["NfcCheckInDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 201 response. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["NfcTagTestResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getOperatorAttendanceSlots: {
+    parameters: {
+      query?: {
+        date?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperatorAttendanceSlotsResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  selectPreferredAttendanceEvent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SelectPreferredEventDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperatorAttendanceSlotDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  clearPreferredAttendanceEvent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  recordAttendance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RecordAttendanceDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 201 response. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceRecordResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  recordBarcodeAttendance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RecordBarcodeAttendanceDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionAttendanceResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  listAttendanceSessions: {
+    parameters: {
+      query?: {
+        /** @description Limit results to one event */
+        eventID?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceSessionListResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  createAttendanceSession: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateAttendanceSessionDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 201 response. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceSessionResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getAttendanceSession: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        sessionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceSessionResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  deleteAttendanceSession: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        sessionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeleteAttendanceSessionResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  updateAttendanceSession: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        sessionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateAttendanceSessionDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceSessionResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  setAttendanceCount: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        sessionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetGuestCountDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionAttendanceResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getVerifiedAttendanceHistory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VerifiedAttendanceHistoryResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
   getAllAttendance: {
     parameters: {
       query?: {
@@ -8195,7 +10178,7 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
-  VenueController_getAllVenues: {
+  getAllVenues: {
     parameters: {
       query?: {
         buildingId?: string;
@@ -8214,7 +10197,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["VenueMappingListResponseDto"];
+          "application/json": components["schemas"]["VenueListResponseDto"];
         };
       };
       400: components["responses"]["BadRequestError"];
@@ -8229,31 +10212,29 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
-  VenueController_assignBuilding: {
+  createVenue: {
     parameters: {
       query?: never;
       header?: never;
-      path: {
-        venueId: string;
-      };
+      path?: never;
       cookie?: never;
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["AssignVenueBuildingDto"];
+        "application/json": components["schemas"]["CreateVenueDto"];
       };
     };
     responses: {
-      /** @description Venue updated successfully */
-      200: {
+      /** @description Venue created successfully */
+      201: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["VenueMappingDto"];
+          "application/json": components["schemas"]["VenueSingleResponseDto"];
         };
       };
-      /** @description Building does not belong to the selected university */
+      /** @description Invalid venue payload */
       400: {
         headers: {
           [name: string]: unknown;
@@ -8268,6 +10249,39 @@ export interface operations {
         };
         content?: never;
       };
+      /** @description Venue name already exists for this university */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getVenueById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        venueId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Venue returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VenueSingleResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Venue not found */
       404: {
         headers: {
@@ -8275,11 +10289,99 @@ export interface operations {
         };
         content?: never;
       };
-      409: components["responses"]["ConflictError"];
       500: components["responses"]["InternalError"];
     };
   };
-  VenueController_bulkAssign: {
+  deleteVenue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        venueId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Venue deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VenueSingleResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description Venue not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  updateVenue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        venueId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateVenueDto"];
+      };
+    };
+    responses: {
+      /** @description Venue updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VenueSingleResponseDto"];
+        };
+      };
+      /** @description Invalid update payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description Wrong permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Venue or building not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Venue name already exists for this university */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  assignVenuesToBuildings: {
     parameters: {
       query?: never;
       header?: never;
@@ -8301,7 +10403,7 @@ export interface operations {
           "application/json": components["schemas"]["BulkAssignResponseDto"];
         };
       };
-      /** @description One/more buildings do not belong to the selected university */
+      /** @description One or more buildings or venues do not belong to the selected university */
       400: {
         headers: {
           [name: string]: unknown;
@@ -8309,7 +10411,7 @@ export interface operations {
         content?: never;
       };
       401: components["responses"]["UnauthorizedError"];
-      /** @description Wrong permissions bud */
+      /** @description Wrong permissions */
       403: {
         headers: {
           [name: string]: unknown;
@@ -8320,7 +10422,48 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
-  BuildingController_getAllBuildings: {
+  getAllBuildingsHeatmap: {
+    parameters: {
+      query?: {
+        /** @description Date heatmap needs to compute. Default date is the current day */
+        date?: string;
+        /** @description Attendance values to include in the response. */
+        view?: "projected" | "worstCase" | "all";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description All building heatmaps returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AllBuildingsHeatmapResponseDto"];
+        };
+      };
+      /** @description Invalid request parameters for heatmap query */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description No university selected */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getAllBuildings: {
     parameters: {
       query?: {
         /** @description True: building with pin. False: only buildings without pin. Omit for all buildings. */
@@ -8355,7 +10498,7 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
-  BuildingController_createBuilding: {
+  createBuilding: {
     parameters: {
       query?: never;
       header?: never;
@@ -8377,16 +10520,22 @@ export interface operations {
           "application/json": components["schemas"]["BuildingSingleResponseDto"];
         };
       };
-      400: components["responses"]["BadRequestError"];
+      /** @description Invalid building payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
       401: components["responses"]["UnauthorizedError"];
-      /** @description Incorrect role permissions */
+      /** @description Wrong permissions */
       403: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description Building with this name already exists */
+      /** @description Building name already exists for this university */
       409: {
         headers: {
           [name: string]: unknown;
@@ -8396,7 +10545,7 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
-  BuildingController_updateBuildingLocation: {
+  getBuildingById: {
     parameters: {
       query?: never;
       header?: never;
@@ -8405,13 +10554,9 @@ export interface operations {
       };
       cookie?: never;
     };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UpdateBuildingLocationDto"];
-      };
-    };
+    requestBody?: never;
     responses: {
-      /** @description The building was updated successfully */
+      /** @description Building returned successfully */
       200: {
         headers: {
           [name: string]: unknown;
@@ -8422,21 +10567,159 @@ export interface operations {
       };
       400: components["responses"]["BadRequestError"];
       401: components["responses"]["UnauthorizedError"];
-      /** @description Your role is not admin, not allowed */
+      /** @description No university selected */
       403: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description The building was not found in this uni */
+      /** @description Building not found */
       404: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  deleteBuilding: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        buildingId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Building deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BuildingSingleResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description Building not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  updateBuilding: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        buildingId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateBuildingDto"];
+      };
+    };
+    responses: {
+      /** @description Building updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BuildingSingleResponseDto"];
+        };
+      };
+      /** @description Invalid update payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description Wrong permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Building not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Building name already exists for this university */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getBuildingHeatmap: {
+    parameters: {
+      query?: {
+        /** @description Date heatmap needs to compute. Default date is the current day */
+        date?: string;
+        /** @description Attendance values to include in the response. */
+        view?: "projected" | "worstCase" | "all";
+      };
+      header?: never;
+      path: {
+        buildingId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Building heatmap returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BuildingHeatmapResponseDto"];
+        };
+      };
+      /** @description Invalid heatmap query parameters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description No university selected or insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Building not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
       500: components["responses"]["InternalError"];
     };
   };
@@ -8512,12 +10795,60 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
+  getRoutingHeatmap: {
+    parameters: {
+      query: {
+        /** @description Date for which to return route heatmap statistics */
+        date: string;
+        /** @description WHich metrics to include */
+        view?: "projected" | "worstCase" | "all";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Routing heatmap returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RoutingHeatmapResponseDto"];
+        };
+      };
+      /** @description Invalid routing heatmap query parameters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description No university selected or insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Required route, event, venue, or building data was not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
   RouteController_getRoute: {
     parameters: {
       query: {
-        /** @description The origin building that the student is walking from */
+        /** @description The building the student is walking from. */
         originBuildingId: string;
-        /** @description The destination building that the student is walking to */
+        /** @description The building the student is walking to. */
         destinationBuildingId: string;
       };
       header?: never;
@@ -8557,9 +10888,9 @@ export interface operations {
   RouteController_getActiveRoute: {
     parameters: {
       query: {
-        /** @description Calendar date that matches the EventAttendance date */
+        /** @description Calendar date matching the EventAttendance date. */
         date: string;
-        /** @description Time in hh:mm */
+        /** @description Time in HH:mm format. */
         time: string;
       };
       header?: never;
@@ -8581,6 +10912,212 @@ export interface operations {
       401: components["responses"]["UnauthorizedError"];
       /** @description No university or university role was selected */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  routeDiversion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DiversionRequestDto"];
+      };
+    };
+    responses: {
+      /** @description Diversion successfully created or updated. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DiversionRouteResponseDto"];
+        };
+      };
+      /** @description Invalid request. Diversion must be between 0 and 1 and either toRoute or toRouteIndex must be supplied. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description The source route, destination route, or requested alternative route could not be found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  RouteController_getVariant: {
+    parameters: {
+      query: {
+        originBuildingId: string;
+        destinationBuildingId: string;
+        routeIndex: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RouteDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getRouteViaBuilding: {
+    parameters: {
+      query: {
+        /** @description Date whose attended events should be used. */
+        date: string;
+        /** @description Building the student wants to visit before their next class. */
+        buildingId: string;
+        /** @description Optional time in HH:mm. When omitted, the largest gap between scheduled events is selected. */
+        time?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Stop route returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StudentStopRouteResponseDto"];
+        };
+      };
+      /** @description Invalid stop route query parameters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description No university selected or insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No attended events found for the date, or no route could be determined for the stop */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getStudentRoutesForDate: {
+    parameters: {
+      query: {
+        /** @description Calendar date for which the student needs routes. */
+        date: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Student routes returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StudentRoutesResponseDto"];
+        };
+      };
+      /** @description The requested date is invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description A required event, venue, building, or route was not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getAlternativeRouteBetweenEvents: {
+    parameters: {
+      query: {
+        /** @description The event from which the student is travelling. */
+        originEventId: string;
+        /** @description The event to which the student is travelling. */
+        destinationEventId: string;
+        /** @description Calendar date on which both events occur. */
+        date: string;
+        /** @description Zero-based route index. Index 0 is the shortest/default route. */
+        routeIndex?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Alternative route returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AlternativeRoutesResponseDto"];
+        };
+      };
+      /** @description The events are invalid, identical, in the same building, or the route index is invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description The events are not attended on the requested date, or the requested route is unavailable */
+      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -9397,6 +11934,119 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  assignLecturer: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateTeachesDto"];
+      };
+    };
+    responses: {
+      /** @description Lecturer assigned to module successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TeachesResponseDto"];
+        };
+      };
+      /** @description Missing or invalid teaches payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description Insufficient permissions or no university selected */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components["responses"]["ConflictError"];
+      /** @description Lecturer was not assigned to module */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getLecturerModules: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Lecturer modules returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TeachesResponseDto"][];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      /** @description Insufficient permissions or no university selected */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  assignMeToModule: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SelfAssignTeachesDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 201 response. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TeachesResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
       500: components["responses"]["InternalError"];
     };
   };

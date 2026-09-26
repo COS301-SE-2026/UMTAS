@@ -5,3 +5,8 @@ export * from './builder.mock';
 export * from './event-import-fingerprint';
 export * from './grouping.mock';
 export * from './event.mock';
+export * from './building.mock';
+export * from './venue.mock';
+export * from './recurring-event.mock';
+export * from './route.mock';
+export * from './routeHelper.mock';

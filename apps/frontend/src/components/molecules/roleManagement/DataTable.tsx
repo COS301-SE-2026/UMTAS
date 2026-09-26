@@ -1,4 +1,5 @@
 "use client";
+
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import * as React from "react";
@@ -38,6 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
+
 import { useState } from "react";
 
 interface DataTableProps<TData, TValue> {
@@ -77,6 +79,7 @@ export function DataTable<TData, TValue>({
       const name = String(row.getValue("Name") || "").toLowerCase();
       const email = String(row.getValue("Email") || "").toLowerCase();
       const role = String(row.getValue("role") || "").toLowerCase();
+
       return (
         name.includes(searchValue) ||
         email.includes(searchValue) ||
@@ -97,6 +100,7 @@ export function DataTable<TData, TValue>({
 
     data.forEach((row) => {
       const rowData = row as { role?: string };
+
       if (rowData.role) roles.add(rowData.role);
     });
 
@@ -105,152 +109,168 @@ export function DataTable<TData, TValue>({
 
   const handleRoleChange = (value: string) => {
     setRoleFilter(value);
+
     const roleColumn = table.getColumn("role");
+
     if (roleColumn) {
       roleColumn.setFilterValue(value === "ALL" ? "" : value);
     }
   };
 
   return (
-    <div className="h-[80vh] items-center flex flex-col gap-6 w-full px-6">
-      <div className="w-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm">
-        <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
+    <div className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
+      <div className="border-b border-[var(--border)] px-5 py-4">
+        <h1 className="text-lg font-semibold text-[var(--text-primary)]">
           Role Management
         </h1>
-        <p className="text-sm text-[var(--text-secondary)] pl-4 pt-2 pb-2">
-          Search and filter names, emails and roles
+
+        <p className="mt-1 text-sm text-[var(--text-secondary)]">
+          Search and filter names, emails and roles.
         </p>
-        <div className="flex flex-col md:flex-row gap-4 p-5 border-b border-[var(--border)] items-center justify-between bg-[var(--bg-surface)]">
-          <div className="w-full md:max-w-sm flex-1">
-            <Input
-              id="input-search-name-email-role"
-              placeholder="Search names, emails or roles..."
-              value={globalFilter ?? ""}
-              onChange={(event) => setGlobalFilter(event.target.value)}
-              className="w-full bg-[var(--background)]"
-            />
-          </div>
+      </div>
 
-          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-            <Select value={roleFilter} onValueChange={handleRoleChange}>
-              <SelectTrigger
-                id="select-all-roles"
-                className="w-[180px] bg-[var(--background)]"
-              >
-                <SelectValue placeholder="Filter Role Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Roles</SelectItem>
-                {availableRoles.map((role) => (
-                  <SelectItem key={role} value={role}>
-                    {role}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  id="btn-columns-to-show"
-                  variant="outline"
-                  className="ml-auto bg-[var(--background)]"
-                >
-                  Columns
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {table
-                  .getAllColumns()
-                  .filter(
-                    (column) =>
-                      column.getCanHide() && column.id.toLowerCase() !== "role",
-                  )
-                  .map((column) => {
-                    return (
-                      <DropdownMenuCheckboxItem
-                        key={column.id}
-                        className="capitalize"
-                        checked={column.getIsVisible()}
-                        onCheckedChange={(value) =>
-                          column.toggleVisibility(!!value)
-                        }
-                      >
-                        {column.id}
-                      </DropdownMenuCheckboxItem>
-                    );
-                  })}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+      <div className="flex flex-col items-center justify-between gap-4 bg-[var(--bg-surface)] p-5 md:flex-row">
+        <div className="w-full flex-1 md:max-w-sm">
+          <Input
+            id="input-search-name-email-role"
+            placeholder="Search names, emails or roles..."
+            value={globalFilter ?? ""}
+            onChange={(event) => setGlobalFilter(event.target.value)}
+            className="w-full bg-[var(--background)]"
+          />
         </div>
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow
-                key={headerGroup.id}
-                className="border-b border-[var(--border)]"
+
+        <div className="flex w-full flex-wrap items-center gap-3 md:w-auto">
+          <Select value={roleFilter} onValueChange={handleRoleChange}>
+            <SelectTrigger
+              id="select-all-roles"
+              className="w-[180px] bg-[var(--background)]"
+            >
+              <SelectValue placeholder="Filter Role Type" />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectItem value="ALL">All Roles</SelectItem>
+
+              {availableRoles.map((role) => (
+                <SelectItem key={role} value={role}>
+                  {role}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                id="btn-columns-to-show"
+                variant="outline"
+                className="ml-auto bg-[var(--background)]"
               >
-                {headerGroup.headers.map((header) => {
-                  const isActions = header.id.toLowerCase() === "actions";
+                Columns
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter(
+                  (column) =>
+                    column.getCanHide() && column.id.toLowerCase() !== "role",
+                )
+                .map((column) => {
                   return (
-                    <TableHead
-                      key={header.id}
-                      className={`p-4 text-[var(--text-primary)] font-bold ${isActions ? "text-right" : ""}`}
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow
+              key={headerGroup.id}
+              className="border-b border-[var(--border)]"
+            >
+              {headerGroup.headers.map((header) => {
+                const isActions = header.id.toLowerCase() === "actions";
+
+                return (
+                  <TableHead
+                    key={header.id}
+                    className={`p-4 font-bold text-[var(--text-primary)] ${
+                      isActions ? "text-right" : ""
+                    }`}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                data-testid="row-roles-table"
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+                className="brand-table-hover border-b border-[var(--border)]"
+              >
+                {row.getVisibleCells().map((cell) => {
+                  const isActions = cell.column.id.toLowerCase() === "actions";
+
+                  return (
+                    <TableCell
+                      id="select-the-row-in-table"
+                      key={cell.id}
+                      className={`p-4 text-[var(--text-primary)] ${
+                        isActions ? "text-right" : ""
+                      }`}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
                   );
                 })}
               </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  data-testid="row-roles-table"
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="border-b border-[var(--border)] brand-table-hover"
-                >
-                  {row.getVisibleCells().map((cell) => {
-                    const isActions =
-                      cell.column.id.toLowerCase() === "actions";
-                    return (
-                      <TableCell
-                        id="select-the-row-in-table"
-                        key={cell.id}
-                        className={`p-4 text-[var(--text-primary)] ${isActions ? "text-right" : ""}`}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="p-8 text-center text-[var(--text-secondary)]"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell
+                colSpan={columns.length}
+                className="p-8 text-center text-[var(--text-secondary)]"
+              >
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
 
-        <div className="flex items-center justify-between p-4 border-t border-[var(--border)] bg-[var(--bg-surface)]">
+      {table.getAllLeafColumns().some((column) => column.id === "select") && (
+        <div className="flex items-center justify-between border-t border-[var(--border)] bg-[var(--bg-surface)] p-4">
           <div className="text-sm text-muted-foreground">
             {table.getFilteredSelectedRowModel().rows.length} of{" "}
             {table.getFilteredRowModel().rows.length} row(s) selected.
@@ -266,6 +286,7 @@ export function DataTable<TData, TValue>({
             >
               Previous
             </Button>
+
             <Button
               id="btn-role-next"
               variant="outline"
@@ -277,7 +298,7 @@ export function DataTable<TData, TValue>({
             </Button>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

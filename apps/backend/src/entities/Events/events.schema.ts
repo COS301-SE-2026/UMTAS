@@ -52,12 +52,16 @@ export const UniversityEvent = pgTable(
   'UniversityEvent',
   {
     UniversityEventID: uuid('universityEventID').primaryKey().defaultRandom(),
-    moduleID: uuid('moduleID').references(() => modules.moduleID, {
-      onDelete: 'cascade',
-    }),
-    eventID: uuid('eventID').references(() => Event.eventID, {
-      onDelete: 'cascade',
-    }),
+    moduleID: uuid('moduleID')
+      .references(() => modules.moduleID, {
+        onDelete: 'cascade',
+      })
+      .notNull(),
+    eventID: uuid('eventID')
+      .references(() => Event.eventID, {
+        onDelete: 'cascade',
+      })
+      .notNull(),
   },
   (table) => ({
     moduleEventUnique: uniqueIndex('university_event_module_event_unique').on(

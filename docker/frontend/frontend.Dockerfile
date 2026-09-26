@@ -1,3 +1,44 @@
+FROM rust:slim AS rust-builder
+RUN apt-get update && apt-get install -y \
+    curl \
+    python3 \
+    python3-venv \
+    python3-pip \
+    build-essential \
+    libxcb1 \
+    libgl1 \
+    libglib2.0-0 && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+WORKDIR /app
+
+COPY apps/frontend/public/models ./apps/frontend/public/models
+
+RUN if [ ! -f apps/frontend/public/models/yolo26n.onnx ] || [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ]; then \
+    python3 -m venv .venv && \
+    .venv/bin/pip install --no-cache-dir ultralytics onnx onnxruntime && \
+    if [ ! -f apps/frontend/public/models/yolo26n.onnx ]; then \
+    .venv/bin/yolo export model=yolo26n.pt format=onnx imgsz=640 && \
+    mkdir -p apps/frontend/public/models && \
+    mv yolo26n.onnx apps/frontend/public/models/yolo26n.onnx; \
+    fi && \
+    if [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ]; then \
+    .venv/bin/yolo export model=yolo26n-pose.pt format=onnx imgsz=640 && \
+    mkdir -p apps/frontend/public/models && \
+    mv yolo26n-pose.onnx apps/frontend/public/models/yolo26n-pose.onnx; \
+    fi && \
+    rm -rf .venv; \
+    else echo "ONNX models already exist locally, skipping export."; fi
+
+COPY apps/frontend/wasm-engine ./apps/frontend/wasm-engine
+WORKDIR /app/apps/frontend/wasm-engine
+
+RUN rustup target add wasm32-unknown-unknown
+RUN if [ ! -d "pkg" ]; then \
+    wasm-pack build --target web --release; \
+    else echo "WASM pkg already exists, skipping build."; fi
+
 FROM node:22-alpine AS base
 WORKDIR /app
 RUN corepack enable
@@ -30,6 +71,17 @@ ENV NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV}
 
 COPY packages/shared-types/ ./packages/shared-types/
 COPY apps/frontend/ ./apps/frontend/
+
+COPY --from=rust-builder /app/apps/frontend/wasm-engine/pkg ./apps/frontend/wasm-engine/pkg
+COPY --from=rust-builder /app/apps/frontend/public/models/yolo26n.onnx ./apps/frontend/public/models/yolo26n.onnx
+COPY --from=rust-builder /app/apps/frontend/public/models/yolo26n-pose.onnx ./apps/frontend/public/models/yolo26n-pose.onnx
+
+RUN mkdir -p apps/frontend/public/wasm && \
+    cp node_modules/onnxruntime-web/dist/ort-wasm*.wasm apps/frontend/public/wasm/ 2>/dev/null || \
+    cp apps/frontend/node_modules/onnxruntime-web/dist/ort-wasm*.wasm apps/frontend/public/wasm/ 2>/dev/null || \
+    find . -name "ort-wasm*.wasm" -exec cp {} apps/frontend/public/wasm/ \; || true && \
+    cp node_modules/onnxruntime-web/dist/ort-wasm*.mjs apps/frontend/public/wasm/ 2>/dev/null || true
+
 RUN pnpm --filter=shared-types build
 RUN pnpm --filter=frontend build
 

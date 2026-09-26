@@ -325,6 +325,7 @@ describe('GroupingService', () => {
           [], //getbyId
           [], //checkFormatchingHashGroup
         ],
+        insert: [[]],
       });
 
       const spy = jest.spyOn(service, 'updateGroup').mockResolvedValue({
@@ -352,9 +353,11 @@ describe('GroupingService', () => {
       mockTransaction(mockDb, {
         select: [
           [group],
-          [], //getbyId
-          [matchingGroup], //checkFormatchingHashGroup
+          [], // modules for group
+          [matchingGroup], // checkForMatchingHashGroup
         ],
+        update: [[]], // update Course.GroupID
+        delete: [[matchingGroup]], // deleteGroup
       });
 
       const spy = jest.spyOn(service, 'deleteGroup');
@@ -368,4 +371,17 @@ describe('GroupingService', () => {
       expect(spy).toHaveBeenCalled();
     });
   }); //END_Test_populateGroup
+
+  //RemoveModulesFromGroup
+  describe('Test_removeModulesFromGroup', () => {
+    it('should remove modules from a group', async () => {
+      mockDbResult(mockDb.delete, []);
+
+      await expect(
+        service.removeModulesFromGroup(groupId, [moduleId], mockDb),
+      ).resolves.toBeUndefined();
+
+      expect(mockDb.delete).toHaveBeenCalledTimes(1);
+    });
+  });
 });
