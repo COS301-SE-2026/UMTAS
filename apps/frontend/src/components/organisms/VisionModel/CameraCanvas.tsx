@@ -469,45 +469,41 @@ function CanvasWebcam({
         </div>
 
         <div className="w-full lg:w-80 border border-[var(--border)] bg-[var(--bg-surface)] rounded-2xl p-5 flex flex-col justify-between shadow-sm shrink-0">
-          <div className="space-y-4">
-            <h3 className="text-base font-semibold text-[var(--text-primary)] border-b border-[var(--border)] pb-3">
-              Session Details
-            </h3>
-
-            <div className="space-y-3">
-              <h2 className="text-sm font-medium text-[var(--text-primary)]">
-                Processing Results
+          <div className="space-y-3 ">
+            <div>
+              <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
+                Results:
               </h2>
+            </div>
 
-              <div className="grid grid-cols-2 gap-y-2 text-sm text-[var(--text-secondary)]">
-                <span>Questions asked:</span>
-                <span className="font-medium text-[var(--text-primary)] text-right">
-                  {sessionRes.questions_asked}
-                </span>
+            <div className="grid grid-cols-2 gap-y-2 text-sm text-[var(--text-secondary)]">
+              <span>Questions asked:</span>
+              <span className="font-medium text-[var(--text-primary)] text-right">
+                {sessionRes.questions_asked}
+              </span>
 
-                <span>Paying Attention:</span>
-                <span className="font-medium text-[var(--text-primary)] text-right">
-                  {sessionRes.total_frames > 0
-                    ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
-                    : "0.00%"}
-                </span>
+              <span>Paying Attention:</span>
+              <span className="font-medium text-[var(--text-primary)] text-right">
+                {sessionRes.total_frames > 0
+                  ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                  : "0.00%"}
+              </span>
 
-                <span>Not Paying Attention:</span>
-                <span className="font-medium text-[var(--text-primary)] text-right">
-                  {sessionRes.total_frames > 0
-                    ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
-                    : "0.00%"}
-                </span>
-                <span>Sitting still:</span>
-                <span className="font-medium text-[var(--text-primary)] text-right">
-                  {`${percentageStable.toFixed(2)}%`}
-                </span>
+              <span>Not Paying Attention:</span>
+              <span className="font-medium text-[var(--text-primary)] text-right">
+                {sessionRes.total_frames > 0
+                  ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                  : "0.00%"}
+              </span>
+              <span>Sitting still:</span>
+              <span className="font-medium text-[var(--text-primary)] text-right">
+                {`${percentageStable.toFixed(2)}%`}
+              </span>
 
-                <span>Not Sitting still:</span>
-                <span className="font-medium text-[var(--text-primary)] text-right">
-                  {`${percentageNotStable.toFixed(2)}%`}
-                </span>
-              </div>
+              <span>Not Sitting still:</span>
+              <span className="font-medium text-[var(--text-primary)] text-right">
+                {`${percentageNotStable.toFixed(2)}%`}
+              </span>
             </div>
           </div>
 
