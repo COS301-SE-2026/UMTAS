@@ -1,4 +1,4 @@
-use crate::pose_inference::{DetectedPersonPose, Keypoint};
+use crate::pose_inference::DetectedPersonPose;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -36,6 +36,7 @@ pub fn attach_id_first(
             last_seen_frame: frame,
             last_seen_timestamp: timestamp,
             hand_up: is_hands_up(&new_person),
+            gaze: analyze_gaze(&new_person),
         });
     }
 
@@ -116,6 +117,7 @@ pub fn attach_id(
                     last_seen_frame: frame,
                     last_seen_timestamp: timestamp,
                     hand_up: is_hands_up(new_person),
+                    gaze: analyze_gaze(new_person),
                 });
             }
         }
@@ -131,7 +133,12 @@ pub fn attach_id(
                 last_seen_frame: prev_person.last_seen_frame,
                 last_seen_timestamp: prev_person.last_seen_timestamp,
                 hand_up: false,
-                // we do not look at hands up of inferred frames
+                gaze: GazeDirection {
+                    looking_left: false,
+                    looking_right: false,
+                    looking_straight: false,
+                },
+                // we do not look at hands up or gaze of inferred frames
             });
         }
     }
@@ -149,6 +156,7 @@ pub fn attach_id(
                 last_seen_frame: frame,
                 last_seen_timestamp: timestamp,
                 hand_up: is_hands_up(new_person),
+                gaze: analyze_gaze(new_person),
             });
         }
     }
@@ -161,14 +169,64 @@ pub fn attach_id(
 }
 
 pub fn is_hands_up(new_person: &DetectedPersonPose) -> bool {
-    let bottom_boundary = (new_person.center_mass.y + new_person.nose.y) / 2.0;
+    let head_boundary = new_person.nose.y;
 
     let right_hand_up =
-        new_person.right_arm.len() > 1 && new_person.right_arm[1].y <= bottom_boundary;
+        new_person.right_arm.len() > 1 && new_person.right_arm[1].y <= head_boundary;
 
-    let left_hand_up = new_person.left_arm.len() > 1 && new_person.left_arm[1].y <= bottom_boundary;
+    let left_hand_up = new_person.left_arm.len() > 1 && new_person.left_arm[1].y <= head_boundary;
 
-    right_hand_up || left_hand_up
+    if right_hand_up && left_hand_up {
+        return false;
+    }
+
+    return right_hand_up || left_hand_up;
+}
+pub fn analyze_gaze(person: &DetectedPersonPose) -> GazeDirection {
+    let confidence_threshold = 0.4;
+
+    let eye_span = ((person.left_eye.x - person.right_eye.x).powi(2)
+        + (person.left_eye.y - person.right_eye.y).powi(2))
+    .sqrt();
+
+    if eye_span <= 0.0 {
+        return GazeDirection {
+            looking_left: false,
+            looking_right: false,
+            looking_straight: true,
+        };
+    }
+
+    let eye_center_x = (person.left_eye.x + person.right_eye.x) / 2.0;
+    let nose_ratio = (person.nose.x - eye_center_x) / eye_span;
+
+    let left_ear_visible = person.left_ear.score > confidence_threshold;
+    let right_ear_visible = person.right_ear.score > confidence_threshold;
+
+    let mut looking_left = false;
+    let mut looking_right = false;
+    let mut looking_straight = true;
+
+    if left_ear_visible && !right_ear_visible && nose_ratio < -0.15 {
+        looking_left = true;
+        looking_straight = false;
+    } else if right_ear_visible && !left_ear_visible && nose_ratio > 0.15 {
+        looking_right = true;
+        looking_straight = false;
+    }
+
+    GazeDirection {
+        looking_left,
+        looking_right,
+        looking_straight,
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct GazeDirection {
+    pub looking_left: bool,
+    pub looking_right: bool,
+    pub looking_straight: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -179,6 +237,7 @@ pub struct SinglePersonSessionData {
     pub last_seen_frame: usize,
     pub last_seen_timestamp: f64,
     pub hand_up: bool,
+    pub gaze: GazeDirection,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

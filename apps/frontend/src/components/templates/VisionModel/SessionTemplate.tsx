@@ -29,6 +29,7 @@ export default function VM_SessionTemplate() {
   const [modelVerified, setModelVerified] = useState(false);
 
   const [cameraOn, setCameraOn] = useState(false);
+  const [sessionId, setSessionID] = useState<string | null>(null);
 
   const [detectionSettings, setDetectionSettings] = useState<DetectionSettings>(
     {
@@ -88,7 +89,7 @@ export default function VM_SessionTemplate() {
             {/* Camera / image preview */}
             <section
               aria-label="Vision preview"
-              className="overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)]"
+              className="overflow-hidden rounded-lg border w-full "
             >
               <div className="mx-auto w-full max-w-5xl md:aspect-video">
                 <CameraCanvas

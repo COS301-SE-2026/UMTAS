@@ -19,6 +19,10 @@ pub struct DetectedPersonPose {
     pub left_arm: Vec<Keypoint>, // 2 points
     pub right_shoulder: Keypoint,
     pub right_arm: Vec<Keypoint>, // 2 points
+    pub left_eye: Keypoint,
+    pub right_eye: Keypoint,
+    pub left_ear: Keypoint,
+    pub right_ear: Keypoint,
 }
 
 #[wasm_bindgen]
@@ -109,6 +113,10 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
             let top_left_y = center_y - height / 2.0;
 
             let nose = get_kp(slice_data, 0, anchor_idx, num_anchors);
+            let left_eye = get_kp(slice_data, 1, anchor_idx, num_anchors);
+            let right_eye = get_kp(slice_data, 2, anchor_idx, num_anchors);
+            let left_ear = get_kp(slice_data, 3, anchor_idx, num_anchors);
+            let right_ear = get_kp(slice_data, 4, anchor_idx, num_anchors);
             let left_shoulder = get_kp(slice_data, 5, anchor_idx, num_anchors);
             let right_shoulder = get_kp(slice_data, 6, anchor_idx, num_anchors);
 
@@ -146,6 +154,10 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
                 right_arm: vec![right_elbow, right_wrist],
                 center_mass: shoulder_midpoint,
                 nose,
+                left_eye,
+                right_eye,
+                left_ear,
+                right_ear,
             });
         }
     }

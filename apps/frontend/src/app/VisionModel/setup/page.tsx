@@ -14,7 +14,7 @@ import {
 import { Progress } from "@/components/atoms/baseShadcn/progress";
 import { Download, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type NavigatorWithGPU = Navigator & {
   gpu?: {
@@ -25,15 +25,16 @@ type NavigatorWithGPU = Navigator & {
 type SetupStatus = "idle" | "installing" | "ready" | "error";
 
 const MODEL_KEY = "vision-model-ready";
+const CACHE_NAME = "vision-models-v1";
 
 const MODELS = [
   {
     name: "Person Detection Model",
-    url: "https://huggingface.co/zwh20081/yolo26-onnx/resolve/main/yolo26n.onnx",
+    url: "/models/yolo26n.onnx",
   },
   {
     name: "Pose Estimation Model",
-    url: "https://huggingface.co/zwh20081/yolo26-onnx/resolve/main/yolo26n-pose.onnx",
+    url: "/models/yolo26n-pose.onnx",
   },
 ];
 
@@ -48,28 +49,47 @@ export default function VisionModelSetupPage() {
   const [downloadedMb, setDownloadedMb] = useState(0);
   const [totalMb, setTotalMb] = useState<number | null>(null);
 
-  async function downloadModel(
-    url: string,
-    modelIndex: number,
-  ): Promise<ArrayBuffer> {
-    const response = await fetch(url, {
-      cache: "force-cache",
-    });
+  useEffect(() => {
+    async function checkExistingCache() {
+      if (localStorage.getItem(MODEL_KEY) === "true") {
+        try {
+          const cache = await caches.open(CACHE_NAME);
+          const match1 = await cache.match(MODELS[0].url);
+          const match2 = await cache.match(MODELS[1].url);
+
+          if (match1 && match2) {
+            setStatus("ready");
+            setProgress(100);
+          }
+        } catch {}
+      }
+    }
+    checkExistingCache();
+  }, []);
+
+  async function cacheModel(url: string, modelIndex: number): Promise<void> {
+    const cache = await caches.open(CACHE_NAME);
+    const cachedResponse = await cache.match(url);
+
+    if (cachedResponse) {
+      return;
+    }
+
+    const response = await fetch(url);
 
     if (!response.ok) {
       throw new Error(
-        `Model download failed with ${response.status} ${response.statusText}. Please check your connection and try again.`,
+        `Failed to load ${url} with status ${response.status}. Ensure the model file exists in public/models/.`,
       );
     }
 
+    await cache.put(url, response.clone());
+
     if (!response.body) {
-      throw new Error(
-        "Your browser does not support streamed downloads. Please use a supported browser.",
-      );
+      throw new Error("Streamed downloads not supported by your browser.");
     }
 
     const reader = response.body.getReader();
-
     const contentLength = response.headers.get("content-length");
     const totalBytes = contentLength ? Number(contentLength) : null;
 
@@ -80,21 +100,17 @@ export default function VisionModelSetupPage() {
     );
 
     let receivedBytes = 0;
-    const chunks: Uint8Array[] = [];
 
     while (true) {
       const { done, value } = await reader.read();
 
       if (done) break;
 
-      chunks.push(value);
       receivedBytes += value.length;
-
       setDownloadedMb(Number((receivedBytes / 1024 / 1024).toFixed(1)));
 
       if (totalBytes) {
         const modelProgress = receivedBytes / totalBytes;
-
         const overallProgress =
           (modelIndex / MODELS.length) * 100 +
           modelProgress * (100 / MODELS.length);
@@ -102,17 +118,6 @@ export default function VisionModelSetupPage() {
         setProgress(Math.min(overallProgress, 100));
       }
     }
-
-    const combined = new Uint8Array(receivedBytes);
-
-    let offset = 0;
-
-    for (const chunk of chunks) {
-      combined.set(chunk, offset);
-      offset += chunk.length;
-    }
-
-    return combined.buffer;
   }
 
   async function prepareModels() {
@@ -146,7 +151,7 @@ export default function VisionModelSetupPage() {
         setDownloadedMb(0);
         setTotalMb(null);
 
-        await downloadModel(model.url, i);
+        await cacheModel(model.url, i);
 
         setProgress(((i + 1) / MODELS.length) * 100);
       }
@@ -190,11 +195,11 @@ export default function VisionModelSetupPage() {
         requirement === "detection" &&
         currentModel === "Person Detection Model"
       ) {
-        return "Downloading";
+        return "Caching";
       }
 
       if (requirement === "pose" && currentModel === "Pose Estimation Model") {
-        return "Downloading";
+        return "Caching";
       }
 
       if (
@@ -217,9 +222,7 @@ export default function VisionModelSetupPage() {
           </CardTitle>
 
           <CardDescription className="text-sm text-[var(--text-secondary)]">
-            Prepare the required vision models before using vision analytics.
-            This only needs to be completed once per browser unless site data is
-            cleared.
+            Verify WebGPU and cache local model files into browser storage.
           </CardDescription>
         </CardHeader>
 
@@ -245,17 +248,17 @@ export default function VisionModelSetupPage() {
           </section>
 
           {status === "installing" && (
-            <section className="space-y-3" aria-label="Model download progress">
+            <section className="space-y-3" aria-label="Model cache progress">
               <div className="flex items-center justify-between gap-4 text-sm">
                 <div className="min-w-0">
                   <p className="truncate font-medium text-[var(--text-primary)]">
                     {currentModel
-                      ? `Preparing ${currentModel}`
+                      ? `Caching ${currentModel}`
                       : "Preparing vision models"}
                   </p>
 
                   <p className="text-xs text-[var(--text-secondary)]">
-                    Keep this page open until setup is complete.
+                    Keep this page open until caching is complete.
                   </p>
                 </div>
 
@@ -293,7 +296,8 @@ export default function VisionModelSetupPage() {
           {status === "ready" && (
             <Alert>
               <AlertDescription>
-                Vision models are ready. You can continue to the session.
+                Vision models are cached and ready. You can continue to the
+                session.
               </AlertDescription>
             </Alert>
           )}
@@ -309,12 +313,12 @@ export default function VisionModelSetupPage() {
               {status === "installing" ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Preparing Models
+                  Caching Models
                 </>
               ) : (
                 <>
                   <Download className="h-4 w-4" />
-                  {status === "error" ? "Try Again" : "Prepare Vision Models"}
+                  {status === "error" ? "Try Again" : "Verify & Cache Models"}
                 </>
               )}
             </Button>

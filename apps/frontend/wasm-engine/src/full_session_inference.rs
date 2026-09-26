@@ -1,6 +1,5 @@
 use serde::Serialize;
 use std::collections::HashMap;
-use std::num;
 use wasm_bindgen::prelude::*;
 
 use crate::pose_inference::Keypoint;
@@ -17,85 +16,120 @@ pub fn analyse_session(frames: JsValue) -> Result<String, JsValue> {
     return serde_json::to_string(&session_data).map_err(|e| JsValue::from_str(&e.to_string()));
 }
 pub fn group_data(full_session: HashMap<usize, SessionPerson>) -> SessionAnalysis {
-    let mut total_restless: usize = 0;
     let mut total_question: usize = 0;
+    let mut total_paying_attention: usize = 0;
+    let mut total_no_attention: usize = 0;
+    let mut total_restless_frames: usize = 0;
+    let mut total_stable_frames: usize = 0;
     let mut restless_ids: Vec<usize> = Vec::new();
 
     for (&id, session) in &full_session {
-        if let Some(restless_id) = evaluate_restlessness(
-            id,
-            &session.all_center_mass,
-            &session.left_shoulder,
-            &session.right_shoulder,
-        ) {
-            total_restless += 1;
-            restless_ids.push(restless_id);
+        if let Some((restless_id, restless_count, stable_count, is_restless)) =
+            evaluate_restlessness(
+                id,
+                &session.all_center_mass,
+                &session.left_shoulder,
+                &session.right_shoulder,
+            )
+        {
+            if is_restless {
+                restless_ids.push(restless_id);
+            }
+            total_restless_frames += restless_count;
+            total_stable_frames += stable_count;
         }
         total_question += session.count_hand_up;
+        total_paying_attention += session.gaze_paying_attention_count;
+        total_no_attention += session.gaze_no_attention_count;
     }
 
+    let total_frames = total_paying_attention + total_no_attention;
+
     return SessionAnalysis {
-        detected_restless: total_restless,
         questions_asked: total_question,
-        restless_ids: restless_ids,
+        total_restless_frames,
+        total_stable_frames,
+        total_paying_attention,
+        total_no_attention,
+        total_frames,
     };
 }
 
 pub fn evaluate_restlessness(
     id: usize,
-    centers: &[Keypoint],
+    _centers: &[Keypoint],
     left_shoulder: &[Keypoint],
     right_shoulder: &[Keypoint],
-) -> Option<usize> {
-    if centers.is_empty()
-        || centers.len() != left_shoulder.len()
-        || centers.len() != right_shoulder.len()
-    {
+) -> Option<(usize, usize, usize, bool)> {
+    if left_shoulder.is_empty() || left_shoulder.len() != right_shoulder.len() {
         return None;
     }
 
-    // ratio of how many frames they are expected to be moving for
-    const R_RATIO: f32 = 0.2;
-
     let mut total_shoulder_width = 0.0;
-    for i in 0..centers.len() {
+    for i in 0..left_shoulder.len() {
         let dx = left_shoulder[i].x - right_shoulder[i].x;
         let dy = left_shoulder[i].y - right_shoulder[i].y;
         total_shoulder_width += (dx.powi(2) + dy.powi(2)).sqrt();
     }
-    let avg_shoulder_width = total_shoulder_width / centers.len() as f32;
-    let NOISE = avg_shoulder_width * 0.15;
+    let avg_shoulder_width = total_shoulder_width / left_shoulder.len() as f32;
 
-    let mut sumx = 0.0;
-    let mut sumy = 0.0;
-    for kp in centers {
-        sumx += kp.x;
-        sumy += kp.y;
+    let mut midpoints = Vec::with_capacity(left_shoulder.len());
+    for i in 0..left_shoulder.len() {
+        let mid_x = (left_shoulder[i].x + right_shoulder[i].x) / 2.0;
+        let mid_y = (left_shoulder[i].y + right_shoulder[i].y) / 2.0;
+        midpoints.push((mid_x, mid_y));
     }
-    let len = centers.len() as f32;
-    let baseline_x = sumx / len;
-    let baseline_y = sumy / len;
 
+    let mut smoothed_midpoints = Vec::with_capacity(midpoints.len());
+    let window_size = 3;
+    for i in 0..midpoints.len() {
+        let start = if i >= window_size {
+            i - window_size + 1
+        } else {
+            0
+        };
+
+        let mut sum_x = 0.0;
+        let mut sum_y = 0.0;
+        let mut count = 0.0;
+
+        for j in start..=i {
+            sum_x += midpoints[j].0;
+            sum_y += midpoints[j].1;
+            count += 1.0;
+        }
+
+        smoothed_midpoints.push((sum_x / count, sum_y / count));
+    }
+
+    let substantial_move = avg_shoulder_width * 0.05;
     let mut restless_frame_count = 0;
+    let mut stable_frame_count = 0;
 
-    for kp in centers {
-        let dx = kp.x - baseline_x;
-        let dy = kp.y - baseline_y;
+    for i in 1..smoothed_midpoints.len() {
+        let dx = smoothed_midpoints[i].0 - smoothed_midpoints[i - 1].0;
+        let dy = smoothed_midpoints[i].1 - smoothed_midpoints[i - 1].1;
         let distance = (dx.powi(2) + dy.powi(2)).sqrt();
 
-        if distance > NOISE {
+        if distance > substantial_move {
             restless_frame_count += 1;
+        } else {
+            stable_frame_count += 1;
         }
     }
 
-    let restlessness_ratio = restless_frame_count as f32 / len;
-
-    if restlessness_ratio > R_RATIO {
-        return Some(id);
+    let total_evaluated = restless_frame_count + stable_frame_count;
+    if total_evaluated == 0 {
+        return None;
     }
 
-    return None;
+    let restlessness_ratio = restless_frame_count as f32 / total_evaluated as f32;
+    const R_RATIO: f32 = 0.20;
+    let is_restless = restlessness_ratio > R_RATIO;
+
+    return Some((id, restless_frame_count, stable_frame_count, is_restless));
 }
+
 pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson> {
     let mut total_frames_count: HashMap<usize, usize> = HashMap::new();
     let mut inferred_frames_count: HashMap<usize, usize> = HashMap::new();
@@ -132,6 +166,9 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
                 continue;
             }
 
+            let is_paying = person.gaze.looking_straight;
+            let is_no_attention = person.gaze.looking_left || person.gaze.looking_right;
+
             if let Some(stored_person) = all_session_people.get_mut(&id) {
                 if !person.is_inferred {
                     stored_person
@@ -144,9 +181,23 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
                         .right_shoulder
                         .push(person.pose_data.right_shoulder);
                 }
+                if !person.is_inferred && person.pose_data.nose.y > stored_person.highest_nose.y {
+                    stored_person.highest_nose = person.pose_data.nose;
+                }
+
+                // Accumulate gaze frame counts directly
+                if !person.is_inferred {
+                    if is_paying {
+                        stored_person.gaze_paying_attention_count += 1;
+                    }
+                    if is_no_attention {
+                        stored_person.gaze_no_attention_count += 1;
+                    }
+                }
+
                 // question logic
 
-                if person.hand_up {
+                if person.hand_up && !person.is_inferred {
                     if let Some(first_frame_up) = stored_person.first_frame_hand_up
                         && let Some(last_frame_up) = stored_person.last_frame_hand_up
                     {
@@ -199,6 +250,7 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
                 all_session_people.insert(
                     person.assigned_id,
                     SessionPerson {
+                        highest_nose: person.pose_data.nose,
                         count_hand_up: if person.hand_up { 1 } else { 0 },
                         first_frame_hand_up: if person.hand_up {
                             Some(frame.frame_number)
@@ -211,6 +263,16 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
                             None
                         },
                         frame_hand_down: None,
+                        gaze_paying_attention_count: if is_paying && !person.is_inferred {
+                            1
+                        } else {
+                            0
+                        },
+                        gaze_no_attention_count: if is_no_attention && !person.is_inferred {
+                            1
+                        } else {
+                            0
+                        },
                         assigned_id: person.assigned_id,
                         all_center_mass: [person.pose_data.center_mass].to_vec(),
                         left_shoulder: [person.pose_data.left_shoulder].to_vec(),
@@ -226,9 +288,11 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
 #[derive(Serialize)]
 pub struct SessionAnalysis {
     questions_asked: usize,
-    // a measure of everyones center and the average movement of that point
-    detected_restless: usize,
-    restless_ids: Vec<usize>,
+    total_restless_frames: usize,
+    total_stable_frames: usize,
+    total_paying_attention: usize,
+    total_no_attention: usize,
+    total_frames: usize,
 }
 
 #[derive(Clone)]
@@ -237,7 +301,10 @@ pub struct SessionPerson {
     first_frame_hand_up: Option<usize>,
     last_frame_hand_up: Option<usize>,
     frame_hand_down: Option<usize>,
+    gaze_paying_attention_count: usize,
+    gaze_no_attention_count: usize,
     assigned_id: usize,
+    highest_nose: Keypoint,
     all_center_mass: Vec<Keypoint>,
     left_shoulder: Vec<Keypoint>,
     right_shoulder: Vec<Keypoint>,
