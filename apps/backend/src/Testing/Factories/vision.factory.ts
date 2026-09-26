@@ -4,6 +4,7 @@ import { VisionSession } from '../../entities';
 import {
   CreateVisionSessionInput,
   SessionInferenceResult,
+  VisionSessionQueryDto,
 } from 'src/Vision/dto';
 
 type VisionSessionEntity = typeof VisionSession.$inferSelect;
@@ -63,3 +64,12 @@ export function createSessionInferenceResult(
     ...overrides,
   };
 } //END_createSessionInferenceResult
+
+//createVisionSessionQueryDto
+export function createVisionSessionQueryDto(
+  overrides: Partial<VisionSessionQueryDto> = {},
+): VisionSessionQueryDto {
+  return {
+    ...overrides,
+  };
+} //END_createVisionSessionQueryDto

@@ -9,13 +9,15 @@ import {
 import { AppDatabase, DatabaseService } from 'src/db/database.service';
 
 //Dtos
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq, gte, ilike, lte, SQL } from 'drizzle-orm';
 import { Event, UniversityEvent, VisionSession } from 'src/entities';
 import { ModuleServiceV2 } from 'src/Module/moduleV2.service';
 import {
   CreateVisionSessionInput,
   SessionInferenceResult,
   VisionSessionDto,
+  VisionSessionListResponseDto,
+  VisionSessionQueryDto,
   VisionSessionSingleResponseDto,
 } from './dto';
 
@@ -100,6 +102,45 @@ export class VisionService {
       session: visionSessionDtoAdapter(session),
     };
   } //END_getById
+
+  async getAll(
+    query: VisionSessionQueryDto,
+    tx?: AppDatabase,
+  ): Promise<VisionSessionListResponseDto> {
+    const db = tx ?? this.dbService.db;
+
+    const conditions: SQL[] = [];
+
+    //Module
+    if (query.moduleId)
+      conditions.push(eq(VisionSession.ModuleID, query.moduleId));
+
+    //Event
+    if (query.eventId)
+      conditions.push(eq(VisionSession.EventID, query.eventId));
+
+    //From date
+    if (query.from) conditions.push(gte(VisionSession.Date, query.from));
+
+    //To date
+    if (query.to) conditions.push(lte(VisionSession.Date, query.to));
+
+    //Name search
+    if (query.search)
+      conditions.push(
+        ilike(VisionSession.SessionName, `%${query.search.trim()}%`),
+      );
+
+    const sessions = await db
+      .select()
+      .from(VisionSession)
+      .where(and(...conditions))
+      .orderBy(desc(VisionSession.Date), VisionSession.SessionName);
+
+    return {
+      sessions: sessions.map((s) => visionSessionDtoAdapter(s)),
+    };
+  } //END_getAll
 
   //🎅's little helpers
 

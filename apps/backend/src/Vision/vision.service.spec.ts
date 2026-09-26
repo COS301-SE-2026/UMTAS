@@ -12,6 +12,7 @@ import { VisionService } from './vision.service';
 import {
   createCreateVisionSessionInput,
   createVisionSession,
+  createVisionSessionQueryDto,
 } from '../Testing/Factories/';
 import {
   mockDbResult,
@@ -122,6 +123,45 @@ describe('VisionService', () => {
       expect(result.session.Data).toEqual(session.Data);
     });
   }); //END_Test_getById
+
+  //getAll
+  describe('Test_getAll', () => {
+    it('should return empty array when no sessions found', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act
+      const result = await service.getAll(createVisionSessionQueryDto());
+
+      //Assert
+      expect(result).toEqual({ sessions: [] });
+    });
+
+    it('should return sessions and apply filters', async () => {
+      //Arrange
+      const sessionA = createVisionSession({ SessionName: 'Lecture A' });
+      const sessionB = createVisionSession({ SessionName: 'Lecture B' });
+
+      const query = createVisionSessionQueryDto({
+        moduleId: moduleId,
+        eventId: 'event-1',
+        from: '2026-01-01',
+        to: '2026-12-31',
+        search: '  lecture  ',
+      });
+
+      mockDbResult(mockDb.select, [sessionA, sessionB]);
+
+      //Act
+      const result = await service.getAll(query);
+
+      //Assert
+      expect(result.sessions).toHaveLength(2);
+      expect(result.sessions[0].SessionID).toBe(sessionA.SessionID);
+      expect(result.sessions[1].SessionID).toBe(sessionB.SessionID);
+      expect(result.sessions[0].Data).toEqual(sessionA.Data);
+    });
+  }); //END_Test_getAll
 
   //Helpers
 
