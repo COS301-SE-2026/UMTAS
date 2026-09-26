@@ -41,7 +41,7 @@ export default function CreateVmSession() {
       const codeMatch =
         m.moduleCode?.toLowerCase().includes(lowerQuery) ?? false;
 
-      return nameMatch || codeMatch;
+      return (nameMatch || codeMatch) && m.Events && m.Events?.length > 0;
     });
   }
 
@@ -138,64 +138,58 @@ export default function CreateVmSession() {
             </Select>
           </div>
 
-          {selectedModule &&
-            (selectedModule.Events?.length != 0 ? (
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-[var(--text-primary)]">
-                  Select Event Type
-                </Label>
-                <Select
-                  value={
-                    selectedEvent && selectedEvent.activityCode
-                      ? selectedEvent.activityCode +
-                        " " +
-                        (selectedEvent.isRecurring
-                          ? selectedEvent.eventCriteria.dayOfWeek
-                          : selectedEvent.eventCriteria.date)
-                      : ""
-                  }
+          {
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-[var(--text-primary)]">
+                Select Event Type
+              </Label>
+              <Select
+                disabled={selectedModule == null}
+                value={
+                  selectedEvent && selectedEvent.activityCode
+                    ? selectedEvent.activityCode +
+                      " " +
+                      (selectedEvent.isRecurring
+                        ? selectedEvent.eventCriteria.dayOfWeek
+                        : selectedEvent.eventCriteria.date)
+                    : ""
+                }
 
-                  onValueChange={(v) => {
-                    findSetEvent(v);
-                  }}
+                onValueChange={(v) => {
+                  findSetEvent(v);
+                }}
+              >
+                <SelectTrigger
+                  data-testid="event-Module-Select"
+                  className="w-80 max-w-100"
                 >
-                  <SelectTrigger
-                    data-testid="event-Module-Select"
-                    className="w-80 max-w-100"
-                  >
-                    <SelectValue placeholder="Select an event type" />
-                  </SelectTrigger>
+                  <SelectValue placeholder="Select an event type" />
+                </SelectTrigger>
 
-                  <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)] capitalize">
-                    {selectedModule?.Events?.map((event) => {
-                      if (event.activityCode) {
-                        const label =
-                          event.activityCode +
-                          " " +
-                          (event.isRecurring
-                            ? event.eventCriteria.dayOfWeek
-                            : event.eventCriteria.date);
-                        return (
-                          <SelectItem
-                            key={label}
-                            value={label}
-                            className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
-                          >
-                            {label}
-                          </SelectItem>
-                        );
-                      }
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Label className="text-sm   font-medium text-[var(--text-primary)]">
-                  This module has no events yet please select one with events
-                </Label>
-              </div>
-            ))}
+                <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)] capitalize">
+                  {selectedModule?.Events?.map((event) => {
+                    if (event.activityCode) {
+                      const label =
+                        event.activityCode +
+                        " " +
+                        (event.isRecurring
+                          ? event.eventCriteria.dayOfWeek
+                          : event.eventCriteria.date);
+                      return (
+                        <SelectItem
+                          key={label}
+                          value={label}
+                          className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
+                        >
+                          {label}
+                        </SelectItem>
+                      );
+                    }
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+          }
         </div>
       </CardContent>
     </Card>
