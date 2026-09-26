@@ -169,14 +169,18 @@ pub fn attach_id(
 }
 
 pub fn is_hands_up(new_person: &DetectedPersonPose) -> bool {
-    let bottom_boundary = (new_person.center_mass.y + new_person.nose.y) / 2.0;
+    let head_boundary = new_person.nose.y;
 
     let right_hand_up =
-        new_person.right_arm.len() > 1 && new_person.right_arm[1].y <= bottom_boundary;
+        new_person.right_arm.len() > 1 && new_person.right_arm[1].y <= head_boundary;
 
-    let left_hand_up = new_person.left_arm.len() > 1 && new_person.left_arm[1].y <= bottom_boundary;
+    let left_hand_up = new_person.left_arm.len() > 1 && new_person.left_arm[1].y <= head_boundary;
 
-    right_hand_up || left_hand_up
+    if right_hand_up && left_hand_up {
+        return false;
+    }
+
+    return right_hand_up || left_hand_up;
 }
 pub fn analyze_gaze(person: &DetectedPersonPose) -> GazeDirection {
     let confidence_threshold = 0.4;
