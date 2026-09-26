@@ -62,8 +62,6 @@ export default function CreateVmSession({
   ];
 
   function setDate(date: string) {
-    if (!date) return;
-
     if (selectedEvent) {
       if (selectedEvent.eventCriteria.date) {
         setSelectedDate(selectedEvent.eventCriteria.date);
@@ -120,7 +118,7 @@ export default function CreateVmSession({
 
     if (uniEvent) {
       if (uniEvent.eventCriteria.date) {
-        setDate(uniEvent.eventCriteria.date);
+        setSelectedDate(uniEvent.eventCriteria.date);
       }
       setSelectedEvent(uniEvent);
     }

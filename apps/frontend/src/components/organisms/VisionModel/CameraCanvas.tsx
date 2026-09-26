@@ -7,6 +7,7 @@ import {
   DetectedPerson,
   DetectedPersonPose,
   Keypoint,
+  SessionInferenceResult,
 } from "../../../../utilities/VisionModel/messageTypes";
 import { pose_Manager } from "../../../../utilities/VisionModel/pose_manager";
 import { pose_data_manager } from "../../../../utilities/VisionModel/pose_data_manager";
@@ -82,7 +83,7 @@ export default function CameraCanvas({
 }: CanvasCamProps) {
   return (
     <div className="w-full min-w-fit h-full justify-around flex flex-col gap-y-4 p-4">
-      <div className="w-full min-w-fit h-full flex flex-col justify-center items-center text-center border rounded-2xl ">
+      <div className="w-full min-w-fit h-full flex flex-col justify-center items-center text-center  rounded-2xl ">
         <div className="w-full h-full min-w-fit justify-center items-center flex">
           <CanvasWebcam
             imageFile={imageFile}
@@ -394,22 +395,77 @@ function CanvasWebcam({
     inferenceSettings,
   ]);
 
+  const [sessionRes, SetSessionRes] = useState<SessionInferenceResult>({
+    detected_restless: 0,
+    questions_asked: 0,
+    restless_ids: [],
+    total_frames: 0,
+    total_no_attention: 0,
+    total_paying_attention: 0,
+  });
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    if (cameraLoaded && inferenceSettings.runInference) {
+      interval = setInterval(async () => {
+        if (frameStore.current) {
+          const result = await frameStore.current.analyseAllFrames();
+          if (result) {
+            SetSessionRes(result);
+          }
+        }
+      }, 3 * 1000);
+    } else {
+      if (interval) clearInterval(interval);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [cameraLoaded, inferenceSettings.runInference]);
+
   const showCanvas = imageFile !== null || isCameraActive;
 
-  return showCanvas ? (
-    <>
-      <video ref={videoRef} playsInline muted className="hidden"></video>
-      <canvas
-        ref={canvasRef}
-        width={getCanvasConstraints().width}
-        height={getCanvasConstraints().height}
-        className="w-full h-full rounded-2xl"
-      ></canvas>
-    </>
-  ) : (
-    <div className="w-full h-full text-center items-center justify-center flex gap-x-2">
-      Camera Disabled
-      <CircleX />
+  return (
+    <div className="w-full h-full gap-4 grid grid-cols-1 md:grid-cols-3  ">
+      <div className="w-full col-span-2 h-full items-center flex justify-center ">
+        <video ref={videoRef} playsInline muted className="hidden"></video>
+        {showCanvas ? (
+          <canvas
+            ref={canvasRef}
+            width={getCanvasConstraints().width}
+            height={getCanvasConstraints().height}
+            className="w-full h-full rounded-2xl object-contain border border-[var(--border)]"
+          ></canvas>
+        ) : (
+          <div className="w-full h-full text-center items-center  justify-center flex gap-x-2 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)]">
+            Camera Disabled
+            <CircleX />
+          </div>
+        )}
+      </div>
+
+      <div className="w-full  border border-[var(--border)] bg-[var(--bg-surface)] rounded-2xl p-4 flex flex-col shadow-sm">
+        <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-2">
+          Session Details
+        </h3>
+
+        <div className="w-full grid grid-cols-3 my-2 gap-y-4">
+          <h2 className="text-[15px] font-medium leading-[1.4] col-span-3 text-[var(--text-primary)]">
+            Processing Results
+          </h2>
+          <span className="col-span-2">Questions asked :</span>{" "}
+          {`${sessionRes.questions_asked}`}
+          <span className="col-span-2">Paying Attention : </span>
+          {sessionRes.total_frames > 0
+            ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+            : "0.00%"}
+          <span className="col-span-2">Not Paying Attention : </span>
+          {sessionRes.total_frames > 0
+            ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+            : "0.00%"}
+        </div>
+      </div>
     </div>
   );
 }
