@@ -232,6 +232,42 @@ describe('VisionService', () => {
     });
   }); //END_Test_update
 
+  //Delete
+  describe('Test_delete', () => {
+    it('should throw NotFoundException when session does not exist', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        delete: [[]],
+      });
+
+      //Act + Assert
+      await expect(service.delete('session-1')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('should return the deleted session', async () => {
+      //Arrange
+      const session = createVisionSession({
+        SessionID: 'session-1',
+        SessionName: 'Lecture 1',
+      });
+      mockTransaction(mockDb, {
+        delete: [[session]],
+      });
+
+      //Act
+      const result = await service.delete(session.SessionID);
+
+      //Assert
+      expect(result).toEqual({
+        SessionID: session.SessionID,
+        SessionName: session.SessionName,
+        success: true,
+      });
+    });
+  }); //END_Test_delete
+
   //Helpers
 
   describe('Test_validateCreateInput', () => {

@@ -14,6 +14,7 @@ import { Event, UniversityEvent, VisionSession } from 'src/entities';
 import { ModuleServiceV2 } from 'src/Module/moduleV2.service';
 import {
   CreateVisionSessionInput,
+  DeleteVisionSessionResponseDto,
   SessionInferenceResult,
   UpdateVisionSessionDto,
   VisionSessionDto,
@@ -143,7 +144,6 @@ export class VisionService {
     };
   } //END_getAll
 
-  // Update vision session
   async update(
     sessionId: string,
     dto: UpdateVisionSessionDto,
@@ -191,6 +191,33 @@ export class VisionService {
       message: 'Vision session updated successfully',
     };
   } //END_update
+
+  async delete(
+    sessionId: string,
+    tx?: AppDatabase,
+  ): Promise<DeleteVisionSessionResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.delete(sessionId, t);
+      });
+    } //END_transaction
+
+    const [deletedSession] = await tx
+      .delete(VisionSession)
+      .where(eq(VisionSession.SessionID, sessionId))
+      .returning();
+
+    if (!deletedSession) {
+      this.OOPSIE.warn(`Vision session not found for deletion [${sessionId}]`);
+      throw new NotFoundException(`Vision session not found.`);
+    }
+
+    return {
+      SessionID: deletedSession.SessionID,
+      SessionName: deletedSession.SessionName,
+      success: true,
+    };
+  } //END_delete
 
   //🎅's little helpers
 
