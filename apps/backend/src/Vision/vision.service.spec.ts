@@ -11,7 +11,10 @@ import { VisionService } from './vision.service';
 //Mock Database and factories
 import {
   createCreateVisionSessionInput,
+  createSessionInferenceResult,
+  createUpdateVisionSessionDto,
   createVisionSession,
+  createVisionSessionDto,
   createVisionSessionQueryDto,
 } from '../Testing/Factories/';
 import {
@@ -162,6 +165,72 @@ describe('VisionService', () => {
       expect(result.sessions[0].Data).toEqual(sessionA.Data);
     });
   }); //END_Test_getAll
+
+  //Update
+  describe('Test_update', () => {
+    const sessionId = 'session-1';
+
+    it('should throw InternalServerErrorException when update fails', async () => {
+      //Arrange
+      const dto = createUpdateVisionSessionDto({ SessionName: 'New Name' });
+      const existing = createVisionSessionDto({ SessionID: sessionId });
+      jest.spyOn(service, 'getById').mockResolvedValue({ session: existing });
+      jest
+        .spyOn(service as any, 'validateUpdateInput')
+        .mockResolvedValue({ SessionName: 'New Name' });
+      mockTransaction(mockDb, {
+        update: [[]],
+      });
+
+      //Act + Assert
+      await expect(service.update(sessionId, dto)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+    });
+
+    it('should return early when nothing to update', async () => {
+      //Arrange
+      const dto = createUpdateVisionSessionDto();
+      const existing = createVisionSessionDto({ SessionID: sessionId });
+      jest.spyOn(service, 'getById').mockResolvedValue({ session: existing });
+      jest.spyOn(service as any, 'validateUpdateInput').mockResolvedValue({});
+      mockTransaction(mockDb, {});
+
+      //Act
+      const result = await service.update(sessionId, dto);
+
+      //Assert
+      expect(result.session).toEqual(existing);
+      expect(result.message).toBe('Nothing to update for session');
+    });
+
+    it('should return the updated session', async () => {
+      //Arrange
+      const dto = createUpdateVisionSessionDto({ SessionName: 'New Name' });
+      const existing = createVisionSessionDto({ SessionID: sessionId });
+      const updated = createVisionSession({
+        SessionID: sessionId,
+        SessionName: 'New Name',
+      });
+      jest.spyOn(service, 'getById').mockResolvedValue({ session: existing });
+      jest
+        .spyOn(service as any, 'validateUpdateInput')
+        .mockResolvedValue({ SessionName: 'New Name' });
+
+      mockTransaction(mockDb, {
+        update: [[updated]],
+      });
+
+      //Act
+      const result = await service.update(sessionId, dto);
+
+      //Assert
+      expect(result.message).toBe('Vision session updated successfully');
+      expect(result.session.SessionID).toBe(updated.SessionID);
+      expect(result.session.SessionName).toBe('New Name');
+      expect(result.session.Data).toEqual(updated.Data);
+    });
+  }); //END_Test_update
 
   //Helpers
 
@@ -331,4 +400,170 @@ describe('VisionService', () => {
       expect(result).toEqual({ sessionId: 'session-1' });
     });
   }); //END_Test_findDuplicateSession
+
+  describe('Test_validateUpdateInput', () => {
+    const existing = createVisionSessionDto({
+      SessionID: 'session-1',
+      ModuleID: moduleId,
+      SessionName: 'Original Name',
+      SessionDsc: 'Original description',
+      Date: '2026-12-15',
+      EventID: null,
+    });
+
+    it('should return empty object when input has no fields', async () => {
+      //Arrange
+      const input = createUpdateVisionSessionDto();
+
+      //Act
+      const result = await (service as any).validateUpdateInput(
+        existing,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toEqual({});
+    });
+
+    it('should throw BadRequestException when SessionName is empty after trim', async () => {
+      //Arrange
+      const input = createUpdateVisionSessionDto({ SessionName: '   ' });
+
+      //Act + Assert
+      await expect(
+        (service as any).validateUpdateInput(existing, input, mockDb),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should validate event when EventID provided', async () => {
+      //Arrange
+      const input = createUpdateVisionSessionDto({ EventID: 'event-1' });
+      const eventSpy = jest
+        .spyOn(service as any, 'validateEventBelongsToModule')
+        .mockResolvedValue(undefined);
+      jest
+        .spyOn(service as any, 'findDuplicateSession')
+        .mockResolvedValue(undefined);
+
+      //Act
+      const result = await (service as any).validateUpdateInput(
+        existing,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.EventID).toBe('event-1');
+      expect(eventSpy).toHaveBeenCalledWith('event-1', moduleId, mockDb);
+    });
+
+    it('should set EventID to null without validating when null provided', async () => {
+      //Arrange
+      const input = createUpdateVisionSessionDto({ EventID: null });
+      const eventSpy = jest.spyOn(
+        service as any,
+        'validateEventBelongsToModule',
+      );
+      jest
+        .spyOn(service as any, 'findDuplicateSession')
+        .mockResolvedValue(undefined);
+
+      //Act
+      const result = await (service as any).validateUpdateInput(
+        existing,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.EventID).toBeNull();
+      expect(eventSpy).not.toHaveBeenCalled();
+    });
+
+    it('should throw ConflictException when a duplicate exists with a different ID', async () => {
+      //Arrange
+      const input = createUpdateVisionSessionDto({ SessionName: 'New Name' });
+      jest
+        .spyOn(service as any, 'findDuplicateSession')
+        .mockResolvedValue({ sessionId: 'other-session' });
+
+      //Act + Assert
+      await expect(
+        (service as any).validateUpdateInput(existing, input, mockDb),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('should allow identity change when the duplicate is the same session', async () => {
+      //Arrange
+      const input = createUpdateVisionSessionDto({ SessionName: 'New Name' });
+      jest
+        .spyOn(service as any, 'findDuplicateSession')
+        .mockResolvedValue({ sessionId: existing.SessionID });
+
+      //Act
+      const result = await (service as any).validateUpdateInput(
+        existing,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.SessionName).toBe('New Name');
+    });
+
+    it('should return all validated fields when all provided and unique', async () => {
+      //Arrange
+      const input = createUpdateVisionSessionDto({
+        SessionName: '  New Name  ',
+        SessionDsc: '  New desc  ',
+        Data: createSessionInferenceResult({ questions_asked: 5 }),
+        EventID: 'event-1',
+        Date: '2026-12-20',
+      });
+      jest
+        .spyOn(service as any, 'validateEventBelongsToModule')
+        .mockResolvedValue(undefined);
+      jest
+        .spyOn(service as any, 'findDuplicateSession')
+        .mockResolvedValue(undefined);
+
+      //Act
+      const result = await (service as any).validateUpdateInput(
+        existing,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toEqual({
+        SessionName: 'New Name',
+        SessionDsc: 'New desc',
+        Data: input.Data,
+        EventID: 'event-1',
+        Date: '2026-12-20',
+      });
+    });
+  }); //END_Test_validateUpdateInput
+
+  describe('Test_validateDate', () => {
+    it('should throw BadRequestException when date is invalid', () => {
+      //Act + Assert
+      expect(() => (service as any).validateDate('not-a-date')).toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should throw BadRequestException when date is in the past', () => {
+      //Act + Assert
+      expect(() => (service as any).validateDate('2020-01-01')).toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should not throw for a valid future date', () => {
+      //Act + Assert
+      expect(() => (service as any).validateDate('2026-12-01')).not.toThrow();
+    });
+  }); //END_Test_validateDate
 }); //END_VisionService

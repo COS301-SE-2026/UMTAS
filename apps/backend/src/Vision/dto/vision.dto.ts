@@ -157,8 +157,6 @@ export class UpdateVisionSessionDto extends PartialType(
   ] as const),
 ) {} //END_UpdateVisionSessionDto
 
-export class UpdateVisionSessionInput extends UpdateVisionSessionDto {} //END_UpdateVisionSessionInput
-
 //Responses
 export class VisionSessionSingleResponseDto {
   @ApiProperty({ type: VisionSessionDto })

@@ -4,8 +4,11 @@ import { VisionSession } from '../../entities';
 import {
   CreateVisionSessionInput,
   SessionInferenceResult,
+  UpdateVisionSessionDto,
+  VisionSessionDto,
   VisionSessionQueryDto,
 } from 'src/Vision/dto';
+import { moduleId } from '../constants';
 
 type VisionSessionEntity = typeof VisionSession.$inferSelect;
 
@@ -73,3 +76,28 @@ export function createVisionSessionQueryDto(
     ...overrides,
   };
 } //END_createVisionSessionQueryDto
+
+export function createVisionSessionDto(
+  overrides: Partial<VisionSessionDto> = {},
+): VisionSessionDto {
+  return {
+    SessionID: 'session-1',
+    ModuleID: moduleId,
+    EventID: null,
+    Date: '2026-12-15',
+    SessionName: 'Test Session',
+    SessionDsc: null,
+    Data: createSessionInferenceResult(),
+    CreatedBy: null,
+    CreatedAt: new Date().toISOString(),
+    ...overrides,
+  };
+}
+
+export function createUpdateVisionSessionDto(
+  overrides: Partial<UpdateVisionSessionDto> = {},
+): UpdateVisionSessionDto {
+  return {
+    ...overrides,
+  };
+}

@@ -15,6 +15,7 @@ import { ModuleServiceV2 } from 'src/Module/moduleV2.service';
 import {
   CreateVisionSessionInput,
   SessionInferenceResult,
+  UpdateVisionSessionDto,
   VisionSessionDto,
   VisionSessionListResponseDto,
   VisionSessionQueryDto,
@@ -142,6 +143,55 @@ export class VisionService {
     };
   } //END_getAll
 
+  // Update vision session
+  async update(
+    sessionId: string,
+    dto: UpdateVisionSessionDto,
+    tx?: AppDatabase,
+  ): Promise<VisionSessionSingleResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.update(sessionId, dto, t);
+      });
+    } //END_transaction
+
+    //Validate session exists - throws 404
+    const existingSession = (await this.getById(sessionId, tx)).session;
+
+    const updateValues = await this.validateUpdateInput(
+      existingSession,
+      dto,
+      tx,
+    );
+
+    //nothing to update -> return early
+    if (Object.keys(updateValues).length === 0) {
+      this.OOPSIE.log(`Nothing to update for session[${sessionId}]`);
+      return {
+        session: existingSession,
+        message: `Nothing to update for session`,
+      };
+    }
+
+    const [updatedSession] = await tx
+      .update(VisionSession)
+      .set(updateValues)
+      .where(eq(VisionSession.SessionID, sessionId))
+      .returning();
+
+    if (!updatedSession) {
+      this.OOPSIE.fatal(`Failed to update vision session [${sessionId}]`);
+      throw new InternalServerErrorException(
+        'Vision session failed to be updated',
+      );
+    }
+
+    return {
+      session: visionSessionDtoAdapter(updatedSession),
+      message: 'Vision session updated successfully',
+    };
+  } //END_update
+
   //🎅's little helpers
 
   /**
@@ -170,19 +220,7 @@ export class VisionService {
     if (eventId) await this.validateEventBelongsToModule(eventId, moduleId, tx);
 
     // Date
-    const sessionDate = new Date(input.Date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (sessionDate < today) {
-      //Cannot be date in past
-      this.OOPSIE.warn(
-        `Cannot create vision session in the past [${input.Date}]`,
-      );
-      throw new BadRequestException(
-        `Vision session date cannot be in the past`,
-      );
-    }
+    this.validateDate(input.Date);
 
     //Session Name
     const sessionName = input.SessionName.trim();
@@ -272,6 +310,119 @@ export class VisionService {
 
     return session;
   } //END_findDuplicateSession
+
+  /**
+   * Validates and normalises a vision session update
+   *
+   * @param existingSession - Existing session
+   * @param input - Update input
+   * @param tx - transaction
+   * @returns Normalised update values
+   */
+  private async validateUpdateInput(
+    existingSession: VisionSessionDto,
+    input: UpdateVisionSessionDto,
+    tx: AppDatabase,
+  ): Promise<UpdateVisionSessionDto> {
+    const validated: UpdateVisionSessionDto = {};
+
+    //SessinoName
+    const sessionName =
+      input.SessionName !== undefined
+        ? input.SessionName.trim()
+        : existingSession.SessionName;
+
+    if (input.SessionName !== undefined) {
+      if (sessionName.length === 0)
+        throw new BadRequestException('SessionName cannot be empty');
+
+      validated.SessionName = sessionName;
+    }
+
+    //Description
+    if (input.SessionDsc !== undefined)
+      validated.SessionDsc = input.SessionDsc?.trim() ?? null;
+
+    //Data
+    if (input.Data !== undefined)
+      validated.Data = copyInferenceData(input.Data);
+
+    //Event
+    const eventId =
+      input.EventID !== undefined ? input.EventID : existingSession.EventID;
+
+    if (input.EventID !== undefined) {
+      if (eventId)
+        await this.validateEventBelongsToModule(
+          eventId,
+          existingSession.ModuleID,
+          tx,
+        );
+
+      validated.EventID = eventId;
+    }
+
+    //Date
+    const sessionDate = input.Date ?? existingSession.Date;
+    if (input.Date !== undefined) {
+      this.validateDate(input.Date);
+      validated.Date = input.Date;
+    }
+
+    //If name changed or date - validate duplicates
+    const sessionIdentityChanged =
+      sessionName !== existingSession.SessionName ||
+      sessionDate !== existingSession.Date;
+
+    if (sessionIdentityChanged) {
+      const duplicateSession = await this.findDuplicateSession(
+        existingSession.ModuleID,
+        sessionName,
+        sessionDate,
+        tx,
+      );
+
+      if (
+        duplicateSession &&
+        duplicateSession.sessionId !== existingSession.SessionID
+      ) {
+        this.OOPSIE.warn(
+          `Vision session name/date conflict for module[${existingSession.ModuleID}]`,
+        );
+
+        throw new ConflictException(
+          'A vision session with that name already exists for module on specified date',
+        );
+      }
+    }
+
+    return validated;
+  } //END_validateUpdateInput
+
+  /**
+   * Validates a vision session date is a valid calendar date in the future or today.
+   *
+   * @param date - Date string to validate.
+   * @throws BadRequestException when the date is invalid or in the past.
+   */
+  private validateDate(date: string): void {
+    const sessionDate = new Date(date);
+
+    if (Number.isNaN(sessionDate.getTime()))
+      throw new BadRequestException('Invalid vision session date');
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (sessionDate < today) {
+      this.OOPSIE.warn(
+        `Cannot update vision session with a past date [${date}]`,
+      );
+      throw new BadRequestException(
+        'Vision session date cannot be in the past',
+      );
+    }
+  } //END_validateDate
 } //END_VisionService
 
 function copyInferenceData(
