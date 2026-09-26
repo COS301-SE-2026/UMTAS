@@ -20,6 +20,8 @@ import { moduleDTO } from "@/app/course-management/queries/modules/moduleBuilder
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
+import { useErrorListener } from "@/hooks/errorListener";
+import { errorName } from "../../../../utilities/errorCries";
 
 export default function CreateVmSession() {
   const { data: allModules = [], isLoading: isLoadingModules } = useQuery({
@@ -32,6 +34,46 @@ export default function CreateVmSession() {
     },
   });
   const [filterText, setFilterText] = useState<string>("");
+  const [selectedDate, setSelectedDate] = useState<string>("");
+
+  useErrorListener();
+  const DAYS = [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+  ];
+
+  function setDate(date: string) {
+    if (!date) return;
+
+    if (selectedEvent) {
+      if (selectedEvent.eventCriteria.date) {
+        setSelectedDate(selectedEvent.eventCriteria.date);
+      } else if (
+        selectedEvent.isRecurring &&
+        selectedEvent.eventCriteria.dayOfWeek
+      ) {
+        const requiredDay = selectedEvent.eventCriteria.dayOfWeek.toLowerCase();
+        const targetIndex = DAYS.indexOf(requiredDay);
+
+        if (new Date(date).getDay() === targetIndex) {
+          setSelectedDate(date);
+        } else {
+          window.dispatchEvent(
+            new CustomEvent(errorName, {
+              detail: {
+                userMessage: `Please ensure a date is selected on a ${requiredDay}`,
+              },
+            }),
+          );
+        }
+      }
+    }
+  }
 
   function filterModules(query: string) {
     const lowerQuery = query.toLowerCase();
@@ -138,58 +180,68 @@ export default function CreateVmSession() {
             </Select>
           </div>
 
-          {
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-[var(--text-primary)]">
-                Select Event Type
-              </Label>
-              <Select
-                disabled={selectedModule == null}
-                value={
-                  selectedEvent && selectedEvent.activityCode
-                    ? selectedEvent.activityCode +
-                      " " +
-                      (selectedEvent.isRecurring
-                        ? selectedEvent.eventCriteria.dayOfWeek
-                        : selectedEvent.eventCriteria.date)
-                    : ""
-                }
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-[var(--text-primary)]">
+              Select Event Type
+            </Label>
+            <Select
+              disabled={selectedModule == null}
+              value={
+                selectedEvent && selectedEvent.activityCode
+                  ? selectedEvent.activityCode +
+                    " " +
+                    (selectedEvent.isRecurring
+                      ? selectedEvent.eventCriteria.dayOfWeek
+                      : selectedEvent.eventCriteria.date)
+                  : ""
+              }
 
-                onValueChange={(v) => {
-                  findSetEvent(v);
-                }}
+              onValueChange={(v) => {
+                findSetEvent(v);
+              }}
+            >
+              <SelectTrigger
+                data-testid="event-Module-Select"
+                className="w-80 max-w-100"
               >
-                <SelectTrigger
-                  data-testid="event-Module-Select"
-                  className="w-80 max-w-100"
-                >
-                  <SelectValue placeholder="Select an event type" />
-                </SelectTrigger>
+                <SelectValue placeholder="Select an event type" />
+              </SelectTrigger>
 
-                <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)] capitalize">
-                  {selectedModule?.Events?.map((event) => {
-                    if (event.activityCode) {
-                      const label =
-                        event.activityCode +
-                        " " +
-                        (event.isRecurring
-                          ? event.eventCriteria.dayOfWeek
-                          : event.eventCriteria.date);
-                      return (
-                        <SelectItem
-                          key={label}
-                          value={label}
-                          className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
-                        >
-                          {label}
-                        </SelectItem>
-                      );
-                    }
-                  })}
-                </SelectContent>
-              </Select>
-            </div>
-          }
+              <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)] capitalize">
+                {selectedModule?.Events?.map((event) => {
+                  if (event.activityCode) {
+                    const label =
+                      event.activityCode +
+                      " " +
+                      (event.isRecurring
+                        ? event.eventCriteria.dayOfWeek
+                        : event.eventCriteria.date);
+                    return (
+                      <SelectItem
+                        key={label}
+                        value={label}
+                        className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
+                      >
+                        {label}
+                      </SelectItem>
+                    );
+                  }
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-[var(--text-primary)]">
+              Select Date
+            </Label>
+            <Input
+              type="date"
+              disabled={selectedEvent == null}
+              value={selectedDate}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-80 max-w-100 bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
+            />
+          </div>
         </div>
       </CardContent>
     </Card>
