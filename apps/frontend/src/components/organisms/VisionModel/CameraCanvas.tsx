@@ -12,6 +12,7 @@ import {
 import { pose_Manager } from "../../../../utilities/VisionModel/pose_manager";
 import { pose_data_manager } from "../../../../utilities/VisionModel/pose_data_manager";
 import SessionStorePose from "../../../../utilities/VisionModel/sessionStore/poseSessionStore";
+import { Button } from "@/components/atoms/baseShadcn/button";
 
 const KEY_SCORE_THRESHOLD = 0.15;
 
@@ -59,14 +60,17 @@ function getCanvasConstraints() {
     height: 640,
   };
 }
+
 export interface DetectionSettings {
   runDetection: boolean;
-  DetectionInterval: number; // in seconds
+  DetectionInterval: number;
 }
+
 export interface InferenceSettings {
   runInference: boolean;
-  InferenceInterval: number; // in seconds
+  InferenceInterval: number;
 }
+
 interface CanvasCamProps {
   isCameraActive: boolean;
   detectionSettings: DetectionSettings;
@@ -82,9 +86,9 @@ export default function CameraCanvas({
   inferenceSettings,
 }: CanvasCamProps) {
   return (
-    <div className="w-full min-w-fit h-full justify-around flex flex-col gap-y-4 p-4">
-      <div className="w-full min-w-fit h-full flex flex-col justify-center items-center text-center  rounded-2xl ">
-        <div className="w-full h-full min-w-fit justify-center items-center flex">
+    <div className="w-full h-full flex flex-col p-4">
+      <div className="w-full h-full flex flex-col justify-center items-center rounded-2xl">
+        <div className="w-full h-full flex">
           <CanvasWebcam
             imageFile={imageFile}
             isCameraActive={isCameraActive}
@@ -205,7 +209,6 @@ function CanvasWebcam({
     };
   }, [isCameraActive, imageFile]);
 
-  // Render loop for Canvas
   useEffect(() => {
     const isReady = imageFile ? imageLoaded : cameraLoaded;
     if (!isReady) return;
@@ -232,6 +235,7 @@ function CanvasWebcam({
             detectionSettings.DetectionInterval * 1000;
           const inferenceIntervalMs =
             inferenceSettings.InferenceInterval * 1000;
+
           if (
             detectionSettings.runDetection &&
             timestamp - lastRunRef.current >= detectionIntervalMs
@@ -256,6 +260,7 @@ function CanvasWebcam({
                 }
               });
           }
+
           if (
             inferenceSettings.runInference &&
             timestamp - lastRunRef.current >= inferenceIntervalMs
@@ -277,8 +282,9 @@ function CanvasWebcam({
                       const frame = ++frameCounterRef.current;
                       if (frameStore.current?.getNumFrames() === 0) {
                         frameStore.current.sendFirst(frame, timestamp, people);
-                      } else
+                      } else {
                         frameStore.current?.sendData(frame, timestamp, people);
+                      }
                     }
                   });
                 }
@@ -322,16 +328,13 @@ function CanvasWebcam({
 
               const leftElbow = data.left_arm?.[0];
               const leftWrist = data.left_arm?.[1];
-
               const rightElbow = data.right_arm?.[0];
               const rightWrist = data.right_arm?.[1];
 
               drawSegment(context, data.left_shoulder, data.center_mass);
               drawSegment(context, data.right_shoulder, data.center_mass);
-
               drawSegment(context, data.left_shoulder, leftElbow);
               drawSegment(context, leftElbow, leftWrist);
-
               drawSegment(context, data.right_shoulder, rightElbow);
               drawSegment(context, rightElbow, rightWrist);
               drawSegment(context, data.nose, data.center_mass);
@@ -403,10 +406,11 @@ function CanvasWebcam({
     total_no_attention: 0,
     total_paying_attention: 0,
   });
+
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
-    if (cameraLoaded && inferenceSettings.runInference) {
+    if ((cameraLoaded || imageLoaded) && inferenceSettings.runInference) {
       interval = setInterval(async () => {
         if (frameStore.current) {
           const result = await frameStore.current.analyseAllFrames();
@@ -422,48 +426,83 @@ function CanvasWebcam({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [cameraLoaded, inferenceSettings.runInference]);
+  }, [cameraLoaded, imageLoaded, inferenceSettings.runInference]);
 
   const showCanvas = imageFile !== null || isCameraActive;
 
   return (
-    <div className="w-full h-full gap-4 grid grid-cols-1 md:grid-cols-3  ">
-      <div className="w-full col-span-2 h-full items-center flex justify-center ">
+    <div className="w-full h-full flex flex-col lg:flex-row gap-6 items-center lg:items-stretch">
+      {/* Canvas / Video Feed Section (Takes up available proportional space) */}
+      <div className="flex-1 w-full h-full flex items-center justify-center bg-[var(--bg-elevated)] rounded-2xl border border-[var(--border)] overflow-hidden p-2">
         <video ref={videoRef} playsInline muted className="hidden"></video>
         {showCanvas ? (
           <canvas
             ref={canvasRef}
             width={getCanvasConstraints().width}
             height={getCanvasConstraints().height}
-            className="w-full h-full rounded-2xl object-contain border border-[var(--border)]"
+            className="w-full h-full max-h-[75vh] object-contain rounded-xl"
           ></canvas>
         ) : (
-          <div className="w-full h-full text-center items-center  justify-center flex gap-x-2 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)]">
+          <div className="w-full h-[60vh] text-center items-center justify-center flex gap-x-2 text-[var(--text-secondary)]">
             Camera Disabled
-            <CircleX />
+            <CircleX className="w-5 h-5" />
           </div>
         )}
       </div>
 
-      <div className="w-full  border border-[var(--border)] bg-[var(--bg-surface)] rounded-2xl p-4 flex flex-col shadow-sm">
-        <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-2">
-          Session Details
-        </h3>
+      {/* Details Sidebar (Fixed clean width on desktop, full-width on mobile) */}
+      <div className="w-full lg:w-80 border border-[var(--border)] bg-[var(--bg-surface)] rounded-2xl p-5 flex flex-col justify-between shadow-sm shrink-0">
+        <div className="space-y-4">
+          <h3 className="text-base font-semibold text-[var(--text-primary)] border-b border-[var(--border)] pb-3">
+            Session Details
+          </h3>
 
-        <div className="w-full grid grid-cols-3 my-2 gap-y-4">
-          <h2 className="text-[15px] font-medium leading-[1.4] col-span-3 text-[var(--text-primary)]">
-            Processing Results
-          </h2>
-          <span className="col-span-2">Questions asked :</span>{" "}
-          {`${sessionRes.questions_asked}`}
-          <span className="col-span-2">Paying Attention : </span>
-          {sessionRes.total_frames > 0
-            ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
-            : "0.00%"}
-          <span className="col-span-2">Not Paying Attention : </span>
-          {sessionRes.total_frames > 0
-            ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
-            : "0.00%"}
+          <div className="space-y-3">
+            <h2 className="text-sm font-medium text-[var(--text-primary)]">
+              Processing Results
+            </h2>
+
+            <div className="grid grid-cols-2 gap-y-2 text-sm text-[var(--text-secondary)]">
+              <span>Questions asked:</span>
+              <span className="font-medium text-[var(--text-primary)] text-right">
+                {sessionRes.questions_asked}
+              </span>
+
+              <span>Paying Attention:</span>
+              <span className="font-medium text-[var(--text-primary)] text-right">
+                {sessionRes.total_frames > 0
+                  ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                  : "0.00%"}
+              </span>
+
+              <span>Not Paying Attention:</span>
+              <span className="font-medium text-[var(--text-primary)] text-right">
+                {sessionRes.total_frames > 0
+                  ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                  : "0.00%"}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-6 border-t border-[var(--border)] mt-4">
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => {
+              frameStore.current?.clear();
+              SetSessionRes({
+                detected_restless: 0,
+                questions_asked: 0,
+                restless_ids: [],
+                total_frames: 0,
+                total_no_attention: 0,
+                total_paying_attention: 0,
+              });
+            }}
+          >
+            Reset Details
+          </Button>
         </div>
       </div>
     </div>

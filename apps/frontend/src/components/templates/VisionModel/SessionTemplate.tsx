@@ -85,11 +85,11 @@ export default function VM_SessionTemplate() {
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-6 p-6 ">
+          <CardContent className="space-y-6 p-6">
             {/* Camera / image preview */}
             <section
               aria-label="Vision preview"
-              className="overflow-hidden rounded-lg "
+              className="overflow-hidden rounded-lg border w-full "
             >
               <div className="mx-auto w-full max-w-5xl md:aspect-video">
                 <CameraCanvas
