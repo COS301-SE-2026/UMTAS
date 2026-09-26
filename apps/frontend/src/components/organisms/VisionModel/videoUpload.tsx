@@ -94,9 +94,6 @@ export default function VideoUploadComp() {
 
     try {
       while (currentTime < duration && isProcessingRef.current) {
-        const resultsloop = await frameStore.current.analyseAllFrames();
-        console.log(resultsloop);
-
         const timestamp = currentTime * 1000;
 
         videoElement.currentTime = currentTime;
@@ -301,6 +298,14 @@ export default function VideoUploadComp() {
     setCurrentTimeDisplay("0:00 / 0:00");
 
     const context = canvasRef.current?.getContext("2d");
+    SetSessionRes({
+      detected_restless: 0,
+      questions_asked: 0,
+      restless_ids: [],
+      total_frames: 0,
+      total_no_attention: 0,
+      total_paying_attention: 0,
+    });
 
     if (context && canvasRef.current) {
       context.clearRect(
@@ -323,7 +328,7 @@ export default function VideoUploadComp() {
             SetSessionRes(result);
           }
         }
-      }, 5 * 1000);
+      }, 3 * 1000);
     } else {
       if (interval) clearInterval(interval);
     }
@@ -450,6 +455,24 @@ export default function VideoUploadComp() {
               )}
             </div>
 
+            <div className="w-full grid grid-cols-1 my-2 gap-y-2">
+              <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
+                Processing Results
+              </h2>
+              <span>Questions asked : {`${sessionRes.questions_asked}`}</span>
+              <span>
+                Paying Attention :{" "}
+                {sessionRes.total_frames > 0
+                  ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                  : "0.00%"}
+              </span>
+              <span>
+                Not Paying Attention :{" "}
+                {sessionRes.total_frames > 0
+                  ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                  : "0.00%"}
+              </span>
+            </div>
             <div className="mt-auto pt-6">
               <Input
                 ref={uploadVideoRef}
