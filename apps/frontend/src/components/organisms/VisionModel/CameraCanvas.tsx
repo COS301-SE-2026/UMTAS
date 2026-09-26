@@ -13,6 +13,8 @@ import { pose_Manager } from "../../../../utilities/VisionModel/pose_manager";
 import { pose_data_manager } from "../../../../utilities/VisionModel/pose_data_manager";
 import SessionStorePose from "../../../../utilities/VisionModel/sessionStore/poseSessionStore";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import Popup from "@/components/atoms/utility/floatContainer";
+import CreateVmSession from "./createSession";
 
 const KEY_SCORE_THRESHOLD = 0.15;
 
@@ -112,12 +114,15 @@ function CanvasWebcam({
   const imageRef = useRef<HTMLImageElement | null>(null);
 
   const [cameraLoaded, setCameraLoaded] = useState<boolean>(false);
-  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
+  const [createSessionPop, setCreateSessionPop] = useState<boolean>(false);
 
+  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
+  const [sessionID, setSessionID] = useState<string | null>(null);
   const detectedPeopleRef = useRef<DetectedPerson[]>([]);
   const frameStore = useRef<SessionStorePose | null>(null);
   const lastRunRef = useRef<number>(0);
   const frameCounterRef = useRef<number>(0);
+
   // Manage detection workers
   // Lazy initialize frameStore once
 
@@ -444,89 +449,112 @@ function CanvasWebcam({
   const showCanvas = imageFile !== null || isCameraActive;
 
   return (
-    <div className="w-full h-full flex flex-col lg:flex-row gap-6 items-center lg:items-stretch">
-      {/* Canvas / Video Feed Section (Takes up available proportional space) */}
-      <div className="flex-1 w-full h-full flex items-center justify-center bg-[var(--bg-elevated)] rounded-2xl border border-[var(--border)] overflow-hidden p-2">
-        <video ref={videoRef} playsInline muted className="hidden"></video>
-        {showCanvas ? (
-          <canvas
-            ref={canvasRef}
-            width={getCanvasConstraints().width}
-            height={getCanvasConstraints().height}
-            className="w-full h-full max-h-[75vh] object-contain rounded-xl"
-          ></canvas>
-        ) : (
-          <div className="w-full h-[60vh] text-center items-center justify-center flex gap-x-2 text-[var(--text-secondary)]">
-            Camera Disabled
-            <CircleX className="w-5 h-5" />
-          </div>
-        )}
-      </div>
+    <>
+      <div className="w-full h-full flex flex-col lg:flex-row gap-6 items-center lg:items-stretch">
+        <div className="flex-1 w-full h-full flex items-center justify-center bg-[var(--bg-elevated)] rounded-2xl border border-[var(--border)] overflow-hidden p-2">
+          <video ref={videoRef} playsInline muted className="hidden"></video>
+          {showCanvas ? (
+            <canvas
+              ref={canvasRef}
+              width={getCanvasConstraints().width}
+              height={getCanvasConstraints().height}
+              className="w-full h-full max-h-[75vh] object-contain rounded-xl"
+            ></canvas>
+          ) : (
+            <div className="w-full h-[60vh] text-center items-center justify-center flex gap-x-2 text-[var(--text-secondary)]">
+              Camera Disabled
+              <CircleX className="w-5 h-5" />
+            </div>
+          )}
+        </div>
 
-      {/* Details Sidebar (Fixed clean width on desktop, full-width on mobile) */}
-      <div className="w-full lg:w-80 border border-[var(--border)] bg-[var(--bg-surface)] rounded-2xl p-5 flex flex-col justify-between shadow-sm shrink-0">
-        <div className="space-y-4">
-          <h3 className="text-base font-semibold text-[var(--text-primary)] border-b border-[var(--border)] pb-3">
-            Session Details
-          </h3>
+        <div className="w-full lg:w-80 border border-[var(--border)] bg-[var(--bg-surface)] rounded-2xl p-5 flex flex-col justify-between shadow-sm shrink-0">
+          <div className="space-y-4">
+            <h3 className="text-base font-semibold text-[var(--text-primary)] border-b border-[var(--border)] pb-3">
+              Session Details
+            </h3>
 
-          <div className="space-y-3">
-            <h2 className="text-sm font-medium text-[var(--text-primary)]">
-              Processing Results
-            </h2>
+            <div className="space-y-3">
+              <h2 className="text-sm font-medium text-[var(--text-primary)]">
+                Processing Results
+              </h2>
 
-            <div className="grid grid-cols-2 gap-y-2 text-sm text-[var(--text-secondary)]">
-              <span>Questions asked:</span>
-              <span className="font-medium text-[var(--text-primary)] text-right">
-                {sessionRes.questions_asked}
-              </span>
+              <div className="grid grid-cols-2 gap-y-2 text-sm text-[var(--text-secondary)]">
+                <span>Questions asked:</span>
+                <span className="font-medium text-[var(--text-primary)] text-right">
+                  {sessionRes.questions_asked}
+                </span>
 
-              <span>Paying Attention:</span>
-              <span className="font-medium text-[var(--text-primary)] text-right">
-                {sessionRes.total_frames > 0
-                  ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
-                  : "0.00%"}
-              </span>
+                <span>Paying Attention:</span>
+                <span className="font-medium text-[var(--text-primary)] text-right">
+                  {sessionRes.total_frames > 0
+                    ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                    : "0.00%"}
+                </span>
 
-              <span>Not Paying Attention:</span>
-              <span className="font-medium text-[var(--text-primary)] text-right">
-                {sessionRes.total_frames > 0
-                  ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
-                  : "0.00%"}
-              </span>
-              <span>Sitting still:</span>
-              <span className="font-medium text-[var(--text-primary)] text-right">
-                {`${percentageStable.toFixed(2)}%`}
-              </span>
+                <span>Not Paying Attention:</span>
+                <span className="font-medium text-[var(--text-primary)] text-right">
+                  {sessionRes.total_frames > 0
+                    ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                    : "0.00%"}
+                </span>
+                <span>Sitting still:</span>
+                <span className="font-medium text-[var(--text-primary)] text-right">
+                  {`${percentageStable.toFixed(2)}%`}
+                </span>
 
-              <span>Not Sitting still:</span>
-              <span className="font-medium text-[var(--text-primary)] text-right">
-                {`${percentageNotStable.toFixed(2)}%`}
-              </span>
+                <span>Not Sitting still:</span>
+                <span className="font-medium text-[var(--text-primary)] text-right">
+                  {`${percentageNotStable.toFixed(2)}%`}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="pt-6 border-t border-[var(--border)] mt-4">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => {
-              frameStore.current?.clear();
-              SetSessionRes({
-                total_restless_frames: 0,
-                total_stable_frames: 0,
-                questions_asked: 0,
-                total_frames: 0,
-                total_no_attention: 0,
-                total_paying_attention: 0,
-              });
-            }}
-          >
-            Reset Details
-          </Button>
+          <div className="pt-6 flex border-t w-full justify-around border-[var(--border)] mt-4">
+            <Button
+              variant="outline"
+              className=""
+              onClick={() => {
+                frameStore.current?.clear();
+                SetSessionRes({
+                  total_restless_frames: 0,
+                  total_stable_frames: 0,
+                  questions_asked: 0,
+                  total_frames: 0,
+                  total_no_attention: 0,
+                  total_paying_attention: 0,
+                });
+              }}
+            >
+              Reset Details
+            </Button>
+            <Button
+              variant="outline"
+              className=""
+              onClick={() => {
+                setCreateSessionPop(true);
+              }}
+            >
+              Create Session
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+      {createSessionPop == true && (
+        <Popup
+          onClose={() => {
+            setCreateSessionPop(false);
+          }}
+        >
+          <CreateVmSession
+            updateSessionID={(id: string) => {
+              setSessionID(id);
+              setCreateSessionPop(false);
+            }}
+          />
+        </Popup>
+      )}
+    </>
   );
 }
