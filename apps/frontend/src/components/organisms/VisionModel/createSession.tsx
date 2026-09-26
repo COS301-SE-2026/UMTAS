@@ -119,8 +119,9 @@ export default function CreateVmSession() {
       setSelectedEvent(uniEvent);
     }
   }
+
   return (
-    <Card className="w-[min(95vw,960px)] p-2 h-[85vh] overflow-auto border-[var(--border)] bg-[var(--bg-surface)]  shadow-sm">
+    <Card className=" sm:max-w-1/3 w-[min(95vw,960px)] h-[85vh] overflow-auto border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
       <CardHeader className="space-y-1 border-b border-[var(--border)]">
         <CardTitle className="text-lg font-semibold text-[var(--text-primary)]">
           Create or update a session
@@ -131,58 +132,67 @@ export default function CreateVmSession() {
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-6 p-6 flex flex-col items-center w-full h-full ">
-        <div className="space-y-2 w-full max-w-sm">
-          <Label className="text-sm font-medium text-[var(--text-primary)]">
-            Filter Session
-          </Label>
-          <Input
-            type="text"
-            placeholder="Filter Sessions..."
-            value={filterText}
-            onChange={(e) => setFilterText(e.target.value)}
-            className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
-          />
-        </div>
-        <div className="space-y-2 w-full max-w-sm">
-          <Label className="text-sm font-medium text-[var(--text-primary)]">
-            Select Session
-          </Label>
-          <Select
-            value={String(selectedModule?.moduleID ?? "")}
-            onValueChange={(v) => {
-              findSetModule(v);
-            }}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a Module" />
-            </SelectTrigger>
+      <CardContent className="space-y-6 p-3 flex flex-col items-center  w-full h-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl justify-items-center">
+          <h2 className="col-span-1 md:col-span-2 text-[15px] font-medium leading-[1.4] text-[var(--text-primary)] justify-self-start">
+            Re-capture session
+          </h2>
 
-            <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
-              {[].map((m) => {
-                return (
-                  <SelectItem
-                    key={m}
-                    value={String(m)}
-                    className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
-                  >
-                    {"text"}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2 w-full max-w-sm">
-          <Button className="w-full">Re-capture Session</Button>
+          <div className="space-y-2 w-full max-w-sm">
+            <Label className="text-sm font-medium text-[var(--text-primary)]">
+              Filter Session
+            </Label>
+            <Input
+              type="text"
+              placeholder="Filter Sessions..."
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+              className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
+            />
+          </div>
+
+          <div className="space-y-2 w-full max-w-sm">
+            <Label className="text-sm font-medium text-[var(--text-primary)]">
+              Select Session
+            </Label>
+            <Select
+              value={String(selectedModule?.moduleID ?? "")}
+              onValueChange={(v) => {
+                findSetModule(v);
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a session" />
+              </SelectTrigger>
+
+              <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+                {[].map((m) => {
+                  return (
+                    <SelectItem
+                      key={m}
+                      value={String(m)}
+                      className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
+                    >
+                      {"text"}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2 w-full max-w-sm md:col-span-2 flex justify-center">
+            <Button className="w-full md:w-50">Re-capture Session</Button>
+          </div>
         </div>
 
-        <div className="h-[2px] w-full bg-[var(--border)] my-2" />
+        <div className="h-[2px] w-full bg-[var(--border)] my-4" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl justify-items-center">
           <h2 className="col-span-1 md:col-span-2 text-[15px] font-medium leading-[1.4] text-[var(--text-primary)] justify-self-start">
             Create new session
           </h2>
+
           <div className="space-y-2 w-full max-w-sm">
             <Label className="text-sm font-medium text-[var(--text-primary)]">
               Filter Modules
@@ -307,6 +317,7 @@ export default function CreateVmSession() {
               className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
             />
           </div>
+
           <div className="space-y-2 w-full max-w-sm">
             <Label className="text-sm font-medium text-[var(--text-primary)]">
               Describe Session
@@ -321,12 +332,12 @@ export default function CreateVmSession() {
           </div>
         </div>
 
-        <div className="space-y-2 w-full max-w-sm flex justify-center mb-2 p-2">
+        <div className="space-y-2 w-full max-w-sm flex justify-center p-2 mb-2">
           <Button
             disabled={
               selectedDate == "" || sessionName == "" || selectedEvent == null
             }
-            className="w-full"
+            className="w-full md:w-50"
           >
             Create Session
           </Button>
