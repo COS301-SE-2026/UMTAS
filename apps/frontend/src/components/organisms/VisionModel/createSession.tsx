@@ -116,6 +116,54 @@ export default function CreateVmSession() {
               </SelectContent>
             </Select>
           </div>
+
+          {selectedModule &&
+            (selectedModule.Events?.length != 0 ? (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-[var(--text-primary)]">
+                  Select Event Type
+                </Label>
+                <Select
+                  value={String(selectedModule?.moduleID ?? "")}
+                  onValueChange={(v) => {
+                    findSetModule(v);
+                  }}
+                >
+                  <SelectTrigger
+                    data-testid="event-Module-Select"
+                    className="w-80 max-w-100"
+                  >
+                    <SelectValue placeholder="Select an event type" />
+                  </SelectTrigger>
+
+                  <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+                    {selectedModule?.Events?.map((event) => {
+                      const label = event.activityCode;
+
+                      return (
+                        <SelectItem
+                          key={
+                            (event?.activityCode ?? "" + event.isRecurring)
+                              ? event.eventCriteria.dayOfWeek
+                              : event.eventCriteria.date
+                          }
+                          value={String(event.activityCode)}
+                          className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
+                        >
+                          {label}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label className="text-sm   font-medium text-[var(--text-primary)]">
+                  This module has no events yet please select one with events
+                </Label>
+              </div>
+            ))}
         </div>
       </CardContent>
     </Card>
