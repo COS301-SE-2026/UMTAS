@@ -24,3 +24,4 @@ export * from './venue.factory';
 export * from './student-route.factory';
 export * from './route.factory';
 export * from './moduleTeaches.factory';
+export * from './vision.factory';
