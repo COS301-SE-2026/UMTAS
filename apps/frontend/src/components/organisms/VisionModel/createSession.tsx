@@ -17,6 +17,8 @@ import { useQuery } from "@tanstack/react-query";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { useState } from "react";
 import { moduleDTO } from "@/app/course-management/queries/modules/moduleBuilder";
+import { Input } from "@/components/atoms/baseShadcn/input";
+import { Label } from "@/components/atoms/baseShadcn/label";
 
 export default function CreateVmSession() {
   const { data: allModules = [], isLoading: isLoadingModules } = useQuery({
@@ -62,43 +64,58 @@ export default function CreateVmSession() {
       </CardHeader>
 
       <CardContent className="space-y-6 p-6">
-        <div className="w-full space-y-2">
-          <label className="text-sm font-medium text-[var(--text-primary)]">
-            Select Module
-          </label>
+        <div className="w-full space-y-4">
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-[var(--text-primary)]">
+              Filter Modules
+            </Label>
+            <Input
+              type="text"
+              placeholder="Filter modules..."
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+              className="w-80 max-w-100 bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
+            />
+          </div>
 
-          <Select
-            value={String(selectedModule?.moduleID ?? "")}
-            onValueChange={(v) => {
-              findSetModule(v);
-            }}
-          >
-            <SelectTrigger
-              data-testid="event-Module-Select"
-              className=" w-80 max-w-100"
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-[var(--text-primary)]">
+              Select Module
+            </Label>
+
+            <Select
+              value={String(selectedModule?.moduleID ?? "")}
+              onValueChange={(v) => {
+                findSetModule(v);
+              }}
             >
-              <SelectValue placeholder="Select a Module" />
-            </SelectTrigger>
+              <SelectTrigger
+                data-testid="event-Module-Select"
+                className="w-80 max-w-100"
+              >
+                <SelectValue placeholder="Select a Module" />
+              </SelectTrigger>
 
-            <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
-              {filterModules(filterText).map((m) => {
-                let label = m.moduleName;
-                if (m.moduleCode) {
-                  label = `${m.moduleCode} - ${m.moduleName}`;
-                }
+              <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+                {filterModules(filterText).map((m) => {
+                  let label = m.moduleName;
+                  if (m.moduleCode) {
+                    label = `${m.moduleCode} - ${m.moduleName}`;
+                  }
 
-                return (
-                  <SelectItem
-                    key={m.moduleID}
-                    value={String(m.moduleID)}
-                    className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
-                  >
-                    {label}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
+                  return (
+                    <SelectItem
+                      key={m.moduleID}
+                      value={String(m.moduleID)}
+                      className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
+                    >
+                      {label}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </CardContent>
     </Card>
