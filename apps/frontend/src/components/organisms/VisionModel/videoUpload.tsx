@@ -476,10 +476,12 @@ export default function VideoUploadComp() {
                   )}
                 </div>
 
-                <div className="space-y-3">
-                  <h2 className="text-sm font-medium text-[var(--text-primary)]">
-                    Processing Results
-                  </h2>
+                <div className="space-y-3 mt-4 border-t py-4">
+                  <div>
+                    <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
+                      Results:
+                    </h2>
+                  </div>
 
                   <div className="grid grid-cols-2 gap-y-2 text-sm text-[var(--text-secondary)]">
                     <span>Questions asked:</span>
