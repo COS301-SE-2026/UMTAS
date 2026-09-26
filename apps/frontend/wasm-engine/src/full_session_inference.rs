@@ -16,21 +16,23 @@ pub fn analyse_session(frames: JsValue) -> Result<String, JsValue> {
     return serde_json::to_string(&session_data).map_err(|e| JsValue::from_str(&e.to_string()));
 }
 pub fn group_data(full_session: HashMap<usize, SessionPerson>) -> SessionAnalysis {
-    let mut total_restless: usize = 0;
     let mut total_question: usize = 0;
     let mut total_paying_attention: usize = 0;
     let mut total_no_attention: usize = 0;
+    let mut total_restless_frames: usize = 0;
+    let mut total_stable_frames: usize = 0;
     let mut restless_ids: Vec<usize> = Vec::new();
 
     for (&id, session) in &full_session {
-        if let Some(restless_id) = evaluate_restlessness(
+        if let Some((restless_id, restless_count, stable_count)) = evaluate_restlessness(
             id,
             &session.all_center_mass,
             &session.left_shoulder,
             &session.right_shoulder,
         ) {
-            total_restless += 1;
             restless_ids.push(restless_id);
+            total_restless_frames += restless_count;
+            total_stable_frames += stable_count;
         }
         total_question += session.count_hand_up;
         total_paying_attention += session.gaze_paying_attention_count;
@@ -40,9 +42,9 @@ pub fn group_data(full_session: HashMap<usize, SessionPerson>) -> SessionAnalysi
     let total_frames = total_paying_attention + total_no_attention;
 
     return SessionAnalysis {
-        detected_restless: total_restless,
         questions_asked: total_question,
-        restless_ids: restless_ids,
+        total_restless_frames,
+        total_stable_frames,
         total_paying_attention,
         total_no_attention,
         total_frames,
@@ -51,10 +53,10 @@ pub fn group_data(full_session: HashMap<usize, SessionPerson>) -> SessionAnalysi
 
 pub fn evaluate_restlessness(
     id: usize,
-    centers: &[Keypoint],
+    _centers: &[Keypoint],
     left_shoulder: &[Keypoint],
     right_shoulder: &[Keypoint],
-) -> Option<usize> {
+) -> Option<(usize, usize, usize)> {
     if left_shoulder.is_empty() || left_shoulder.len() != right_shoulder.len() {
         return None;
     }
@@ -67,50 +69,66 @@ pub fn evaluate_restlessness(
     }
     let avg_shoulder_width = total_shoulder_width / left_shoulder.len() as f32;
 
-    let mut distances = Vec::new();
-    for i in 1..left_shoulder.len() {
-        let prev_mid_x = (left_shoulder[i - 1].x + right_shoulder[i - 1].x) / 2.0;
-        let prev_mid_y = (left_shoulder[i - 1].y + right_shoulder[i - 1].y) / 2.0;
-        let curr_mid_x = (left_shoulder[i].x + right_shoulder[i].x) / 2.0;
-        let curr_mid_y = (left_shoulder[i].y + right_shoulder[i].y) / 2.0;
-
-        let dx = curr_mid_x - prev_mid_x;
-        let dy = curr_mid_y - prev_mid_y;
-        let distance = (dx.powi(2) + dy.powi(2)).sqrt();
-        distances.push(distance);
+    let mut midpoints = Vec::with_capacity(left_shoulder.len());
+    for i in 0..left_shoulder.len() {
+        let mid_x = (left_shoulder[i].x + right_shoulder[i].x) / 2.0;
+        let mid_y = (left_shoulder[i].y + right_shoulder[i].y) / 2.0;
+        midpoints.push((mid_x, mid_y));
     }
 
-    if distances.is_empty() {
-        return None;
+    let mut smoothed_midpoints = Vec::with_capacity(midpoints.len());
+    let window_size = 3;
+    for i in 0..midpoints.len() {
+        let start = if i >= window_size {
+            i - window_size + 1
+        } else {
+            0
+        };
+
+        let mut sum_x = 0.0;
+        let mut sum_y = 0.0;
+        let mut count = 0.0;
+
+        for j in start..=i {
+            sum_x += midpoints[j].0;
+            sum_y += midpoints[j].1;
+            count += 1.0;
+        }
+
+        smoothed_midpoints.push((sum_x / count, sum_y / count));
     }
 
-    distances.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-
-    let p90_idx = ((distances.len() as f32) * 0.90) as usize;
-    let p90_distance = distances[p90_idx.min(distances.len() - 1)];
-    if p90_distance < avg_shoulder_width * 0.04 {
-        return None;
-    }
-
-    const R_RATIO: f32 = 0.20;
-    let substantial_move = avg_shoulder_width * 0.06;
+    let substantial_move = avg_shoulder_width * 0.05;
     let mut restless_frame_count = 0;
+    let mut stable_frame_count = 0;
 
-    for &dist in &distances {
-        if dist > substantial_move {
+    for i in 1..smoothed_midpoints.len() {
+        let dx = smoothed_midpoints[i].0 - smoothed_midpoints[i - 1].0;
+        let dy = smoothed_midpoints[i].1 - smoothed_midpoints[i - 1].1;
+        let distance = (dx.powi(2) + dy.powi(2)).sqrt();
+
+        if distance > substantial_move {
             restless_frame_count += 1;
+        } else {
+            stable_frame_count += 1;
         }
     }
 
-    let len = distances.len() as f32;
-    let restlessness_ratio = restless_frame_count as f32 / len;
+    let total_evaluated = restless_frame_count + stable_frame_count;
+    if total_evaluated == 0 {
+        return None;
+    }
+
+    let restlessness_ratio = restless_frame_count as f32 / total_evaluated as f32;
+    const R_RATIO: f32 = 0.20;
 
     if restlessness_ratio > R_RATIO {
-        return Some(id);
+        return Some((id, restless_frame_count, stable_frame_count));
     }
 
     return None;
 }
+
 pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson> {
     let mut total_frames_count: HashMap<usize, usize> = HashMap::new();
     let mut inferred_frames_count: HashMap<usize, usize> = HashMap::new();
@@ -269,9 +287,8 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
 #[derive(Serialize)]
 pub struct SessionAnalysis {
     questions_asked: usize,
-    // a measure of everyones center and the average movement of that point
-    detected_restless: usize,
-    restless_ids: Vec<usize>,
+    total_restless_frames: usize,
+    total_stable_frames: usize,
     total_paying_attention: usize,
     total_no_attention: usize,
     total_frames: usize,

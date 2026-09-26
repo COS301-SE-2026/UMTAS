@@ -38,9 +38,9 @@ export default function VideoUploadComp() {
 
   const startTimeRef = useRef<number>(0);
   const [sessionRes, SetSessionRes] = useState<SessionInferenceResult>({
-    detected_restless: 0,
+    total_restless_frames: 0,
+    total_stable_frames: 0,
     questions_asked: 0,
-    restless_ids: [],
     total_frames: 0,
     total_no_attention: 0,
     total_paying_attention: 0,
@@ -302,9 +302,9 @@ export default function VideoUploadComp() {
 
     const context = canvasRef.current?.getContext("2d");
     SetSessionRes({
-      detected_restless: 0,
+      total_restless_frames: 0,
+      total_stable_frames: 0,
       questions_asked: 0,
-      restless_ids: [],
       total_frames: 0,
       total_no_attention: 0,
       total_paying_attention: 0,

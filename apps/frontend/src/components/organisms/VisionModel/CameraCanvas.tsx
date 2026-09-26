@@ -399,9 +399,9 @@ function CanvasWebcam({
   ]);
 
   const [sessionRes, SetSessionRes] = useState<SessionInferenceResult>({
-    detected_restless: 0,
+    total_restless_frames: 0,
+    total_stable_frames: 0,
     questions_asked: 0,
-    restless_ids: [],
     total_frames: 0,
     total_no_attention: 0,
     total_paying_attention: 0,
@@ -492,9 +492,9 @@ function CanvasWebcam({
             onClick={() => {
               frameStore.current?.clear();
               SetSessionRes({
-                detected_restless: 0,
+                total_restless_frames: 0,
+                total_stable_frames: 0,
                 questions_asked: 0,
-                restless_ids: [],
                 total_frames: 0,
                 total_no_attention: 0,
                 total_paying_attention: 0,
