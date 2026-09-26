@@ -31,7 +31,7 @@ export interface CreateSessionProps {
 export default function CreateVmSession({
   updateSessionID,
 }: CreateSessionProps) {
-  const { data: allModules = [], isLoading: isLoadingModules } = useQuery({
+  const { data: allModules = [] } = useQuery({
     queryKey: ["Modules"],
     queryFn: async () => {
       const result = await fetchAllModulesv2({
@@ -40,6 +40,7 @@ export default function CreateVmSession({
       return result.modules;
     },
   });
+
   const [filterText, setFilterText] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [sessionName, setSessionName] = useState<string>("");
@@ -102,7 +103,6 @@ export default function CreateVmSession({
 
   function findSetModule(modID: string) {
     const UniModule = allModules.find((mod) => mod.moduleID === modID);
-
     if (UniModule) setSelectedModule(UniModule);
   }
 
@@ -127,232 +127,229 @@ export default function CreateVmSession({
   }
 
   return (
-    <Card className="  w-[min(95vw,960px)] h-[85vh] overflow-auto border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
+    <Card className="w-[min(90vw,960px)] max-h-[85vh] overflow-auto border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
       <CardHeader className="space-y-1 border-b border-[var(--border)]">
         <CardTitle className="text-lg font-semibold text-[var(--text-primary)]">
           Create or update a session
         </CardTitle>
-
         <CardDescription className="text-sm text-[var(--text-secondary)]">
           A session will hold everything captured from a video or live session
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-6 p-3 flex flex-col items-center  w-full h-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl justify-items-center">
-          <h2 className="col-span-1 md:col-span-2 text-[15px] font-medium leading-[1.4] text-[var(--text-primary)] justify-self-start">
-            Re-capture session
-          </h2>
-
-          <div className="space-y-2 w-full max-w-sm">
-            <Label className="text-sm font-medium text-[var(--text-primary)]">
-              Filter Session
-            </Label>
-            <Input
-              type="text"
-              placeholder="Filter Sessions..."
-              value={filterText}
-              onChange={(e) => setFilterText(e.target.value)}
-              className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
-            />
+      <CardContent className="space-y-6 p-6">
+        <section
+          aria-label="Re-capture session"
+          className="space-y-4 rounded-lg border border-[var(--border)] p-4"
+        >
+          <div>
+            <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
+              Re-capture session
+            </h2>
+            <p className="mt-1 text-xs leading-[1.5] text-[var(--text-secondary)]">
+              Select an existing session to re-capture data.
+            </p>
           </div>
 
-          <div className="space-y-2 w-full max-w-sm">
-            <Label className="text-sm font-medium text-[var(--text-primary)]">
-              Select Session
-            </Label>
-            <Select
-              value={String(selectedModule?.moduleID ?? "")}
-              onValueChange={(v) => {
-                findSetModule(v);
-              }}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a session" />
-              </SelectTrigger>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-[var(--text-primary)]">
+                Filter Session
+              </Label>
+              <Input
+                type="text"
+                placeholder="Filter Sessions..."
+                value={filterText}
+                onChange={(e) => setFilterText(e.target.value)}
+                className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
+              />
+            </div>
 
-              <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
-                {[].map((m) => {
-                  return (
-                    <SelectItem
-                      key={m}
-                      value={String(m)}
-                      className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
-                    >
-                      {"text"}
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-[var(--text-primary)]">
+                Select Session
+              </Label>
+              <Select
+                value={String(selectedModule?.moduleID ?? "")}
+                onValueChange={(v) => findSetModule(v)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a session" />
+                </SelectTrigger>
+                <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]"></SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <div className="space-y-2 w-full max-w-sm md:col-span-2 flex justify-center">
+          <div className="flex justify-end pt-2">
             <Button
-              className="w-full md:w-50"
+              type="button"
+              variant="outline"
+              className="w-full sm:w-auto"
               onClick={() => updateSessionID("Fake flag")}
             >
               Re-capture Session
             </Button>
           </div>
-        </div>
+        </section>
 
-        <div className="h-[2px] w-full bg-[var(--border)] my-4" />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl justify-items-center">
-          <h2 className="col-span-1 md:col-span-2 text-[15px] font-medium leading-[1.4] text-[var(--text-primary)] justify-self-start">
-            Create new session
-          </h2>
-
-          <div className="space-y-2 w-full max-w-sm">
-            <Label className="text-sm font-medium text-[var(--text-primary)]">
-              Filter Modules
-            </Label>
-            <Input
-              type="text"
-              placeholder="Filter modules..."
-              value={filterText}
-              onChange={(e) => setFilterText(e.target.value)}
-              className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
-            />
+        <section
+          aria-label="Create new session"
+          className="space-y-4 rounded-lg border border-[var(--border)] p-4"
+        >
+          <div>
+            <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
+              Create new session
+            </h2>
+            <p className="mt-1 text-xs leading-[1.5] text-[var(--text-secondary)]">
+              Choose a module, event type, and configure your session details.
+            </p>
           </div>
 
-          <div className="space-y-2 w-full max-w-sm">
-            <Label className="text-sm font-medium text-[var(--text-primary)]">
-              Select Module
-            </Label>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-[var(--text-primary)]">
+                Filter Modules
+              </Label>
+              <Input
+                type="text"
+                placeholder="Filter modules..."
+                value={filterText}
+                onChange={(e) => setFilterText(e.target.value)}
+                className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
+              />
+            </div>
 
-            <Select
-              value={String(selectedModule?.moduleID ?? "")}
-              onValueChange={(v) => {
-                findSetModule(v);
-              }}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a Module" />
-              </SelectTrigger>
-
-              <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
-                {filterModules(filterText).map((m) => {
-                  let label = m.moduleName;
-                  if (m.moduleCode) {
-                    label = `${m.moduleCode} - ${m.moduleName}`;
-                  }
-
-                  return (
-                    <SelectItem
-                      key={m.moduleID}
-                      value={String(m.moduleID)}
-                      className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
-                    >
-                      {label}
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2 w-full max-w-sm">
-            <Label className="text-sm font-medium text-[var(--text-primary)]">
-              Select Event Type
-            </Label>
-            <Select
-              disabled={selectedModule == null}
-              value={
-                selectedEvent && selectedEvent.activityCode
-                  ? selectedEvent.activityCode +
-                    " " +
-                    (selectedEvent.isRecurring
-                      ? selectedEvent.eventCriteria.dayOfWeek
-                      : selectedEvent.eventCriteria.date)
-                  : ""
-              }
-              onValueChange={(v) => {
-                findSetEvent(v);
-              }}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select an event type" />
-              </SelectTrigger>
-
-              <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)] capitalize">
-                {selectedModule?.Events?.map((event) => {
-                  if (event.activityCode) {
-                    const label =
-                      event.activityCode +
-                      " " +
-                      (event.isRecurring
-                        ? event.eventCriteria.dayOfWeek
-                        : event.eventCriteria.date);
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-[var(--text-primary)]">
+                Select Module
+              </Label>
+              <Select
+                value={String(selectedModule?.moduleID ?? "")}
+                onValueChange={(v) => findSetModule(v)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a Module" />
+                </SelectTrigger>
+                <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+                  {filterModules(filterText).map((m) => {
+                    let label = m.moduleName;
+                    if (m.moduleCode) {
+                      label = `${m.moduleCode} - ${m.moduleName}`;
+                    }
                     return (
                       <SelectItem
-                        key={label}
-                        value={label}
+                        key={m.moduleID}
+                        value={String(m.moduleID)}
                         className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
                       >
                         {label}
                       </SelectItem>
                     );
-                  }
-                })}
-              </SelectContent>
-            </Select>
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-[var(--text-primary)]">
+                Select Event Type
+              </Label>
+              <Select
+                disabled={selectedModule == null}
+                value={
+                  selectedEvent && selectedEvent.activityCode
+                    ? selectedEvent.activityCode +
+                      " " +
+                      (selectedEvent.isRecurring
+                        ? selectedEvent.eventCriteria.dayOfWeek
+                        : selectedEvent.eventCriteria.date)
+                    : ""
+                }
+                onValueChange={(v) => findSetEvent(v)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select an event type" />
+                </SelectTrigger>
+                <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)] capitalize">
+                  {selectedModule?.Events?.map((event) => {
+                    if (event.activityCode) {
+                      const label =
+                        event.activityCode +
+                        " " +
+                        (event.isRecurring
+                          ? event.eventCriteria.dayOfWeek
+                          : event.eventCriteria.date);
+                      return (
+                        <SelectItem
+                          key={label}
+                          value={label}
+                          className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
+                        >
+                          {label}
+                        </SelectItem>
+                      );
+                    }
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-[var(--text-primary)]">
+                Select Date
+              </Label>
+              <Input
+                type="date"
+                disabled={
+                  selectedEvent == null ||
+                  selectedEvent.eventCriteria.date != null
+                }
+                value={selectedDate}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-[var(--text-primary)]">
+                Name Session
+              </Label>
+              <Input
+                type="text"
+                placeholder="name your session"
+                value={sessionName}
+                onChange={(e) => setSessionName(e.target.value)}
+                className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-[var(--text-primary)]">
+                Describe Session
+              </Label>
+              <Input
+                type="text"
+                placeholder="Describe your session"
+                value={sessionDsc}
+                onChange={(e) => setSessionDsc(e.target.value)}
+                className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
+              />
+            </div>
           </div>
 
-          <div className="space-y-2 w-full max-w-sm">
-            <Label className="text-sm font-medium text-[var(--text-primary)]">
-              Select Date
-            </Label>
-            <Input
-              type="date"
+          <div className="flex justify-end pt-2">
+            <Button
+              type="button"
               disabled={
-                selectedEvent == null ||
-                selectedEvent.eventCriteria.date != null
+                selectedDate == "" || sessionName == "" || selectedEvent == null
               }
-              value={selectedDate}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
-            />
+              className="w-full sm:w-auto"
+            >
+              Create Session
+            </Button>
           </div>
-
-          <div className="space-y-2 w-full max-w-sm">
-            <Label className="text-sm font-medium text-[var(--text-primary)]">
-              Name Session
-            </Label>
-            <Input
-              type="text"
-              placeholder="name your session"
-              value={sessionName}
-              onChange={(e) => setSessionName(e.target.value)}
-              className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
-            />
-          </div>
-
-          <div className="space-y-2 w-full max-w-sm">
-            <Label className="text-sm font-medium text-[var(--text-primary)]">
-              Describe Session
-            </Label>
-            <Input
-              type="text"
-              placeholder="Describe your session"
-              value={sessionDsc}
-              onChange={(e) => setSessionDsc(e.target.value)}
-              className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2 w-full max-w-sm flex justify-center p-2 mb-2">
-          <Button
-            disabled={
-              selectedDate == "" || sessionName == "" || selectedEvent == null
-            }
-            className="w-full md:w-50"
-          >
-            Create Session
-          </Button>
-        </div>
+        </section>
       </CardContent>
     </Card>
   );
