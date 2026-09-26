@@ -19,6 +19,7 @@ import { useState } from "react";
 import { moduleDTO } from "@/app/course-management/queries/modules/moduleBuilder";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
+import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 
 export default function CreateVmSession() {
   const { data: allModules = [], isLoading: isLoadingModules } = useQuery({
@@ -45,11 +46,31 @@ export default function CreateVmSession() {
   }
 
   const [selectedModule, setSelectedModule] = useState<moduleDTO | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<EventResponse | null>(
+    null,
+  );
 
   function findSetModule(modID: string) {
     const UniModule = allModules.find((mod) => mod.moduleID === modID);
 
     if (UniModule) setSelectedModule(UniModule);
+  }
+
+  function findSetEvent(key: string) {
+    const uniEvent = selectedModule?.Events?.find((event) => {
+      const eventKey =
+        event.activityCode +
+        " " +
+        (event.isRecurring
+          ? event.eventCriteria.dayOfWeek
+          : event.eventCriteria.date);
+
+      return eventKey === key;
+    });
+
+    if (uniEvent) {
+      setSelectedEvent(uniEvent);
+    }
   }
   return (
     <Card className="w-[min(90vw,960px)] h-[85vh] overflow-auto border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
@@ -124,9 +145,18 @@ export default function CreateVmSession() {
                   Select Event Type
                 </Label>
                 <Select
-                  value={String(selectedModule?.moduleID ?? "")}
+                  value={
+                    selectedEvent && selectedEvent.activityCode
+                      ? selectedEvent.activityCode +
+                        " " +
+                        (selectedEvent.isRecurring
+                          ? selectedEvent.eventCriteria.dayOfWeek
+                          : selectedEvent.eventCriteria.date)
+                      : ""
+                  }
+
                   onValueChange={(v) => {
-                    findSetModule(v);
+                    findSetEvent(v);
                   }}
                 >
                   <SelectTrigger
@@ -148,7 +178,7 @@ export default function CreateVmSession() {
                         return (
                           <SelectItem
                             key={label}
-                            value={String(event.activityCode)}
+                            value={label}
                             className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
                           >
                             {label}
