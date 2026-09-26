@@ -24,7 +24,13 @@ import { useErrorListener } from "@/hooks/errorListener";
 import { errorName } from "../../../../utilities/errorCries";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
-export default function CreateVmSession() {
+export interface CreateSessionProps {
+  updateSessionID: (id: string) => void;
+}
+
+export default function CreateVmSession({
+  updateSessionID,
+}: CreateSessionProps) {
   const { data: allModules = [], isLoading: isLoadingModules } = useQuery({
     queryKey: ["Modules"],
     queryFn: async () => {
@@ -121,7 +127,7 @@ export default function CreateVmSession() {
   }
 
   return (
-    <Card className=" sm:max-w-1/3 w-[min(95vw,960px)] h-[85vh] overflow-auto border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
+    <Card className="  w-[min(95vw,960px)] h-[85vh] overflow-auto border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
       <CardHeader className="space-y-1 border-b border-[var(--border)]">
         <CardTitle className="text-lg font-semibold text-[var(--text-primary)]">
           Create or update a session
@@ -182,7 +188,12 @@ export default function CreateVmSession() {
           </div>
 
           <div className="space-y-2 w-full max-w-sm md:col-span-2 flex justify-center">
-            <Button className="w-full md:w-50">Re-capture Session</Button>
+            <Button
+              className="w-full md:w-50"
+              onClick={() => updateSessionID("Fake flag")}
+            >
+              Re-capture Session
+            </Button>
           </div>
         </div>
 
