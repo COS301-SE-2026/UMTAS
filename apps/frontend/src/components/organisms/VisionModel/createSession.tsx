@@ -111,6 +111,9 @@ export default function CreateVmSession() {
     });
 
     if (uniEvent) {
+      if (uniEvent.eventCriteria.date) {
+        setDate(uniEvent.eventCriteria.date);
+      }
       setSelectedEvent(uniEvent);
     }
   }
@@ -236,7 +239,10 @@ export default function CreateVmSession() {
             </Label>
             <Input
               type="date"
-              disabled={selectedEvent == null}
+              disabled={
+                selectedEvent == null ||
+                selectedEvent.eventCriteria.date != null
+              }
               value={selectedDate}
               onChange={(e) => setDate(e.target.value)}
               className="w-80 max-w-100 bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
