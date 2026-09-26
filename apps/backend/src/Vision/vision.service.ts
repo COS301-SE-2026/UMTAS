@@ -77,7 +77,29 @@ export class VisionService {
       session: visionSessionDtoAdapter(session),
       message: 'Vision session created successfully',
     };
-  } // END_create
+  } //END_create
+
+  async getById(
+    sessionId: string,
+    tx?: AppDatabase,
+  ): Promise<VisionSessionSingleResponseDto> {
+    const db = tx ?? this.dbService.db;
+
+    const [session] = await db
+      .select()
+      .from(VisionSession)
+      .where(eq(VisionSession.SessionID, sessionId))
+      .limit(1);
+
+    if (!session) {
+      this.OOPSIE.warn(`Vision session not found for [${sessionId}]`);
+      throw new NotFoundException(`Vision session not found`);
+    }
+
+    return {
+      session: visionSessionDtoAdapter(session),
+    };
+  } //END_getById
 
   //🎅's little helpers
 

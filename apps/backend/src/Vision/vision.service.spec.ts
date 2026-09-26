@@ -94,6 +94,35 @@ describe('VisionService', () => {
     });
   }); //END_Test_create
 
+  //GetById
+  describe('Test_getById', () => {
+    it('should throw NotFoundException when no session found', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act + Assert
+      await expect(service.getById('session-1')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('should return the session', async () => {
+      //Arrange
+      const session = createVisionSession();
+      mockDbResult(mockDb.select, [session]);
+
+      //Act
+      const result = await service.getById(session.SessionID);
+
+      //Assert
+      expect(result.session.SessionID).toBe(session.SessionID);
+      expect(result.session.ModuleID).toBe(session.ModuleID);
+      expect(result.session.SessionName).toBe(session.SessionName);
+      expect(result.session.Date).toBe(session.Date);
+      expect(result.session.Data).toEqual(session.Data);
+    });
+  }); //END_Test_getById
+
   //Helpers
 
   describe('Test_validateCreateInput', () => {
