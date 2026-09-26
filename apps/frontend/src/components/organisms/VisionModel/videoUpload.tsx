@@ -15,11 +15,14 @@ import { pose_data_manager } from "../../../../utilities/VisionModel/pose_data_m
 import SessionStorePose from "../../../../utilities/VisionModel/sessionStore/poseSessionStore";
 import { drawPoint, drawSegment } from "./CameraCanvas";
 import { SessionInferenceResult } from "../../../../utilities/VisionModel/messageTypes";
+import CreateVmSession from "./createSession";
 
 export default function VideoUploadComp() {
   const [video, setVideo] = useState<File | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const [sessionID, setSessionID] = useState<string | null>(null);
 
   const isProcessingRef = useRef<boolean>(false);
   const uploadVideoRef = useRef<HTMLInputElement>(null);
@@ -338,6 +341,10 @@ export default function VideoUploadComp() {
     };
   }, [isProcessing]);
 
+  if (!sessionID) {
+    return <CreateVmSession></CreateVmSession>;
+  }
+
   return (
     <Card className="w-[min(90vw,960px)] max-h-[85vh] overflow-auto border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
       <CardHeader className="space-y-1 border-b border-[var(--border)]">
@@ -455,23 +462,20 @@ export default function VideoUploadComp() {
               )}
             </div>
 
-            <div className="w-full grid grid-cols-1 my-2 gap-y-2">
-              <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
+            <div className="w-full grid grid-cols-3 my-2 gap-y-4">
+              <h2 className="text-[15px] font-medium leading-[1.4] col-span-3 text-[var(--text-primary)]">
                 Processing Results
               </h2>
-              <span>Questions asked : {`${sessionRes.questions_asked}`}</span>
-              <span>
-                Paying Attention :{" "}
-                {sessionRes.total_frames > 0
-                  ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
-                  : "0.00%"}
-              </span>
-              <span>
-                Not Paying Attention :{" "}
-                {sessionRes.total_frames > 0
-                  ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
-                  : "0.00%"}
-              </span>
+              <span className="col-span-2">Questions asked :</span>{" "}
+              {`${sessionRes.questions_asked}`}
+              <span className="col-span-2">Paying Attention : </span>
+              {sessionRes.total_frames > 0
+                ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                : "0.00%"}
+              <span className="col-span-2">Not Paying Attention : </span>
+              {sessionRes.total_frames > 0
+                ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                : "0.00%"}
             </div>
             <div className="mt-auto pt-6">
               <Input
