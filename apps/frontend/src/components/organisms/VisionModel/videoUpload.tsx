@@ -341,6 +341,19 @@ export default function VideoUploadComp() {
     };
   }, [isProcessing]);
 
+  const totalRestlessFramesCount =
+    sessionRes.total_restless_frames + sessionRes.total_stable_frames;
+
+  const percentageStable =
+    totalRestlessFramesCount > 0
+      ? (sessionRes.total_stable_frames / totalRestlessFramesCount) * 100
+      : 0;
+
+  const percentageNotStable =
+    totalRestlessFramesCount > 0
+      ? (sessionRes.total_restless_frames / totalRestlessFramesCount) * 100
+      : 0;
+
   return (
     <>
       {sessionID == null ? (
@@ -463,20 +476,40 @@ export default function VideoUploadComp() {
                   )}
                 </div>
 
-                <div className="w-full grid grid-cols-3 my-2 gap-y-4">
-                  <h2 className="text-[15px] font-medium leading-[1.4] col-span-3 text-[var(--text-primary)]">
+                <div className="space-y-3">
+                  <h2 className="text-sm font-medium text-[var(--text-primary)]">
                     Processing Results
                   </h2>
-                  <span className="col-span-2">Questions asked :</span>{" "}
-                  {`${sessionRes.questions_asked}`}
-                  <span className="col-span-2">Paying Attention : </span>
-                  {sessionRes.total_frames > 0
-                    ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
-                    : "0.00%"}
-                  <span className="col-span-2">Not Paying Attention : </span>
-                  {sessionRes.total_frames > 0
-                    ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
-                    : "0.00%"}
+
+                  <div className="grid grid-cols-2 gap-y-2 text-sm text-[var(--text-secondary)]">
+                    <span>Questions asked:</span>
+                    <span className="font-medium text-[var(--text-primary)] text-right">
+                      {sessionRes.questions_asked}
+                    </span>
+
+                    <span>Paying Attention:</span>
+                    <span className="font-medium text-[var(--text-primary)] text-right">
+                      {sessionRes.total_frames > 0
+                        ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                        : "0.00%"}
+                    </span>
+
+                    <span>Not Paying Attention:</span>
+                    <span className="font-medium text-[var(--text-primary)] text-right">
+                      {sessionRes.total_frames > 0
+                        ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                        : "0.00%"}
+                    </span>
+                    <span>Sitting still:</span>
+                    <span className="font-medium text-[var(--text-primary)] text-right">
+                      {`${percentageStable.toFixed(2)}%`}
+                    </span>
+
+                    <span>Not Sitting still:</span>
+                    <span className="font-medium text-[var(--text-primary)] text-right">
+                      {`${percentageNotStable.toFixed(2)}%`}
+                    </span>
+                  </div>
                 </div>
                 <div className="mt-auto pt-6">
                   <Input

@@ -24,13 +24,17 @@ pub fn group_data(full_session: HashMap<usize, SessionPerson>) -> SessionAnalysi
     let mut restless_ids: Vec<usize> = Vec::new();
 
     for (&id, session) in &full_session {
-        if let Some((restless_id, restless_count, stable_count)) = evaluate_restlessness(
-            id,
-            &session.all_center_mass,
-            &session.left_shoulder,
-            &session.right_shoulder,
-        ) {
-            restless_ids.push(restless_id);
+        if let Some((restless_id, restless_count, stable_count, is_restless)) =
+            evaluate_restlessness(
+                id,
+                &session.all_center_mass,
+                &session.left_shoulder,
+                &session.right_shoulder,
+            )
+        {
+            if is_restless {
+                restless_ids.push(restless_id);
+            }
             total_restless_frames += restless_count;
             total_stable_frames += stable_count;
         }
@@ -56,7 +60,7 @@ pub fn evaluate_restlessness(
     _centers: &[Keypoint],
     left_shoulder: &[Keypoint],
     right_shoulder: &[Keypoint],
-) -> Option<(usize, usize, usize)> {
+) -> Option<(usize, usize, usize, bool)> {
     if left_shoulder.is_empty() || left_shoulder.len() != right_shoulder.len() {
         return None;
     }
@@ -121,12 +125,9 @@ pub fn evaluate_restlessness(
 
     let restlessness_ratio = restless_frame_count as f32 / total_evaluated as f32;
     const R_RATIO: f32 = 0.20;
+    let is_restless = restlessness_ratio > R_RATIO;
 
-    if restlessness_ratio > R_RATIO {
-        return Some((id, restless_frame_count, stable_frame_count));
-    }
-
-    return None;
+    return Some((id, restless_frame_count, stable_frame_count, is_restless));
 }
 
 pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson> {

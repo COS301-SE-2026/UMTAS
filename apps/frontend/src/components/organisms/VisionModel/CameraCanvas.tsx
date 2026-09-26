@@ -407,6 +407,19 @@ function CanvasWebcam({
     total_paying_attention: 0,
   });
 
+  const totalRestlessFramesCount =
+    sessionRes.total_restless_frames + sessionRes.total_stable_frames;
+
+  const percentageStable =
+    totalRestlessFramesCount > 0
+      ? (sessionRes.total_stable_frames / totalRestlessFramesCount) * 100
+      : 0.0;
+
+  const percentageNotStable =
+    totalRestlessFramesCount > 0
+      ? (sessionRes.total_restless_frames / totalRestlessFramesCount) * 100
+      : 0.0;
+
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
@@ -480,6 +493,15 @@ function CanvasWebcam({
                 {sessionRes.total_frames > 0
                   ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
                   : "0.00%"}
+              </span>
+              <span>Sitting still:</span>
+              <span className="font-medium text-[var(--text-primary)] text-right">
+                {`${percentageStable.toFixed(2)}%`}
+              </span>
+
+              <span>Not Sitting still:</span>
+              <span className="font-medium text-[var(--text-primary)] text-right">
+                {`${percentageNotStable.toFixed(2)}%`}
               </span>
             </div>
           </div>
