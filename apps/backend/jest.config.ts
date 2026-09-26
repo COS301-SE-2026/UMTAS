@@ -38,7 +38,6 @@ const config: Config = {
     '!**/Map-config/**',
     '!**/entities/**',
     '!**/health/**',
-    '!**/mail/**',
     '!**/redis/**',
   ],
   coverageDirectory: 'coverage',
