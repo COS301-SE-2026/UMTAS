@@ -8,3 +8,4 @@ export * from './timetables/index';
 export * from './Universities/index';
 export * from './Map/index';
 export * from './Attendance/index';
+export * from './Vision';
