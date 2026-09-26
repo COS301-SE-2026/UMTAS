@@ -120,7 +120,7 @@ export default function CreateVmSession() {
     }
   }
   return (
-    <Card className="min-w-1/3 h-[85vh] overflow-auto border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
+    <Card className="w-[min(95vw,960px)] p-2 h-[85vh] overflow-auto border-[var(--border)] bg-[var(--bg-surface)]  shadow-sm">
       <CardHeader className="space-y-1 border-b border-[var(--border)]">
         <CardTitle className="text-lg font-semibold text-[var(--text-primary)]">
           Create or update a session
@@ -131,8 +131,8 @@ export default function CreateVmSession() {
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-6 p-6 flex flex-col justify-center items-center w-full h-full">
-        <div className="space-y-2">
+      <CardContent className="space-y-6 p-6 flex flex-col items-center w-full h-full ">
+        <div className="space-y-2 w-full max-w-sm">
           <Label className="text-sm font-medium text-[var(--text-primary)]">
             Filter Session
           </Label>
@@ -141,10 +141,10 @@ export default function CreateVmSession() {
             placeholder="Filter Sessions..."
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
-            className="w-80 max-w-100 bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
+            className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
           />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 w-full max-w-sm">
           <Label className="text-sm font-medium text-[var(--text-primary)]">
             Select Session
           </Label>
@@ -154,7 +154,7 @@ export default function CreateVmSession() {
               findSetModule(v);
             }}
           >
-            <SelectTrigger className="w-80 max-w-100">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Select a Module" />
             </SelectTrigger>
 
@@ -173,17 +173,17 @@ export default function CreateVmSession() {
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-2">
-          <Button>Re-capture Session</Button>
+        <div className="space-y-2 w-full max-w-sm">
+          <Button className="w-full">Re-capture Session</Button>
         </div>
 
-        <div className="h-[2px] w-full bg-[var(--border)]" />
+        <div className="h-[2px] w-full bg-[var(--border)] my-2" />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full justify-items-center">
-          <h2 className="col-span-2 text-[15px] font-medium leading-[1.4] text-[var(--text-primary)] ">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl justify-items-center">
+          <h2 className="col-span-1 md:col-span-2 text-[15px] font-medium leading-[1.4] text-[var(--text-primary)] justify-self-start">
             Create new session
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-2 w-full max-w-sm">
             <Label className="text-sm font-medium text-[var(--text-primary)]">
               Filter Modules
             </Label>
@@ -192,11 +192,11 @@ export default function CreateVmSession() {
               placeholder="Filter modules..."
               value={filterText}
               onChange={(e) => setFilterText(e.target.value)}
-              className="w-80 max-w-100 bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
+              className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 w-full max-w-sm">
             <Label className="text-sm font-medium text-[var(--text-primary)]">
               Select Module
             </Label>
@@ -207,7 +207,7 @@ export default function CreateVmSession() {
                 findSetModule(v);
               }}
             >
-              <SelectTrigger className="w-80 max-w-100">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a Module" />
               </SelectTrigger>
 
@@ -232,7 +232,7 @@ export default function CreateVmSession() {
             </Select>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 w-full max-w-sm">
             <Label className="text-sm font-medium text-[var(--text-primary)]">
               Select Event Type
             </Label>
@@ -247,12 +247,11 @@ export default function CreateVmSession() {
                       : selectedEvent.eventCriteria.date)
                   : ""
               }
-
               onValueChange={(v) => {
                 findSetEvent(v);
               }}
             >
-              <SelectTrigger className="w-80 max-w-100">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select an event type" />
               </SelectTrigger>
 
@@ -280,7 +279,7 @@ export default function CreateVmSession() {
             </Select>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 w-full max-w-sm">
             <Label className="text-sm font-medium text-[var(--text-primary)]">
               Select Date
             </Label>
@@ -292,11 +291,11 @@ export default function CreateVmSession() {
               }
               value={selectedDate}
               onChange={(e) => setDate(e.target.value)}
-              className="w-80 max-w-100 bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
+              className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 w-full max-w-sm">
             <Label className="text-sm font-medium text-[var(--text-primary)]">
               Name Session
             </Label>
@@ -305,10 +304,10 @@ export default function CreateVmSession() {
               placeholder="name your session"
               value={sessionName}
               onChange={(e) => setSessionName(e.target.value)}
-              className="w-80 max-w-100 bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
+              className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 w-full max-w-sm">
             <Label className="text-sm font-medium text-[var(--text-primary)]">
               Describe Session
             </Label>
@@ -317,16 +316,17 @@ export default function CreateVmSession() {
               placeholder="Describe your session"
               value={sessionDsc}
               onChange={(e) => setSessionDsc(e.target.value)}
-              className="w-80 max-w-100 bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
+              className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
             />
           </div>
         </div>
-        <div className="space-y-2 flex items-end">
+
+        <div className="space-y-2 w-full max-w-sm flex justify-center mb-2 p-2">
           <Button
             disabled={
               selectedDate == "" || sessionName == "" || selectedEvent == null
             }
-            className="w-50"
+            className="w-full"
           >
             Create Session
           </Button>
