@@ -136,23 +136,25 @@ export default function CreateVmSession() {
                     <SelectValue placeholder="Select an event type" />
                   </SelectTrigger>
 
-                  <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+                  <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)] capitalize">
                     {selectedModule?.Events?.map((event) => {
-                      const label = event.activityCode;
-
-                      return (
-                        <SelectItem
-                          key={
-                            (event?.activityCode ?? "" + event.isRecurring)
-                              ? event.eventCriteria.dayOfWeek
-                              : event.eventCriteria.date
-                          }
-                          value={String(event.activityCode)}
-                          className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
-                        >
-                          {label}
-                        </SelectItem>
-                      );
+                      if (event.activityCode) {
+                        const label =
+                          event.activityCode +
+                          " " +
+                          (event.isRecurring
+                            ? event.eventCriteria.dayOfWeek
+                            : event.eventCriteria.date);
+                        return (
+                          <SelectItem
+                            key={label}
+                            value={String(event.activityCode)}
+                            className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
+                          >
+                            {label}
+                          </SelectItem>
+                        );
+                      }
                     })}
                   </SelectContent>
                 </Select>
