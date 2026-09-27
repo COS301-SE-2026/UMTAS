@@ -129,6 +129,7 @@ export default function VM_SessionTemplate() {
                   detectionSettings={detectionSettings}
                   inferenceSettings={inferenceSettings}
                   imageFile={imageUpload}
+                  deviceId={selectedDeviceId}
                 />
               </div>
             </section>

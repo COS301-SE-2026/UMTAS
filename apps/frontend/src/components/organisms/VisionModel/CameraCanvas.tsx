@@ -49,18 +49,19 @@ export function drawPoint(ctx: CanvasRenderingContext2D, kp?: Keypoint) {
   }
 }
 
-function getVideoConstraints(): MediaStreamConstraints {
+function getVideoConstraints(deviceId?: string): MediaStreamConstraints {
   const isMobile = window.innerWidth < 768;
   return {
-    video: {
-      width: isMobile ? { ideal: 720 } : { ideal: 1280 },
-      height: isMobile ? { ideal: 1280 } : { ideal: 720 },
-      facingMode: isMobile ? "user" : "environment",
-    },
+    video: deviceId
+      ? { deviceId: { ideal: deviceId } }
+      : {
+          width: isMobile ? { ideal: 720 } : { ideal: 1280 },
+          height: isMobile ? { ideal: 1280 } : { ideal: 720 },
+          facingMode: isMobile ? "user" : "environment",
+        },
     audio: true,
   };
 }
-
 function getCanvasConstraints() {
   return {
     width: 640,
@@ -82,8 +83,8 @@ interface CanvasCamProps {
   isCameraActive: boolean;
   detectionSettings: DetectionSettings;
   inferenceSettings: InferenceSettings;
-
   imageFile: File | null;
+  deviceId?: string;
 }
 
 export default function CameraCanvas({
@@ -91,6 +92,7 @@ export default function CameraCanvas({
   imageFile,
   detectionSettings,
   inferenceSettings,
+  deviceId,
 }: CanvasCamProps) {
   return (
     <div className="w-full h-full flex flex-col p-4">
@@ -101,6 +103,7 @@ export default function CameraCanvas({
             isCameraActive={isCameraActive}
             detectionSettings={detectionSettings}
             inferenceSettings={inferenceSettings}
+            deviceId={deviceId}
           />
         </div>
       </div>
@@ -113,6 +116,7 @@ function CanvasWebcam({
   detectionSettings,
   imageFile,
   inferenceSettings,
+  deviceId,
 }: CanvasCamProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -202,7 +206,7 @@ function CanvasWebcam({
     async function startCam() {
       try {
         currentStream = await navigator.mediaDevices.getUserMedia(
-          getVideoConstraints(),
+          getVideoConstraints(deviceId),
         );
         if (videoRef.current) {
           videoRef.current.srcObject = currentStream;
@@ -223,7 +227,7 @@ function CanvasWebcam({
         currentStream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [isCameraActive, imageFile]);
+  }, [isCameraActive, imageFile, deviceId]);
 
   useEffect(() => {
     const isReady = imageFile ? imageLoaded : cameraLoaded;
