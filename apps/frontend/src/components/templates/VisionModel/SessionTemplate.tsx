@@ -55,7 +55,6 @@ export default function VM_SessionTemplate() {
   );
 
   const [imageUpload, setImageUpload] = useState<File | null>(null);
-
   const [showVideoPopUp, setShowVideoPopUp] = useState(false);
 
   const uploadImageRef = useRef<HTMLInputElement>(null);
@@ -76,11 +75,14 @@ export default function VM_SessionTemplate() {
   }, [router]);
 
   useEffect(() => {
+    if (!cameraOn) return;
+
     async function getCameraDevices() {
       try {
         await navigator.mediaDevices
           .getUserMedia({ video: true })
           .catch(() => {});
+
         const allDevices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = allDevices.filter(
           (device) => device.kind === "videoinput",
@@ -96,7 +98,7 @@ export default function VM_SessionTemplate() {
     }
 
     getCameraDevices();
-  });
+  }, [cameraOn, selectedDeviceId]);
 
   if (!modelVerified) {
     return null;
@@ -217,7 +219,7 @@ export default function VM_SessionTemplate() {
                       aria-label="Toggle camera"
                       onCheckedChange={(checked) => {
                         setCameraOn(checked);
-                        setImageUpload(null);
+                        if (checked) setImageUpload(null);
                       }}
                     />
                   </SettingRow>
@@ -228,6 +230,7 @@ export default function VM_SessionTemplate() {
                     </Label>
 
                     <Select
+                      disabled={cameraOn == false}
                       value={selectedDeviceId}
                       onValueChange={setSelectedDeviceId}
                     >
