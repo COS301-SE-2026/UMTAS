@@ -1,6 +1,7 @@
-import { api } from "@/components/tanstack/getQueryClient";
+import { api, getQueryClient } from "@/components/tanstack/getQueryClient";
 import { components, paths } from "@/lib/api";
 import { RequestBuilder, RequestMethod } from "../../request";
+import { mutationOptions } from "@tanstack/react-query";
 
 export type createSession = paths["/api/vision-sessions"]["post"];
 export type createSessionBody =
@@ -55,7 +56,7 @@ export class patchSessionBuilder extends RequestBuilder<
 }
 
 export type deleteSessionResponse =
-  paths["/api/vision-sessions/{sessionId}"]["delete"]["responses"]["200"];
+  paths["/api/vision-sessions/{sessionId}"]["delete"]["responses"]["200"]["content"]["application/json"];
 
 export class deleteSessionBuilder extends RequestBuilder<
   patchSessionPath,
@@ -66,4 +67,54 @@ export class deleteSessionBuilder extends RequestBuilder<
     super();
     this.setUrl("/vision-sessions/{sessionId}").setMethod(RequestMethod.DELETE);
   }
+}
+
+export function createSessionMut() {
+  return mutationOptions({
+    mutationFn: async (body: createSessionBody) => {
+      const result = await new CreateSessionBuilder().send({ body: body });
+      return result;
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: ["VM_SESSIONS"],
+      });
+    },
+  });
+}
+
+export function patchSessionMut() {
+  return mutationOptions({
+    mutationFn: async (vars: {
+      body: patchSessionBody;
+      path: patchSessionPath;
+    }) => {
+      const result = await new patchSessionBuilder().send({
+        body: vars.body,
+        paths: vars.path,
+      });
+      return result;
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: ["VM_SESSIONS"],
+      });
+    },
+  });
+}
+
+export function deleteSessionMut() {
+  return mutationOptions({
+    mutationFn: async (vars: { path: patchSessionPath }) => {
+      const result = await new deleteSessionBuilder().send({
+        paths: vars.path,
+      });
+      return result;
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: ["VM_SESSIONS"],
+      });
+    },
+  });
 }
