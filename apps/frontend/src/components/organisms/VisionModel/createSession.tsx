@@ -265,7 +265,7 @@ export default function CreateVmSession({
               disabled={selectedSession?.SessionID == null || deleteIsPending}
               type="button"
               variant="outline"
-              className="w-full sm:w-auto"
+              className=""
               onClick={() => {
                 if (selectedSession?.SessionID)
                   deleteSessionFunction({
@@ -288,7 +288,7 @@ export default function CreateVmSession({
               disabled={selectedSession?.SessionID == null}
               type="button"
               variant="outline"
-              className="w-full sm:w-auto"
+              className=""
               onClick={() => {
                 if (selectedSession?.SessionID)
                   updateSessionID(selectedSession?.SessionID);
