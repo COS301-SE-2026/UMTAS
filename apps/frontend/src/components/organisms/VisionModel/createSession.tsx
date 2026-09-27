@@ -25,6 +25,7 @@ import { errorName } from "../../../../utilities/errorCries";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import {
   createSessionMut,
+  deleteSessionMut,
   getAllSessionQuery,
   sessionDTO,
 } from "../../../../utilities/VisionModel/backend/persistance";
@@ -95,6 +96,9 @@ export default function CreateVmSession({
     mutateAsync: createSessionFunction,
     isPending: createSessionPending,
   } = useMutation(createSessionMut());
+
+  const { mutateAsync: deleteSessionFunction, isPending: deleteIsPending } =
+    useMutation(deleteSessionMut());
 
   function filterSession(filter: string) {
     const lowerQuery = filter.toLowerCase();
@@ -256,7 +260,30 @@ export default function CreateVmSession({
             </div>
           </div>
 
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-end pt-2 gap-x-3">
+            <Button
+              disabled={selectedSession?.SessionID == null || deleteIsPending}
+              type="button"
+              variant="outline"
+              className="w-full sm:w-auto"
+              onClick={() => {
+                if (selectedSession?.SessionID)
+                  deleteSessionFunction({
+                    path: {
+                      sessionId: selectedSession.SessionID,
+                    },
+                  });
+                setSelectedSession(null);
+              }}
+            >
+              {!deleteIsPending ? (
+                <>Delete Session</>
+              ) : (
+                <>
+                  <Spinner />
+                </>
+              )}
+            </Button>
             <Button
               disabled={selectedSession?.SessionID == null}
               type="button"

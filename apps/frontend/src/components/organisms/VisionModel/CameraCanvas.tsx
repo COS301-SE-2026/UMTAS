@@ -131,7 +131,7 @@ function CanvasWebcam({
   const { data: singleSession } = useQuery(
     getSingleSessionQuery({ sessionId: sessionID ?? "" }),
   );
-  const { mutate: updateSession, isPending: pendingPatch } =
+  const { mutateAsync: updateSession, isPending: pendingPatch } =
     useMutation(patchSessionMut());
 
   // Manage detection workers
@@ -443,16 +443,17 @@ function CanvasWebcam({
       interval = setInterval(async () => {
         if (frameStore.current) {
           const result = await frameStore.current.analyseAllFrames();
-          if (result) {
-            SetSessionRes(result);
-          }
-          if (singleSession && !pendingPatch)
-            updateSession({
+          if (singleSession && !pendingPatch) {
+            const apiRes = await updateSession({
               body: {
                 Data: result,
               },
               path: { sessionId: singleSession?.session.SessionID },
             });
+            SetSessionRes(apiRes.session.Data);
+          } else {
+            SetSessionRes(result);
+          }
         }
       }, 3 * 1000);
     } else {
@@ -494,45 +495,54 @@ function CanvasWebcam({
         </div>
 
         <div className="w-full lg:w-80 border border-[var(--border)] bg-[var(--bg-surface)] rounded-2xl p-5 flex flex-col justify-between shadow-sm shrink-0">
-          <div className="space-y-3 ">
-            <div>
+          <div className="space-y-4">
+            <div className="pb-3 border-b border-[var(--border)]">
               <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
-                {singleSession && (
-                  <>Session Name : {` ${singleSession?.session.SessionName}`}</>
+                {singleSession ? (
+                  <>Session: {` ${singleSession?.session.SessionName}`} </>
+                ) : (
+                  <>No Active Session</>
                 )}
-                <br />
-                Results:
               </h2>
+              {singleSession && (
+                <p className="text-xs text-[var(--text-secondary)] mt-1">
+                  Your results will be automatically saved
+                </p>
+              )}
             </div>
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-3">
+                Results
+              </h3>
+              <div className="grid grid-cols-2 gap-y-2 text-sm text-[var(--text-secondary)]">
+                <span>Questions asked:</span>
+                <span className="font-medium text-[var(--text-primary)] text-right">
+                  {sessionRes.questions_asked}
+                </span>
 
-            <div className="grid grid-cols-2 gap-y-2 text-sm text-[var(--text-secondary)]">
-              <span>Questions asked:</span>
-              <span className="font-medium text-[var(--text-primary)] text-right">
-                {sessionRes.questions_asked}
-              </span>
+                <span>Paying Attention:</span>
+                <span className="font-medium text-[var(--text-primary)] text-right">
+                  {sessionRes.total_frames > 0
+                    ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                    : "0.00%"}
+                </span>
 
-              <span>Paying Attention:</span>
-              <span className="font-medium text-[var(--text-primary)] text-right">
-                {sessionRes.total_frames > 0
-                  ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
-                  : "0.00%"}
-              </span>
+                <span>Not Paying Attention:</span>
+                <span className="font-medium text-[var(--text-primary)] text-right">
+                  {sessionRes.total_frames > 0
+                    ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                    : "0.00%"}
+                </span>
+                <span>Sitting still:</span>
+                <span className="font-medium text-[var(--text-primary)] text-right">
+                  {`${percentageStable.toFixed(2)}%`}
+                </span>
 
-              <span>Not Paying Attention:</span>
-              <span className="font-medium text-[var(--text-primary)] text-right">
-                {sessionRes.total_frames > 0
-                  ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
-                  : "0.00%"}
-              </span>
-              <span>Sitting still:</span>
-              <span className="font-medium text-[var(--text-primary)] text-right">
-                {`${percentageStable.toFixed(2)}%`}
-              </span>
-
-              <span>Not Sitting still:</span>
-              <span className="font-medium text-[var(--text-primary)] text-right">
-                {`${percentageNotStable.toFixed(2)}%`}
-              </span>
+                <span>Not Sitting still:</span>
+                <span className="font-medium text-[var(--text-primary)] text-right">
+                  {`${percentageNotStable.toFixed(2)}%`}
+                </span>
+              </div>
             </div>
           </div>
 

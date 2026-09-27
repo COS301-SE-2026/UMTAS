@@ -44,7 +44,7 @@ export default function VideoUploadComp() {
   const { data: singleSession } = useQuery(
     getSingleSessionQuery({ sessionId: sessionID ?? "" }),
   );
-  const { mutate: updateSession, isPending: pendingPatch } =
+  const { mutateAsync: updateSession, isPending: pendingPatch } =
     useMutation(patchSessionMut());
 
   const startTimeRef = useRef<number>(0);
@@ -336,16 +336,15 @@ export default function VideoUploadComp() {
       interval = setInterval(async () => {
         if (frameStore.current) {
           const result = await frameStore.current.analyseAllFrames();
-          if (result) {
-            SetSessionRes(result);
-          }
-          if (singleSession && !pendingPatch)
-            updateSession({
+          if (singleSession && !pendingPatch) {
+            const apiRes = await updateSession({
               body: {
                 Data: result,
               },
               path: { sessionId: singleSession?.session.SessionID },
             });
+            SetSessionRes(apiRes.session.Data);
+          }
         }
       }, 3 * 1000);
     } else {
