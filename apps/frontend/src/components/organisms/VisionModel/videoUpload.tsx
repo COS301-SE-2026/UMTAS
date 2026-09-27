@@ -16,8 +16,11 @@ import SessionStorePose from "../../../../utilities/VisionModel/sessionStore/pos
 import { drawPoint, drawSegment } from "./CameraCanvas";
 import { SessionInferenceResult } from "../../../../utilities/VisionModel/messageTypes";
 import CreateVmSession from "./createSession";
-import { getSingleSessionQuery } from "../../../../utilities/VisionModel/backend/persistance";
-import { useQuery } from "@tanstack/react-query";
+import {
+  getSingleSessionQuery,
+  patchSessionMut,
+} from "../../../../utilities/VisionModel/backend/persistance";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export default function VideoUploadComp() {
   const [video, setVideo] = useState<File | null>(null);
@@ -41,6 +44,8 @@ export default function VideoUploadComp() {
   const { data: singleSession } = useQuery(
     getSingleSessionQuery({ sessionId: sessionID ?? "" }),
   );
+  const { mutate: updateSession, isPending: pendingPatch } =
+    useMutation(patchSessionMut());
 
   const startTimeRef = useRef<number>(0);
   const [sessionRes, SetSessionRes] = useState<SessionInferenceResult>({
@@ -334,6 +339,13 @@ export default function VideoUploadComp() {
           if (result) {
             SetSessionRes(result);
           }
+          if (singleSession && !pendingPatch)
+            updateSession({
+              body: {
+                Data: result,
+              },
+              path: { sessionId: singleSession?.session.SessionID },
+            });
         }
       }, 3 * 1000);
     } else {
@@ -343,7 +355,7 @@ export default function VideoUploadComp() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isProcessing]);
+  }, [isProcessing, singleSession, updateSession, pendingPatch]);
 
   const totalRestlessFramesCount =
     sessionRes.total_restless_frames + sessionRes.total_stable_frames;
