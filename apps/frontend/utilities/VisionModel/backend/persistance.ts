@@ -1,7 +1,7 @@
 import { api, getQueryClient } from "@/components/tanstack/getQueryClient";
 import { components, paths } from "@/lib/api";
 import { RequestBuilder, RequestMethod } from "../../request";
-import { mutationOptions } from "@tanstack/react-query";
+import { mutationOptions, queryOptions, useQuery } from "@tanstack/react-query";
 
 export type createSession = paths["/api/vision-sessions"]["post"];
 export type createSessionBody =
@@ -29,7 +29,7 @@ export type getAllSessionResp =
 export async function getAllvmSessions(
   params: getAllSessionFilters,
 ): Promise<getAllSessionResp> {
-  return api
+  return await api
     .get("/vision-sessions", {
       searchParams: params as getAllSessionFilters,
     })
@@ -67,6 +67,15 @@ export class deleteSessionBuilder extends RequestBuilder<
     super();
     this.setUrl("/vision-sessions/{sessionId}").setMethod(RequestMethod.DELETE);
   }
+}
+
+export function getAllSessionQuery(filters: getAllSessionFilters) {
+  return queryOptions({
+    queryKey: ["VM_SESSIONS", filters],
+    queryFn: async () => {
+      return (await getAllvmSessions(filters)).sessions;
+    },
+  });
 }
 
 export function createSessionMut() {
