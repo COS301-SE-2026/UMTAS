@@ -26,7 +26,9 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 import {
   createSessionMut,
   getAllSessionQuery,
+  sessionDTO,
 } from "../../../../utilities/VisionModel/backend/persistance";
+import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 
 export interface CreateSessionProps {
   updateSessionID: (id: string) => void;
@@ -51,6 +53,10 @@ export default function CreateVmSession({
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [sessionName, setSessionName] = useState<string>("");
   const [sessionDsc, setSessionDsc] = useState<string>("");
+  const [selectedSession, setSelectedSession] = useState<sessionDTO | null>(
+    null,
+  );
+
   const [selectedModule, setSelectedModule] = useState<moduleDTO | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<EventResponse | null>(
     null,
@@ -67,6 +73,21 @@ export default function CreateVmSession({
     if (selectedEvent == null || selectedEvent.eventId == undefined)
       return false;
     if (sessionName == "") return false;
+
+    const foundSession = allSessions.find((sesh) => {
+      return sesh.Date == selectedDate && sesh.SessionName == sessionName;
+    });
+    if (foundSession) {
+      window.dispatchEvent(
+        new CustomEvent(errorName, {
+          detail: {
+            userMessage: "A session already exists with this name on this date",
+          },
+        }),
+      );
+      return false;
+    }
+
     return true;
   }
 
@@ -135,6 +156,10 @@ export default function CreateVmSession({
       return (nameMatch || codeMatch) && m.Events && m.Events?.length > 0;
     });
   }
+  function findSetSession(seshID: string) {
+    const sesh = allSessions.find((sesh) => sesh.SessionID === seshID);
+    if (sesh) setSelectedSession(sesh);
+  }
 
   function findSetModule(modID: string) {
     const UniModule = allModules.find((mod) => mod.moduleID === modID);
@@ -172,7 +197,7 @@ export default function CreateVmSession({
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-6 p-6">
+      <CardContent className="space-y-6 p-4">
         <section
           aria-label="Re-capture session"
           className="space-y-4 rounded-lg border border-[var(--border)] p-4"
@@ -206,8 +231,8 @@ export default function CreateVmSession({
               </Label>
               <Select
                 disabled={allSessions.length == 0}
-                value={String(selectedModule?.moduleID ?? "")}
-                onValueChange={(v) => findSetModule(v)}
+                value={selectedSession?.SessionID}
+                onValueChange={(v) => findSetSession(v)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a session" />
@@ -233,10 +258,14 @@ export default function CreateVmSession({
 
           <div className="flex justify-end pt-2">
             <Button
+              disabled={selectedSession?.SessionID == null}
               type="button"
               variant="outline"
               className="w-full sm:w-auto"
-              onClick={() => updateSessionID("Fake flag")}
+              onClick={() => {
+                if (selectedSession?.SessionID)
+                  updateSessionID(selectedSession?.SessionID);
+              }}
             >
               Re-capture Session
             </Button>
@@ -390,6 +419,7 @@ export default function CreateVmSession({
 
           <div className="flex justify-end pt-2">
             <Button
+              variant="outline"
               onClick={async () => {
                 if (verifyDetails()) {
                   const result = await createSessionFunction({
@@ -422,7 +452,13 @@ export default function CreateVmSession({
               }
               className="w-full sm:w-auto"
             >
-              Create Session
+              {!createSessionPending ? (
+                <>Create Session</>
+              ) : (
+                <>
+                  <Spinner />
+                </>
+              )}
             </Button>
           </div>
         </section>

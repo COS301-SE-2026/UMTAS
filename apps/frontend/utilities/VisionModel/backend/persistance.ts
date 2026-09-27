@@ -4,6 +4,8 @@ import { RequestBuilder, RequestMethod } from "../../request";
 import { mutationOptions, queryOptions, useQuery } from "@tanstack/react-query";
 import { SessionInferenceResult } from "../messageTypes";
 
+export type sessionDTO = components["schemas"]["VisionSessionDto"];
+
 export type createSession = paths["/api/vision-sessions"]["post"];
 export type createSessionBody =
   createSession["requestBody"]["content"]["application/json"];
