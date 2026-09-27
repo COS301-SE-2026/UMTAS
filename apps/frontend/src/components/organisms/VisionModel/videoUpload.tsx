@@ -16,6 +16,8 @@ import SessionStorePose from "../../../../utilities/VisionModel/sessionStore/pos
 import { drawPoint, drawSegment } from "./CameraCanvas";
 import { SessionInferenceResult } from "../../../../utilities/VisionModel/messageTypes";
 import CreateVmSession from "./createSession";
+import { getSingleSessionQuery } from "../../../../utilities/VisionModel/backend/persistance";
+import { useQuery } from "@tanstack/react-query";
 
 export default function VideoUploadComp() {
   const [video, setVideo] = useState<File | null>(null);
@@ -35,6 +37,10 @@ export default function VideoUploadComp() {
   const [eta, setEta] = useState<string>("Calculating...");
   const [currentTimeDisplay, setCurrentTimeDisplay] =
     useState<string>("0:00 / 0:00");
+
+  const { data: singleSession } = useQuery(
+    getSingleSessionQuery({ sessionId: sessionID ?? "" }),
+  );
 
   const startTimeRef = useRef<number>(0);
   const [sessionRes, SetSessionRes] = useState<SessionInferenceResult>({
@@ -282,8 +288,6 @@ export default function VideoUploadComp() {
 
     if (isProcessingRef.current && frameStore.current) {
       const results = await frameStore.current.analyseAllFrames();
-
-      console.log(results);
     }
   }
 
@@ -363,6 +367,8 @@ export default function VideoUploadComp() {
           <CardHeader className="space-y-1 border-b border-[var(--border)]">
             <CardTitle className="text-lg font-semibold text-[var(--text-primary)]">
               Upload Video
+              <br />
+              Session Name : {`${singleSession?.session.SessionName}`}
             </CardTitle>
 
             <CardDescription className="text-sm text-[var(--text-secondary)]">

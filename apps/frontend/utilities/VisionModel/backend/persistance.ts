@@ -92,6 +92,7 @@ export function getSingleSessionQuery(path: patchSessionPath) {
     queryFn: async () => {
       return new getSingleSessionBuilder().send({ paths: path });
     },
+    enabled: path.sessionId != "",
   });
 }
 
