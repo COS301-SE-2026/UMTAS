@@ -293,6 +293,15 @@ export default function VideoUploadComp() {
 
     if (isProcessingRef.current && frameStore.current) {
       const results = await frameStore.current.analyseAllFrames();
+      if (singleSession && !pendingPatch) {
+        const apiRes = await updateSession({
+          body: {
+            Data: results,
+          },
+          path: { sessionId: singleSession?.session.SessionID },
+        });
+        SetSessionRes(apiRes.session.Data);
+      }
     }
   }
 
