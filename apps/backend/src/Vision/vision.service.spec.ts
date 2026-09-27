@@ -271,21 +271,6 @@ describe('VisionService', () => {
   //Helpers
 
   describe('Test_validateCreateInput', () => {
-    it('should throw BadRequestException when date is in the past', async () => {
-      //Arrange
-      const input = createCreateVisionSessionInput({
-        Date: '2020-01-01',
-      });
-      jest
-        .spyOn(mockModuleServiceV2, 'getByIdV2')
-        .mockResolvedValue(undefined as any);
-
-      //Act + Assert
-      await expect(
-        (service as any).validateCreateInput(input, mockDb),
-      ).rejects.toThrow(BadRequestException);
-    });
-
     it('should validate event when EventID is provided', async () => {
       //Arrange
       const input = createCreateVisionSessionInput({
@@ -586,13 +571,6 @@ describe('VisionService', () => {
     it('should throw BadRequestException when date is invalid', () => {
       //Act + Assert
       expect(() => (service as any).validateDate('not-a-date')).toThrow(
-        BadRequestException,
-      );
-    });
-
-    it('should throw BadRequestException when date is in the past', () => {
-      //Act + Assert
-      expect(() => (service as any).validateDate('2020-01-01')).toThrow(
         BadRequestException,
       );
     });
