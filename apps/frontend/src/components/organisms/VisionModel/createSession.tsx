@@ -23,6 +23,7 @@ import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { useErrorListener } from "@/hooks/errorListener";
 import { errorName } from "../../../../utilities/errorCries";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import { getAllSessionQuery } from "../../../../utilities/VisionModel/backend/persistance";
 
 export interface CreateSessionProps {
   updateSessionID: (id: string) => void;
@@ -49,6 +50,21 @@ export default function CreateVmSession({
   const [selectedEvent, setSelectedEvent] = useState<EventResponse | null>(
     null,
   );
+
+  const { data: allSessions = [], isLoading: sessionsLoading } = useQuery(
+    getAllSessionQuery({}),
+  );
+  function filterSession(filter: string) {
+    const lowerQuery = filter.toLowerCase();
+
+    return allSessions.filter((sesh) => {
+      const nameMatch = sesh.SessionName.toLowerCase().includes(lowerQuery);
+      const codeMatch =
+        sesh.SessionDsc?.toLowerCase().includes(lowerQuery) ?? false;
+
+      return nameMatch || codeMatch;
+    });
+  }
 
   useErrorListener();
   const DAYS = [
@@ -168,13 +184,28 @@ export default function CreateVmSession({
                 Select Session
               </Label>
               <Select
+                disabled={allSessions.length == 0}
                 value={String(selectedModule?.moduleID ?? "")}
                 onValueChange={(v) => findSetModule(v)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a session" />
                 </SelectTrigger>
-                <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]"></SelectContent>
+                <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+                  {filterSession(filterText).map((sesh) => {
+                    const label = `${sesh.SessionName} : ${sesh.Date} `;
+
+                    return (
+                      <SelectItem
+                        key={sesh.SessionID}
+                        value={String(sesh.SessionID)}
+                        className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
+                      >
+                        {label}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
               </Select>
             </div>
           </div>
