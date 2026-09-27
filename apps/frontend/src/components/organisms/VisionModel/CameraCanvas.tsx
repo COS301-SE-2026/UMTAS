@@ -15,6 +15,11 @@ import SessionStorePose from "../../../../utilities/VisionModel/sessionStore/pos
 import { Button } from "@/components/atoms/baseShadcn/button";
 import Popup from "@/components/atoms/utility/floatContainer";
 import CreateVmSession from "./createSession";
+import {
+  getSingleSessionQuery,
+  patchSessionMut,
+} from "../../../../utilities/VisionModel/backend/persistance";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 const KEY_SCORE_THRESHOLD = 0.15;
 
@@ -122,6 +127,12 @@ function CanvasWebcam({
   const frameStore = useRef<SessionStorePose | null>(null);
   const lastRunRef = useRef<number>(0);
   const frameCounterRef = useRef<number>(0);
+
+  const { data: singleSession } = useQuery(
+    getSingleSessionQuery({ sessionId: sessionID ?? "" }),
+  );
+  const { mutate: updateSession, isPending: pendingPatch } =
+    useMutation(patchSessionMut());
 
   // Manage detection workers
   // Lazy initialize frameStore once
@@ -435,6 +446,13 @@ function CanvasWebcam({
           if (result) {
             SetSessionRes(result);
           }
+          if (singleSession && !pendingPatch)
+            updateSession({
+              body: {
+                Data: result,
+              },
+              path: { sessionId: singleSession?.session.SessionID },
+            });
         }
       }, 3 * 1000);
     } else {
@@ -444,7 +462,14 @@ function CanvasWebcam({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [cameraLoaded, imageLoaded, inferenceSettings.runInference]);
+  }, [
+    cameraLoaded,
+    imageLoaded,
+    inferenceSettings.runInference,
+    pendingPatch,
+    singleSession,
+    updateSession,
+  ]);
 
   const showCanvas = imageFile !== null || isCameraActive;
 
@@ -472,6 +497,10 @@ function CanvasWebcam({
           <div className="space-y-3 ">
             <div>
               <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
+                {singleSession && (
+                  <>Session Name : {` ${singleSession?.session.SessionName}`}</>
+                )}
+                <br />
                 Results:
               </h2>
             </div>
@@ -512,6 +541,20 @@ function CanvasWebcam({
               variant="outline"
               className=""
               onClick={() => {
+                if (singleSession && !pendingPatch)
+                  updateSession({
+                    body: {
+                      Data: {
+                        questions_asked: 0,
+                        total_frames: 0,
+                        total_no_attention: 0,
+                        total_paying_attention: 0,
+                        total_restless_frames: 0,
+                        total_stable_frames: 0,
+                      },
+                    },
+                    path: { sessionId: singleSession?.session.SessionID },
+                  });
                 frameStore.current?.clear();
                 SetSessionRes({
                   total_restless_frames: 0,
