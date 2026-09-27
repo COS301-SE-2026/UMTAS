@@ -34,3 +34,36 @@ export async function getAllvmSessions(
     })
     .json<getAllSessionResp>();
 }
+
+export type patchSession = paths["/api/vision-sessions/{sessionId}"]["patch"];
+export type patchSessionPath = patchSession["parameters"]["path"];
+export type patchSessionBody =
+  patchSession["requestBody"]["content"]["application/json"];
+
+export type patchSessionResp =
+  patchSession["responses"]["200"]["content"]["application/json"];
+
+export class patchSessionBuilder extends RequestBuilder<
+  patchSessionPath,
+  patchSessionBody,
+  patchSessionResp
+> {
+  constructor() {
+    super();
+    this.setUrl("/vision-sessions/{sessionId}").setMethod(RequestMethod.PATCH);
+  }
+}
+
+export type deleteSessionResponse =
+  paths["/api/vision-sessions/{sessionId}"]["delete"]["responses"]["200"];
+
+export class deleteSessionBuilder extends RequestBuilder<
+  patchSessionPath,
+  undefined,
+  deleteSessionResponse
+> {
+  constructor() {
+    super();
+    this.setUrl("/vision-sessions/{sessionId}").setMethod(RequestMethod.DELETE);
+  }
+}
