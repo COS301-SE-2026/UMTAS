@@ -72,6 +72,29 @@ export class deleteSessionBuilder extends RequestBuilder<
   }
 }
 
+export type getSingleSession =
+  paths["/api/vision-sessions/{sessionId}"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export class getSingleSessionBuilder extends RequestBuilder<
+  patchSessionPath,
+  undefined,
+  getSingleSession
+> {
+  constructor() {
+    super();
+    this.setUrl("/vision-sessions/{sessionId}").setMethod(RequestMethod.GET);
+  }
+}
+
+export function getSingleSessionQuery(path: patchSessionPath) {
+  return queryOptions({
+    queryKey: ["VM_SESSIONS", path],
+    queryFn: async () => {
+      return new getSingleSessionBuilder().send({ paths: path });
+    },
+  });
+}
+
 export function getAllSessionQuery(filters: getAllSessionFilters) {
   return queryOptions({
     queryKey: ["VM_SESSIONS", filters],
