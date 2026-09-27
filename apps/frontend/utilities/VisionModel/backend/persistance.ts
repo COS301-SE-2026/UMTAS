@@ -2,6 +2,7 @@ import { api, getQueryClient } from "@/components/tanstack/getQueryClient";
 import { components, paths } from "@/lib/api";
 import { RequestBuilder, RequestMethod } from "../../request";
 import { mutationOptions, queryOptions, useQuery } from "@tanstack/react-query";
+import { SessionInferenceResult } from "../messageTypes";
 
 export type createSession = paths["/api/vision-sessions"]["post"];
 export type createSessionBody =
@@ -127,3 +128,12 @@ export function deleteSessionMut() {
     },
   });
 }
+
+export type SessionData = {
+  questions_asked: number;
+  total_restless_frames: number;
+  total_stable_frames: number;
+  total_paying_attention: number;
+  total_no_attention: number;
+  total_frames: number;
+};

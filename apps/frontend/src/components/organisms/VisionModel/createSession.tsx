@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { useState } from "react";
 import { moduleDTO } from "@/app/course-management/queries/modules/moduleBuilder";
@@ -23,7 +23,10 @@ import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { useErrorListener } from "@/hooks/errorListener";
 import { errorName } from "../../../../utilities/errorCries";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import { getAllSessionQuery } from "../../../../utilities/VisionModel/backend/persistance";
+import {
+  createSessionMut,
+  getAllSessionQuery,
+} from "../../../../utilities/VisionModel/backend/persistance";
 
 export interface CreateSessionProps {
   updateSessionID: (id: string) => void;
@@ -43,6 +46,8 @@ export default function CreateVmSession({
   });
 
   const [filterText, setFilterText] = useState<string>("");
+  const [SessionfilterText, setSessionFilterText] = useState<string>("");
+
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [sessionName, setSessionName] = useState<string>("");
   const [sessionDsc, setSessionDsc] = useState<string>("");
@@ -54,6 +59,22 @@ export default function CreateVmSession({
   const { data: allSessions = [], isLoading: sessionsLoading } = useQuery(
     getAllSessionQuery({}),
   );
+
+  function verifyDetails() {
+    if (selectedDate == "") return false;
+    if (selectedModule == null || selectedModule.moduleID == undefined)
+      return false;
+    if (selectedEvent == null || selectedEvent.eventId == undefined)
+      return false;
+    if (sessionName == "") return false;
+    return true;
+  }
+
+  const {
+    mutateAsync: createSessionFunction,
+    isPending: createSessionPending,
+  } = useMutation(createSessionMut());
+
   function filterSession(filter: string) {
     const lowerQuery = filter.toLowerCase();
 
@@ -173,8 +194,8 @@ export default function CreateVmSession({
               <Input
                 type="text"
                 placeholder="Filter Sessions..."
-                value={filterText}
-                onChange={(e) => setFilterText(e.target.value)}
+                value={SessionfilterText}
+                onChange={(e) => setSessionFilterText(e.target.value)}
                 className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
               />
             </div>
@@ -192,7 +213,7 @@ export default function CreateVmSession({
                   <SelectValue placeholder="Select a session" />
                 </SelectTrigger>
                 <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
-                  {filterSession(filterText).map((sesh) => {
+                  {filterSession(SessionfilterText).map((sesh) => {
                     const label = `${sesh.SessionName} : ${sesh.Date} `;
 
                     return (
@@ -369,9 +390,35 @@ export default function CreateVmSession({
 
           <div className="flex justify-end pt-2">
             <Button
+              onClick={async () => {
+                if (verifyDetails()) {
+                  const result = await createSessionFunction({
+                    Date: selectedDate,
+                    ModuleID: selectedModule?.moduleID ?? "",
+                    EventID: selectedEvent?.eventId,
+                    SessionName: sessionName,
+                    SessionDsc: sessionDsc == "" ? undefined : sessionDsc,
+                    Data: {
+                      questions_asked: 0,
+                      total_frames: 0,
+                      total_no_attention: 0,
+                      total_paying_attention: 0,
+                      total_restless_frames: 0,
+                      total_stable_frames: 0,
+                    },
+                  });
+
+                  if (result.session) {
+                    updateSessionID(result.session.SessionID);
+                  }
+                }
+              }}
               type="button"
               disabled={
-                selectedDate == "" || sessionName == "" || selectedEvent == null
+                selectedDate == "" ||
+                sessionName == "" ||
+                selectedEvent == null ||
+                selectedModule == null
               }
               className="w-full sm:w-auto"
             >
