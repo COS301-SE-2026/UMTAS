@@ -69,6 +69,31 @@ const EMS_BUILDING_VENUES: readonly UpHatfieldVenueSeed[] = [
     buildingName: 'Economic and Management Sciences (EMS) ',
     capacity: 120,
   },
+  {
+    name: 'EMS 4-150',
+    buildingName: 'Economic and Management Sciences (EMS) ',
+    capacity: 120,
+  },
+  {
+    name: 'EMS 4-151',
+    buildingName: 'Economic and Management Sciences (EMS) ',
+    capacity: 120,
+  },
+  {
+    name: 'EMS 4-152',
+    buildingName: 'Economic and Management Sciences (EMS) ',
+    capacity: 120,
+  },
+  {
+    name: 'EMS 4-153',
+    buildingName: 'Economic and Management Sciences (EMS) ',
+    capacity: 120,
+  },
+  {
+    name: 'EMS 4-154',
+    buildingName: 'Economic and Management Sciences (EMS) ',
+    capacity: 120,
+  },
 ];
 const IT_BUILDING_VENUES: readonly UpHatfieldVenueSeed[] = [
   { name: 'IT 2-23', buildingName: 'IT ', capacity: 200 },
@@ -81,6 +106,21 @@ const IT_BUILDING_VENUES: readonly UpHatfieldVenueSeed[] = [
   { name: 'IT 4-3', buildingName: 'IT ', capacity: 200 },
   { name: 'IT 4-4', buildingName: 'IT ', capacity: 200 },
   { name: 'IT 4-5', buildingName: 'IT ', capacity: 200 },
+  { name: 'Informatorium Brown Lab', buildingName: 'IT ', capacity: 200 },
+  { name: 'Informatorium Maroon Lab', buildingName: 'IT ', capacity: 200 },
+  { name: 'Informatorium Yellow Lab', buildingName: 'IT ', capacity: 200 },
+  { name: 'Informatorium Grey Lab', buildingName: 'IT ', capacity: 200 },
+  { name: 'Informatorium Red Lab', buildingName: 'IT ', capacity: 200 },
+  { name: 'Informatorium Green Lab', buildingName: 'IT ', capacity: 200 },
+  { name: 'Informatorium Orange Lab', buildingName: 'IT ', capacity: 200 },
+  { name: 'Informatorium Purple Lab', buildingName: 'IT ', capacity: 200 },
+  { name: 'Informatorium CBT Lab', buildingName: 'IT ', capacity: 200 },
+  { name: 'Informatorium Blue Lab 1', buildingName: 'IT ', capacity: 200 },
+  { name: 'Informatorium Blue Lab 2', buildingName: 'IT ', capacity: 200 },
+  { name: 'Informatorium Blue Lab 3', buildingName: 'IT ', capacity: 200 },
+  { name: 'Informatorium SIT Lab 1', buildingName: 'IT ', capacity: 200 },
+  { name: 'Informatorium SIT Lab 2', buildingName: 'IT ', capacity: 200 },
+  { name: 'Informatorium SIT Lab 3', buildingName: 'IT ', capacity: 200 },
 ];
 const CENTENARY_BUILDING_VENUES: readonly UpHatfieldVenueSeed[] = [
   { name: 'Centenary 1', buildingName: 'Centenary ', capacity: 150 },
@@ -112,6 +152,7 @@ const CHEMISTRY_BUILDING_VENUES: readonly UpHatfieldVenueSeed[] = [
   { name: 'Chemistry Lab 1-40', buildingName: 'Chemistry ', capacity: 0 },
   { name: 'Chemistry Lab 1-40 Ext', buildingName: 'Chemistry ', capacity: 0 },
   { name: 'Large Chemistry Hall', buildingName: 'Chemistry ', capacity: 0 },
+  { name: 'North hall', buildingName: 'Chemistry ', capacity: 0 },
 ];
 
 const OLD_CHEMISTRY_BUILDING_VENUES: readonly UpHatfieldVenueSeed[] = [
@@ -123,9 +164,16 @@ const THUTO_BUILDING_VENUES: readonly UpHatfieldVenueSeed[] = [
   { name: 'Thuto 1-2', buildingName: 'Thuto ', capacity: 300 },
   { name: 'Thuto 2-1', buildingName: 'Thuto ', capacity: 250 },
   { name: 'Thuto 2-2', buildingName: 'Thuto ', capacity: 250 },
+  { name: 'Thuto 3-1', buildingName: 'Thuto ', capacity: 250 },
+  { name: 'Thuto 3-2', buildingName: 'Thuto ', capacity: 250 },
 ];
 const CHANCELLORS_BUILDING_VENUES: readonly UpHatfieldVenueSeed[] = [
-  { name: 'Roos Hall', buildingName: 'Chancellors ', capacity: 0 },
+  { name: 'Roos hall', buildingName: 'Chancellors ', capacity: 0 },
+  { name: 'Louw hall', buildingName: 'Chancellors ', capacity: 0 },
+  { name: 'Te Water hall', buildingName: 'Chancellors ', capacity: 0 },
+  { name: 'Muller hall', buildingName: 'Chancellors ', capacity: 0 },
+  { name: 'Van der Bijl hall', buildingName: 'Chancellors ', capacity: 0 },
+
   { name: 'Chancellors 1-1', buildingName: 'Chancellors ', capacity: 100 },
   { name: 'Chancellors 1-2', buildingName: 'Chancellors ', capacity: 100 },
   { name: 'Admin Boardroom 1', buildingName: 'Chancellors ', capacity: 40 },
@@ -157,6 +205,43 @@ const HUMANITIES_BUILDING_VENUES: readonly UpHatfieldVenueSeed[] = [
   { name: 'HB 2-1', buildingName: 'Humanities ', capacity: 200 },
   { name: 'HB 2-2', buildingName: 'Humanities ', capacity: 200 },
   { name: 'HB 3-1', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-2', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-3', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-4', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-5', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-6', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-7', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-8', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-9', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-10', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-11', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-12', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-13', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-14', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-15', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-16', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-17', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-18', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-19', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-20', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-21', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-22', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 3-23', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 4-1', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 4-2', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 4-3', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 4-4', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 4-5', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 4-6', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 4-7', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 4-8', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 4-9', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 4-10', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 4-11', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 4-12', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 4-13', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 4-14', buildingName: 'Humanities ', capacity: 150 },
+  { name: 'HB 4-15', buildingName: 'Humanities ', capacity: 150 },
   { name: 'Old Arts 1-1', buildingName: 'Humanities ', capacity: 150 },
   { name: 'Old Arts 1-2', buildingName: 'Humanities ', capacity: 150 },
   { name: 'Mapungubwe Gallery', buildingName: 'Humanities ', capacity: 0 },
@@ -200,21 +285,34 @@ const NATURAL_AND_AGRICULTURAL_SCIENCES_VENUES: readonly UpHatfieldVenueSeed[] =
 
 const PLANT_SCIENCE_COMPLEX_VENUES: readonly UpHatfieldVenueSeed[] = [
   {
-    name: 'Plant Science Auditorium',
+    name: 'Plant Science complex 2-10',
     buildingName: 'Plant Science Complex',
-    capacity: 0,
-  },
-  { name: 'Herbarium', buildingName: 'Plant Science Complex', capacity: 0 },
-  { name: 'Phytotron', buildingName: 'Plant Science Complex', capacity: 0 },
-  {
-    name: 'Plant Science Lab 1',
-    buildingName: 'Plant Science Complex',
-    capacity: 0,
+    capacity: 150,
   },
   {
-    name: 'Plant Science Conference Room',
+    name: 'Plant Science complex 2-11',
     buildingName: 'Plant Science Complex',
-    capacity: 20,
+    capacity: 150,
+  },
+  {
+    name: 'Plant Science complex 2-12',
+    buildingName: 'Plant Science Complex',
+    capacity: 150,
+  },
+  {
+    name: 'Plant Science complex 2-13',
+    buildingName: 'Plant Science Complex',
+    capacity: 150,
+  },
+  {
+    name: 'Plant Science complex 2-14',
+    buildingName: 'Plant Science Complex',
+    capacity: 150,
+  },
+  {
+    name: 'Plant Science complex 2-15',
+    buildingName: 'Plant Science Complex',
+    capacity: 150,
   },
 ];
 const BOTNAY_VENUES: readonly UpHatfieldVenueSeed[] = [
@@ -225,6 +323,21 @@ const BOTNAY_VENUES: readonly UpHatfieldVenueSeed[] = [
 const ZOOLOGY_BUILDING_VENUES: readonly UpHatfieldVenueSeed[] = [
   { name: 'Zoology Lab 1', buildingName: 'Zoology', capacity: 0 },
   { name: 'Zoology 1-1', buildingName: 'Zoology', capacity: 100 },
+  { name: 'Zoology 1-2', buildingName: 'Zoology', capacity: 100 },
+  { name: 'Zoology 1-3', buildingName: 'Zoology', capacity: 100 },
+  { name: 'Zoology 1-4', buildingName: 'Zoology', capacity: 100 },
+  { name: 'Zoology 2-1', buildingName: 'Zoology', capacity: 100 },
+  { name: 'Zoology 2-2', buildingName: 'Zoology', capacity: 100 },
+  { name: 'Zoology 2-3', buildingName: 'Zoology', capacity: 100 },
+  { name: 'Zoology 2-4', buildingName: 'Zoology', capacity: 100 },
+  { name: 'Zoology 3-1', buildingName: 'Zoology', capacity: 100 },
+  { name: 'Zoology 3-2', buildingName: 'Zoology', capacity: 100 },
+  { name: 'Zoology 3-3', buildingName: 'Zoology', capacity: 100 },
+  { name: 'Zoology 3-4', buildingName: 'Zoology', capacity: 100 },
+  { name: 'Zoology 4-1', buildingName: 'Zoology', capacity: 100 },
+  { name: 'Zoology 4-2', buildingName: 'Zoology', capacity: 100 },
+  { name: 'Zoology 4-3', buildingName: 'Zoology', capacity: 100 },
+  { name: 'Zoology 4-4', buildingName: 'Zoology', capacity: 100 },
 ];
 const MATHEMATICS_BUILDING_VENUES: readonly UpHatfieldVenueSeed[] = [
   { name: 'Maths 1-1', buildingName: 'Mathematics', capacity: 150 },
@@ -239,6 +352,13 @@ const LAW_BUILDING_VENUES: readonly UpHatfieldVenueSeed[] = [
 const THEOLOGY_BUILDING_VENUES: readonly UpHatfieldVenueSeed[] = [
   { name: 'Theology 1-1', buildingName: 'Theology ', capacity: 100 },
   { name: 'Theology 1-2', buildingName: 'Theology ', capacity: 100 },
+  { name: 'Theology 1-3', buildingName: 'Theology ', capacity: 100 },
+  { name: 'Theology 1-4', buildingName: 'Theology ', capacity: 100 },
+  { name: 'Theology 1-5', buildingName: 'Theology ', capacity: 100 },
+  { name: 'Theology 1-6', buildingName: 'Theology ', capacity: 100 },
+  { name: 'Theology 1-7', buildingName: 'Theology ', capacity: 100 },
+  { name: 'Theology 1-8', buildingName: 'Theology ', capacity: 100 },
+  { name: 'Theology 1-9', buildingName: 'Theology ', capacity: 100 },
 ];
 const DRAMA_BUILDING_VENUES: readonly UpHatfieldVenueSeed[] = [
   { name: 'Masker Theatre', buildingName: 'Drama ', capacity: 0 },
@@ -295,12 +415,32 @@ const MINING_SCIENCE_VENUES: readonly UpHatfieldVenueSeed[] = [
 
 const A_E_DU_TOIT_AUDITORIUM_VENUES: readonly UpHatfieldVenueSeed[] = [
   {
-    name: 'AE du Toit Lecture Hall 1',
+    name: 'AE du Toit Auditorium',
+    buildingName: 'A E Du Toit Auditorium',
+    capacity: 600,
+  },
+  {
+    name: 'AE du Toit Lecture Hall 2',
     buildingName: 'A E Du Toit Auditorium',
     capacity: 0,
   },
   {
-    name: 'AE du Toit Lecture Hall 2',
+    name: 'AE Annex Tutorial Lab 4-1',
+    buildingName: 'A E Du Toit Auditorium',
+    capacity: 0,
+  },
+  {
+    name: 'AE Annex Tutorial Lab 4-2',
+    buildingName: 'A E Du Toit Auditorium',
+    capacity: 0,
+  },
+  {
+    name: 'AE Annex Tutorial Lab 4-3',
+    buildingName: 'A E Du Toit Auditorium',
+    capacity: 0,
+  },
+  {
+    name: 'AE Annex Tutorial Lab 4-4',
     buildingName: 'A E Du Toit Auditorium',
     capacity: 0,
   },

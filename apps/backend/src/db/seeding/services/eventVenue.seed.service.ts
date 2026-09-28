@@ -26,7 +26,9 @@ export class EventVenuesSeedService extends BaseSeedService {
       return;
     }
 
-    const codes = this.constants.ALL_SEED_MODULES.map((module) => module.Code);
+    const codes = this.constants.ALL_CS_SEED_MODULES.map(
+      (module) => module.Code,
+    );
     const moduleRows = await db
       .select({ id: modules.moduleID, code: modules.moduleCode })
       .from(modules)

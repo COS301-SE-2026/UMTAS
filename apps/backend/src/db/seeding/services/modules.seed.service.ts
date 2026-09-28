@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BaseSeedService } from '../base.seed.service';
 
 import { DatabaseService } from '../../database.service';
-import { eq } from 'drizzle-orm';
+import { eq, ilike } from 'drizzle-orm';
 
 import crypto from 'crypto';
 
@@ -16,6 +16,8 @@ import {
   ModuleStyling,
 } from '../../../entities';
 import { SeedPersistenceService } from '../seed-persistence.service';
+import { AppDatabase } from 'src/auth/auth';
+import { SeedModule } from '../Constants/Modules/Modules.constants';
 
 @Injectable()
 export class ModuleSeedService extends BaseSeedService {
@@ -24,16 +26,34 @@ export class ModuleSeedService extends BaseSeedService {
   }
 
   async seed(tx: DatabaseService['db']): Promise<void> {
-    await this.seedComputerScienceModules(tx);
+    //cs modules
+    await this.seedModulesForCourse(
+      tx,
+      this.constants.ALL_CS_SEED_MODULES,
+      this.constants.CourseNames[0],
+    );
+
+    //as modules
+    await this.seedModulesForCourse(
+      tx,
+      this.constants.ALL_AS_SEED_MODULES,
+      this.constants.CourseNames[1],
+    );
+
+    //physiology moduels
+    await this.seedModulesForCourse(
+      tx,
+      this.constants.ALL_PH_SEED_MODULES,
+      this.constants.CourseNames[2],
+    );
   } //END_seed
 
-  private async seedComputerScienceModules(
-    tx: DatabaseService['db'],
+  private async seedModulesForCourse(
+    tx: AppDatabase,
+    seedModules: SeedModule[],
+    courseName: string,
   ): Promise<void> {
-    //get all modules
-    const seedModules = this.constants.ALL_SEED_MODULES;
-
-    //Get all existing modules
+    //Get existing modules
     const existingModules = await tx.select().from(modules);
 
     //All existing module codes
@@ -46,100 +66,98 @@ export class ModuleSeedService extends BaseSeedService {
       (mod) => !existingModuleCodes.has(mod.Code),
     );
 
-    //if there are modules to be seeded, seed them in
-    if (missingModules.length > 0) {
-      const courseName = this.constants.CourseNames[0]; //CS
+    //If there are no moduels to seed -> return
+    if (missingModules.length === 0) {
+      this.logResult(`[${courseName}]Modules`);
+      return;
+    }
 
-      //Get Computer Science course
-      const [course] = await tx
-        .select()
-        .from(Course)
-        .where(eq(Course.CourseName, courseName))
-        .limit(1);
+    //Get course
+    const [course] = await tx
+      .select()
+      .from(Course)
+      .where(ilike(Course.CourseName, `%${courseName}%`))
+      .limit(1);
 
-      //enusre course exists
-      if (!course) {
-        this.logger.warn(`Course for [${courseName}] does not exist`);
-        return;
-      } //END_!course
+    //enusre course exists
+    if (!course) {
+      this.logger.warn(`Course for [${courseName}] does not exist`);
+      return;
+    } //END_!course
 
-      //Have to ensure course has groupID :(
-      if (!course.GroupID) {
-        this.logger.warn(
-          `Course[${JSON.stringify(course)}] does not have a group, be better. Skipping modules seeding for ${courseName}`,
-        );
-        return;
-      } //END_!course.GroupID
+    //Have to ensure course has groupID :(
+    if (!course.GroupID) {
+      this.logger.warn(
+        `Course[${JSON.stringify(course)}] does not have a group, be better. Skipping modules seeding for ${courseName}`,
+      );
+      return;
+    } //END_!course.GroupID
 
-      const groupId = course.GroupID;
+    const groupId = course.GroupID;
 
-      //Create new modules
-      const newModules = await this.persistence.insertModules(
+    //Create new modules
+    const newModules = await this.persistence.insertModules(
+      tx,
+      missingModules.map((mod) => ({
+        moduleCode: mod.Code,
+        moduleName: mod.Name,
+        moduleDescription: mod.Description,
+        semester: this.moduleSemester(mod.SemesterOfStudy),
+      })),
+    );
+
+    if (newModules.length > 0) {
+      //Populate CompSci's group with modules
+      const groupModules = await this.persistence.insertGroupModules(
         tx,
-        missingModules.map((mod) => ({
-          moduleCode: mod.Code,
-          moduleName: mod.Name,
-          moduleDescription: mod.Description,
-          semester: this.moduleSemester(mod.SemesterOfStudy),
+        newModules.map((mod) => ({
+          GroupID: groupId,
+          ModuleID: mod.moduleID,
         })),
       );
 
-      if (newModules.length > 0) {
-        //Populate CompSci's group with modules
-        const groupModules = await this.persistence.insertGroupModules(
-          tx,
-          newModules.map((mod) => ({
-            GroupID: groupId,
-            ModuleID: mod.moduleID,
-          })),
-        );
+      this.logResult('GroupModules', groupModules?.length ?? 0);
 
-        this.logResult('GroupModules', groupModules?.length ?? 0);
-
-        //Add courseModule metadata for each
-        const courseModules = await this.persistence.insertCourseModules(
-          tx,
-          groupModules.map((gm, index) => ({
-            CourseID: course.CourseID,
-            GroupModuleID: gm.GroupModuleID,
-            Core: missingModules[index].Core,
-            SemesterOfStudy: missingModules[index].SemesterOfStudy,
-            YearOfStudy: missingModules[index].YearOfStudy,
-          })),
-        );
-
-        this.logResult('CourseModules', courseModules?.length ?? 0);
-      } else {
-        this.logger.warn(
-          `Seed modules for [${courseName}] failed to insert newModules`,
-        );
-      } //END_if-else
-
-      this.logResult('Modules', newModules.length);
-
-      //Create syling enities for the new modules
-      await this.generateRandomStylingForModules(
+      //Add courseModule metadata for each
+      const courseModules = await this.persistence.insertCourseModules(
         tx,
-        newModules.map((mod) => mod.moduleID),
+        groupModules.map((gm, index) => ({
+          CourseID: course.CourseID,
+          GroupModuleID: gm.GroupModuleID,
+          Core: missingModules[index].Core,
+          SemesterOfStudy: missingModules[index].SemesterOfStudy,
+          YearOfStudy: missingModules[index].YearOfStudy,
+        })),
       );
 
-      //update hash for course's group
-      //Get all modules belonging to group
-      const allThaModulesIDs = await tx
-        .select({ ModuleID: GroupModules.ModuleID })
-        .from(GroupModules)
-        .where(eq(GroupModules.GroupID, course.GroupID));
-
-      await this.updateGroupHash(
-        tx,
-        course.GroupID,
-        allThaModulesIDs.map((mod) => mod.ModuleID),
+      this.logResult('CourseModules', courseModules?.length ?? 0);
+    } else {
+      this.logger.warn(
+        `Seed modules for [${courseName}] failed to insert newModules`,
       );
-    } //END_missingModules.length check
-    else {
-      this.logResult('Modules');
-    }
-  } //END_seedComputerScienceModules
+    } //END_if-else
+
+    this.logResult('Modules', newModules.length);
+
+    //Create syling enities for the new modules
+    await this.generateRandomStylingForModules(
+      tx,
+      newModules.map((mod) => mod.moduleID),
+    );
+
+    //update hash for course's group
+    //Get all modules belonging to group
+    const allThaModulesIDs = await tx
+      .select({ ModuleID: GroupModules.ModuleID })
+      .from(GroupModules)
+      .where(eq(GroupModules.GroupID, course.GroupID));
+
+    await this.updateGroupHash(
+      tx,
+      course.GroupID,
+      allThaModulesIDs.map((mod) => mod.ModuleID),
+    );
+  } //END_seedModulesForCourse
 
   //generate random colours for the module ID's specified
   private async generateRandomStylingForModules(
