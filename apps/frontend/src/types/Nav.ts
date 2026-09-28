@@ -197,7 +197,26 @@ export const navigationItems: NavigationItem[] = [
     showInNavbar: true,
     showInCommandPalette: true,
   },
-
+  {
+    id: "VisionStats",
+    label: "Vision Stats",
+    href: "/vision-stats",
+    section: "admin",
+    icon: "ChartBarIcon",
+    tourContent: "Gain lecture insights for vision recordings",
+    keywords: [
+      "statistics",
+      "stats",
+      "analytics",
+      "insights",
+      "vision",
+      "model",
+    ],
+    roles: ["LECTURER", "UNIVERSITY_ADMIN"],
+    requiresUniversity: true,
+    showInNavbar: true,
+    showInCommandPalette: true,
+  },
   {
     id: "attendance",
     label: "Attendance",
