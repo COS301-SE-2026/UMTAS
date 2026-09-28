@@ -146,7 +146,7 @@ export default function CalTemplate() {
 
   return (
     <>
-      {/* <Tutorial steps={steps} wait={true} /> */}
+      <Tutorial steps={steps} wait={true} />
 
       <div className="flex w-full flex-col items-center gap-6 px-6 pt-6 capitalize">
         <div className="w-full max-w-6xl overflow-auto">
