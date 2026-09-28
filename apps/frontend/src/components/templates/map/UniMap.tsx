@@ -173,9 +173,20 @@ export function UniMap() {
 
   const steps = [
     {
-      target: "#map-date-time",
-      content:
-        "Select a date and time to view routes between events on your schedule.",
+      target: "#btn-route",
+      content: "View campus buildings and routes.",
+    },
+    {
+      target: "#btn-heatmap",
+      content: "View campus statistics in heatmap format.",
+    },
+    {
+      target: "#date-for-routes",
+      content: "Select a date to view routes between events on your schedule.",
+    },
+    {
+      target: "#time-routes",
+      content: "Select a time to view specific routes.",
     },
     {
       target: "#university-map",
@@ -187,7 +198,7 @@ export function UniMap() {
           {
             target: "#admin-map-controls",
             content:
-              "Use these controls to select buildings, place pins, and manage building areas on the map.",
+              "Use these controls to select buildings, place pins, and reroute traffic between buildings.",
           },
         ]
       : []),
@@ -218,6 +229,7 @@ export function UniMap() {
         >
           <div className="flex rounded-lg border border-[var(--border)] overflow-hidden">
             <button
+              id="btn-route"
               type="button"
               onClick={() => setMapMode("route")}
               className={`px-2 py-1 text-sm cursor-pointer ${
@@ -229,6 +241,7 @@ export function UniMap() {
               Route
             </button>
             <button
+              id="btn-heatmap"
               type="button"
               onClick={() => setMapMode("heatmap")}
               className={`px-2 py-1 text-sm cursor-pointer ${
@@ -242,6 +255,7 @@ export function UniMap() {
           </div>
 
           <input
+            id="date-for-routes"
             type="date"
             value={selectedDate}
             className="text-sm"
@@ -251,6 +265,7 @@ export function UniMap() {
           {mapMode === "route" && (
             <>
               <input
+                id="time-routes"
                 type="time"
                 value={selectedTime}
                 onChange={(e) => setSelectedTime(e.target.value)}
