@@ -339,9 +339,7 @@ export function GenerateStep({
           type="button"
           variant="ghost"
           size="default"
-          onClick={() => {
-            onGenerate("BACK", []);
-          }}
+          onClick={() => router.push("/builder")}
           className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)]"
         >
           <ArrowLeft size={16} strokeWidth={1.5} />
