@@ -10,7 +10,6 @@ import { CourseSeedService } from './services/courses.seed.service';
 import { ModuleSeedService } from './services/modules.seed.service';
 import { PublicCalendarSeedService } from './services/public-calendar.seed.service';
 import { UniversitySeedService } from './services/university.seed.service';
-import { UniRolesSeedService } from './services/universityRoles.seed.service';
 import { UserSeedService } from './services/users.seed.service';
 import { VenuesSeedService } from './services/venues.seed.service';
 
@@ -21,7 +20,6 @@ export class DatabaseSeedService {
   constructor(
     private readonly universitySeedService: UniversitySeedService,
     private readonly userSeedService: UserSeedService,
-    private readonly universityRolesSeedService: UniRolesSeedService,
     private readonly courseSeedService: CourseSeedService,
     private readonly moduleSeedService: ModuleSeedService,
     private readonly publicCalendarSeedService: PublicCalendarSeedService,
@@ -40,10 +38,6 @@ export class DatabaseSeedService {
         (tx: AppDatabase) => this.universitySeedService.seed(tx),
       ],
       ['users', (tx: AppDatabase) => this.userSeedService.seed(tx)],
-      [
-        'university roles',
-        (tx: AppDatabase) => this.universityRolesSeedService.seed(tx),
-      ],
       ['courses', (tx: AppDatabase) => this.courseSeedService.seed(tx)],
       ['modules', (tx: AppDatabase) => this.moduleSeedService.seed(tx)],
       [
