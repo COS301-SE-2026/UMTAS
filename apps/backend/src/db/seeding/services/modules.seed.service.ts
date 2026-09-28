@@ -19,6 +19,17 @@ import { SeedPersistenceService } from '../seed-persistence.service';
 import { AppDatabase } from 'src/auth/auth';
 import { SeedModule } from '../Constants/Modules/Modules.constants';
 
+const MODULE_COLOURS = [
+  '#4A90F8', //Blue
+  '#22C55E', //Green
+  '#F59E0B', //Amber
+  '#F56363', //Red
+  '#A78BFA', //Purple
+  '#FB923C', //Orange
+  '#38BDF8', //Sky
+  '#F472B6', //Pink
+];
+
 @Injectable()
 export class ModuleSeedService extends BaseSeedService {
   constructor(private readonly persistence: SeedPersistenceService) {
@@ -164,23 +175,13 @@ export class ModuleSeedService extends BaseSeedService {
     tx: DatabaseService['db'],
     modules: string[],
   ) {
-    //will generate random colours for modules for all users
-
     //Get all users
     const users = await tx.select().from(usersTable);
 
-    if (users.length === 0 || modules.length === 0)
+    if (users.length === 0 || modules.length === 0) {
       this.logResult('ModuleStyling');
-
-    //Helper for random colors
-    const genRandomColour = (): string => {
-      const chars = '0123456789ABCDEF';
-      let out = '#';
-
-      for (let i = 0; i < 6; i++) out += chars[Math.floor(Math.random() * 16)];
-
-      return out;
-    }; //END_genRandomColour
+      return;
+    }
 
     //Create styling objects
     const stylingObjects: (typeof ModuleStyling.$inferInsert)[] = [];
@@ -190,7 +191,10 @@ export class ModuleSeedService extends BaseSeedService {
         stylingObjects.push({
           ModuleID: id,
           UserID: user.id,
-          styling: { colour: genRandomColour() },
+          styling: {
+            colour:
+              MODULE_COLOURS[Math.floor(Math.random() * MODULE_COLOURS.length)],
+          },
         });
       } //END_id
     } //END_user
