@@ -12,10 +12,8 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/Alert_System.svg)
 
-    ??? warning "**Traceability Matrix**"
-        <div align="center">
-        ![](./Traceability_Matrix/FR3_3.svg)
-        </div>
+    ??? info "**Historical Alert Traceability Diagram**"
+        ![Historical mapping of UC-AL-01 to the former FR3.3 alert requirements](./Traceability_Matrix/FR3_3.svg)
 
     ---
     ??? "UC-AL-01: Event Change Alerts"

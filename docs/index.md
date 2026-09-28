@@ -40,7 +40,7 @@ Get up and running with the UMTAS platform in minutes.
 
     ---
 
-    Find the Demo 4 rubric, evidence links and outstanding NFR tests.
+    Find direct links to the current documentation, application and assessment resources.
 
     [:octicons-arrow-right-24: Open Marking Guide](management/Marking-Guide.md)
 

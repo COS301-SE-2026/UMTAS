@@ -433,7 +433,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 ### Demo 4
 
-The three wow factors are assessed in the live demonstration. The [Demo 4 marking guide](https://cos301-se-2026.github.io/UMTAS/latest/management/Marking-Guide/) covers the rubric and outstanding NFR evidence.
+The three wow factors are assessed in the live demonstration. The [Demo 4 marking guide](https://cos301-se-2026.github.io/UMTAS/latest/management/Marking-Guide/) links to the current documentation and assessment resources.
 
 Current documents: [SRS](https://cos301-se-2026.github.io/UMTAS/latest/srs/), [SAS](https://cos301-se-2026.github.io/UMTAS/latest/sas/), [Non-Functional Requirements and evidence](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_REQUIREMENTS/), [user manual](https://cos301-se-2026.github.io/UMTAS/latest/management/UserManual/) and [team profiles with LinkedIn links](https://cos301-se-2026.github.io/UMTAS/latest/management/Team-Profiles/). The [project board](https://github.com/orgs/COS301-SE-2026/projects/31) tracks work, and the [live application](https://capstone-vigil.dns.net.za/) provides the help menu. The Demo 3 archive links above will resolve after the documentation deployment on `main` publishes `/demo3/`.
 
