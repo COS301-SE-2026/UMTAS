@@ -393,7 +393,7 @@ export function GenerateStep({
             {isGenerating
               ? "Generating..."
               : selectedEventIds.length === 0
-                ? "Select at Least One Event"
+                ? "Select At Least One Event"
                 : isEditMode
                   ? "Edit Timetable"
                   : "Generate Timetable"}
@@ -408,7 +408,7 @@ export function GenerateStep({
             onClick={() => setShowSolver(true)}
             className="w-fit px-4 text-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40 transition-colors duration-[var(--duration-fast)]"
           >
-            Solve timetable
+            Solve Timetable
           </Button>
         </div>
       </div>
