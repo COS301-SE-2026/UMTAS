@@ -21,6 +21,7 @@ import {
   DeleteMockUsersResponseDto,
   MockUserRole,
 } from './auth.dto';
+import { cloneSeededUserData } from './clone.user.helper';
 
 export interface ProvisionedUser {
   userId: string;
@@ -210,13 +211,24 @@ export class AuthService implements OnModuleInit {
     const email = `guest+${randomUUID()}@simulation.com`;
     const password = randomBytes(32).toString('base64url');
 
-    return this.createProvisionedTestUser({
+    const guest = await this.createProvisionedTestUser({
       email,
       password,
       name: 'Guest',
       role: 'STUDENT',
       universityName: 'University of Pretoria',
     });
+
+    try {
+      await this.databaseService.db.transaction((tx: AppDatabase) =>
+        cloneSeededUserData(tx, guest.userId),
+      );
+    } catch (error) {
+      await this.removeProvisionedUser(guest.userId);
+      throw error;
+    }
+
+    return guest;
   }
 
   async removeProvisionedUser(userId: string): Promise<void> {
