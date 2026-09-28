@@ -20,15 +20,11 @@ import { eventCols } from "@/components/organisms/module-management/eventsColumn
 import CustomiseEventPopup from "@/components/organisms/customise/customiseEventPopup";
 const steps = [
   {
-    target: "#input-search-event",
+    target: "#input-search-event-code",
     content: "Search for an event by name, activity code, or module code.",
   },
   {
-    target: "#select-event-type",
-    content: "Filter events using type or prefix filters.",
-  },
-  {
-    target: "#row-event-row",
+    target: "#event-row",
     content: "Select an event to open its specific customization options.",
   },
 ];

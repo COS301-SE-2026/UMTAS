@@ -102,9 +102,9 @@ function CourseTableBody<TData>({
           </TableCell>
         </TableRow>
       ) : (
-        rows.map((row) => (
+        rows.map((row, index) => (
           <TableRow
-            id="row-module-row"
+            id={index === 0 ? "event-row" : undefined}
             key={row.id}
             className="border-b border-[var(--border)] brand-table-hover cursor-pointer"
           >
