@@ -102,8 +102,8 @@ export function UniMap() {
 
   //heatmap use state stuff
   const [mapMode, setMapMode] = useState<"route" | "heatmap">("route");
-  const [fromHour, setFromHour] = useState(8);
-  const [toHour, setToHour] = useState(15);
+  const [fromHour, setFromHour] = useState(7);
+  const [toHour, setToHour] = useState(18);
   const [metricMode, setMetricMode] = useState<"projected" | "worstCase">(
     "projected",
   );
