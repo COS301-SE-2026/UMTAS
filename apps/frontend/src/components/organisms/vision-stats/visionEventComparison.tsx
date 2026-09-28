@@ -46,7 +46,7 @@ export default function VisionEventComparison({
   if (!selectedEventId) {
     return (
       <div className="flex items-center justify-center py-10 text-text-secondary">
-        Select an event in the filter bar above to see its occurrences
+        Select an event with the filter button above to see its occurrences
       </div>
     );
   }
