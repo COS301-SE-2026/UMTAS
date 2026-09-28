@@ -132,4 +132,4 @@ UMTAS is a [COS 301](https://www.up.ac.za/) capstone project built in partnershi
 
 ## :material-link-variant: Quick Links
 
-- [GitHub Project Board](https://github.com/orgs/COS301-SE-2026/projects/[ID])
+- [GitHub Project Board](https://github.com/orgs/COS301-SE-2026/projects/31)

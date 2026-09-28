@@ -1,0 +1,36 @@
+NFR-Corr-2 diagnostic solver regression
+Date: 2026-09-28 (Africa/Johannesburg)
+Branch: feat/demo4-doc-polish
+Revision: 500d69f673883270cf9eae6cf225b53df325582c
+Command: bash -x ./tests/run-cli-regressions.sh
+Binary: existing local GA_BIN; this is not a release acceptance run.
+
++ set -euo pipefail
+++ mktemp -d
++ tmp_dir=/var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb
++ trap 'rm -rf "$tmp_dir"' EXIT
++ ./GA_BIN --input src/data/API/example.json --output /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/cp-sat.json --engine cp-sat --solve-mode optimization
++ assert_json_contains /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/cp-sat.json '"status": "feasible"'
++ local file=/var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/cp-sat.json
++ local 'expected="status": "feasible"'
++ grep -Fq '"status": "feasible"' /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/cp-sat.json
++ assert_json_contains /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/cp-sat.json '"outcome": "conflict-free"'
++ local file=/var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/cp-sat.json
++ local 'expected="outcome": "conflict-free"'
++ grep -Fq '"outcome": "conflict-free"' /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/cp-sat.json
++ assert_json_contains /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/cp-sat.json '"solveMode": "optimization"'
++ local file=/var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/cp-sat.json
++ local 'expected="solveMode": "optimization"'
++ grep -Fq '"solveMode": "optimization"' /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/cp-sat.json
++ assert_json_contains /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/cp-sat.json '"CS101-L1-A"'
++ local file=/var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/cp-sat.json
++ local 'expected="CS101-L1-A"'
++ grep -Fq '"CS101-L1-A"' /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/cp-sat.json
++ ./GA_BIN --input tests/fixtures/preferred-start-time.json --output /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/preferred-start-time.json --engine cp-sat --solve-mode optimization
++ assert_json_contains /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/preferred-start-time.json '"CS101-L1-B"'
++ local file=/var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/preferred-start-time.json
++ local 'expected="CS101-L1-B"'
++ grep -Fq '"CS101-L1-B"' /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb/preferred-start-time.json
++ rm -rf /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.ZV3ghPORAb
+
+Exit code: 1

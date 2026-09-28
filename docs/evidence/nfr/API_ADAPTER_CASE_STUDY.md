@@ -192,13 +192,18 @@ Added:      New_Adapter
 Unchanged:  CourseService, ModuleService, EventService, Controllers, Database layer
 ```
 
-The new adapter contains all university-specific code-requests, authentication, mapping, error handling-without touching existing services.
+The proposed new adapter would contain university-specific requests, authentication, mapping and
+error handling without changing existing services. A controlled implementation and diff are still
+needed to measure the result.
 
 ---
 
 ## 10. Findings
 
-The adapter architecture successfully controls the impact of external system changes. University-specific behaviour sits behind a stable internal contract, so core UMTAS components remain unaware of individual API details.
+The adapter architecture is designed to control the impact of external system changes.
+University-specific behaviour sits behind a stable internal contract, so core UMTAS components
+should remain unaware of individual API details. This case study has not yet measured a second
+university implementation.
 
 The architecture supports the modifiability NFR. However, new integrations still require new code-the benefit is confinement of that code to the adapter layer rather than spread across the application.
 
@@ -210,7 +215,7 @@ A key consideration is the abstraction contract: it must remain general enough t
 
 This case study demonstrates how the University API Adapter addresses external API variability through a common abstraction and concrete implementations.
 
-The NFR requires zero modifications to existing non-adapter components when adding a new university. The architecture achieves this through:
+The NFR requires zero modifications to existing non-adapter components when adding a new university. The architecture aims to achieve this through:
 
 - isolating volatile behaviour inside adapters;
 - depending on abstractions rather than concretions;
@@ -218,7 +223,8 @@ The NFR requires zero modifications to existing non-adapter components when addi
 
 The Adapter pattern provides the mechanism, supported by dependency inversion and registry-based selection.
 
-The trade-off: additional abstraction and indirection for reduced change propagation-is appropriate given that external university APIs are a known source of architectural volatility.
+The trade-off, additional abstraction and indirection in exchange for reduced change propagation,
+is appropriate given that external university APIs are a known source of architectural volatility.
 
 The design traces clearly from a quality attribute through NFR, tactics, patterns, implementation, and measurable verification.
 
