@@ -43,7 +43,9 @@ export class EventsSeedService extends BaseSeedService {
       return;
     }
 
-    const codes = this.constants.ALL_SEED_MODULES.map((module) => module.Code);
+    const codes = this.constants.ALL_CS_SEED_MODULES.map(
+      (module) => module.Code,
+    );
 
     const modulesByCode = await this.getSeededModulesByCode(db, codes);
 
