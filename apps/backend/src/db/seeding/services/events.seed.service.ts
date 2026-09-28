@@ -1,13 +1,16 @@
 import { Injectable } from '@nestjs/common';
 
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, ne } from 'drizzle-orm';
 
 import {
   Event,
+  EventAttendance,
   EventVenue,
+  ModuleEnrollment,
   UniversityEvent,
   Venue,
   modules,
+  usersTable,
 } from '../../../entities';
 
 import type { AppDatabase } from '../../database.service';
@@ -34,6 +37,18 @@ type SeededModule = {
 type SeededVenue = {
   id: string;
   name: string;
+};
+
+const ATTENDANCE_WEEKS = 12;
+
+const DAY_OFFSETS: Record<string, number> = {
+  monday: 0,
+  tuesday: 1,
+  wednesday: 2,
+  thursday: 3,
+  friday: 4,
+  saturday: 5,
+  sunday: 6,
 };
 
 @Injectable()
@@ -64,9 +79,17 @@ export class EventsSeedService extends BaseSeedService {
     // Validate that every module and venue exists
     this.validateReferences(modulesByCode, venuesByName);
 
+    // Enroll every user in every module that has seeded events
+    await this.enrollAllUsersInModules(
+      db,
+      [...modulesByCode.values()].map((module) => module.id),
+    );
+
     let eventsCreated = 0;
     let relationshipsCreated = 0;
     let venuesCreated = 0;
+
+    const seededEvents: { eventId: string; event: SeedEvent }[] = [];
 
     // Seed every configured event
     for (const event of FIRST_YEAR_EVENTS) {
@@ -79,6 +102,8 @@ export class EventsSeedService extends BaseSeedService {
       }
 
       const result = await this.seedEvent(db, event, module, venue);
+
+      seededEvents.push({ eventId: result.eventId, event });
 
       if (result.eventCreated) {
         eventsCreated++;
@@ -93,11 +118,19 @@ export class EventsSeedService extends BaseSeedService {
       }
     }
 
+    // Every user attends every seeded event
+    const attendancesCreated = await this.seedAttendanceForAllUsers(
+      db,
+      seededEvents,
+    );
+
     this.logResult('First-year events', eventsCreated);
 
     this.logResult('Module event relationships', relationshipsCreated);
 
     this.logResult('Event venue relationships', venuesCreated);
+
+    this.logResult('Event attendances', attendancesCreated);
   } //END_seed
 
   private async getSeededModulesByCode(
@@ -165,6 +198,7 @@ export class EventsSeedService extends BaseSeedService {
     module: SeededModule,
     venue: SeededVenue,
   ): Promise<{
+    eventId: string;
     eventCreated: boolean;
     moduleRelationshipCreated: boolean;
     venueRelationshipCreated: boolean;
@@ -249,6 +283,7 @@ export class EventsSeedService extends BaseSeedService {
     );
 
     return {
+      eventId,
       eventCreated,
       moduleRelationshipCreated,
       venueRelationshipCreated,
@@ -314,4 +349,164 @@ export class EventsSeedService extends BaseSeedService {
 
     return true;
   } //END_ensureEventVenueRelationship
+
+  private async enrollAllUsersInModules(
+    db: AppDatabase,
+    moduleIds: string[],
+  ): Promise<number> {
+    if (moduleIds.length === 0) {
+      return 0;
+    }
+
+    // Get all users
+    const users = await db.select({ id: usersTable.id }).from(usersTable);
+
+    if (users.length === 0) {
+      return 0;
+    }
+
+    // Get existing enrollments for these modules
+    const existingEnrollments = await db
+      .select({
+        moduleId: ModuleEnrollment.ModuleID,
+        userId: ModuleEnrollment.UserID,
+      })
+      .from(ModuleEnrollment)
+      .where(inArray(ModuleEnrollment.ModuleID, moduleIds));
+
+    const existingKeys = new Set(
+      existingEnrollments.map(
+        (enrollment) => `${enrollment.moduleId}:${enrollment.userId}`,
+      ),
+    );
+
+    // Only enroll the missing user/module pairs
+    const missingEnrollments: (typeof ModuleEnrollment.$inferInsert)[] = [];
+
+    for (const moduleId of moduleIds) {
+      for (const user of users) {
+        if (existingKeys.has(`${moduleId}:${user.id}`)) {
+          continue;
+        }
+
+        missingEnrollments.push({
+          ModuleID: moduleId,
+          UserID: user.id,
+        });
+      } //END_user
+    } //END_moduleId
+
+    if (missingEnrollments.length === 0) {
+      return 0;
+    }
+
+    const created = await this.persistence.insertModuleEnrollments(
+      db,
+      missingEnrollments,
+    );
+
+    return created.length;
+  } //END_enrollAllUsersInModules
+
+  private async seedAttendanceForAllUsers(
+    db: AppDatabase,
+    seededEvents: { eventId: string; event: SeedEvent }[],
+  ): Promise<number> {
+    if (seededEvents.length === 0) {
+      return 0;
+    }
+
+    // Get all users
+    const users = await db.select({ id: usersTable.id }).from(usersTable);
+
+    if (users.length === 0) {
+      return 0;
+    }
+
+    const eventIds = seededEvents.map((seeded) => seeded.eventId);
+
+    // Get existing attendance rows for these events
+    const existingAttendances = await db
+      .select({
+        eventId: EventAttendance.eventID,
+        userId: EventAttendance.UserID,
+        eventDate: EventAttendance.eventDate,
+      })
+      .from(EventAttendance)
+      .where(inArray(EventAttendance.eventID, eventIds));
+
+    const existingKeys = new Set(
+      existingAttendances.map(
+        (attendance) =>
+          `${attendance.eventId}:${attendance.userId}:${attendance.eventDate}`,
+      ),
+    );
+
+    // Only create the missing user/event/date rows
+    const missingAttendances: (typeof EventAttendance.$inferInsert)[] = [];
+
+    for (const { eventId, event } of seededEvents) {
+      const dates = this.getOccurrenceDates(event.dayOfWeek);
+
+      for (const user of users) {
+        for (const eventDate of dates) {
+          if (existingKeys.has(`${eventId}:${user.id}:${eventDate}`)) {
+            continue;
+          }
+
+          missingAttendances.push({
+            eventID: eventId,
+            UserID: user.id,
+            eventDate,
+            state: 'ATTENDING',
+          });
+        } //END_eventDate
+      } //END_user
+    } //END_seededEvents
+
+    // Insert in batches to stay well under Postgres' parameter limit
+    const BATCH_SIZE = 1000;
+    let created = 0;
+
+    for (let i = 0; i < missingAttendances.length; i += BATCH_SIZE) {
+      const inserted = await this.persistence.insertEventAttendances(
+        db,
+        missingAttendances.slice(i, i + BATCH_SIZE),
+      );
+
+      created += inserted.length;
+    }
+
+    await db
+      .update(EventAttendance)
+      .set({ state: 'ATTENDING' })
+      .where(
+        and(
+          inArray(EventAttendance.eventID, eventIds),
+          ne(EventAttendance.state, 'ATTENDING'),
+        ),
+      );
+
+    return created;
+  } //END_seedAttendanceForAllUsers
+
+  private getOccurrenceDates(dayOfWeek: string): string[] {
+    const offset = DAY_OFFSETS[dayOfWeek.toLowerCase()] ?? 0;
+
+    const now = new Date();
+    const monday = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+    );
+    monday.setUTCDate(monday.getUTCDate() - ((monday.getUTCDay() + 6) % 7));
+
+    const dates: string[] = [];
+
+    for (let week = 0; week < ATTENDANCE_WEEKS; week++) {
+      const date = new Date(monday);
+      date.setUTCDate(monday.getUTCDate() + week * 7 + offset);
+      dates.push(date.toISOString().slice(0, 10));
+    } //END_week
+
+    return dates;
+  } //END_getOccurrenceDates
 } //END_EventsSeedService
