@@ -285,22 +285,21 @@ export default function EditModuleEvent({
             {isAttendanceOperator ? (
               <div className="flex flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
                 <Label className="text-sm font-medium text-[var(--text-primary)]">
-                  Teaching assignment
+                  Teaching Assignment
                 </Label>
-                <Label className="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)]">
+
+                <Label className="text-sm font-medium text-[var(--text-secondary)]">
+                  I teach this module
                   <Checkbox
                     checked={teachesModule}
                     disabled={teachesModule || teachingPending}
                     onCheckedChange={(checked) => {
-                      if (checked) assignMeToModule(moduleState.moduleID);
+                      if (checked) {
+                        assignMeToModule(moduleState.moduleID);
+                      }
                     }}
                   />
-                  I teach this module
                 </Label>
-                <p className="text-xs text-[var(--text-secondary)]">
-                  This assignment lets you take attendance for the module&apos;s
-                  classes.
-                </p>
               </div>
             ) : (
               <div className="flex flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
