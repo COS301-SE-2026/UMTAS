@@ -7,6 +7,20 @@ import {
   TabsTrigger,
 } from "@/components/atoms/baseShadcn/tabs";
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import VisionFilterBar from "@/components/organisms/stats/visionFilterBar";
+import VisionOverview from "@/components/organisms/vision-stats/visionOverview";
+import VisionEventComparisonTab from "@/components/organisms/vision-stats/visionEventComparison";
+import VisionModule from "@/components/organisms/vision-stats/visionModule";
+import VisionSessions from "@/components/organisms/vision-stats/visionSessions";
+import VisionInsights from "@/components/organisms/vision-stats/visionInsights";
+import {
+  mockEvents,
+  mockModules,
+} from "../../../../utilities/vision-stats/VisionMock";
+import { VisionFilters } from "../../../../utilities/vision-stats/VisionTypes";
+import { getUniversityStatsQ } from "../../../../utilities/vision-stats/VisionQueries";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 const steps = [
   {
@@ -21,6 +35,38 @@ const steps = [
 ];
 
 export default function VisionStatsPageTemplate() {
+  const [filters, setFilters] = useState<VisionFilters>({});
+  const [selectedEventId, setSelectedEventId] = useState<string>();
+
+  const {
+    data: sessions = [],
+    isLoading,
+    isError,
+  } = useQuery(
+    getUniversityStatsQ({
+      moduleId: filters.moduleId,
+      from: filters.from,
+      to: filters.to,
+      search: filters.search,
+    }),
+  );
+
+  const scopedEvents = mockEvents.filter(
+    (event) =>
+      (!filters.moduleId || event.moduleId === filters.moduleId) &&
+      (!filters.eventType || event.activityType === filters.eventType),
+  );
+
+  const sessionsToDisplay = filters.eventType
+    ? sessions.filter((session) =>
+        scopedEvents.some((event) => event.id === session.eventID),
+      )
+    : sessions;
+
+  const comparisonSessions = selectedEventId
+    ? sessions.filter((session) => session.eventID === selectedEventId)
+    : [];
+
   return (
     <>
       <Tutorial steps={steps} wait={true} />
@@ -30,12 +76,21 @@ export default function VisionStatsPageTemplate() {
             Vision Stats Dashboard
           </h1>
           <p className="text-sm text-[var(--text-secondary)]">
-            View various statistics and metrics related to the UMTAS system.
+            View various statistics and metrics related to the Vision Model.
           </p>
         </div>
 
+        <VisionFilterBar
+          modules={mockModules}
+          events={mockEvents}
+          filters={filters}
+          setFilters={setFilters}
+          selectedEventId={selectedEventId}
+          onEventChange={setSelectedEventId}
+        />
+
         <div>
-          <Tabs defaultValue="university" className="w-full space-y-4">
+          <Tabs defaultValue="overview" className="w-full space-y-4">
             <TabsList
               id="stats-tabs"
               className="w-full flex flex-wrap gap-2 h-auto"
@@ -45,6 +100,12 @@ export default function VisionStatsPageTemplate() {
                 className="px-4 py-2 cursor-pointer focus-visible:ring-2"
               >
                 Overview
+              </TabsTrigger>
+              <TabsTrigger
+                value="sessions"
+                className="px-4 py-2 cursor-pointer focus-visible:ring-2"
+              >
+                Sessions
               </TabsTrigger>
               <TabsTrigger
                 value="event-comparison"
@@ -59,12 +120,6 @@ export default function VisionStatsPageTemplate() {
                 Modules
               </TabsTrigger>
               <TabsTrigger
-                value="sessions"
-                className="px-4 py-2 cursor-pointer focus-visible:ring-2"
-              >
-                Sessions
-              </TabsTrigger>
-              <TabsTrigger
                 value="insights"
                 className="px-4 py-2 cursor-pointer focus-visible:ring-2"
               >
@@ -74,15 +129,52 @@ export default function VisionStatsPageTemplate() {
 
             <div id="stats-content">
               <TabsContent value="overview" className="space-y-6">
-                hier
+                <VisionOverview
+                  data={sessionsToDisplay}
+                  isLoading={isLoading}
+                  isError={isError}
+                />
               </TabsContent>
-              <TabsContent value="event-comparison">hier</TabsContent>
 
-              <TabsContent value="modules">hier</TabsContent>
+              <TabsContent value="sessions">
+                <VisionSessions
+                  data={sessionsToDisplay}
+                  isLoading={isLoading}
+                  isError={isError}
+                />
+              </TabsContent>
 
-              <TabsContent value="sessions">hier</TabsContent>
+              <TabsContent value="event-comparison">
+                <VisionEventComparisonTab
+                  events={mockEvents.filter(
+                    (event) =>
+                      !filters.moduleId || event.moduleId === filters.moduleId,
+                  )}
+                  selectedEventId={selectedEventId}
+                  filters={filters}
+                  data={comparisonSessions}
+                  isLoading={isLoading}
+                  isError={isError}
+                />
+              </TabsContent>
 
-              <TabsContent value="insights">hier</TabsContent>
+              <TabsContent value="modules">
+                <VisionModule
+                  moduleSelected={Boolean(filters.moduleId)}
+                  events={scopedEvents}
+                  data={sessionsToDisplay}
+                  isLoading={isLoading}
+                  isError={isError}
+                />
+              </TabsContent>
+
+              <TabsContent value="insights">
+                <VisionInsights
+                  data={sessionsToDisplay}
+                  isLoading={isLoading}
+                  isError={isError}
+                />
+              </TabsContent>
             </div>
           </Tabs>
         </div>
