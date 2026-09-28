@@ -84,7 +84,7 @@ export default function VisionStatsPageTemplate() {
       <Tutorial steps={steps} wait={true} />
       <div className="container mx-auto py-10 space-y-6 px-8">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)] pb-2">
+          <h1 className="text-xl font-bold tracking-tight text-[var(--text-primary)] pb-2">
             Vision Stats Dashboard
           </h1>
           <p className="text-sm text-[var(--text-secondary)]">

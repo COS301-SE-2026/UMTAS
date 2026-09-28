@@ -85,7 +85,7 @@ export default function EventManagementTemplate() {
       <Tutorial steps={steps} wait={true} />
 
       <div className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
-        <div className="border-b border-[var(--border)] px-5 py-4">
+        <div className="px-5 py-4">
           <h1 className="text-lg font-semibold text-[var(--text-primary)]">
             Event Management
           </h1>
