@@ -50,6 +50,7 @@ export default function Tutorial({
       scrollToFirstStep={true}
       options={{
         zIndex: 10000,
+        scrollOffset: 80,
       }}
       // @ts-expect-error idk why this keeps giving an error but it works haha
       callback={(data: { status: string; action: string }) => {
