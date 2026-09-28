@@ -70,7 +70,7 @@ pub fn infer_pose_data(
     all_people.extend(full_image_people);
     all_people.extend(quadrant_people);
 
-    let res_people = non_maximum_sepression(all_people, 0.30);
+    let res_people = non_maximum_sepression(all_people, 0.70);
 
     return serde_json::to_string(&res_people).map_err(|e| JsValue::from_str(&e.to_string()));
 }
@@ -87,8 +87,8 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
     let mut people: Vec<DetectedPersonPose> = Vec::new();
 
     const NUM_FEATURES: usize = 56;
-    const CONFIDENCE_THRESHOLD: f32 = 0.15;
-    const KEYPOINT_CONFIDENCE_THRESHOLD: f32 = 0.1;
+    const CONFIDENCE_THRESHOLD: f32 = 0.05;
+    const KEYPOINT_CONFIDENCE_THRESHOLD: f32 = 0.4;
 
     if slice_data.is_empty() || slice_data.len() % NUM_FEATURES != 0 {
         return Err(format!(
