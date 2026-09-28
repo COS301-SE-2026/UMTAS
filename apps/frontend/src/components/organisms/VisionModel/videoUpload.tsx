@@ -31,6 +31,7 @@ export default function VideoUploadComp() {
   const [sessionID, setSessionID] = useState<string | null>(null);
 
   const isProcessingRef = useRef<boolean>(false);
+  const activeToastIdRef = useRef<string | number | null>(null);
   const uploadVideoRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameStore = useRef<SessionStorePose>(null);
@@ -58,9 +59,13 @@ export default function VideoUploadComp() {
     total_no_attention: 0,
     total_paying_attention: 0,
   });
+
   useEffect(() => {
     return () => {
       isProcessingRef.current = false;
+      if (activeToastIdRef.current !== null) {
+        toast.dismiss(activeToastIdRef.current);
+      }
       pose_Manager.terminate();
       pose_data_manager.terminate();
     };
@@ -76,6 +81,7 @@ export default function VideoUploadComp() {
     const toastId = toast.loading("Analysing video", {
       description: `${file.name} is being processed.`,
     });
+    activeToastIdRef.current = toastId;
 
     const videoUrl = URL.createObjectURL(file);
     const videoElement = document.createElement("video");
@@ -302,6 +308,11 @@ export default function VideoUploadComp() {
     } catch (error) {
       console.error("Error processing video", error);
 
+      if (!isProcessingRef.current) {
+        toast.dismiss(toastId);
+        return;
+      }
+
       const message =
         error instanceof Error
           ? error.message
@@ -313,6 +324,7 @@ export default function VideoUploadComp() {
       });
     } finally {
       URL.revokeObjectURL(videoUrl);
+      activeToastIdRef.current = null;
       isProcessingRef.current = false;
       setIsProcessing(false);
       pose_Manager.terminate();
@@ -331,6 +343,13 @@ export default function VideoUploadComp() {
     setVideo(null);
     isProcessingRef.current = false;
     setIsProcessing(false);
+
+    if (activeToastIdRef.current !== null) {
+      toast.dismiss(activeToastIdRef.current);
+      activeToastIdRef.current = null;
+    }
+
+    setVideo(null);
     setProgress(0);
     setEta("Calculating...");
     setCurrentTimeDisplay("0:00 / 0:00");
