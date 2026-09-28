@@ -281,7 +281,7 @@ export default function AttendanceScanner() {
 
   if (!sessionStarted) {
     return (
-      <div className="mx-auto flex w-full max-w-2xl flex-col gap-5">
+      <div className="flex w-full flex-col gap-5">
         <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
           <p className="mb-2 text-xs font-medium text-[var(--text-secondary)]">
             Current class
