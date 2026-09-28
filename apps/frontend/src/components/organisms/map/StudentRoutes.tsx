@@ -107,7 +107,9 @@ function StudentRouteLineItem({
   transition,
   routeIndex,
   date,
+  buildingPairKey,
   onAlternateRouteError,
+  onAlternateRouteSuccess,
   onRouteClick,
   onRouteHover,
   onRouteHoverEnd,
@@ -115,7 +117,9 @@ function StudentRouteLineItem({
   transition: getStudentRouteTransitionType;
   routeIndex?: number;
   date: string;
+  buildingPairKey: string;
   onAlternateRouteError: () => void;
+  onAlternateRouteSuccess: (buildingPairKey: string) => void;
   onRouteClick: () => void;
   onRouteHover: (position: { x: number; y: number }) => void;
   onRouteHoverEnd: () => void;
@@ -135,7 +139,7 @@ function StudentRouteLineItem({
   //Alternate route found
   useEffect(() => {
     if (alternativeRouteData) {
-      console.log("ALTERNATIVE ROUTE:", alternativeRouteData);
+      onAlternateRouteSuccess(buildingPairKey);
     }
   }, [alternativeRouteData]);
 
@@ -171,6 +175,7 @@ export function StudentRouteLines({
   time,
   selectedIndex,
   onAlternateRouteError,
+  onAlternateRouteSuccess,
   onRouteClick,
   onRouteHover,
   onRouteHoverEnd,
@@ -179,6 +184,7 @@ export function StudentRouteLines({
   time?: string;
   selectedIndex: Record<string, number>;
   onAlternateRouteError: () => void;
+  onAlternateRouteSuccess: (buildingPairKey: string) => void;
   onRouteClick: (buildingPairKey: string) => void;
   onRouteHover: (position: { x: number; y: number }) => void;
   onRouteHoverEnd: () => void;
@@ -209,7 +215,9 @@ export function StudentRouteLines({
             transition={transition}
             routeIndex={selectedIndex[buildingPairKey]}
             date={date}
+            buildingPairKey={buildingPairKey}
             onAlternateRouteError={onAlternateRouteError}
+            onAlternateRouteSuccess={onAlternateRouteSuccess}
             onRouteClick={() => onRouteClick(buildingPairKey)}
             onRouteHover={onRouteHover}
             onRouteHoverEnd={onRouteHoverEnd}
