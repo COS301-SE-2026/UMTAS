@@ -21,6 +21,7 @@ import {
   patchSessionMut,
 } from "../../../../utilities/VisionModel/backend/persistance";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export default function VideoUploadComp() {
   const [video, setVideo] = useState<File | null>(null);
@@ -48,6 +49,7 @@ export default function VideoUploadComp() {
     useMutation(patchSessionMut());
 
   const startTimeRef = useRef<number>(0);
+  const saveErrorShownRef = useRef(false);
   const [sessionRes, SetSessionRes] = useState<SessionInferenceResult>({
     total_restless_frames: 0,
     total_stable_frames: 0,
@@ -59,6 +61,8 @@ export default function VideoUploadComp() {
   useEffect(() => {
     return () => {
       isProcessingRef.current = false;
+      pose_Manager.terminate();
+      pose_data_manager.terminate();
     };
   }, []);
 
@@ -67,58 +71,68 @@ export default function VideoUploadComp() {
     setProgress(0);
     setEta("Calculating...");
     setCurrentTimeDisplay("0:00 / 0:00");
-
     startTimeRef.current = performance.now();
+
+    const toastId = toast.loading("Analysing video", {
+      description: `${file.name} is being processed.`,
+    });
 
     const videoUrl = URL.createObjectURL(file);
     const videoElement = document.createElement("video");
-
-    videoElement.src = videoUrl;
-    videoElement.playsInline = true;
-
-    await new Promise((resolve) => {
-      videoElement.onloadedmetadata = () => resolve(true);
-    });
-
-    pose_Manager.start();
-    pose_data_manager.start();
-
-    if (frameStore.current === null) {
-      frameStore.current = new SessionStorePose();
-      await frameStore.current.ready();
-    }
-
-    frameStore.current.clear();
-
-    const canvas = canvasRef.current;
-    const context = canvas?.getContext("2d", {
-      willReadFrequently: true,
-    });
-
-    if (!canvas || !context) {
-      URL.revokeObjectURL(videoUrl);
-      setIsProcessing(false);
-      return;
-    }
-
-    const duration = videoElement.duration;
-
-    let currentTime = 0;
-    let numFrames = 0;
+    let completed = false;
 
     try {
+      videoElement.src = videoUrl;
+      videoElement.playsInline = true;
+      videoElement.preload = "metadata";
+
+      await new Promise<void>((resolve, reject) => {
+        videoElement.onloadedmetadata = () => resolve();
+        videoElement.onerror = () =>
+          reject(new Error("The selected video could not be loaded."));
+      });
+
+      if (
+        !Number.isFinite(videoElement.duration) ||
+        videoElement.duration <= 0
+      ) {
+        throw new Error("The selected video has an invalid duration.");
+      }
+
+      pose_Manager.start();
+      pose_data_manager.start();
+
+      if (frameStore.current === null) {
+        frameStore.current = new SessionStorePose();
+        await frameStore.current.ready();
+      }
+
+      frameStore.current.clear();
+
+      const canvas = canvasRef.current;
+      const context = canvas?.getContext("2d", {
+        willReadFrequently: true,
+      });
+
+      if (!canvas || !context) {
+        throw new Error("The video analysis canvas is not available.");
+      }
+
+      const duration = videoElement.duration;
+      let currentTime = 0;
+      let numFrames = 0;
+
       while (currentTime < duration && isProcessingRef.current) {
         const timestamp = currentTime * 1000;
-
         videoElement.currentTime = currentTime;
 
-        await new Promise((resolve) => {
-          videoElement.onseeked = resolve;
+        await new Promise<void>((resolve, reject) => {
+          videoElement.onseeked = () => resolve();
+          videoElement.onerror = () =>
+            reject(new Error("The video could not be read during processing."));
         });
 
-        if (!isProcessingRef.current) {
-          break;
-        }
+        if (!isProcessingRef.current) break;
 
         context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
 
@@ -135,48 +149,39 @@ export default function VideoUploadComp() {
           canvas.height,
         );
 
-        if (!isProcessingRef.current) {
-          break;
-        }
+        if (!isProcessingRef.current) break;
 
         if (results) {
           const people = await pose_data_manager.run(results);
 
-          if (!isProcessingRef.current) {
-            break;
-          }
+          if (!isProcessingRef.current) break;
 
           if (people) {
             const frame = ++numFrames;
 
-            if (frameStore.current?.getNumFrames() === 0) {
+            if (frameStore.current.getNumFrames() === 0) {
               await frameStore.current.sendFirst(frame, timestamp, people);
             } else {
-              await frameStore.current?.sendData(frame, timestamp, people);
+              await frameStore.current.sendData(frame, timestamp, people);
             }
           }
         }
 
         const styles = getComputedStyle(document.documentElement);
-
         const primaryColour =
           styles.getPropertyValue("--text-primary").trim() || "#171717";
-
         const secondaryColour =
           styles.getPropertyValue("--text-secondary").trim() || "#525252";
 
-        for (const frameOfPeople of frameStore.current?.getLastFrame()
-          ?.people ?? []) {
+        for (const frameOfPeople of frameStore.current.getLastFrame()?.people ??
+          []) {
           const data = frameOfPeople.pose_data;
           const gaze = frameOfPeople.gaze;
 
-          if (numFrames - frameOfPeople.last_seen_frame > 3) {
-            continue;
-          }
+          if (numFrames - frameOfPeople.last_seen_frame > 3) continue;
 
           context.fillStyle = primaryColour;
           context.font = "14px 'DM Sans', sans-serif";
-
           context.fillText(
             `ID ${frameOfPeople.assigned_id.toString()}`,
             data.person.top_left_x,
@@ -189,22 +194,15 @@ export default function VideoUploadComp() {
 
           const leftElbow = data.left_arm?.[0];
           const leftWrist = data.left_arm?.[1];
-
           const rightElbow = data.right_arm?.[0];
           const rightWrist = data.right_arm?.[1];
 
           drawSegment(context, data.left_shoulder, data.center_mass);
-
           drawSegment(context, data.right_shoulder, data.center_mass);
-
           drawSegment(context, data.left_shoulder, leftElbow);
-
           drawSegment(context, leftElbow, leftWrist);
-
           drawSegment(context, data.right_shoulder, rightElbow);
-
           drawSegment(context, rightElbow, rightWrist);
-
           drawSegment(context, data.nose, data.center_mass);
 
           drawPoint(context, data.nose);
@@ -245,23 +243,15 @@ export default function VideoUploadComp() {
         }
 
         currentTime += frameIntervalRef.current;
-
-        if (currentTime > duration) {
-          currentTime = duration;
-        }
+        if (currentTime > duration) currentTime = duration;
 
         const progressValue = (currentTime / duration) * 100;
-
         setProgress(progressValue);
 
         const elapsed = (performance.now() - startTimeRef.current) / 1000;
-
         const rate = currentTime / elapsed;
-
         const remainingSeconds = rate > 0 ? (duration - currentTime) / rate : 0;
-
         const remainingMinutes = Math.floor(remainingSeconds / 60);
-
         const remainingSecs = Math.floor(remainingSeconds % 60);
 
         setEta(
@@ -269,11 +259,8 @@ export default function VideoUploadComp() {
         );
 
         const currentMinutes = Math.floor(currentTime / 60);
-
         const currentSeconds = Math.floor(currentTime % 60);
-
         const durationMinutes = Math.floor(duration / 60);
-
         const durationSeconds = Math.floor(duration % 60);
 
         setCurrentTimeDisplay(
@@ -284,24 +271,52 @@ export default function VideoUploadComp() {
             .padStart(2, "0")}`,
         );
       }
+
+      completed = isProcessingRef.current;
+
+      if (completed && frameStore.current) {
+        const results = await frameStore.current.analyseAllFrames();
+
+        if (singleSession && !pendingPatch) {
+          const apiRes = await updateSession({
+            body: { Data: results },
+            path: { sessionId: singleSession.session.SessionID },
+          });
+          SetSessionRes(apiRes.session.Data);
+        } else {
+          SetSessionRes(results);
+        }
+
+        setProgress(100);
+        setEta("0:00");
+
+        toast.success("Video analysis complete", {
+          id: toastId,
+          description: singleSession
+            ? "The final results were saved to the session."
+            : "The analysis finished successfully.",
+        });
+      } else {
+        toast.dismiss(toastId);
+      }
     } catch (error) {
       console.error("Error processing video", error);
+
+      const message =
+        error instanceof Error
+          ? error.message
+          : "The video could not be processed.";
+
+      toast.error("Video analysis failed", {
+        id: toastId,
+        description: message,
+      });
     } finally {
       URL.revokeObjectURL(videoUrl);
+      isProcessingRef.current = false;
       setIsProcessing(false);
-    }
-
-    if (isProcessingRef.current && frameStore.current) {
-      const results = await frameStore.current.analyseAllFrames();
-      if (singleSession && !pendingPatch) {
-        const apiRes = await updateSession({
-          body: {
-            Data: results,
-          },
-          path: { sessionId: singleSession?.session.SessionID },
-        });
-        SetSessionRes(apiRes.session.Data);
-      }
+      pose_Manager.terminate();
+      pose_data_manager.terminate();
     }
   }
 
@@ -310,6 +325,8 @@ export default function VideoUploadComp() {
       uploadVideoRef.current?.click();
       return;
     }
+
+    const wasProcessing = isProcessingRef.current;
 
     setVideo(null);
     isProcessingRef.current = false;
@@ -336,6 +353,15 @@ export default function VideoUploadComp() {
         canvasRef.current.height,
       );
     }
+
+    if (uploadVideoRef.current) {
+      uploadVideoRef.current.value = "";
+    }
+
+    pose_Manager.terminate();
+    pose_data_manager.terminate();
+
+    toast.info(wasProcessing ? "Video analysis cancelled" : "Video removed");
   }
 
   useEffect(() => {
@@ -343,16 +369,26 @@ export default function VideoUploadComp() {
 
     if (isProcessing) {
       interval = setInterval(async () => {
-        if (frameStore.current) {
+        if (!frameStore.current || !singleSession || pendingPatch) return;
+
+        try {
           const result = await frameStore.current.analyseAllFrames();
-          if (singleSession && !pendingPatch) {
-            const apiRes = await updateSession({
-              body: {
-                Data: result,
-              },
-              path: { sessionId: singleSession?.session.SessionID },
+          const apiRes = await updateSession({
+            body: { Data: result },
+            path: { sessionId: singleSession.session.SessionID },
+          });
+
+          SetSessionRes(apiRes.session.Data);
+          saveErrorShownRef.current = false;
+        } catch (error) {
+          console.error("Could not save video analysis progress:", error);
+
+          if (!saveErrorShownRef.current) {
+            saveErrorShownRef.current = true;
+            toast.error("Progress could not be saved", {
+              description:
+                "Video analysis is still running. UMTAS will try to save again automatically.",
             });
-            SetSessionRes(apiRes.session.Data);
           }
         }
       }, 3 * 1000);
@@ -386,14 +422,15 @@ export default function VideoUploadComp() {
         <Card className="w-[min(90vw,960px)] max-h-[85vh] overflow-auto border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
           <CardHeader className="space-y-1 border-b border-[var(--border)]">
             <CardTitle className="text-lg font-semibold text-[var(--text-primary)]">
-              Upload Video
-              <br />
-              Session Name : {`${singleSession?.session.SessionName}`}
+              Analyse Video
+              {singleSession?.session.SessionName && (
+                <> · {singleSession.session.SessionName}</>
+              )}
             </CardTitle>
 
             <CardDescription className="text-sm text-[var(--text-secondary)]">
-              Upload a lecture video to run pose estimation and session
-              analysis.
+              Select a lecture video and let Lecture Watch analyse attention,
+              movement and participation.
             </CardDescription>
           </CardHeader>
 
@@ -447,7 +484,7 @@ export default function VideoUploadComp() {
               <section className="flex flex-col rounded-lg border border-[var(--border)] p-4">
                 <div>
                   <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
-                    Processing Settings
+                    Analysis Settings
                   </h2>
 
                   <p className="mt-1 text-xs leading-[1.5] text-[var(--text-secondary)]">
@@ -461,7 +498,7 @@ export default function VideoUploadComp() {
                       htmlFor="frame-interval"
                       className="text-sm font-medium text-[var(--text-primary)]"
                     >
-                      Detection Interval
+                      Analysis Interval
                     </Label>
 
                     <Input
@@ -505,7 +542,7 @@ export default function VideoUploadComp() {
                 <div className="space-y-3 mt-4 border-t py-4">
                   <div>
                     <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
-                      Results:
+                      Results
                     </h2>
                   </div>
 
@@ -515,14 +552,14 @@ export default function VideoUploadComp() {
                       {sessionRes.questions_asked}
                     </span>
 
-                    <span>Paying Attention:</span>
+                    <span>Paying attention:</span>
                     <span className="font-medium text-[var(--text-primary)] text-right">
                       {sessionRes.total_frames > 0
                         ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
                         : "0.00%"}
                     </span>
 
-                    <span>Not Paying Attention:</span>
+                    <span>Not Paying attention:</span>
                     <span className="font-medium text-[var(--text-primary)] text-right">
                       {sessionRes.total_frames > 0
                         ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
@@ -533,7 +570,7 @@ export default function VideoUploadComp() {
                       {`${percentageStable.toFixed(2)}%`}
                     </span>
 
-                    <span>Not Sitting still:</span>
+                    <span>Restless:</span>
                     <span className="font-medium text-[var(--text-primary)] text-right">
                       {`${percentageNotStable.toFixed(2)}%`}
                     </span>
@@ -548,11 +585,19 @@ export default function VideoUploadComp() {
                     onChange={(event) => {
                       const file = event.target.files?.[0];
 
-                      if (file) {
-                        setVideo(file);
-                        isProcessingRef.current = true;
-                        void processVideo(file);
+                      if (!file) return;
+
+                      if (file.type !== "video/mp4") {
+                        toast.error("Unsupported video", {
+                          description: "Please choose an MP4 video file.",
+                        });
+                        event.target.value = "";
+                        return;
                       }
+
+                      setVideo(file);
+                      isProcessingRef.current = true;
+                      void processVideo(file);
                     }}
                   />
 
@@ -562,7 +607,11 @@ export default function VideoUploadComp() {
                     className="w-full"
                     onClick={handleVideoButton}
                   >
-                    {video ? "Cancel Processing" : "Select Video"}
+                    {isProcessing
+                      ? "Cancel Analysis"
+                      : video
+                        ? "Remove Video"
+                        : "Select Video"}
                   </Button>
                 </div>
               </section>
