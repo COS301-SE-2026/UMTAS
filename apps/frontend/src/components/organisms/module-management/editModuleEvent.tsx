@@ -236,9 +236,11 @@ export default function EditModuleEvent({
       }
       setFeedback({ type: "success", message: "Changes saved successfully!" });
 
-      setTimeout(() => {
-        onClose();
-      }, 2001);
+      // setTimeout(() => {
+      //   onClose();
+      // }, 2001);
+
+      onClose();
     } catch (error) {
       setFeedback({
         type: "error",
