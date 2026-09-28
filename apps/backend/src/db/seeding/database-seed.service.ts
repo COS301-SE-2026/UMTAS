@@ -13,6 +13,7 @@ import { UniversitySeedService } from './services/university.seed.service';
 import { UserSeedService } from './services/users.seed.service';
 import { VenuesSeedService } from './services/venues.seed.service';
 import { EventsSeedService } from './services/events.seed.service';
+import { TimetableSeedService } from './services/timetable.seed.service';
 
 @Injectable()
 export class DatabaseSeedService {
@@ -29,6 +30,7 @@ export class DatabaseSeedService {
     private readonly buildingSeedService: BuildingSeedService,
     private readonly venueSeedService: VenuesSeedService,
     private readonly eventSeedService: EventsSeedService,
+    private readonly timetableSeedService: TimetableSeedService,
   ) {}
 
   async seed(db: AppDatabase): Promise<void> {
@@ -57,6 +59,7 @@ export class DatabaseSeedService {
       ],
       ['Venues', (tx: AppDatabase) => this.venueSeedService.seed(tx)],
       ['Events', (tx: AppDatabase) => this.eventSeedService.seed(tx)],
+      ['Timetables', (tx: AppDatabase) => this.timetableSeedService.seed(tx)],
     ] as const;
 
     this.logger.log(`Starting database seeding (${tasks.length} tasks)`);
