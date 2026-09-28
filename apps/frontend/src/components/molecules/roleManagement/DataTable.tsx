@@ -241,7 +241,6 @@ export function DataTable<TData, TValue>({
 
                   return (
                     <TableCell
-                      id="select-the-row-in-table"
                       key={cell.id}
                       className={`p-4 text-[var(--text-primary)] ${
                         isActions ? "text-right" : ""

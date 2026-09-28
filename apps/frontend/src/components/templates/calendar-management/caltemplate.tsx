@@ -71,11 +71,6 @@ function toRead(str: string) {
 
 const steps = [
   {
-    target: "#calendar-management",
-    content:
-      "Manage your university's academic calendars, public holidays, and calendar restrictions here.",
-  },
-  {
     target: "#select-calendar-year",
     content:
       "Select the academic year you want to manage. A calendar will be created automatically if one does not already exist.",
@@ -154,10 +149,7 @@ export default function CalTemplate() {
       {/* <Tutorial steps={steps} wait={true} /> */}
 
       <div className="flex w-full flex-col items-center gap-6 px-6 pt-6 capitalize">
-        <div
-          id="calendar-management"
-          className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm"
-        >
+        <div className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
           {/* Header */}
           <div className="border-b border-[var(--border)] px-5 py-4">
             <h1 className="text-lg font-semibold text-[var(--text-primary)]">
