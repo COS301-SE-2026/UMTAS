@@ -29,12 +29,12 @@ import {
 } from "@/hooks/useUniversityState";
 const steps = [
   {
-    target: "#btn-create-module-new",
-    content: "Create a brand new module.",
-  },
-  {
     target: "#input-search-module-code",
     content: "Search for a module by code, name, or events.",
+  },
+  {
+    target: "#chk-enrolled-modules",
+    content: "Show only modules you are enrolled into.",
   },
   {
     target: "#select-module-prefixes",
@@ -165,6 +165,7 @@ export default function ModManagementTemplate() {
                 Enrolled Modules
               </label>
               <Checkbox
+                id="chk-enrolled-modules"
                 checked={enrolledQ}
                 onCheckedChange={(checked: boolean) => setEnrolledQ(checked)}
               />
