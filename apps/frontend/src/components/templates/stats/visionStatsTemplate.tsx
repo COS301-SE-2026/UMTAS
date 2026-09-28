@@ -6,6 +6,13 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/atoms/baseShadcn/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/baseShadcn/select";
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import VisionFilterBar from "@/components/organisms/stats/visionFilterBar";
 import VisionOverview from "@/components/organisms/vision-stats/visionOverview";
@@ -37,6 +44,7 @@ const steps = [
 export default function VisionStatsPageTemplate() {
   const [filters, setFilters] = useState<VisionFilters>({});
   const [selectedEventId, setSelectedEventId] = useState<string>();
+  const [activeTab, setActiveTab] = useState("overview");
 
   const {
     data: sessions = [],
@@ -94,42 +102,66 @@ export default function VisionStatsPageTemplate() {
         />
 
         <div>
-          <Tabs defaultValue="overview" className="w-full space-y-4">
-            <TabsList
-              id="stats-tabs"
-              className="w-full flex flex-wrap gap-2 h-auto bg-bg-surface"
-            >
-              <TabsTrigger
-                value="overview"
-                className="px-4 py-2 cursor-pointer focus-visible:ring-2"
-              >
-                Overview
-              </TabsTrigger>
-              <TabsTrigger
-                value="sessions"
-                className="px-4 py-2 cursor-pointer focus-visible:ring-2"
-              >
-                Sessions
-              </TabsTrigger>
-              <TabsTrigger
-                value="event-comparison"
-                className="px-4 py-2 cursor-pointer focus-visible:ring-2"
-              >
-                Event Comparison
-              </TabsTrigger>
-              <TabsTrigger
-                value="modules"
-                className="px-4 py-2 cursor-pointer focus-visible:ring-2"
-              >
-                Modules
-              </TabsTrigger>
-              <TabsTrigger
-                value="insights"
-                className="px-4 py-2 cursor-pointer focus-visible:ring-2"
-              >
-                Insights
-              </TabsTrigger>
-            </TabsList>
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full space-y-4"
+          >
+            <div id="stats-tabs">
+              <div className="sm:hidden">
+                <Select value={activeTab} onValueChange={setActiveTab}>
+                  <SelectTrigger
+                    aria-label="Statistics view"
+                    className="w-full bg-bg-surface cursor-pointer"
+                    title="Select Statistics View"
+                  >
+                    <SelectValue placeholder="Select a view" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-bg-surface">
+                    <SelectItem value="overview">Overview</SelectItem>
+                    <SelectItem value="sessions">Sessions</SelectItem>
+                    <SelectItem value="event-comparison">
+                      Event Comparison
+                    </SelectItem>
+                    <SelectItem value="modules">Modules</SelectItem>
+                    <SelectItem value="insights">Insights</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <TabsList className="w-full hidden sm:flex gap-2 h-auto bg-bg-surface">
+                <TabsTrigger
+                  value="overview"
+                  className="px-4 py-2 cursor-pointer focus-visible:ring-2"
+                >
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger
+                  value="sessions"
+                  className="px-4 py-2 cursor-pointer focus-visible:ring-2"
+                >
+                  Sessions
+                </TabsTrigger>
+                <TabsTrigger
+                  value="event-comparison"
+                  className="px-4 py-2 cursor-pointer focus-visible:ring-2"
+                >
+                  Event Comparison
+                </TabsTrigger>
+                <TabsTrigger
+                  value="modules"
+                  className="px-4 py-2 cursor-pointer focus-visible:ring-2"
+                >
+                  Modules
+                </TabsTrigger>
+                <TabsTrigger
+                  value="insights"
+                  className="px-4 py-2 cursor-pointer focus-visible:ring-2"
+                >
+                  Insights
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             <div id="stats-content">
               <TabsContent value="overview" className="space-y-6">
