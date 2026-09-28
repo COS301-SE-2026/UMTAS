@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { AdvancedMarker, Pin } from "@vis.gl/react-google-maps";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -51,6 +51,7 @@ import {
   StudentRouteLines,
 } from "@/components/organisms/map/StudentRoutes";
 import { AdminRouteDiversion } from "@/components/organisms/map/AdminRouteDiversion";
+import { NoAlternateRouteMessage } from "@/components/molecules/map/NoAlternateRouteMessage";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -111,6 +112,14 @@ export function UniMap() {
   const [selectedIndex, setSelectedIndex] = useState<Record<string, number>>(
     {},
   );
+  const [showNoAlternateRoute, setShowNoAlternateRoute] = useState(false);
+  const showAlternateRouteError = useCallback(() => {
+    setShowNoAlternateRoute(true);
+
+    setTimeout(() => {
+      setShowNoAlternateRoute(false);
+    }, 3000);
+  }, []);
 
   //this needs to be in a very specific format. Looks super complicated, but the backend cries when I don't send the request in this format
   const [selectedTime, setSelectedTime] = useState(() => {
@@ -349,8 +358,13 @@ export function UniMap() {
 
         <div
           id="university-map"
-          className="flex-1 min-h-[75vh] overflow-hidden"
+          className="relative flex-1 min-h-[75vh] overflow-hidden"
         >
+          {showNoAlternateRoute && (
+            <div className="absolute top-4 left-1/2 z-50 -translate-x-1/2">
+              <NoAlternateRouteMessage />
+            </div>
+          )}
           <MapScreen
             onRequestMapSetup={() => router.push("/mapping/config")}
             adminMode={adminMode}
@@ -369,6 +383,13 @@ export function UniMap() {
                 date={selectedDate}
                 time={selectedTime}
                 selectedIndex={selectedIndex}
+                onAlternateRouteError={showAlternateRouteError}
+                onRouteClick={(buildingPairKey) => {
+                  setSelectedIndex((previous) => ({
+                    ...previous,
+                    [buildingPairKey]: 1,
+                  }));
+                }}
               />
             )}
 
