@@ -112,6 +112,20 @@ export function UniMap() {
   const [selectedIndex, setSelectedIndex] = useState<Record<string, number>>(
     {},
   );
+
+  const [routeTooltip, setRouteTooltip] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+
+  const handleRouteHover = useCallback((position: { x: number; y: number }) => {
+    setRouteTooltip(position);
+  }, []);
+
+  const handleRouteHoverEnd = useCallback(() => {
+    setRouteTooltip(null);
+  }, []);
+
   const [showNoAlternateRoute, setShowNoAlternateRoute] = useState(false);
   const showAlternateRouteError = useCallback(() => {
     setShowNoAlternateRoute(true);
@@ -365,6 +379,19 @@ export function UniMap() {
               <NoAlternateRouteMessage />
             </div>
           )}
+          {routeTooltip && (
+            <div
+              className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded-md border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-2 shadow-lg"
+              style={{
+                left: routeTooltip.x,
+                top: routeTooltip.y - 12,
+              }}
+            >
+              <p className="whitespace-nowrap text-sm font-medium text-[var(--text-primary)]">
+                Click to find alternate route
+              </p>
+            </div>
+          )}
           <MapScreen
             onRequestMapSetup={() => router.push("/mapping/config")}
             adminMode={adminMode}
@@ -390,6 +417,8 @@ export function UniMap() {
                     [buildingPairKey]: 1,
                   }));
                 }}
+                onRouteHover={handleRouteHover}
+                onRouteHoverEnd={handleRouteHoverEnd}
               />
             )}
 

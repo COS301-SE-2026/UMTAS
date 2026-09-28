@@ -109,12 +109,16 @@ function StudentRouteLineItem({
   date,
   onAlternateRouteError,
   onRouteClick,
+  onRouteHover,
+  onRouteHoverEnd,
 }: {
   transition: getStudentRouteTransitionType;
   routeIndex?: number;
   date: string;
   onAlternateRouteError: () => void;
   onRouteClick: () => void;
+  onRouteHover: (position: { x: number; y: number }) => void;
+  onRouteHoverEnd: () => void;
 }) {
   const isAlternative = routeIndex !== undefined && routeIndex !== 0;
 
@@ -156,6 +160,8 @@ function StudentRouteLineItem({
       path={path}
       colour={isAlternative ? "#3B82F6" : transition.route?.displayColour}
       onClick={onRouteClick}
+      onHover={onRouteHover}
+      onHoverEnd={onRouteHoverEnd}
     />
   );
 }
@@ -166,12 +172,16 @@ export function StudentRouteLines({
   selectedIndex,
   onAlternateRouteError,
   onRouteClick,
+  onRouteHover,
+  onRouteHoverEnd,
 }: {
   date: string;
   time?: string;
   selectedIndex: Record<string, number>;
   onAlternateRouteError: () => void;
   onRouteClick: (buildingPairKey: string) => void;
+  onRouteHover: (position: { x: number; y: number }) => void;
+  onRouteHoverEnd: () => void;
 }) {
   const { data: studentRoutes } = useQuery(getStudentRoutesQ({ date }));
 
@@ -201,6 +211,8 @@ export function StudentRouteLines({
             date={date}
             onAlternateRouteError={onAlternateRouteError}
             onRouteClick={() => onRouteClick(buildingPairKey)}
+            onRouteHover={onRouteHover}
+            onRouteHoverEnd={onRouteHoverEnd}
           />
         );
       })}
