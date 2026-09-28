@@ -119,7 +119,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <>
-      <div className="w-full max-w-6xl py-4">
+      <div className="w-full max-w-6xl py-4 border-b border-[var(--border)]">
         <h1 className="text-lg font-semibold text-[var(--text-primary)]">
           Role Management
         </h1>

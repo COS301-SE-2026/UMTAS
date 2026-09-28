@@ -33,7 +33,7 @@ export default function ModuleEventTemplateTabs() {
         className="w-full"
       >
         <div className="flex w-full flex-col items-center gap-6 px-6 pt-4">
-          <div className="w-full max-w-6xl pt-4">
+          <div className="w-full max-w-6xl pt-4 pb-4 border-b border-[var(--border)]">
             <h1 className="text-lg font-semibold text-[var(--text-primary)]">
               {headings[activeTab].title}
             </h1>
@@ -46,14 +46,14 @@ export default function ModuleEventTemplateTabs() {
             <TabsList id="management-tabs" className="flex h-auto gap-2">
               <TabsTrigger
                 value="events"
-                className="cursor-pointer px-4 py-2 focus-visible:ring-2"
+                className="cursor-pointer px-4 focus-visible:ring-2"
               >
                 Events
               </TabsTrigger>
 
               <TabsTrigger
                 value="modules"
-                className="cursor-pointer px-4 py-2 focus-visible:ring-2"
+                className="cursor-pointer px-4 focus-visible:ring-2"
               >
                 Modules
               </TabsTrigger>

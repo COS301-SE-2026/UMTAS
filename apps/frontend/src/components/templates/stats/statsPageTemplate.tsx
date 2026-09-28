@@ -68,8 +68,8 @@ export default function StatsPageTemplate() {
     <>
       <Tutorial steps={steps} wait={true} />
       <div className="container mx-auto py-10 space-y-6 px-8 bg-(--bg-base)">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-[var(--text-primary)] pb-2">
+        <div className="border-b border-[var(--border)] pb-4">
+          <h1 className="text-xl font-bold tracking-tight text-[var(--text-primary)] pb-2 ">
             Stats Dashboard
           </h1>
           <p className="text-sm text-[var(--text-secondary)]">

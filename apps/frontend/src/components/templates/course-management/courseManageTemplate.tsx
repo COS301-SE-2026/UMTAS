@@ -243,7 +243,7 @@ export default function CourseManagementTemplate() {
     <>
       <Tutorial steps={steps} wait={true} />
       <div className="flex w-full flex-col items-center gap-6 px-6 pt-6">
-        <div className="w-full max-w-6xl py-4">
+        <div className="w-full max-w-6xl py-4 border-b border-[var(--border)]">
           <h1 className="text-lg font-semibold text-[var(--text-primary)]">
             Course Management
           </h1>

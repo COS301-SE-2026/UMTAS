@@ -127,7 +127,7 @@ export default function ModManagementTemplate() {
   }
 
   return (
-    <div className="flex w-full flex-col items-center gap-6 px-6 pt-6">
+    <div className="flex w-full flex-col items-center gap-6 px-6 pt-4">
       <Tutorial steps={steps} wait={true} />
 
       <div className="flex w-full max-w-6xl flex-col items-start gap-4 md:flex-row md:justify-between">

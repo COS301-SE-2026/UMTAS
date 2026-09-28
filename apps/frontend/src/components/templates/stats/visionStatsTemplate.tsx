@@ -83,23 +83,27 @@ export default function VisionStatsPageTemplate() {
     <>
       <Tutorial steps={steps} wait={true} />
       <div className="container mx-auto py-10 space-y-6 px-8">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-[var(--text-primary)] pb-2">
-            Vision Stats Dashboard
-          </h1>
-          <p className="text-sm text-[var(--text-secondary)]">
-            View various statistics and metrics related to the Vision Model.
-          </p>
-        </div>
+        <div className="flex flex-col gap-4 pb-4 border-b border-[var(--border)] sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-[var(--text-primary)] pb-2">
+              Vision Stats Dashboard
+            </h1>
+            <p className="text-sm text-[var(--text-secondary)]">
+              View various statistics and metrics related to the Vision Model.
+            </p>
+          </div>
 
-        <VisionFilterBar
-          modules={modules}
-          events={events}
-          filters={filters}
-          setFilters={setFilters}
-          selectedEventId={selectedEventId}
-          onEventChange={setSelectedEventId}
-        />
+          <div className="sm:max-w-md">
+            <VisionFilterBar
+              modules={modules}
+              events={events}
+              filters={filters}
+              setFilters={setFilters}
+              selectedEventId={selectedEventId}
+              onEventChange={setSelectedEventId}
+            />
+          </div>
+        </div>
 
         <div>
           <Tabs

@@ -151,7 +151,7 @@ export default function CalTemplate() {
       <div className="flex w-full flex-col items-center gap-6 px-6 pt-6 capitalize">
         <div className="w-full max-w-6xl overflow-auto">
           {/* Header */}
-          <div className="px-5 py-4">
+          <div className="mx-5 py-4 border-b border-[var(--border)]">
             <h1 className="text-xl font-semibold text-[var(--text-primary)]">
               Calendar Management
             </h1>

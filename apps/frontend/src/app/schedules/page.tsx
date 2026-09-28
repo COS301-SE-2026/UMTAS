@@ -45,7 +45,6 @@ export default function SchedulesPage() {
             onExport={handleExport}
           />
         </div>
-        <Separator className="bg-[var(--border)]" />
 
         <div className="px-8 py-6">
           <div id="schedule-view" className="mx-auto max-w-6xl">
