@@ -13,14 +13,14 @@ import VisionEventComparisonTab from "@/components/organisms/vision-stats/vision
 import VisionModule from "@/components/organisms/vision-stats/visionModule";
 import VisionSessions from "@/components/organisms/vision-stats/visionSessions";
 import VisionInsights from "@/components/organisms/vision-stats/visionInsights";
-import {
-  mockEvents,
-  mockModules,
-} from "../../../../utilities/vision-stats/VisionMock";
 import { VisionFilters } from "../../../../utilities/vision-stats/VisionTypes";
-import { getUniversityStatsQ } from "../../../../utilities/vision-stats/VisionQueries";
+import {
+  getVisionEventsQ,
+  getVisionSessionsQ,
+} from "../../../../utilities/vision-stats/VisionQueries";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { getModuleStatsQ } from "../../../../utilities/stats/statsQueries";
 
 const steps = [
   {
@@ -43,7 +43,7 @@ export default function VisionStatsPageTemplate() {
     isLoading,
     isError,
   } = useQuery(
-    getUniversityStatsQ({
+    getVisionSessionsQ({
       moduleId: filters.moduleId,
       from: filters.from,
       to: filters.to,
@@ -51,7 +51,15 @@ export default function VisionStatsPageTemplate() {
     }),
   );
 
-  const scopedEvents = mockEvents.filter(
+  const { data: comparisonSessions = [] } = useQuery({
+    ...getVisionSessionsQ({ eventId: selectedEventId }),
+    enabled: Boolean(selectedEventId),
+  });
+
+  const { data: modules = [] } = useQuery(getModuleStatsQ());
+  const { data: events = [] } = useQuery(getVisionEventsQ());
+
+  const scopedEvents = events.filter(
     (event) =>
       (!filters.moduleId || event.moduleId === filters.moduleId) &&
       (!filters.eventType || event.activityType === filters.eventType),
@@ -62,10 +70,6 @@ export default function VisionStatsPageTemplate() {
         scopedEvents.some((event) => event.id === session.eventID),
       )
     : sessions;
-
-  const comparisonSessions = selectedEventId
-    ? sessions.filter((session) => session.eventID === selectedEventId)
-    : [];
 
   return (
     <>
@@ -81,8 +85,8 @@ export default function VisionStatsPageTemplate() {
         </div>
 
         <VisionFilterBar
-          modules={mockModules}
-          events={mockEvents}
+          modules={modules}
+          events={events}
           filters={filters}
           setFilters={setFilters}
           selectedEventId={selectedEventId}
@@ -93,7 +97,7 @@ export default function VisionStatsPageTemplate() {
           <Tabs defaultValue="overview" className="w-full space-y-4">
             <TabsList
               id="stats-tabs"
-              className="w-full flex flex-wrap gap-2 h-auto"
+              className="w-full flex flex-wrap gap-2 h-auto bg-bg-surface"
             >
               <TabsTrigger
                 value="overview"
@@ -146,7 +150,7 @@ export default function VisionStatsPageTemplate() {
 
               <TabsContent value="event-comparison">
                 <VisionEventComparisonTab
-                  events={mockEvents.filter(
+                  events={events.filter(
                     (event) =>
                       !filters.moduleId || event.moduleId === filters.moduleId,
                   )}

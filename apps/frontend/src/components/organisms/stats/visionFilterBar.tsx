@@ -92,7 +92,7 @@ export default function VisionFilterBar({
   };
 
   return (
-    <div className="flex justify-between items-end gap-3">
+    <div className="flex flex-wrap justify-between items-end gap-3">
       <div className="flex flex-col gap-1">
         <label className="text-sm">Session name</label>
         <Input

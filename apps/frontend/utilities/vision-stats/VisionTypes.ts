@@ -17,7 +17,7 @@ export interface VisionFilters {
 export interface VisionEvent {
   activityType: string;
   id: string;
-  moduleId: string;
+  moduleId: string | null;
   name: string;
 }
 
