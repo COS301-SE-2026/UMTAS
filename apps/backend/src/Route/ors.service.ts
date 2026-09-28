@@ -302,8 +302,8 @@ export class OrsService {
             ],
             alternative_routes: {
               target_count: maximumAlternatives,
-              weight_factor: 1.6,
-              share_factor: 0.7,
+              weight_factor: 2,
+              share_factor: 0.9,
             },
           }),
           signal: controller.signal,

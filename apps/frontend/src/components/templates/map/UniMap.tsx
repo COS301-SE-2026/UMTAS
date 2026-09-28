@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { AdvancedMarker, Pin } from "@vis.gl/react-google-maps";
 import { Building2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -52,6 +52,7 @@ import {
   StudentRouteLines,
 } from "@/components/organisms/map/StudentRoutes";
 import { AdminRouteDiversion } from "@/components/organisms/map/AdminRouteDiversion";
+import { NoAlternateRouteMessage } from "@/components/molecules/map/NoAlternateRouteMessage";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -102,8 +103,8 @@ export function UniMap() {
 
   //heatmap use state stuff
   const [mapMode, setMapMode] = useState<"route" | "heatmap">("route");
-  const [fromHour, setFromHour] = useState(8);
-  const [toHour, setToHour] = useState(15);
+  const [fromHour, setFromHour] = useState(7);
+  const [toHour, setToHour] = useState(18);
   const [metricMode, setMetricMode] = useState<"projected" | "worstCase">(
     "projected",
   );
@@ -112,6 +113,69 @@ export function UniMap() {
   const [selectedIndex, setSelectedIndex] = useState<Record<string, number>>(
     {},
   );
+
+  const [routeUndo, setRouteUndo] = useState<{
+    buildingPairKey: string;
+    previousIndex: number | undefined;
+  } | null>(null);
+  const routeUndoTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleAlternateRouteSuccess = useCallback((buildingPairKey: string) => {
+    setRouteUndo((previous) => {
+      if (previous?.buildingPairKey === buildingPairKey) return previous;
+
+      return {
+        buildingPairKey,
+        previousIndex: 0,
+      };
+    });
+
+    if (routeUndoTimeout.current) clearTimeout(routeUndoTimeout.current);
+
+    routeUndoTimeout.current = setTimeout(() => {
+      setRouteUndo(null);
+    }, 7000);
+  }, []);
+
+  const handleUndoRoute = useCallback(() => {
+    if (!routeUndo) return;
+
+    setSelectedIndex((previous) => {
+      const next = { ...previous };
+
+      if (routeUndo.previousIndex === undefined)
+        delete next[routeUndo.buildingPairKey];
+      else next[routeUndo.buildingPairKey] = routeUndo.previousIndex;
+
+      return next;
+    });
+
+    if (routeUndoTimeout.current) clearTimeout(routeUndoTimeout.current);
+
+    setRouteUndo(null);
+  }, [routeUndo]);
+
+  const [routeTooltip, setRouteTooltip] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+
+  const handleRouteHover = useCallback((position: { x: number; y: number }) => {
+    setRouteTooltip(position);
+  }, []);
+
+  const handleRouteHoverEnd = useCallback(() => {
+    setRouteTooltip(null);
+  }, []);
+
+  const [showNoAlternateRoute, setShowNoAlternateRoute] = useState(false);
+  const showAlternateRouteError = useCallback(() => {
+    setShowNoAlternateRoute(true);
+
+    setTimeout(() => {
+      setShowNoAlternateRoute(false);
+    }, 3000);
+  }, []);
 
   //this needs to be in a very specific format. Looks super complicated, but the backend cries when I don't send the request in this format
   const [selectedTime, setSelectedTime] = useState(() => {
@@ -350,8 +414,48 @@ export function UniMap() {
 
         <div
           id="university-map"
-          className="flex-1 min-h-[75vh] overflow-hidden"
+          className="relative flex-1 min-h-[75vh] overflow-hidden"
         >
+          {showNoAlternateRoute && ( // No alternate route exists
+            <div className="absolute top-4 left-1/2 z-50 -translate-x-1/2">
+              <NoAlternateRouteMessage />
+            </div>
+          )}
+
+          {routeUndo && ( //undo alternate route selection
+            <div className="absolute bottom-4 right-4 z-50">
+              <div className="flex items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-3 shadow-lg">
+                <span className="text-sm text-[var(--text-primary)]">
+                  Alternate route applied
+                </span>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleUndoRoute}
+                  className="cursor-pointer"
+                >
+                  Undo
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {routeTooltip && ( //Indicate click purpose on route hover
+            <div
+              className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded-md border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-2 shadow-lg"
+              style={{
+                left: routeTooltip.x,
+                top: routeTooltip.y - 12,
+              }}
+            >
+              <p className="whitespace-nowrap text-sm font-medium text-[var(--text-primary)]">
+                Click to find alternate route
+              </p>
+            </div>
+          )}
+
           <MapScreen
             onRequestMapSetup={() => router.push("/mapping/config")}
             adminMode={adminMode}
@@ -370,6 +474,16 @@ export function UniMap() {
                 date={selectedDate}
                 time={selectedTime}
                 selectedIndex={selectedIndex}
+                onAlternateRouteError={showAlternateRouteError}
+                onAlternateRouteSuccess={handleAlternateRouteSuccess}
+                onRouteClick={(buildingPairKey) => {
+                  setSelectedIndex((previous) => ({
+                    ...previous,
+                    [buildingPairKey]: 1,
+                  }));
+                }}
+                onRouteHover={handleRouteHover}
+                onRouteHoverEnd={handleRouteHoverEnd}
               />
             )}
 

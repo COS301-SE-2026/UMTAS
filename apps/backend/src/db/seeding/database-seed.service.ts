@@ -10,9 +10,10 @@ import { CourseSeedService } from './services/courses.seed.service';
 import { ModuleSeedService } from './services/modules.seed.service';
 import { PublicCalendarSeedService } from './services/public-calendar.seed.service';
 import { UniversitySeedService } from './services/university.seed.service';
-import { UniRolesSeedService } from './services/universityRoles.seed.service';
 import { UserSeedService } from './services/users.seed.service';
 import { VenuesSeedService } from './services/venues.seed.service';
+import { EventsSeedService } from './services/events.seed.service';
+import { TimetableSeedService } from './services/timetable.seed.service';
 
 @Injectable()
 export class DatabaseSeedService {
@@ -21,7 +22,6 @@ export class DatabaseSeedService {
   constructor(
     private readonly universitySeedService: UniversitySeedService,
     private readonly userSeedService: UserSeedService,
-    private readonly universityRolesSeedService: UniRolesSeedService,
     private readonly courseSeedService: CourseSeedService,
     private readonly moduleSeedService: ModuleSeedService,
     private readonly publicCalendarSeedService: PublicCalendarSeedService,
@@ -29,6 +29,8 @@ export class DatabaseSeedService {
     private readonly persistence: SeedPersistenceService,
     private readonly buildingSeedService: BuildingSeedService,
     private readonly venueSeedService: VenuesSeedService,
+    private readonly eventSeedService: EventsSeedService,
+    private readonly timetableSeedService: TimetableSeedService,
   ) {}
 
   async seed(db: AppDatabase): Promise<void> {
@@ -40,10 +42,6 @@ export class DatabaseSeedService {
         (tx: AppDatabase) => this.universitySeedService.seed(tx),
       ],
       ['users', (tx: AppDatabase) => this.userSeedService.seed(tx)],
-      [
-        'university roles',
-        (tx: AppDatabase) => this.universityRolesSeedService.seed(tx),
-      ],
       ['courses', (tx: AppDatabase) => this.courseSeedService.seed(tx)],
       ['modules', (tx: AppDatabase) => this.moduleSeedService.seed(tx)],
       [
@@ -60,6 +58,8 @@ export class DatabaseSeedService {
         (tx: AppDatabase) => this.buildingSeedService.seed(tx),
       ],
       ['Venues', (tx: AppDatabase) => this.venueSeedService.seed(tx)],
+      ['Events', (tx: AppDatabase) => this.eventSeedService.seed(tx)],
+      ['Timetables', (tx: AppDatabase) => this.timetableSeedService.seed(tx)],
     ] as const;
 
     this.logger.log(`Starting database seeding (${tasks.length} tasks)`);
