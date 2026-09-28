@@ -171,7 +171,7 @@ function DashboardContent() {
           <div className="flex flex-col items-start gap-6">
             <Badge
               variant="outline"
-              className="text-[var(--text-secondary)] border-[var(--border)] w-fit text-xs"
+              className="text-[var(--text-secondary)] border-[var(--text-secondary)] w-fit text-xs"
             >
               University Modular Timetable &amp; Analytics System
             </Badge>
@@ -391,7 +391,7 @@ function DashboardContent() {
         <div className="max-w-6xl w-full mx-auto px-6 flex flex-col items-center text-center lg:px-8">
           <Badge
             variant="outline"
-            className="text-[var(--text-secondary)] border-[var(--border)] mb-4 text-xs"
+            className="text-[var(--text-secondary)] border-[var(--text-secondary)] mb-4 text-xs"
           >
             One connected platform
           </Badge>
