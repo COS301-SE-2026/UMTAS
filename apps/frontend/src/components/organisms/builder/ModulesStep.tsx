@@ -186,7 +186,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
         </div>
         <p className="text-base text-[var(--text-secondary)]">No modules yet</p>
         <p className="text-sm text-[var(--text-secondary)]">
-          Add a module below to start
+          Add a module above to start
         </p>
       </div>
     );
