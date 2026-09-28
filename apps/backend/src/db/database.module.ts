@@ -12,10 +12,11 @@ import { BuildingSeedService } from './seeding/services/buildings.seed.service';
 import { EventsSeedService } from './seeding/services/events.seed.service';
 import { SeedQueryService } from './seeding/services/seed-query.service';
 import { VenuesSeedService } from './seeding/services/venues.seed.service';
-import { EventVenuesSeedService } from './seeding/services/eventVenue.seed.service';
+import { EventModule } from 'src/Events/event.module';
 
 @Global()
 @Module({
+  imports: [EventModule],
   providers: [
     SeedPersistenceService,
     SeedQueryService,
@@ -30,7 +31,6 @@ import { EventVenuesSeedService } from './seeding/services/eventVenue.seed.servi
     AcademicCalendarSeedService,
     BuildingSeedService,
     VenuesSeedService,
-    EventVenuesSeedService,
   ],
   exports: [DatabaseService, SeedPersistenceService],
 })

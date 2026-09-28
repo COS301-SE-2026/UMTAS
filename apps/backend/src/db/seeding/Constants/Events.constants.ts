@@ -1,73 +1,506 @@
-import { createHash } from 'crypto';
-import { ActivityType, DayOfWeek } from 'shared-types';
-import { VENUES_BY_ACTIVITY } from './Venues.constants';
+import { DayOfWeek } from 'shared-types';
 
-const ACTIVITY_TYPES: ActivityType[] = ['lecture', 'tutorial', 'prac'];
-const DAYS: DayOfWeek[] = [
-  'monday',
-  'tuesday',
-  'wednesday',
-  'thursday',
-  'friday',
-];
-
-export interface EventPattern {
-  activityType: ActivityType;
+export type SeedEvent = {
+  moduleCode: string;
+  eventCode: string;
+  eventName: string;
+  activityType: 'lecture' | 'prac';
   dayOfWeek: DayOfWeek;
   startTime: string;
   endTime: string;
   venueName: string;
-  label: string;
-}
+  isRecurring: boolean;
+};
 
-// Time slots: 07:30 till 17:20
-const TIME_SLOTS: { start: string; end: string }[] = [
-  { start: '07:30', end: '08:20' },
-  { start: '08:30', end: '09:20' },
-  { start: '09:30', end: '10:20' },
-  { start: '10:30', end: '11:20' },
-  { start: '11:30', end: '12:20' },
-  { start: '12:30', end: '13:20' },
-  { start: '13:30', end: '14:20' },
-  { start: '14:30', end: '15:20' },
-  { start: '15:30', end: '16:20' },
-  { start: '16:30', end: '17:20' },
+export const FIRST_YEAR_EVENTS: SeedEvent[] = [
+  // Monday
+  {
+    moduleCode: 'COS110',
+    eventCode: 'L1',
+    eventName: 'COS110 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'monday',
+    startTime: '07:30',
+    endTime: '09:20',
+    venueName: 'IT 4-1',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'WTW114',
+    eventCode: 'L1',
+    eventName: 'WTW114 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'monday',
+    startTime: '09:20',
+    endTime: '11:20',
+    venueName: 'Centenary 1',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'AIM111',
+    eventCode: 'L1',
+    eventName: 'AIM111 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'monday',
+    startTime: '11:20',
+    endTime: '13:20',
+    venueName: 'IT 4-1',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'WTW146',
+    eventCode: 'L1',
+    eventName: 'WTW146 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'monday',
+    startTime: '13:20',
+    endTime: '15:20',
+    venueName: 'Centenary 1',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'BOT161',
+    eventCode: 'L1',
+    eventName: 'BOT161 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'monday',
+    startTime: '15:20',
+    endTime: '17:20',
+    venueName: 'IT 4-1',
+    isRecurring: true,
+  },
+
+  // Tuesday
+  {
+    moduleCode: 'COS132',
+    eventCode: 'L1',
+    eventName: 'COS132 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'tuesday',
+    startTime: '07:30',
+    endTime: '09:20',
+    venueName: 'IT 4-2',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'WTW134',
+    eventCode: 'L1',
+    eventName: 'WTW134 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'tuesday',
+    startTime: '09:20',
+    endTime: '11:20',
+    venueName: 'Centenary 2',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'COS151',
+    eventCode: 'L1',
+    eventName: 'COS151 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'tuesday',
+    startTime: '11:20',
+    endTime: '13:20',
+    venueName: 'IT 2-23',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'WTW115',
+    eventCode: 'L1',
+    eventName: 'WTW115 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'tuesday',
+    startTime: '13:20',
+    endTime: '15:20',
+    venueName: 'Centenary 2',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'CMY117',
+    eventCode: 'L1',
+    eventName: 'CMY117 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'tuesday',
+    startTime: '15:20',
+    endTime: '17:20',
+    venueName: 'IT 4-2',
+    isRecurring: true,
+  },
+
+  // Wednesday
+  {
+    moduleCode: 'COS122',
+    eventCode: 'L1',
+    eventName: 'COS122 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'wednesday',
+    startTime: '07:30',
+    endTime: '09:20',
+    venueName: 'IT 4-1',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'WTW152',
+    eventCode: 'L1',
+    eventName: 'WTW152 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'wednesday',
+    startTime: '09:20',
+    endTime: '11:20',
+    venueName: 'Centenary 1',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'UPO112',
+    eventCode: 'L1',
+    eventName: 'UPO112 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'wednesday',
+    startTime: '11:20',
+    endTime: '13:20',
+    venueName: 'IT 4-2',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'MLB111',
+    eventCode: 'L1',
+    eventName: 'MLB111 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'wednesday',
+    startTime: '13:20',
+    endTime: '15:20',
+    venueName: 'Centenary 1',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'PHY114',
+    eventCode: 'L1',
+    eventName: 'PHY114 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'wednesday',
+    startTime: '15:20',
+    endTime: '17:20',
+    venueName: 'IT 2-26',
+    isRecurring: true,
+  },
+
+  // Thursday
+  {
+    moduleCode: 'WTW124',
+    eventCode: 'L1',
+    eventName: 'WTW124 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'thursday',
+    startTime: '07:30',
+    endTime: '09:20',
+    venueName: 'IT 2-26',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'STK110',
+    eventCode: 'L1',
+    eventName: 'STK110 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'thursday',
+    startTime: '09:20',
+    endTime: '11:20',
+    venueName: 'Centenary 2',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'COS132',
+    eventCode: 'P1',
+    eventName: 'COS132 P1',
+    activityType: 'prac',
+    dayOfWeek: 'thursday',
+    startTime: '11:20',
+    endTime: '13:20',
+    venueName: 'IT 2-23',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'PHY131',
+    eventCode: 'L1',
+    eventName: 'PHY131 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'thursday',
+    startTime: '13:20',
+    endTime: '15:20',
+    venueName: 'Centenary 2',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'GGY156',
+    eventCode: 'L1',
+    eventName: 'GGY156 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'thursday',
+    startTime: '15:20',
+    endTime: '17:20',
+    venueName: 'IT 4-2',
+    isRecurring: true,
+  },
+
+  // Friday
+  {
+    moduleCode: 'COS110',
+    eventCode: 'P1',
+    eventName: 'COS110 P1',
+    activityType: 'prac',
+    dayOfWeek: 'friday',
+    startTime: '07:30',
+    endTime: '09:20',
+    venueName: 'IT 4-1',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'WTW162',
+    eventCode: 'L1',
+    eventName: 'WTW162 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'friday',
+    startTime: '09:20',
+    endTime: '11:20',
+    venueName: 'Centenary 1',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'ALL121',
+    eventCode: 'L1',
+    eventName: 'ALL121 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'friday',
+    startTime: '11:20',
+    endTime: '13:20',
+    venueName: 'IT 4-2',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'STK120',
+    eventCode: 'L1',
+    eventName: 'STK120 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'friday',
+    startTime: '13:20',
+    endTime: '15:20',
+    venueName: 'Centenary 1',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'SCI154',
+    eventCode: 'L1',
+    eventName: 'SCI154 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'friday',
+    startTime: '15:20',
+    endTime: '17:20',
+    venueName: 'IT 2-26',
+    isRecurring: true,
+  },
+
+  // Additional
+  {
+    moduleCode: 'AIM121',
+    eventCode: 'L1',
+    eventName: 'AIM121 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'monday',
+    startTime: '09:20',
+    endTime: '11:20',
+    venueName: 'IT 2-26',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'WTW148',
+    eventCode: 'L1',
+    eventName: 'WTW148 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'monday',
+    startTime: '11:20',
+    endTime: '13:20',
+    venueName: 'IT 2-23',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'GGY168',
+    eventCode: 'L1',
+    eventName: 'GGY168 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'monday',
+    startTime: '13:20',
+    endTime: '15:20',
+    venueName: 'IT 4-2',
+    isRecurring: true,
+  },
+
+  {
+    moduleCode: 'CMY127',
+    eventCode: 'L1',
+    eventName: 'CMY127 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'tuesday',
+    startTime: '09:20',
+    endTime: '11:20',
+    venueName: 'IT 4-1',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'WST111',
+    eventCode: 'L1',
+    eventName: 'WST111 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'tuesday',
+    startTime: '13:20',
+    endTime: '15:20',
+    venueName: 'IT 2-26',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'ENV101',
+    eventCode: 'L1',
+    eventName: 'ENV101 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'tuesday',
+    startTime: '15:20',
+    endTime: '17:20',
+    venueName: 'IT 4-2',
+    isRecurring: true,
+  },
+
+  {
+    moduleCode: 'MBY161',
+    eventCode: 'L1',
+    eventName: 'MBY161 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'wednesday',
+    startTime: '09:20',
+    endTime: '11:20',
+    venueName: 'IT 2-26',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'WST121',
+    eventCode: 'L1',
+    eventName: 'WST121 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'wednesday',
+    startTime: '13:20',
+    endTime: '15:20',
+    venueName: 'IT 2-23',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'GLY155',
+    eventCode: 'L1',
+    eventName: 'GLY155 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'wednesday',
+    startTime: '15:20',
+    endTime: '17:20',
+    venueName: 'IT 4-2',
+    isRecurring: true,
+  },
+
+  {
+    moduleCode: 'PHY124',
+    eventCode: 'L1',
+    eventName: 'PHY124 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'thursday',
+    startTime: '09:20',
+    endTime: '11:20',
+    venueName: 'IT 4-1',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'STC122',
+    eventCode: 'L1',
+    eventName: 'STC122 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'thursday',
+    startTime: '11:20',
+    endTime: '13:20',
+    venueName: 'IT 2-26',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'GMC110',
+    eventCode: 'L1',
+    eventName: 'GMC110 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'thursday',
+    startTime: '13:20',
+    endTime: '15:20',
+    venueName: 'IT 2-26',
+    isRecurring: true,
+  },
+
+  {
+    moduleCode: 'GLY163',
+    eventCode: 'L1',
+    eventName: 'GLY163 L1',
+    activityType: 'lecture',
+    dayOfWeek: 'friday',
+    startTime: '09:20',
+    endTime: '11:20',
+    venueName: 'IT 2-26',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'MLB111',
+    eventCode: 'P1',
+    eventName: 'MLB111 P1',
+    activityType: 'prac',
+    dayOfWeek: 'friday',
+    startTime: '11:20',
+    endTime: '13:20',
+    venueName: 'IT 2-23',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'WST121',
+    eventCode: 'P1',
+    eventName: 'WST121 P1',
+    activityType: 'prac',
+    dayOfWeek: 'friday',
+    startTime: '13:20',
+    endTime: '15:20',
+    venueName: 'IT 4-2',
+    isRecurring: true,
+  },
+
+  // Extra events
+  {
+    moduleCode: 'WTW124',
+    eventCode: 'P1',
+    eventName: 'WTW124 P1',
+    activityType: 'prac',
+    dayOfWeek: 'monday',
+    startTime: '15:20',
+    endTime: '17:20',
+    venueName: 'IT 4-2',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'STK110',
+    eventCode: 'P1',
+    eventName: 'STK110 P1',
+    activityType: 'prac',
+    dayOfWeek: 'tuesday',
+    startTime: '11:20',
+    endTime: '13:20',
+    venueName: 'IT 2-26',
+    isRecurring: true,
+  },
+  {
+    moduleCode: 'SCI154',
+    eventCode: 'P1',
+    eventName: 'SCI154 P1',
+    activityType: 'prac',
+    dayOfWeek: 'wednesday',
+    startTime: '11:20',
+    endTime: '13:20',
+    venueName: 'IT 4-2',
+    isRecurring: true,
+  },
 ];
-
-function getEventCount(moduleCode: string): number {
-  //Extract numbers from code
-  const digits = moduleCode.replace(/\D/g, '');
-  const sum = digits.split('').reduce((acc, d) => acc + parseInt(d, 10), 0);
-  //Sum numbers
-  const mod = sum % 5;
-  //max 5
-  return mod === 0 ? 5 : mod;
-}
-
-export function getDeterministicPatterns(moduleCode: string): EventPattern[] {
-  const hash = createHash('sha256').update(moduleCode).digest('hex');
-  const seed = parseInt(hash.slice(0, 8), 16);
-
-  const count = getEventCount(moduleCode);
-
-  const patterns: EventPattern[] = [];
-  for (let i = 0; i < count; i++) {
-    const activity = ACTIVITY_TYPES[(seed + i) % ACTIVITY_TYPES.length];
-    const day = DAYS[(seed + i * 7) % DAYS.length];
-    const time = TIME_SLOTS[(seed + i * 13) % TIME_SLOTS.length];
-
-    const venueNames =
-      VENUES_BY_ACTIVITY[activity] ?? VENUES_BY_ACTIVITY.lecture!;
-    const venueName = venueNames[(seed + i * 17) % venueNames.length];
-
-    patterns.push({
-      activityType: activity,
-      dayOfWeek: day,
-      startTime: time.start,
-      endTime: time.end,
-      venueName,
-      label: activity.charAt(0).toUpperCase() + activity.slice(1),
-    });
-  }
-  return patterns;
-} //END_getDeterministicPatterns
