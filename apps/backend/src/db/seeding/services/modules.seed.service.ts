@@ -39,6 +39,13 @@ export class ModuleSeedService extends BaseSeedService {
       this.constants.ALL_AS_SEED_MODULES,
       this.constants.CourseNames[1],
     );
+
+    //physiology moduels
+    await this.seedModulesForCourse(
+      tx,
+      this.constants.ALL_PH_SEED_MODULES,
+      this.constants.CourseNames[2],
+    );
   } //END_seed
 
   private async seedModulesForCourse(
@@ -61,7 +68,7 @@ export class ModuleSeedService extends BaseSeedService {
 
     //If there are no moduels to seed -> return
     if (missingModules.length === 0) {
-      this.logResult('Modules');
+      this.logResult(`[${courseName}]Modules`);
       return;
     }
 

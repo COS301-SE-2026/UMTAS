@@ -33,3 +33,16 @@ export const ALL_AS_SEED_MODULES: SeedModule[] = [
   ...yearAs3.ALL_SEED_MODULES,
   ...yearAs4.ALL_SEED_MODULES,
 ];
+
+//PH - Physiology
+import * as yearPh1 from './PH_1.constants';
+import * as yearPh2 from './PH_2.constants';
+import * as yearPh3 from './PH_3.constants';
+import * as yearPh4 from './PH_4.constants';
+
+export const ALL_PH_SEED_MODULES: SeedModule[] = [
+  ...yearPh1.ALL_SEED_MODULES,
+  ...yearPh2.ALL_SEED_MODULES,
+  ...yearPh3.ALL_SEED_MODULES,
+  ...yearPh4.ALL_SEED_MODULES,
+];
