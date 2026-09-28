@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { CircleX } from "lucide-react";
@@ -62,6 +63,7 @@ function getVideoConstraints(deviceId?: string): MediaStreamConstraints {
     audio: false,
   };
 }
+
 function getCanvasConstraints() {
   return {
     width: 640,
@@ -95,9 +97,9 @@ export default function CameraCanvas({
   deviceId,
 }: CanvasCamProps) {
   return (
-    <div className="w-full h-full flex flex-col p-4">
-      <div className="w-full h-full flex flex-col justify-center items-center rounded-2xl">
-        <div className="w-full h-full flex">
+    <div className="flex h-full w-full flex-col">
+      <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl">
+        <div className="flex h-full w-full">
           <CanvasWebcam
             imageFile={imageFile}
             isCameraActive={isCameraActive}
@@ -121,28 +123,22 @@ function CanvasWebcam({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
-
   const [loadedCameraKey, setLoadedCameraKey] = useState<string | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [createSessionPop, setCreateSessionPop] = useState<boolean>(false);
-
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
   const [sessionID, setSessionID] = useState<string | null>(null);
   const detectedPeopleRef = useRef<DetectedPerson[]>([]);
   const frameStore = useRef<SessionStorePose | null>(null);
   const lastRunRef = useRef<number>(0);
   const frameCounterRef = useRef<number>(0);
-
   const imageProcessedRef = useRef<boolean>(false);
-
   const { data: singleSession } = useQuery(
     getSingleSessionQuery({ sessionId: sessionID ?? "" }),
   );
   const { mutateAsync: updateSession, isPending: pendingPatch } =
     useMutation(patchSessionMut());
-
   const saveErrorShownRef = useRef(false);
-
   function getCameraErrorMessage(error: unknown): string {
     if (error instanceof DOMException) {
       switch (error.name) {
@@ -158,18 +154,14 @@ function CanvasWebcam({
           return error.message || "The camera could not be opened.";
       }
     }
-
     return error instanceof Error
       ? error.message
       : "The camera could not be opened.";
   }
-
   // Manage detection workers
   // Lazy initialize frameStore once
-
   useEffect(() => {
     const isSourceActive = isCameraActive || imageFile !== null;
-
     if (detectionSettings.runDetection && isSourceActive) {
       detectionManager.start();
       detection_data_manager.start();
@@ -178,7 +170,6 @@ function CanvasWebcam({
       detectionManager.terminate();
       detection_data_manager.terminate();
     }
-
     if (inferenceSettings.runInference && isSourceActive) {
       frameStore.current = new SessionStorePose();
       imageProcessedRef.current = false;
@@ -194,7 +185,6 @@ function CanvasWebcam({
     isCameraActive,
     imageFile,
   ]);
-
   useEffect(() => {
     if (!imageFile) {
       imageRef.current = null;
@@ -204,62 +194,49 @@ function CanvasWebcam({
       imageProcessedRef.current = false;
       return;
     }
-
     detectedPeopleRef.current = [];
     lastRunRef.current = 0;
     imageProcessedRef.current = false;
-
     const img = new Image();
     const objectUrl = URL.createObjectURL(imageFile);
     img.src = objectUrl;
-
     img.onload = () => {
       imageRef.current = img;
       setImageLoaded(true);
     };
-
     img.onerror = () => {
       setImageLoaded(false);
       toast.error("Image could not be loaded", {
         description: "Choose a different image and try again.",
       });
     };
-
     return () => {
       URL.revokeObjectURL(objectUrl);
     };
   }, [imageFile]);
-
   const cameraKey = deviceId || "__default__";
   const cameraLoaded =
     isCameraActive && imageFile === null && loadedCameraKey === cameraKey;
-
   useEffect(() => {
     if (imageFile || !isCameraActive) {
       return;
     }
-
     let cancelled = false;
     let currentStream: MediaStream | null = null;
     const videoElement = videoRef.current;
-
     async function startCam() {
       try {
         if (!navigator.mediaDevices?.getUserMedia) {
           throw new Error("This browser does not support camera access.");
         }
-
         currentStream = await navigator.mediaDevices.getUserMedia(
           getVideoConstraints(deviceId),
         );
-
         if (cancelled) {
           currentStream.getTracks().forEach((track) => track.stop());
           return;
         }
-
         setCameraError(null);
-
         if (videoElement) {
           videoElement.srcObject = currentStream;
           videoElement.onloadedmetadata = () => {
@@ -282,66 +259,50 @@ function CanvasWebcam({
         }
       } catch (error) {
         console.error("Camera start failed:", error);
-
         setLoadedCameraKey(null);
-
         const message = getCameraErrorMessage(error);
         setCameraError(message);
-
         toast.error("Camera could not start", {
           description: message,
         });
       }
     }
-
     void startCam();
-
     return () => {
       cancelled = true;
-
       if (videoElement) {
         videoElement.onloadedmetadata = null;
-
         if (videoElement.srcObject === currentStream) {
           videoElement.srcObject = null;
         }
       }
-
       currentStream?.getTracks().forEach((track) => track.stop());
     };
   }, [cameraKey, deviceId, imageFile, isCameraActive]);
-
   useEffect(() => {
     const isReady = imageFile ? imageLoaded : cameraLoaded;
     if (!isReady) return;
-
     let animationFrameID: number;
-
     function renderFrame(timestamp: number) {
       const canvas = canvasRef.current;
       const video = videoRef.current;
       const img = imageRef.current;
-
       if (canvas) {
         const context = canvas.getContext("2d", { willReadFrequently: true });
         if (context) {
           context.clearRect(0, 0, canvas.width, canvas.height);
-
           if (imageFile && img) {
             context.drawImage(img, 0, 0, canvas.width, canvas.height);
           } else if (video) {
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
           }
-
           const detectionIntervalMs =
             detectionSettings.DetectionInterval * 1000;
           const inferenceIntervalMs =
             inferenceSettings.InferenceInterval * 1000;
-
           const shouldRunForImage = imageFile
             ? !imageProcessedRef.current
             : true;
-
           if (
             detectionSettings.runDetection &&
             shouldRunForImage &&
@@ -354,7 +315,6 @@ function CanvasWebcam({
               canvas.width,
               canvas.height,
             );
-
             detectionManager
               .run(imageData?.data, canvas.width, canvas.height)
               .then((results) => {
@@ -367,25 +327,21 @@ function CanvasWebcam({
                 }
               });
           }
-
           if (
             inferenceSettings.runInference &&
             shouldRunForImage &&
             timestamp - lastRunRef.current >= inferenceIntervalMs
           ) {
             lastRunRef.current = timestamp;
-
             if (imageFile) {
               imageProcessedRef.current = true;
             }
-
             const imageData = context.getImageData(
               0,
               0,
               canvas.width,
               canvas.height,
             );
-
             pose_Manager
               .run(imageData?.data, canvas.width, canvas.height)
               .then((results) => {
@@ -403,7 +359,6 @@ function CanvasWebcam({
                 }
               });
           }
-
           if (detectionSettings.runDetection) {
             for (const person of detectedPeopleRef.current) {
               context.strokeStyle = "#00ff00";
@@ -416,17 +371,14 @@ function CanvasWebcam({
               );
             }
           }
-
           if (inferenceSettings.runInference) {
             for (const frameOfPeople of frameStore.current?.getLastFrame()
               ?.people ?? []) {
               const data = frameOfPeople.pose_data;
               const gaze = frameOfPeople.gaze;
-
               if (frameCounterRef.current - frameOfPeople.last_seen_frame > 5) {
                 continue;
               }
-
               context.fillStyle = "#00ff00";
               context.font = "14px sans-serif";
               context.fillText(
@@ -434,16 +386,13 @@ function CanvasWebcam({
                 data.person.top_left_x,
                 Math.max(data.person.top_left_y - 5, 15),
               );
-
               context.strokeStyle = "#00ffff";
               context.fillStyle = "#00ffff";
               context.lineWidth = 2;
-
               const leftElbow = data.left_arm?.[0];
               const leftWrist = data.left_arm?.[1];
               const rightElbow = data.right_arm?.[0];
               const rightWrist = data.right_arm?.[1];
-
               drawSegment(context, data.left_shoulder, data.center_mass);
               drawSegment(context, data.right_shoulder, data.center_mass);
               drawSegment(context, data.left_shoulder, leftElbow);
@@ -451,7 +400,6 @@ function CanvasWebcam({
               drawSegment(context, data.right_shoulder, rightElbow);
               drawSegment(context, rightElbow, rightWrist);
               drawSegment(context, data.nose, data.center_mass);
-
               drawPoint(context, data.nose);
               drawPoint(context, data.center_mass);
               drawPoint(context, data.left_shoulder);
@@ -460,11 +408,9 @@ function CanvasWebcam({
               drawPoint(context, data.right_shoulder);
               drawPoint(context, rightElbow);
               drawPoint(context, rightWrist);
-
               if (gaze) {
                 const noseX = data.nose.x;
                 const noseY = data.nose.y;
-
                 if (gaze.looking_straight) {
                   const xSize = 5;
                   context.beginPath();
@@ -478,7 +424,6 @@ function CanvasWebcam({
                 } else if (gaze.looking_left || gaze.looking_right) {
                   const lineLength = 25;
                   const directionMultiplier = gaze.looking_left ? -1 : 1;
-
                   context.beginPath();
                   context.strokeStyle = "#ffcc00";
                   context.lineWidth = 3;
@@ -494,12 +439,9 @@ function CanvasWebcam({
           }
         }
       }
-
       animationFrameID = requestAnimationFrame(renderFrame);
     }
-
     animationFrameID = requestAnimationFrame(renderFrame);
-
     return () => {
       cancelAnimationFrame(animationFrameID);
     };
@@ -510,7 +452,6 @@ function CanvasWebcam({
     detectionSettings,
     inferenceSettings,
   ]);
-
   const [sessionRes, SetSessionRes] = useState<SessionInferenceResult>({
     total_restless_frames: 0,
     total_stable_frames: 0,
@@ -519,30 +460,23 @@ function CanvasWebcam({
     total_no_attention: 0,
     total_paying_attention: 0,
   });
-
   const totalRestlessFramesCount =
     sessionRes.total_restless_frames + sessionRes.total_stable_frames;
-
   const percentageStable =
     totalRestlessFramesCount > 0
       ? (sessionRes.total_stable_frames / totalRestlessFramesCount) * 100
       : 0.0;
-
   const percentageNotStable =
     totalRestlessFramesCount > 0
       ? (sessionRes.total_restless_frames / totalRestlessFramesCount) * 100
       : 0.0;
-
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
-
     if ((cameraLoaded || imageLoaded) && inferenceSettings.runInference) {
       interval = setInterval(async () => {
         if (!frameStore.current) return;
-
         try {
           const result = await frameStore.current.analyseAllFrames();
-
           if (singleSession && !pendingPatch) {
             const apiRes = await updateSession({
               body: {
@@ -550,16 +484,13 @@ function CanvasWebcam({
               },
               path: { sessionId: singleSession.session.SessionID },
             });
-
             SetSessionRes(apiRes.session.Data);
           } else {
             SetSessionRes(result);
           }
-
           saveErrorShownRef.current = false;
         } catch (error) {
           console.error("Could not update Lecture Watch results:", error);
-
           if (!saveErrorShownRef.current) {
             saveErrorShownRef.current = true;
             toast.error("Results could not be saved", {
@@ -572,7 +503,6 @@ function CanvasWebcam({
     } else {
       if (interval) clearInterval(interval);
     }
-
     return () => {
       if (interval) clearInterval(interval);
     };
@@ -584,13 +514,11 @@ function CanvasWebcam({
     singleSession,
     updateSession,
   ]);
-
   const showCanvas = imageFile !== null || cameraLoaded;
-
   return (
     <>
-      <div className="w-full h-full flex flex-col lg:flex-row gap-6 items-center lg:items-stretch">
-        <div className="flex-1 w-full h-full flex items-center justify-center bg-[var(--bg-elevated)] rounded-2xl border border-[var(--border)] overflow-hidden p-2">
+      <div className="grid h-full w-full grid-cols-1 gap-4 lg:grid-cols-4">
+        <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-2 lg:col-span-3">
           <video ref={videoRef} playsInline muted className="hidden"></video>
           {showCanvas ? (
             <canvas
@@ -623,8 +551,7 @@ function CanvasWebcam({
             </div>
           )}
         </div>
-
-        <div className="w-full lg:w-80 border border-[var(--border)] bg-[var(--bg-surface)] rounded-2xl p-5 flex flex-col justify-between shadow-sm shrink-0">
+        <div className="flex w-full flex-col justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-5 shadow-sm lg:col-span-1">
           <div className="space-y-4">
             <div className="pb-3 border-b border-[var(--border)]">
               <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
@@ -649,14 +576,12 @@ function CanvasWebcam({
                 <span className="font-medium text-[var(--text-primary)] text-right">
                   {sessionRes.questions_asked}
                 </span>
-
                 <span>Paying attention:</span>
                 <span className="font-medium text-[var(--text-primary)] text-right">
                   {sessionRes.total_frames > 0
                     ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
                     : "0.00%"}
                 </span>
-
                 <span>Not Paying attention:</span>
                 <span className="font-medium text-[var(--text-primary)] text-right">
                   {sessionRes.total_frames > 0
@@ -667,7 +592,6 @@ function CanvasWebcam({
                 <span className="font-medium text-[var(--text-primary)] text-right">
                   {`${percentageStable.toFixed(2)}%`}
                 </span>
-
                 <span>Restless:</span>
                 <span className="font-medium text-[var(--text-primary)] text-right">
                   {`${percentageNotStable.toFixed(2)}%`}
@@ -675,7 +599,6 @@ function CanvasWebcam({
               </div>
             </div>
           </div>
-
           <div className="mt-4 flex w-full gap-2 border-t border-[var(--border)] pt-6">
             <Button
               variant="outline"
@@ -690,7 +613,6 @@ function CanvasWebcam({
                   total_restless_frames: 0,
                   total_stable_frames: 0,
                 };
-
                 try {
                   if (singleSession && !pendingPatch) {
                     await updateSession({
@@ -698,15 +620,12 @@ function CanvasWebcam({
                       path: { sessionId: singleSession.session.SessionID },
                     });
                   }
-
                   frameStore.current?.clear();
                   imageProcessedRef.current = false;
                   SetSessionRes(emptyResults);
-
                   toast.success("Results reset");
                 } catch (error) {
                   console.error("Could not reset results:", error);
-
                   toast.error("Results could not be reset", {
                     description: "Please try again.",
                   });
@@ -715,7 +634,6 @@ function CanvasWebcam({
             >
               Reset Results
             </Button>
-
             <Button
               variant="outline"
               className="flex-1"

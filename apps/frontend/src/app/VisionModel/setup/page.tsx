@@ -7,16 +7,8 @@ import {
 } from "@/components/atoms/baseShadcn/alert";
 import { Badge } from "@/components/atoms/baseShadcn/badge";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/atoms/baseShadcn/card";
 import { Progress } from "@/components/atoms/baseShadcn/progress";
-import { Download, Info, Loader2 } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -236,99 +228,96 @@ export default function VisionModelSetupPage() {
   }
 
   return (
-    <main className="flex min-h-[80vh] w-full items-center justify-center px-4 py-6">
-      <Card className="w-full max-w-2xl border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
-        <CardHeader className="space-y-2">
-          <CardTitle className="text-xl font-semibold text-[var(--text-primary)]">
-            Prepare Lecture Watch
-          </CardTitle>
+    <main className="flex w-full flex-col items-center gap-6 px-6 pt-6">
+      <div className="w-full max-w-2xl py-4">
+        <h1 className="text-lg font-semibold text-[var(--text-primary)]">
+          Prepare Lecture Watch
+        </h1>
+        <p className="mt-1 text-sm text-[var(--text-secondary)]">
+          Check this device and download the models needed for people detection
+          and lecture analysis.
+        </p>
+      </div>
 
-          <CardDescription className="text-sm text-[var(--text-secondary)]">
-            Check this device and download the models needed for people
-            detection and lecture analysis.
-          </CardDescription>
-        </CardHeader>
+      <div className="w-full max-w-2xl space-y-6">
+        <section className="space-y-2">
+          <RequirementRow
+            label="WebGPU"
+            description="Lets Lecture Watch run the models using your GPU."
+            status={getRequirementStatus("webgpu")}
+          />
 
-        <CardContent className="space-y-6">
-          <section className="space-y-2">
-            <RequirementRow
-              label="WebGPU"
-              description="Lets Lecture Watch run the models using your GPU."
-              status={getRequirementStatus("webgpu")}
+          <RequirementRow
+            label="Person Detection"
+            description="Finds and tracks people in the current input."
+            status={getRequirementStatus("detection")}
+          />
+
+          <RequirementRow
+            label="Lecture Analysis"
+            description="Analyses pose, movement and attention signals."
+            status={getRequirementStatus("pose")}
+          />
+        </section>
+
+        {status === "installing" && (
+          <section className="space-y-3" aria-label="Vision model progress">
+            <div className="flex items-center justify-between gap-4 text-sm">
+              <div className="min-w-0">
+                <p className="truncate font-medium text-[var(--text-primary)]">
+                  {currentModel
+                    ? `Preparing ${currentModel}`
+                    : "Preparing vision models"}
+                </p>
+
+                <p className="text-xs text-[var(--text-secondary)]">
+                  Keep this page open until setup is complete.
+                </p>
+              </div>
+
+              <span className="shrink-0 text-sm font-medium text-[var(--text-primary)]">
+                {progress.toFixed(0)}%
+              </span>
+            </div>
+
+            <Progress
+              value={progress}
+              className="h-2 w-full"
+              aria-label={`Vision model setup ${progress.toFixed(0)}% complete`}
             />
 
-            <RequirementRow
-              label="Person Detection"
-              description="Finds and tracks people in the current input."
-              status={getRequirementStatus("detection")}
-            />
+            <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
+              <span>
+                {downloadedMb.toFixed(1)} MB
+                {totalMb !== null && ` / ${totalMb.toFixed(1)} MB`}
+              </span>
 
-            <RequirementRow
-              label="Lecture Analysis"
-              description="Analyses pose, movement and attention signals."
-              status={getRequirementStatus("pose")}
-            />
+              <span>
+                Model {currentModel === "Pose Estimation Model" ? "2" : "1"} of{" "}
+                {MODELS.length}
+              </span>
+            </div>
           </section>
+        )}
 
-          {status === "installing" && (
-            <section className="space-y-3" aria-label="Vision model progress">
-              <div className="flex items-center justify-between gap-4 text-sm">
-                <div className="min-w-0">
-                  <p className="truncate font-medium text-[var(--text-primary)]">
-                    {currentModel
-                      ? `Preparing ${currentModel}`
-                      : "Preparing vision models"}
-                  </p>
+        {status === "error" && error && (
+          <Alert variant="destructive">
+            <AlertTitle>Setup could not finish</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-                  <p className="text-xs text-[var(--text-secondary)]">
-                    Keep this page open until setup is complete.
-                  </p>
-                </div>
+        {status === "ready" && (
+          <Alert variant="success">
+            <AlertTitle>Ready to continue</AlertTitle>
+            <AlertDescription>
+              The vision models are available on this device. You can now start
+              a Lecture Watch session.
+            </AlertDescription>
+          </Alert>
+        )}
 
-                <span className="shrink-0 text-sm font-medium text-[var(--text-primary)]">
-                  {progress.toFixed(0)}%
-                </span>
-              </div>
-
-              <Progress
-                value={progress}
-                className="h-2 w-full"
-                aria-label={`Vision model setup ${progress.toFixed(0)}% complete`}
-              />
-
-              <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
-                <span>
-                  {downloadedMb.toFixed(1)} MB
-                  {totalMb !== null && ` / ${totalMb.toFixed(1)} MB`}
-                </span>
-
-                <span>
-                  Model {currentModel === "Pose Estimation Model" ? "2" : "1"}{" "}
-                  of {MODELS.length}
-                </span>
-              </div>
-            </section>
-          )}
-
-          {status === "error" && error && (
-            <Alert variant="destructive">
-              <AlertTitle>Setup could not finish</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          {status === "ready" && (
-            <Alert variant="success">
-              <AlertTitle>Ready to continue</AlertTitle>
-              <AlertDescription>
-                The vision models are available on this device. You can now
-                start a Lecture Watch session.
-              </AlertDescription>
-            </Alert>
-          )}
-        </CardContent>
-
-        <CardFooter className="flex justify-end">
+        <div className="flex justify-end">
           {status === "ready" ? (
             <Button onClick={() => router.push("/VisionModel")}>
               Continue
@@ -348,8 +337,8 @@ export default function VisionModelSetupPage() {
               )}
             </Button>
           )}
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </main>
   );
 }
