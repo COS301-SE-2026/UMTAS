@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { useState } from "react";
 import { moduleDTO } from "@/app/course-management/queries/modules/moduleBuilder";
@@ -23,6 +23,13 @@ import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { useErrorListener } from "@/hooks/errorListener";
 import { errorName } from "../../../../utilities/errorCries";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import {
+  createSessionMut,
+  deleteSessionMut,
+  getAllSessionQuery,
+  sessionDTO,
+} from "../../../../utilities/VisionModel/backend/persistance";
+import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 
 export interface CreateSessionProps {
   updateSessionID: (id: string) => void;
@@ -42,13 +49,68 @@ export default function CreateVmSession({
   });
 
   const [filterText, setFilterText] = useState<string>("");
+  const [SessionfilterText, setSessionFilterText] = useState<string>("");
+
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [sessionName, setSessionName] = useState<string>("");
   const [sessionDsc, setSessionDsc] = useState<string>("");
+  const [selectedSession, setSelectedSession] = useState<sessionDTO | null>(
+    null,
+  );
+
   const [selectedModule, setSelectedModule] = useState<moduleDTO | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<EventResponse | null>(
     null,
   );
+
+  const { data: allSessions = [], isLoading: sessionsLoading } = useQuery(
+    getAllSessionQuery({}),
+  );
+
+  function verifyDetails() {
+    if (selectedDate == "") return false;
+    if (selectedModule == null || selectedModule.moduleID == undefined)
+      return false;
+    if (selectedEvent == null || selectedEvent.eventId == undefined)
+      return false;
+    if (sessionName == "") return false;
+
+    const foundSession = allSessions.find((sesh) => {
+      return sesh.Date == selectedDate && sesh.SessionName == sessionName;
+    });
+    if (foundSession) {
+      window.dispatchEvent(
+        new CustomEvent(errorName, {
+          detail: {
+            userMessage: "A session already exists with this name on this date",
+          },
+        }),
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  const {
+    mutateAsync: createSessionFunction,
+    isPending: createSessionPending,
+  } = useMutation(createSessionMut());
+
+  const { mutateAsync: deleteSessionFunction, isPending: deleteIsPending } =
+    useMutation(deleteSessionMut());
+
+  function filterSession(filter: string) {
+    const lowerQuery = filter.toLowerCase();
+
+    return allSessions.filter((sesh) => {
+      const nameMatch = sesh.SessionName.toLowerCase().includes(lowerQuery);
+      const codeMatch =
+        sesh.SessionDsc?.toLowerCase().includes(lowerQuery) ?? false;
+
+      return nameMatch || codeMatch;
+    });
+  }
 
   useErrorListener();
   const DAYS = [
@@ -98,6 +160,10 @@ export default function CreateVmSession({
       return (nameMatch || codeMatch) && m.Events && m.Events?.length > 0;
     });
   }
+  function findSetSession(seshID: string) {
+    const sesh = allSessions.find((sesh) => sesh.SessionID === seshID);
+    if (sesh) setSelectedSession(sesh);
+  }
 
   function findSetModule(modID: string) {
     const UniModule = allModules.find((mod) => mod.moduleID === modID);
@@ -135,7 +201,7 @@ export default function CreateVmSession({
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-6 p-6">
+      <CardContent className="space-y-6 p-4">
         <section
           aria-label="Re-capture session"
           className="space-y-4 rounded-lg border border-[var(--border)] p-4"
@@ -157,8 +223,8 @@ export default function CreateVmSession({
               <Input
                 type="text"
                 placeholder="Filter Sessions..."
-                value={filterText}
-                onChange={(e) => setFilterText(e.target.value)}
+                value={SessionfilterText}
+                onChange={(e) => setSessionFilterText(e.target.value)}
                 className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
               />
             </div>
@@ -168,23 +234,65 @@ export default function CreateVmSession({
                 Select Session
               </Label>
               <Select
-                value={String(selectedModule?.moduleID ?? "")}
-                onValueChange={(v) => findSetModule(v)}
+                disabled={allSessions.length == 0}
+                value={selectedSession?.SessionID}
+                onValueChange={(v) => findSetSession(v)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a session" />
                 </SelectTrigger>
-                <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]"></SelectContent>
+                <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+                  {filterSession(SessionfilterText).map((sesh) => {
+                    const label = `${sesh.SessionName} : ${sesh.Date} `;
+
+                    return (
+                      <SelectItem
+                        key={sesh.SessionID}
+                        value={String(sesh.SessionID)}
+                        className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
+                      >
+                        {label}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-end pt-2 gap-x-3">
             <Button
+              disabled={selectedSession?.SessionID == null || deleteIsPending}
               type="button"
               variant="outline"
-              className="w-full sm:w-auto"
-              onClick={() => updateSessionID("Fake flag")}
+              className=""
+              onClick={() => {
+                if (selectedSession?.SessionID)
+                  deleteSessionFunction({
+                    path: {
+                      sessionId: selectedSession.SessionID,
+                    },
+                  });
+                setSelectedSession(null);
+              }}
+            >
+              {!deleteIsPending ? (
+                <>Delete Session</>
+              ) : (
+                <>
+                  <Spinner />
+                </>
+              )}
+            </Button>
+            <Button
+              disabled={selectedSession?.SessionID == null}
+              type="button"
+              variant="outline"
+              className=""
+              onClick={() => {
+                if (selectedSession?.SessionID)
+                  updateSessionID(selectedSession?.SessionID);
+              }}
             >
               Re-capture Session
             </Button>
@@ -338,13 +446,46 @@ export default function CreateVmSession({
 
           <div className="flex justify-end pt-2">
             <Button
+              variant="outline"
+              onClick={async () => {
+                if (verifyDetails()) {
+                  const result = await createSessionFunction({
+                    Date: selectedDate,
+                    ModuleID: selectedModule?.moduleID ?? "",
+                    EventID: selectedEvent?.eventId,
+                    SessionName: sessionName,
+                    SessionDsc: sessionDsc == "" ? undefined : sessionDsc,
+                    Data: {
+                      questions_asked: 0,
+                      total_frames: 0,
+                      total_no_attention: 0,
+                      total_paying_attention: 0,
+                      total_restless_frames: 0,
+                      total_stable_frames: 0,
+                    },
+                  });
+
+                  if (result.session) {
+                    updateSessionID(result.session.SessionID);
+                  }
+                }
+              }}
               type="button"
               disabled={
-                selectedDate == "" || sessionName == "" || selectedEvent == null
+                selectedDate == "" ||
+                sessionName == "" ||
+                selectedEvent == null ||
+                selectedModule == null
               }
               className="w-full sm:w-auto"
             >
-              Create Session
+              {!createSessionPending ? (
+                <>Create Session</>
+              ) : (
+                <>
+                  <Spinner />
+                </>
+              )}
             </Button>
           </div>
         </section>

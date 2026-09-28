@@ -440,15 +440,6 @@ export class VisionService {
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
-    if (sessionDate < today) {
-      this.OOPSIE.warn(
-        `Cannot update vision session with a past date [${date}]`,
-      );
-      throw new BadRequestException(
-        'Vision session date cannot be in the past',
-      );
-    }
   } //END_validateDate
 } //END_VisionService
 

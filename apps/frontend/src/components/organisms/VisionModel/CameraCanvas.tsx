@@ -15,6 +15,11 @@ import SessionStorePose from "../../../../utilities/VisionModel/sessionStore/pos
 import { Button } from "@/components/atoms/baseShadcn/button";
 import Popup from "@/components/atoms/utility/floatContainer";
 import CreateVmSession from "./createSession";
+import {
+  getSingleSessionQuery,
+  patchSessionMut,
+} from "../../../../utilities/VisionModel/backend/persistance";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 const KEY_SCORE_THRESHOLD = 0.15;
 
@@ -44,18 +49,19 @@ export function drawPoint(ctx: CanvasRenderingContext2D, kp?: Keypoint) {
   }
 }
 
-function getVideoConstraints(): MediaStreamConstraints {
+function getVideoConstraints(deviceId?: string): MediaStreamConstraints {
   const isMobile = window.innerWidth < 768;
   return {
-    video: {
-      width: isMobile ? { ideal: 720 } : { ideal: 1280 },
-      height: isMobile ? { ideal: 1280 } : { ideal: 720 },
-      facingMode: isMobile ? "user" : "environment",
-    },
+    video: deviceId
+      ? { deviceId: { ideal: deviceId } }
+      : {
+          width: isMobile ? { ideal: 720 } : { ideal: 1280 },
+          height: isMobile ? { ideal: 1280 } : { ideal: 720 },
+          facingMode: isMobile ? "user" : "environment",
+        },
     audio: true,
   };
 }
-
 function getCanvasConstraints() {
   return {
     width: 640,
@@ -77,8 +83,8 @@ interface CanvasCamProps {
   isCameraActive: boolean;
   detectionSettings: DetectionSettings;
   inferenceSettings: InferenceSettings;
-
   imageFile: File | null;
+  deviceId?: string;
 }
 
 export default function CameraCanvas({
@@ -86,6 +92,7 @@ export default function CameraCanvas({
   imageFile,
   detectionSettings,
   inferenceSettings,
+  deviceId,
 }: CanvasCamProps) {
   return (
     <div className="w-full h-full flex flex-col p-4">
@@ -96,6 +103,7 @@ export default function CameraCanvas({
             isCameraActive={isCameraActive}
             detectionSettings={detectionSettings}
             inferenceSettings={inferenceSettings}
+            deviceId={deviceId}
           />
         </div>
       </div>
@@ -108,6 +116,7 @@ function CanvasWebcam({
   detectionSettings,
   imageFile,
   inferenceSettings,
+  deviceId,
 }: CanvasCamProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -122,6 +131,12 @@ function CanvasWebcam({
   const frameStore = useRef<SessionStorePose | null>(null);
   const lastRunRef = useRef<number>(0);
   const frameCounterRef = useRef<number>(0);
+
+  const { data: singleSession } = useQuery(
+    getSingleSessionQuery({ sessionId: sessionID ?? "" }),
+  );
+  const { mutateAsync: updateSession, isPending: pendingPatch } =
+    useMutation(patchSessionMut());
 
   // Manage detection workers
   // Lazy initialize frameStore once
@@ -191,7 +206,7 @@ function CanvasWebcam({
     async function startCam() {
       try {
         currentStream = await navigator.mediaDevices.getUserMedia(
-          getVideoConstraints(),
+          getVideoConstraints(deviceId),
         );
         if (videoRef.current) {
           videoRef.current.srcObject = currentStream;
@@ -212,7 +227,7 @@ function CanvasWebcam({
         currentStream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [isCameraActive, imageFile]);
+  }, [isCameraActive, imageFile, deviceId]);
 
   useEffect(() => {
     const isReady = imageFile ? imageLoaded : cameraLoaded;
@@ -432,7 +447,15 @@ function CanvasWebcam({
       interval = setInterval(async () => {
         if (frameStore.current) {
           const result = await frameStore.current.analyseAllFrames();
-          if (result) {
+          if (singleSession && !pendingPatch) {
+            const apiRes = await updateSession({
+              body: {
+                Data: result,
+              },
+              path: { sessionId: singleSession?.session.SessionID },
+            });
+            SetSessionRes(apiRes.session.Data);
+          } else {
             SetSessionRes(result);
           }
         }
@@ -444,7 +467,14 @@ function CanvasWebcam({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [cameraLoaded, imageLoaded, inferenceSettings.runInference]);
+  }, [
+    cameraLoaded,
+    imageLoaded,
+    inferenceSettings.runInference,
+    pendingPatch,
+    singleSession,
+    updateSession,
+  ]);
 
   const showCanvas = imageFile !== null || isCameraActive;
 
@@ -469,41 +499,54 @@ function CanvasWebcam({
         </div>
 
         <div className="w-full lg:w-80 border border-[var(--border)] bg-[var(--bg-surface)] rounded-2xl p-5 flex flex-col justify-between shadow-sm shrink-0">
-          <div className="space-y-3 ">
-            <div>
+          <div className="space-y-4">
+            <div className="pb-3 border-b border-[var(--border)]">
               <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
-                Results:
+                {singleSession ? (
+                  <>Session: {` ${singleSession?.session.SessionName}`} </>
+                ) : (
+                  <>No Active Session</>
+                )}
               </h2>
+              {singleSession && (
+                <p className="text-xs text-[var(--text-secondary)] mt-1">
+                  Your results will be automatically saved
+                </p>
+              )}
             </div>
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-3">
+                Results
+              </h3>
+              <div className="grid grid-cols-2 gap-y-2 text-sm text-[var(--text-secondary)]">
+                <span>Questions asked:</span>
+                <span className="font-medium text-[var(--text-primary)] text-right">
+                  {sessionRes.questions_asked}
+                </span>
 
-            <div className="grid grid-cols-2 gap-y-2 text-sm text-[var(--text-secondary)]">
-              <span>Questions asked:</span>
-              <span className="font-medium text-[var(--text-primary)] text-right">
-                {sessionRes.questions_asked}
-              </span>
+                <span>Paying Attention:</span>
+                <span className="font-medium text-[var(--text-primary)] text-right">
+                  {sessionRes.total_frames > 0
+                    ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                    : "0.00%"}
+                </span>
 
-              <span>Paying Attention:</span>
-              <span className="font-medium text-[var(--text-primary)] text-right">
-                {sessionRes.total_frames > 0
-                  ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
-                  : "0.00%"}
-              </span>
+                <span>Not Paying Attention:</span>
+                <span className="font-medium text-[var(--text-primary)] text-right">
+                  {sessionRes.total_frames > 0
+                    ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
+                    : "0.00%"}
+                </span>
+                <span>Sitting still:</span>
+                <span className="font-medium text-[var(--text-primary)] text-right">
+                  {`${percentageStable.toFixed(2)}%`}
+                </span>
 
-              <span>Not Paying Attention:</span>
-              <span className="font-medium text-[var(--text-primary)] text-right">
-                {sessionRes.total_frames > 0
-                  ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
-                  : "0.00%"}
-              </span>
-              <span>Sitting still:</span>
-              <span className="font-medium text-[var(--text-primary)] text-right">
-                {`${percentageStable.toFixed(2)}%`}
-              </span>
-
-              <span>Not Sitting still:</span>
-              <span className="font-medium text-[var(--text-primary)] text-right">
-                {`${percentageNotStable.toFixed(2)}%`}
-              </span>
+                <span>Not Sitting still:</span>
+                <span className="font-medium text-[var(--text-primary)] text-right">
+                  {`${percentageNotStable.toFixed(2)}%`}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -512,6 +555,20 @@ function CanvasWebcam({
               variant="outline"
               className=""
               onClick={() => {
+                if (singleSession && !pendingPatch)
+                  updateSession({
+                    body: {
+                      Data: {
+                        questions_asked: 0,
+                        total_frames: 0,
+                        total_no_attention: 0,
+                        total_paying_attention: 0,
+                        total_restless_frames: 0,
+                        total_stable_frames: 0,
+                      },
+                    },
+                    path: { sessionId: singleSession?.session.SessionID },
+                  });
                 frameStore.current?.clear();
                 SetSessionRes({
                   total_restless_frames: 0,
