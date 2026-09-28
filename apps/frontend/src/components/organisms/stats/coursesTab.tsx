@@ -33,7 +33,7 @@ export default function CoursesTab({
   if (isError === true) {
     return (
       <div className="flex items-center justify-center text-[var(--destructive)]">
-        Could not load chart
+        Could not load stats
       </div>
     );
   }
