@@ -50,7 +50,7 @@ export default function NfcRegistrationTemplate() {
           }
         />
 
-        <div className="mx-auto w-full max-w-3xl p-5">
+        <div className="mx-auto w-full max-w-5xl p-5">
           <NfcTagRegistrationPanel />
         </div>
       </div>
