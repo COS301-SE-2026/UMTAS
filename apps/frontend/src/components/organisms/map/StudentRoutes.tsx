@@ -137,6 +137,10 @@ function StudentRouteLineItem({
     <RouteLine
       path={path}
       colour={isAlternative ? "#3B82F6" : transition.route?.displayColour}
+      onClick={() => {
+        console.log("Origin event:", transition.originEvent);
+        console.log("Destination event:", transition.destinationEvent);
+      }}
     />
   );
 }
