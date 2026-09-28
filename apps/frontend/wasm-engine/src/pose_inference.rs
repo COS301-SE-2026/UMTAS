@@ -70,7 +70,7 @@ pub fn infer_pose_data(
     all_people.extend(full_image_people);
     all_people.extend(quadrant_people);
 
-    let res_people = non_maximum_sepression(all_people, 0.70);
+    let res_people = non_maximum_sepression(all_people, 0.30);
 
     return serde_json::to_string(&res_people).map_err(|e| JsValue::from_str(&e.to_string()));
 }
