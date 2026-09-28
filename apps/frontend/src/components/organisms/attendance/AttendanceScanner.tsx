@@ -6,6 +6,7 @@ import { LastScannedStudent } from "./LastScannedStudent";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Upload } from "lucide-react";
+import { toast } from "sonner";
 
 import { BarcodeCamera } from "@/components/molecules/attendance/BarcodeCamera";
 import { ScannerBadge } from "@/components/molecules/attendance/ScannerBadge";
@@ -51,7 +52,9 @@ export default function AttendanceScanner() {
     isFetchedAfterMount,
     refetch,
   } = useQuery(getAttendanceSlotsQ());
+
   const slotData = isFetchedAfterMount ? fetchedSlotData : undefined;
+
   const slots: AttendanceSlot[] = (slotData?.slotList ?? []).map((slot) => ({
     id: `${slot.eventID}:${slot.scheduledStartAt}`,
     eventID: slot.eventID,
@@ -65,6 +68,7 @@ export default function AttendanceScanner() {
     state: slot.state,
     attendanceCount: slot.attendanceCount,
   }));
+
   const currentSlot = slotData?.currentSlot
     ? (slots.find(
         (slot) =>
@@ -72,17 +76,21 @@ export default function AttendanceScanner() {
           slot.scheduledStartAt === slotData.currentSlot.scheduledStartAt,
       ) ?? null)
     : null;
+
   const selectedSlot = currentSlot;
   const selectedEventID = selectedSlot?.eventID ?? "";
+
   const { mutateAsync: updateAttendanceCount } = useMutation(
     updateAttendanceCountMut(),
   );
 
   useEffect(() => {
     if (!selectedEventID) return;
+
     let cancelled = false;
     const key = `attendance-scanner:${selectedEventID}`;
     const saved = window.sessionStorage.getItem(key);
+
     if (saved) {
       try {
         const state = JSON.parse(saved) as {
@@ -91,8 +99,10 @@ export default function AttendanceScanner() {
           fileName: string;
           active: boolean;
         };
+
         queueMicrotask(() => {
           if (cancelled) return;
+
           setExpectedStudents(state.expected);
           recordedScans.current = new Set(state.scanned ?? []);
           setAttendedStudents(new Set(recordedScans.current));
@@ -103,6 +113,7 @@ export default function AttendanceScanner() {
         window.sessionStorage.removeItem(key);
       }
     }
+
     return () => {
       cancelled = true;
     };
@@ -110,6 +121,7 @@ export default function AttendanceScanner() {
 
   useEffect(() => {
     if (!selectedEventID || !fileName) return;
+
     window.sessionStorage.setItem(
       `attendance-scanner:${selectedEventID}`,
       JSON.stringify({
@@ -128,8 +140,10 @@ export default function AttendanceScanner() {
   ]);
 
   const resetUploadedList = () => {
-    if (selectedEventID)
+    if (selectedEventID) {
       window.sessionStorage.removeItem(`attendance-scanner:${selectedEventID}`);
+    }
+
     setExpectedStudents([]);
     recordedScans.current = new Set();
     setAttendedStudents(new Set());
@@ -139,13 +153,22 @@ export default function AttendanceScanner() {
 
   const handleSlotSelect = async (slot: AttendanceSlot) => {
     setSelectingSlot(true);
+
     try {
       await selectPreferredEvent(slot);
       resetUploadedList();
       setConflictOpen(false);
       await refetch();
+
+      toast.success("Class selected", {
+        description: `${slot.moduleCode} · ${slot.moduleName}`,
+      });
     } catch {
       setConflictOpen(true);
+
+      toast.error("Class could not be selected", {
+        description: "Please try selecting the class again.",
+      });
     } finally {
       setSelectingSlot(false);
     }
@@ -154,12 +177,28 @@ export default function AttendanceScanner() {
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
-    if (!file || !selectedEventID) return;
+    if (!file) return;
+
+    if (!selectedEventID) {
+      toast.error("No class selected", {
+        description: "Select a current class before uploading a student list.",
+      });
+
+      return;
+    }
 
     const text = await file.text();
 
     const studentNumbers = text.match(/\b\d{8}\b/g) ?? [];
     const uniqueStudentNumbers = [...new Set(studentNumbers)];
+
+    if (uniqueStudentNumbers.length === 0) {
+      toast.error("No student numbers found", {
+        description: "The file must contain valid 8-digit student numbers.",
+      });
+
+      return;
+    }
 
     setExpectedStudents(uniqueStudentNumbers);
     setFileName(file.name);
@@ -170,6 +209,10 @@ export default function AttendanceScanner() {
     setSessionEnded(false);
 
     setStatus("READY");
+
+    toast.success("Student list loaded", {
+      description: `${uniqueStudentNumbers.length} students imported.`,
+    });
   };
 
   const handleScan = async (studentNumber: string) => {
@@ -184,6 +227,10 @@ export default function AttendanceScanner() {
     if (!/^\d{8}$/.test(cleanedStudentNumber)) {
       setStatus("ERROR");
 
+      toast.error("Invalid student number", {
+        description: "Student numbers must contain exactly 8 digits.",
+      });
+
       window.setTimeout(() => {
         setStatus("READY");
       }, 1500);
@@ -194,6 +241,10 @@ export default function AttendanceScanner() {
     if (!expectedStudents.includes(cleanedStudentNumber)) {
       setStatus("ERROR");
 
+      toast.error("Student not found", {
+        description: `${cleanedStudentNumber} is not in the uploaded student list.`,
+      });
+
       window.setTimeout(() => {
         setStatus("READY");
       }, 1500);
@@ -201,21 +252,41 @@ export default function AttendanceScanner() {
       return;
     }
 
-    if (pendingScans.current.has(cleanedStudentNumber)) return;
-    pendingScans.current.add(cleanedStudentNumber);
-    if (!recordedScans.current.has(cleanedStudentNumber)) {
-      recordedScans.current.add(cleanedStudentNumber);
-      setAttendedStudents(new Set(recordedScans.current));
+    if (pendingScans.current.has(cleanedStudentNumber)) {
+      return;
     }
+
+    if (recordedScans.current.has(cleanedStudentNumber)) {
+      toast.info("Already recorded", {
+        description: `${cleanedStudentNumber} has already been scanned.`,
+      });
+
+      return;
+    }
+
+    pendingScans.current.add(cleanedStudentNumber);
+
+    recordedScans.current.add(cleanedStudentNumber);
+    setAttendedStudents(new Set(recordedScans.current));
+
     try {
       await updateAttendanceCount({
         guestCount: recordedScans.current.size,
         eventID: selectedEventID,
       });
+
       setStatus("SUCCESS");
+
       void refetch();
     } catch {
+      recordedScans.current.delete(cleanedStudentNumber);
+      setAttendedStudents(new Set(recordedScans.current));
+
       setStatus("ERROR");
+
+      toast.error("Attendance could not be recorded", {
+        description: "Please try scanning the student again.",
+      });
     } finally {
       pendingScans.current.delete(cleanedStudentNumber);
     }
@@ -226,7 +297,19 @@ export default function AttendanceScanner() {
   };
 
   const startSession = () => {
-    if (expectedStudents.length === 0 || !selectedEventID) {
+    if (!selectedEventID) {
+      toast.error("No class selected", {
+        description: "Choose the class you want to record attendance for.",
+      });
+
+      return;
+    }
+
+    if (expectedStudents.length === 0) {
+      toast.error("No student list", {
+        description: "Upload a student list before starting attendance.",
+      });
+
       return;
     }
 
@@ -237,6 +320,10 @@ export default function AttendanceScanner() {
     setSessionStarted(true);
 
     setStatus("READY");
+
+    toast.success("Attendance session started", {
+      description: `${expectedStudents.length} students expected.`,
+    });
   };
 
   const endSession = () => {
@@ -244,13 +331,20 @@ export default function AttendanceScanner() {
     setSessionEnded(true);
 
     setStatus("READY");
+
+    toast.success("Attendance session ended", {
+      description: `${attendedStudents.size} of ${expectedStudents.length} students attended.`,
+    });
   };
 
   const resetSession = () => {
-    if (selectedEventID)
+    if (selectedEventID) {
       window.sessionStorage.removeItem(`attendance-scanner:${selectedEventID}`);
+    }
+
     setExpectedStudents([]);
-    setAttendedStudents(new Set(recordedScans.current));
+    recordedScans.current = new Set();
+    setAttendedStudents(new Set());
 
     setFileName(null);
     setLastScan(null);
@@ -286,6 +380,7 @@ export default function AttendanceScanner() {
           <p className="mb-2 text-xs font-medium text-[var(--text-secondary)]">
             Current class
           </p>
+
           {slotsLoading || !isFetchedAfterMount ? (
             <p className="text-sm text-[var(--text-secondary)]">
               Loading class…
@@ -295,9 +390,11 @@ export default function AttendanceScanner() {
               <p className="text-sm font-medium text-[var(--text-primary)]">
                 {selectedSlot.moduleCode} · {selectedSlot.moduleName}
               </p>
+
               <p className="mt-1 text-xs text-[var(--text-secondary)]">
                 {selectedSlot.venue}
               </p>
+
               {(slotData?.slotList.filter((slot) => slot.state === "AVAILABLE")
                 .length ?? 0) > 1 && (
                 <Button
