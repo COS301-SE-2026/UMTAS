@@ -34,7 +34,11 @@ const baseSteps = [
   },
   {
     target: "#btn-create-schedule",
-    content: "Create your schedule.",
+    content: "Create your timetable.",
+  },
+  {
+    target: "#btn-solve-timetable",
+    content: "Solve your timetable.",
   },
 ];
 
@@ -395,7 +399,7 @@ export function GenerateStep({
                   : "Generate Timetable"}
           </Button>
           <Button
-            id=""
+            id="btn-solve-timetable"
             data-testid=""
             type="button"
             size="default"

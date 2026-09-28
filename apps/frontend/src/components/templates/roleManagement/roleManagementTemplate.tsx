@@ -23,24 +23,12 @@ const steps = [
     content: "Choose which columns to display.",
   },
   {
-    target: "#select-the-row-in-table",
-    content: "Select a row from the table.",
-  },
-  {
     target: "#select-role-for-the-user",
     content: "Assign a role to the selected user.",
   },
   {
     target: "#update-role-of-user",
     content: "Update the user’s role to the chosen role.",
-  },
-  {
-    target: "#btn-role-previous",
-    content: "Go to the previous page of users.",
-  },
-  {
-    target: "#btn-role-next",
-    content: "Go to the next page of users.",
   },
 ];
 

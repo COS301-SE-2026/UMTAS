@@ -133,6 +133,8 @@ function CanvasWebcam({
   const lastRunRef = useRef<number>(0);
   const frameCounterRef = useRef<number>(0);
 
+  const imageProcessedRef = useRef<boolean>(false);
+
   const { data: singleSession } = useQuery(
     getSingleSessionQuery({ sessionId: sessionID ?? "" }),
   );
@@ -179,7 +181,7 @@ function CanvasWebcam({
 
     if (inferenceSettings.runInference && isSourceActive) {
       frameStore.current = new SessionStorePose();
-
+      imageProcessedRef.current = false;
       pose_Manager.start();
       pose_data_manager.start();
     } else {
@@ -199,11 +201,13 @@ function CanvasWebcam({
       // eslint-disable-next-line
       setImageLoaded(false);
       detectedPeopleRef.current = [];
+      imageProcessedRef.current = false;
       return;
     }
 
     detectedPeopleRef.current = [];
     lastRunRef.current = 0;
+    imageProcessedRef.current = false;
 
     const img = new Image();
     const objectUrl = URL.createObjectURL(imageFile);
@@ -334,8 +338,13 @@ function CanvasWebcam({
           const inferenceIntervalMs =
             inferenceSettings.InferenceInterval * 1000;
 
+          const shouldRunForImage = imageFile
+            ? !imageProcessedRef.current
+            : true;
+
           if (
             detectionSettings.runDetection &&
+            shouldRunForImage &&
             timestamp - lastRunRef.current >= detectionIntervalMs
           ) {
             lastRunRef.current = timestamp;
@@ -361,9 +370,15 @@ function CanvasWebcam({
 
           if (
             inferenceSettings.runInference &&
+            shouldRunForImage &&
             timestamp - lastRunRef.current >= inferenceIntervalMs
           ) {
             lastRunRef.current = timestamp;
+
+            if (imageFile) {
+              imageProcessedRef.current = true;
+            }
+
             const imageData = context.getImageData(
               0,
               0,
@@ -685,6 +700,7 @@ function CanvasWebcam({
                   }
 
                   frameStore.current?.clear();
+                  imageProcessedRef.current = false;
                   SetSessionRes(emptyResults);
 
                   toast.success("Results reset");
