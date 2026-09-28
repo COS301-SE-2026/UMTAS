@@ -11,6 +11,13 @@ import {
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { Switch } from "@/components/atoms/baseShadcn/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/baseShadcn/select";
 import Popup from "@/components/atoms/utility/floatContainer";
 import CameraCanvas, {
   DetectionSettings,
@@ -29,6 +36,8 @@ export default function VM_SessionTemplate() {
   const [modelVerified, setModelVerified] = useState(false);
 
   const [cameraOn, setCameraOn] = useState(false);
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
   const [sessionId, setSessionID] = useState<string | null>(null);
 
   const [detectionSettings, setDetectionSettings] = useState<DetectionSettings>(
@@ -46,7 +55,6 @@ export default function VM_SessionTemplate() {
   );
 
   const [imageUpload, setImageUpload] = useState<File | null>(null);
-
   const [showVideoPopUp, setShowVideoPopUp] = useState(false);
 
   const uploadImageRef = useRef<HTMLInputElement>(null);
@@ -65,6 +73,32 @@ export default function VM_SessionTemplate() {
 
     return () => cancelAnimationFrame(frame);
   }, [router]);
+
+  useEffect(() => {
+    if (!cameraOn) return;
+
+    async function getCameraDevices() {
+      try {
+        await navigator.mediaDevices
+          .getUserMedia({ video: true })
+          .catch(() => {});
+
+        const allDevices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = allDevices.filter(
+          (device) => device.kind === "videoinput",
+        );
+        setDevices(videoDevices);
+
+        if (videoDevices.length > 0 && !selectedDeviceId) {
+          setSelectedDeviceId(videoDevices[0].deviceId);
+        }
+      } catch (error) {
+        console.error("Error fetching camera devices:", error);
+      }
+    }
+
+    getCameraDevices();
+  }, [cameraOn, selectedDeviceId]);
 
   if (!modelVerified) {
     return null;
@@ -97,6 +131,7 @@ export default function VM_SessionTemplate() {
                   detectionSettings={detectionSettings}
                   inferenceSettings={inferenceSettings}
                   imageFile={imageUpload}
+                  deviceId={selectedDeviceId}
                 />
               </div>
             </section>
@@ -177,16 +212,45 @@ export default function VM_SessionTemplate() {
                 title="Camera"
                 description="Choose whether the live camera feed is active."
               >
-                <SettingRow label="Camera">
-                  <Switch
-                    checked={cameraOn}
-                    aria-label="Toggle camera"
-                    onCheckedChange={(checked) => {
-                      setCameraOn(checked);
-                      setImageUpload(null);
-                    }}
-                  />
-                </SettingRow>
+                <div className="space-y-4">
+                  <SettingRow label="Camera">
+                    <Switch
+                      checked={cameraOn}
+                      aria-label="Toggle camera"
+                      onCheckedChange={(checked) => {
+                        setCameraOn(checked);
+                        if (checked) setImageUpload(null);
+                      }}
+                    />
+                  </SettingRow>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-[var(--text-primary)]">
+                      Device
+                    </Label>
+
+                    <Select
+                      disabled={cameraOn == false}
+                      value={selectedDeviceId}
+                      onValueChange={setSelectedDeviceId}
+                    >
+                      <SelectTrigger id="camera-select" className="w-full">
+                        <SelectValue placeholder="Select a camera" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {devices.map((device) => (
+                          <SelectItem
+                            key={device.deviceId}
+                            value={device.deviceId}
+                          >
+                            {device.label ||
+                              `Camera ${device.deviceId.slice(0, 5)}...`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </SettingsCard>
 
               {/* Detection */}
