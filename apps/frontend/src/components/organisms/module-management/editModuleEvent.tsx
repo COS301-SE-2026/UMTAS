@@ -236,9 +236,11 @@ export default function EditModuleEvent({
       }
       setFeedback({ type: "success", message: "Changes saved successfully!" });
 
-      setTimeout(() => {
-        onClose();
-      }, 2001);
+      // setTimeout(() => {
+      //   onClose();
+      // }, 2001);
+
+      onClose();
     } catch (error) {
       setFeedback({
         type: "error",
@@ -248,19 +250,11 @@ export default function EditModuleEvent({
   };
 
   return (
-    <div className="flex flex-col gap-4 p-6 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl shadow-sm w-full max-w-2xl mx-auto max-h-[91vh] overflow-hidden">
+    <div className="flex flex-col gap-4 p-6 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl shadow-sm w-full max-w-2xl mx-auto h-[80vh] max-h-[91vh] overflow-hidden">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-[var(--text-primary)]">
           Edit Module and Events
         </h2>
-        <Button
-          type="button"
-          variant={"default"}
-          onClick={onClose}
-          aria-label="Close"
-        >
-          Close
-        </Button>
       </div>
 
       <Tabs

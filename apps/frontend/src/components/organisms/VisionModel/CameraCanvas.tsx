@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { CircleX } from "lucide-react";
 import { detectionManager } from "../../../../utilities/VisionModel/detectionManager";
 import { detection_data_manager } from "../../../../utilities/VisionModel/detection_data_manager";
 import {
   DetectedPerson,
-  DetectedPersonPose,
   Keypoint,
   SessionInferenceResult,
 } from "../../../../utilities/VisionModel/messageTypes";
@@ -53,13 +53,13 @@ function getVideoConstraints(deviceId?: string): MediaStreamConstraints {
   const isMobile = window.innerWidth < 768;
   return {
     video: deviceId
-      ? { deviceId: { ideal: deviceId } }
+      ? { deviceId: { exact: deviceId } }
       : {
           width: isMobile ? { ideal: 720 } : { ideal: 1280 },
           height: isMobile ? { ideal: 1280 } : { ideal: 720 },
           facingMode: isMobile ? "user" : "environment",
         },
-    audio: true,
+    audio: false,
   };
 }
 function getCanvasConstraints() {
@@ -122,7 +122,8 @@ function CanvasWebcam({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
 
-  const [cameraLoaded, setCameraLoaded] = useState<boolean>(false);
+  const [loadedCameraKey, setLoadedCameraKey] = useState<string | null>(null);
+  const [cameraError, setCameraError] = useState<string | null>(null);
   const [createSessionPop, setCreateSessionPop] = useState<boolean>(false);
 
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
@@ -139,6 +140,29 @@ function CanvasWebcam({
   );
   const { mutateAsync: updateSession, isPending: pendingPatch } =
     useMutation(patchSessionMut());
+
+  const saveErrorShownRef = useRef(false);
+
+  function getCameraErrorMessage(error: unknown): string {
+    if (error instanceof DOMException) {
+      switch (error.name) {
+        case "NotAllowedError":
+          return "Camera access was blocked. Allow camera access in your browser and try again.";
+        case "NotFoundError":
+          return "The selected camera is no longer available.";
+        case "NotReadableError":
+          return "The camera is busy or could not be opened. Close other apps or browser tabs using it and try again.";
+        case "OverconstrainedError":
+          return "The selected camera does not support the requested settings. Try another camera.";
+        default:
+          return error.message || "The camera could not be opened.";
+      }
+    }
+
+    return error instanceof Error
+      ? error.message
+      : "The camera could not be opened.";
+  }
 
   // Manage detection workers
   // Lazy initialize frameStore once
@@ -194,44 +218,98 @@ function CanvasWebcam({
       setImageLoaded(true);
     };
 
+    img.onerror = () => {
+      setImageLoaded(false);
+      toast.error("Image could not be loaded", {
+        description: "Choose a different image and try again.",
+      });
+    };
+
     return () => {
       URL.revokeObjectURL(objectUrl);
     };
   }, [imageFile]);
 
+  const cameraKey = deviceId || "__default__";
+  const cameraLoaded =
+    isCameraActive && imageFile === null && loadedCameraKey === cameraKey;
+
   useEffect(() => {
     if (imageFile || !isCameraActive) {
-      // eslint-disable-next-line
-      setCameraLoaded(false);
       return;
     }
 
+    let cancelled = false;
     let currentStream: MediaStream | null = null;
+    const videoElement = videoRef.current;
+
     async function startCam() {
       try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error("This browser does not support camera access.");
+        }
+
         currentStream = await navigator.mediaDevices.getUserMedia(
           getVideoConstraints(deviceId),
         );
-        if (videoRef.current) {
-          videoRef.current.srcObject = currentStream;
-          videoRef.current.onloadedmetadata = () => {
-            videoRef.current?.play();
-            setCameraLoaded(true);
+
+        if (cancelled) {
+          currentStream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+
+        setCameraError(null);
+
+        if (videoElement) {
+          videoElement.srcObject = currentStream;
+          videoElement.onloadedmetadata = () => {
+            void videoElement
+              .play()
+              .then(() => {
+                if (!cancelled) {
+                  setLoadedCameraKey(cameraKey);
+                }
+              })
+              .catch((error) => {
+                const message = getCameraErrorMessage(error);
+                setLoadedCameraKey(null);
+                setCameraError(message);
+                toast.error("Camera preview could not start", {
+                  description: message,
+                });
+              });
           };
         }
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error("Camera start failed:", error);
+
+        setLoadedCameraKey(null);
+
+        const message = getCameraErrorMessage(error);
+        setCameraError(message);
+
+        toast.error("Camera could not start", {
+          description: message,
+        });
       }
     }
 
-    startCam();
+    void startCam();
 
     return () => {
-      if (currentStream) {
-        currentStream.getTracks().forEach((track) => track.stop());
+      cancelled = true;
+
+      if (videoElement) {
+        videoElement.onloadedmetadata = null;
+
+        if (videoElement.srcObject === currentStream) {
+          videoElement.srcObject = null;
+        }
       }
+
+      currentStream?.getTracks().forEach((track) => track.stop());
     };
-  }, [isCameraActive, imageFile, deviceId]);
+  }, [cameraKey, deviceId, imageFile, isCameraActive]);
 
   useEffect(() => {
     const isReady = imageFile ? imageLoaded : cameraLoaded;
@@ -460,18 +538,34 @@ function CanvasWebcam({
 
     if ((cameraLoaded || imageLoaded) && inferenceSettings.runInference) {
       interval = setInterval(async () => {
-        if (frameStore.current) {
+        if (!frameStore.current) return;
+
+        try {
           const result = await frameStore.current.analyseAllFrames();
+
           if (singleSession && !pendingPatch) {
             const apiRes = await updateSession({
               body: {
                 Data: result,
               },
-              path: { sessionId: singleSession?.session.SessionID },
+              path: { sessionId: singleSession.session.SessionID },
             });
+
             SetSessionRes(apiRes.session.Data);
           } else {
             SetSessionRes(result);
+          }
+
+          saveErrorShownRef.current = false;
+        } catch (error) {
+          console.error("Could not update Lecture Watch results:", error);
+
+          if (!saveErrorShownRef.current) {
+            saveErrorShownRef.current = true;
+            toast.error("Results could not be saved", {
+              description:
+                "Lecture analysis is still running, but the latest results could not be saved.",
+            });
           }
         }
       }, 3 * 1000);
@@ -491,7 +585,7 @@ function CanvasWebcam({
     updateSession,
   ]);
 
-  const showCanvas = imageFile !== null || isCameraActive;
+  const showCanvas = imageFile !== null || cameraLoaded;
 
   return (
     <>
@@ -505,10 +599,27 @@ function CanvasWebcam({
               height={getCanvasConstraints().height}
               className="w-full h-full max-h-[75vh] object-contain rounded-xl"
             ></canvas>
+          ) : isCameraActive && cameraError ? (
+            <div className="flex h-[60vh] w-full flex-col items-center justify-center gap-2 px-6 text-center text-[var(--text-secondary)]">
+              <CircleX className="h-6 w-6" aria-hidden="true" />
+              <p className="font-medium text-[var(--text-primary)]">
+                Camera unavailable
+              </p>
+              <p className="max-w-md text-sm">{cameraError}</p>
+            </div>
+          ) : isCameraActive ? (
+            <div className="flex h-[60vh] w-full items-center justify-center text-sm text-[var(--text-secondary)]">
+              Starting camera…
+            </div>
           ) : (
-            <div className="w-full h-[60vh] text-center items-center justify-center flex gap-x-2 text-[var(--text-secondary)]">
-              Camera Disabled
-              <CircleX className="w-5 h-5" />
+            <div className="flex h-[60vh] w-full flex-col items-center justify-center gap-2 px-6 text-center text-[var(--text-secondary)]">
+              <CircleX className="h-6 w-6" aria-hidden="true" />
+              <p className="font-medium text-[var(--text-primary)]">
+                No input selected
+              </p>
+              <p className="text-sm">
+                Turn on the camera or upload an image to begin.
+              </p>
             </div>
           )}
         </div>
@@ -539,14 +650,14 @@ function CanvasWebcam({
                   {sessionRes.questions_asked}
                 </span>
 
-                <span>Paying Attention:</span>
+                <span>Paying attention:</span>
                 <span className="font-medium text-[var(--text-primary)] text-right">
                   {sessionRes.total_frames > 0
                     ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
                     : "0.00%"}
                 </span>
 
-                <span>Not Paying Attention:</span>
+                <span>Not Paying attention:</span>
                 <span className="font-medium text-[var(--text-primary)] text-right">
                   {sessionRes.total_frames > 0
                     ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
@@ -557,7 +668,7 @@ function CanvasWebcam({
                   {`${percentageStable.toFixed(2)}%`}
                 </span>
 
-                <span>Not Sitting still:</span>
+                <span>Restless:</span>
                 <span className="font-medium text-[var(--text-primary)] text-right">
                   {`${percentageNotStable.toFixed(2)}%`}
                 </span>
@@ -565,47 +676,52 @@ function CanvasWebcam({
             </div>
           </div>
 
-          <div className="pt-6 flex border-t w-full justify-around border-[var(--border)] mt-4">
+          <div className="mt-4 flex w-full gap-2 border-t border-[var(--border)] pt-6">
             <Button
               variant="outline"
-              className=""
-              onClick={() => {
-                if (singleSession && !pendingPatch)
-                  updateSession({
-                    body: {
-                      Data: {
-                        questions_asked: 0,
-                        total_frames: 0,
-                        total_no_attention: 0,
-                        total_paying_attention: 0,
-                        total_restless_frames: 0,
-                        total_stable_frames: 0,
-                      },
-                    },
-                    path: { sessionId: singleSession?.session.SessionID },
-                  });
-                frameStore.current?.clear();
-                SetSessionRes({
-                  total_restless_frames: 0,
-                  total_stable_frames: 0,
+              className="flex-1"
+              disabled={pendingPatch}
+              onClick={async () => {
+                const emptyResults = {
                   questions_asked: 0,
                   total_frames: 0,
                   total_no_attention: 0,
                   total_paying_attention: 0,
-                });
-                imageProcessedRef.current = false;
+                  total_restless_frames: 0,
+                  total_stable_frames: 0,
+                };
+
+                try {
+                  if (singleSession && !pendingPatch) {
+                    await updateSession({
+                      body: { Data: emptyResults },
+                      path: { sessionId: singleSession.session.SessionID },
+                    });
+                  }
+
+                  frameStore.current?.clear();
+                  imageProcessedRef.current = false;
+                  SetSessionRes(emptyResults);
+
+                  toast.success("Results reset");
+                } catch (error) {
+                  console.error("Could not reset results:", error);
+
+                  toast.error("Results could not be reset", {
+                    description: "Please try again.",
+                  });
+                }
               }}
             >
-              Reset Details
+              Reset Results
             </Button>
+
             <Button
               variant="outline"
-              className=""
-              onClick={() => {
-                setCreateSessionPop(true);
-              }}
+              className="flex-1"
+              onClick={() => setCreateSessionPop(true)}
             >
-              Create Session
+              {singleSession ? "Change Session" : "Select Session"}
             </Button>
           </div>
         </div>

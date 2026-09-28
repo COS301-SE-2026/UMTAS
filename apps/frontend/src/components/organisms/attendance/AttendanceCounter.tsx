@@ -16,7 +16,7 @@ export default function AttendanceCounter({
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex w-full flex-col">
       <div className="flex items-center justify-between pb-2">
         <p className="text-sm">Attendance</p>
         <p className="text-sm text-[var(--text-secondary)]">

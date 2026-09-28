@@ -45,7 +45,7 @@ export default function ScannerTemplate() {
             }
           />
 
-          <div className="mx-auto w-full max-w-3xl p-5">
+          <div className="w-full p-5">
             <AttendanceScanner />
           </div>
         </div>
