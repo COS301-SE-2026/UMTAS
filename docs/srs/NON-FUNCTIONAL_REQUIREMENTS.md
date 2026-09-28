@@ -1,5 +1,23 @@
 # Non-Functional Requirements
 
+<a id="evidence-and-test-reports"></a>
+
+??? info "Evidence and test reports"
+
+    The supporting material is stored in the separate `docs/evidence/nfr/` area and kept
+    out of the main documentation menu. Start with the
+    [NFR testing and traceability matrix](../evidence/nfr/NON-FUNCTIONAL_TESTING.md) for each requirement's
+    measured result, status, test command and remaining acceptance work. The underlying reports
+    are available here:
+
+    - [Locust load-test report](../evidence/nfr/LOCUST_REPORT.html)
+    - [Lighthouse accessibility reports](../evidence/nfr/Lighthouse.md)
+    - [OWASP ZAP report](../evidence/nfr/Owasp.md)
+    - [Public availability monitor screenshots](../evidence/nfr/Availability.md)
+    - [University adapter case study](../evidence/nfr/API_ADAPTER_CASE_STUDY.md)
+    - [Parser suite output](../evidence/nfr/records/parser-suite-2026-09-28.txt)
+    - [Solver regression diagnostic output](../evidence/nfr/records/solver-regression-2026-09-28.txt)
+
 These requirements are derived from the client's stated success criteria: correct University of
 Pretoria PDF extraction, conflict-free schedules, privacy-preserving administration,
 university-scale simulation, and university-specific adapters that do not alter the core. They are
@@ -10,8 +28,10 @@ not yet measured rather than assumed to pass.
 The performance, throughput, and reliability evidence below comes from a single Locust run against
 the staging deployment on 2026-09-03. The complete interactive report, including per-endpoint
 tables, response-time distributions, and the requests/failures charts, is published as the
-[Locust load-test report](LOCUST_REPORT.html). A summary of that run and the full per-endpoint
-breakdown are in [Non-Functional Requirements Testing](NON-FUNCTIONAL_TESTING.md#332-load-and-performance-test-evidence).
+[Locust load-test report](../evidence/nfr/LOCUST_REPORT.html). A summary of that run and the full per-endpoint
+breakdown are in [Non-Functional Requirements Testing](../evidence/nfr/NON-FUNCTIONAL_TESTING.md#332-load-and-performance-test-evidence).
+The September results describe a historical staging revision. Requirements that passed in that run
+still need a recorded result for the assessed Demo 4 release.
 
 ## Utility Tree
 
@@ -54,7 +74,7 @@ run**. Defining it once keeps the individual response measures comparable.
 | Think time | 0.5 s to 1.0 s between tasks |
 | Workload mix | 19 weighted student tasks: module browsing and enrolment, event listing, timetable create/extend/read, attendance create/update/read, PDF upload and polling, solver submission, polling and result application, session checks |
 | Distinct named endpoints | 23 |
-| Evidence | [Locust load-test report](LOCUST_REPORT.html) |
+| Evidence | [Locust load-test report](../evidence/nfr/LOCUST_REPORT.html) |
 
 ## NFR-Corr-1 - Supported Timetable PDF Extraction Correctness
 
@@ -75,7 +95,7 @@ fixtures pass complete comparisons against the
 The acceptance test calculates 100% field-level precision and recall for each fixture, reports zero
 omitted and zero invented records or fields, and checks exact canonical-result equality. The Python
 parser suite is an active CI gate; see the
-[NFR test matrix](NON-FUNCTIONAL_TESTING.md#333-nfr-traceability-matrix) for the recorded result.
+[NFR test matrix](../evidence/nfr/NON-FUNCTIONAL_TESTING.md#333-nfr-traceability-matrix) for the recorded result.
 
 ## NFR-Corr-2 - Conflict-Free Schedule Correctness
 
@@ -93,6 +113,10 @@ parser suite is an active CI gate; see the
 For an input whose hard constraints admit no conflict-free schedule, the system returns a clearly
 labelled `best-effort` result and identifies every remaining overlap. This is functional behaviour
 and does not weaken the conflict-free acceptance measure above.
+
+**Acceptance evidence pending.** A [diagnostic regression run](../evidence/nfr/NON-FUNCTIONAL_TESTING.md#334-repeatable-evidence-register)
+on 2026-09-28 stopped at a CP-SAT preferred-start-time assertion. It used an existing local binary
+and does not replace a fresh build or the independent overlap validation required by this measure.
 
 ## NFR-Sec-1 - Student Timetable Confidentiality
 
@@ -148,7 +172,7 @@ between 100 and 20,000 users has not been characterised.
 | **Response measure** | Across the steady-state window, the **p95 response time for submission and status endpoints does not exceed 2 seconds**, and the **overall request success rate is at least 99%**. |
 
 **Acceptance evidence (2026-09-03) - met.** From the reference load run
-([Locust load-test report](LOCUST_REPORT.html)):
+([Locust load-test report](../evidence/nfr/LOCUST_REPORT.html)):
 
 | **Component of the measure** | **Target** | **Actual** |
 |---|---|---|
@@ -168,7 +192,7 @@ budget. No endpoint exceeded 1,500 ms at any point.
 The 335 failures behind the 99.17% figure were **all** on `POST /api/solver/jobs`: 334 HTTP 400
 responses and one HTTP 502. The 400s are attributable to a defect in the load script rather than
 the API, and are analysed in
-[Non-Functional Requirements Testing](NON-FUNCTIONAL_TESTING.md#solver-submission-failures). Every
+[Non-Functional Requirements Testing](../evidence/nfr/NON-FUNCTIONAL_TESTING.md#solver-submission-failures). Every
 one of the other 22 named endpoints recorded **0 failures across 39,337 requests**.
 
 ## NFR-Perf-2 - Interactive Read Responsiveness
@@ -194,7 +218,7 @@ endpoints served **30,498 requests with 0 failures**. The slowest was `GET /api/
 (5,680 requests, 75 KB mean payload), returned a **640 ms p95** and a **335.6 ms mean**. Every read
 endpoint met both the 1-second p95 budget and the 500 ms mean budget. The complete per-endpoint
 table is in
-[Non-Functional Requirements Testing](NON-FUNCTIONAL_TESTING.md#per-endpoint-results).
+[Non-Functional Requirements Testing](../evidence/nfr/NON-FUNCTIONAL_TESTING.md#per-endpoint-results).
 
 ## NFR-Cap-1 - Sustained Request Throughput
 
@@ -221,7 +245,7 @@ Throughput did not decay: the last 60 seconds of the window averaged **71.85 req
 **71.53 req/s** for the first 60 seconds. The aggregate mean response time rose from 215 ms at the start of steady
 state to 314 ms at the end - a gradual climb consistent with a cumulative running average over an
 increasing sample, with the instantaneous median flat at roughly 300 ms throughout. See the
-requests-per-second chart in the [Locust load-test report](LOCUST_REPORT.html).
+requests-per-second chart in the [Locust load-test report](../evidence/nfr/LOCUST_REPORT.html).
 
 ## NFR-Eff-1 - Ingestion and Solver Processing Efficiency
 
@@ -261,16 +285,18 @@ Separating acceptance from processing is what makes the asynchronous design obse
 latency is bounded and testable from the client, while processing duration is a worker-side
 property measured under NFR-Eff-1.
 
-**Acceptance evidence (2026-09-03) - met.** `POST /api/pdf-parser/jobs/upload` accepted **255 of
+**Interim evidence (2026-09-03) - acceptance target not met.** `POST /api/pdf-parser/jobs/upload` accepted **255 of
 255** multipart uploads (files of 3 KB to 15 KB drawn from 12 UP fixtures) with **0 failures**, a
 **295.8 ms mean**, a **670 ms p95**, and a worst case of **815 ms**. `POST /api/solver/jobs`
 accepted **841 of the 842 well-formed submissions** it received (99.9%, the exception being a single
 HTTP 502) at a **710 ms p95**; the further 334 rejected submissions carried a malformed preferences
 payload generated by the load script and were correctly refused with HTTP 400 (see
-[the failure analysis](NON-FUNCTIONAL_TESTING.md#solver-submission-failures)). Downstream polling
+[the failure analysis](../evidence/nfr/NON-FUNCTIONAL_TESTING.md#solver-submission-failures)). Downstream polling
 confirmed that accepted jobs remained retrievable: `GET /api/pdf-parser/jobs/[id]` and
 `GET /api/solver/jobs/[id]` together served 2,188 status checks with 0 failures, and 916 result
 fetches likewise succeeded without error.
+The observed p95 latencies met the one-second budget, but the single failed well-formed solver
+submission prevents the 100% acceptance measure from passing.
 
 ## NFR-Rely-1 - Sustained Reliability Under Load
 
@@ -333,14 +359,17 @@ issued.
 | **Part** | **UMTAS scenario** |
 |---|---|
 | **Source of stimulus** | External uptime monitoring, independent of any test run |
-| **Stimulus** | Periodic automated health checks against the public endpoint over the weeks leading up to Demo 3 |
+| **Stimulus** | Periodic automated health checks against the public endpoint over a dated monitoring window covering the assessed release |
 | **Environment** | Production deployment, continuous monitoring window |
 | **Artifact** | Public entry point / health-check endpoint |
 | **Response** | Remain reachable and healthy, with any outage detected and the service restarted automatically or promptly |
-| **Response measure** | Measured uptime over the monitoring window preceding Demo 3 is **at least 99.5%**. |
+| **Response measure** | Measured uptime over a stated 30-day monitoring window that includes the assessed Demo 4 release is **at least 99.5%**. The report must identify its start and end dates and the monitored endpoint. |
 
-**Acceptance evidence - met.** UptimeRobot reports **greater than 99.95%** uptime over the
-monitoring window, against the 99.5% target.
+**Current monitoring evidence (2026-09-28).** The [captured public production monitor](../evidence/nfr/Availability.md)
+reported **99.965% over 30 days** and **99.982% over 90 days**, both above the 99.5% threshold.
+The rolling figures are useful reference evidence. Retain a dated export or screenshot identifying
+the monitor, endpoint and exact 30-day window for the assessed Demo 4 release before reporting this
+requirement as verified.
 
 ## NFR-Maint-1 - University Adapter Modifiability
 
@@ -355,9 +384,10 @@ monitoring window, against the 99.5% target.
 | **Response** | Add the university-specific behaviour without modifying existing production components outside the Adapter layer |
 | **Response measure** | Number of existing production components outside the University API Adapter layer that must be modified equals **0**. The `AdapterRegistry` may be updated; this is considered part of the Adapter layer and does not count against the measure. |
 
-**Acceptance evidence - met.** The [API adapter case study](API_ADAPTER_CASE_STUDY.md) walks through
-introducing a new university integration and verifies that no production component outside the
-adapter boundary required modification.
+**Design evidence only.** The [API adapter case study](../evidence/nfr/API_ADAPTER_CASE_STUDY.md) describes how a
+new university integration should remain within the adapter boundary. It does not record a
+controlled implementation diff or passing regression run. Those artefacts are required before
+the zero-change measure can be marked as met.
 
 ## NFR-Sec-2 - API Vulnerability Resistance
 
@@ -372,8 +402,10 @@ adapter boundary required modification.
 | **Response** | Reject or safely handle malformed, injected, or unauthorised requests without exposing sensitive data or internal state |
 | **Response measure** | The OWASP ZAP report contains **0 alerts of medium severity or above**. Any informational/low findings are logged and triaged, but do not block release. |
 
-**Acceptance evidence - met.** The [OWASP ZAP report](Owasp.md) records **0 alerts** at medium
-severity or above.
+**Archived evidence (2026-09-02) - not met.** The [OWASP ZAP report](../evidence/nfr/Owasp.md) records **two
+Medium alerts**: a missing Content Security Policy header and a missing anti-clickjacking header.
+The report was generated for the production site. A scan of the required staging scope must be
+repeated after remediation before this requirement can be marked as met.
 
 ## NFR-Sec-3 - Dependency Vulnerability Resistance
 
@@ -388,8 +420,10 @@ severity or above.
 | **Response** | Scan the monorepo dependency tree for known Common Vulnerabilities and Exposures (CVEs) and report findings |
 | **Response measure** | The CI pipeline step passes with an exit code of 0, confirming **0 known vulnerabilities** of moderate or higher severity exist in the dependencies on the `main` branch. |
 
-**Acceptance evidence - met.** The `pnpm audit` CI step exits 0 with **0 findings** at moderate
-severity or above on `main`.
+**Evidence outstanding.** The audit step in `.github/workflows/ci.yml` is commented out. An
+attempted `pnpm audit --audit-level=moderate --prod` on 2026-09-28 could not reach the npm registry,
+so it produced no vulnerability result. A successful audit on the assessed revision, with its
+output and exit code retained, is required.
 
 ## NFR-Por-1 - Browser Adaptability
 
@@ -404,6 +438,10 @@ severity or above on `main`.
 | **Response** | Run E2e tests on all provided browsers in the config |
 | **Response measure** | Measured 0 tests fail in the pipeline for repeated tests across all provided browsers |
 
+**Evidence outstanding.** The current Playwright configuration defines Chromium and Firefox, but
+the project labelled as Edge is another Chromium project without an `msedge` channel. The full
+three-browser test must be configured and its results retained.
+
 ## NFR-Acc-1 - Frontend Accessibility Audit
 
 **Quality attribute:** Usability - accessibility
@@ -414,8 +452,11 @@ severity or above on `main`.
 | **Stimulus** | Execute a manual Lighthouse accessibility audit across key pages of the frontend application |
 | **Environment** | Local development or staging environment prior to major deployment |
 | **Artifact** | Frontend web application and all UI views |
-| **Response** | The Lighthouse scanner analyzes the web pages for accessibility best practices, contrast ratios, and ARIA usage, generating a performance and quality breakdown |
+| **Response** | The Lighthouse scanner analyses the web pages for accessibility best practices, contrast ratios, and ARIA usage, generating a performance and quality breakdown |
 | **Response measure** | The resulting Lighthouse Accessibility score exceeds 90 out of a maximum of 100. |
 
-The per-page [Lighthouse reports](Lighthouse.md) cover the Builder, Calendar Management, Course
-Management, Event Management, Module Management, Role Management, and Schedules pages.
+The archived [Lighthouse reports](../evidence/nfr/Lighthouse.md) show numeric Accessibility scores above 90 for
+Builder, Calendar Management, Course Management, Module Management, Role Management and Schedules.
+The file labelled Event Management shows 23 of 23 checks rather than a score out of 100 and records
+the Builder URL. A report from the actual Event page is needed before the seven-page audit can be
+marked as complete.

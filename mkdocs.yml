@@ -68,6 +68,7 @@ nav:
       - User Stories: srs/USER_STORIES.md
       - Use Cases + Traceability Matrix: srs/USE_CASES.md
       - Functional Requirements: srs/FUNCTIONAL_REQUIREMENTS.md
+      - Demo 4 Wow Factors: srs/DEMO4_WOW_FACTORS.md
       - Non-Functional Requirements: srs/NON-FUNCTIONAL_REQUIREMENTS.md
       - Non-Functional Requirements Testing & Traceability Matrix: srs/NON-FUNCTIONAL_TESTING.md
       - Domain Model: srs/DOMAIN_MODEL.md
@@ -94,3 +95,4 @@ nav:
   - Admin:
       - Marking Guide: management/Marking-Guide.md
       - Team Profiles: management/Team-Profiles.md
+      - User Manual: management/UserManual.md
