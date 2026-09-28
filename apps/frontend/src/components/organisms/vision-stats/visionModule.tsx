@@ -100,7 +100,7 @@ export default function VisionModule({
           icon={<Notebook className={"h-4 w-4"} />}
         />
         <StatCard
-          title="Avg Questions per Session"
+          title="Average Questions per Session"
           value={averageQuestionsPerSession() ?? 0}
           isLoading={isLoading}
           icon={<Hash className={"h-4 w-4"} />}
@@ -148,12 +148,12 @@ export default function VisionModule({
           config={{
             restlessPercentage: {
               label: "Restless %",
-              color: "var(--chart-2)",
+              color: "var(--destructive)",
             },
-            stillPercentage: { label: "Still %", color: "var(--chart-3)" },
+            stillPercentage: { label: "Still %", color: "var(--success-text)" },
             attentionPercentage: {
               label: "Attention %",
-              color: "var(--chart-1)",
+              color: "var(--chart-2)",
             },
           }}
           xKey="xKey"
