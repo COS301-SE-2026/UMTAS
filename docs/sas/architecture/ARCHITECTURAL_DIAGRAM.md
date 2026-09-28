@@ -25,15 +25,11 @@
 | Timetable Solver Worker | Fetch input, invoke the Timetable Solver, validate output, and send a callback | Temporary files only |
 | External Identity Provider | Authenticate or link a user through Google OAuth when configured | Provider-owned identity state; encrypted OAuth tokens are held by UMTAS |
 | Calendar Application | Import the iCalendar file generated and downloaded by the browser | Outside UMTAS |
-| Planned Solution Cache | Reuse compatible solutions across requests once the cache policy and additional solver heuristics are implemented | Not implemented |
-| Planned Google Calendar Integration | Synchronise timetable events through the Google Calendar API | Not implemented |
 
 Solver jobs and their results are ordinary records in the relational database and are therefore not
-shown as a separate architectural component. The current Core computes a semantic fingerprint and
-can reuse a matching per-user job record. The separately depicted solution cache is a planned
-cross-request optimisation and is not yet implemented. Redis currently supports queues,
-authentication secondary storage, and rate limiting; it does not currently implement the planned
-solution cache.
+shown as a separate architectural component. The Core computes a semantic fingerprint and can
+reuse a matching per-user job record. Redis supports queues, authentication secondary storage,
+and rate limiting.
 
 ## Data Flow
 

@@ -22,6 +22,7 @@ The Traceability Matrices for the functional requirements to use cases can be fo
     - **R1.2.2** The system shall allow users to register.
         - **R1.2.2.1** The system shall allow users to register using Oauth
         - **R1.2.2.2** The system shall allow users to register using "in house" system
+        - **R1.2.2.3** The system shall allow in-house users to verify their email address using a time-limited link or code and request a replacement when it expires.
     - **R1.2.3** The system shall manage user sessions.
     - **R1.2.4** The system shall allow users manage their account and system state
         - **R1.2.4.1** The system shall allow users to sign out.
@@ -150,36 +151,37 @@ The Traceability Matrices for the functional requirements to use cases can be fo
     - **R4.1.1** The system shall provide tools to create courses for universities
     - **R4.1.2** The system shall provide tools to delete courses from universities
     - **R4.1.3** The system shall provide tools to modify courses for universities
-        - **4.1.3.1** The system will shall allow updates to a courses name
-        - **4.1.3.1** The system will shall allow updates to a courses degree
-        - **4.1.3.3** The system will shall allow modules to be added to courses
+        - **R4.1.3.1** The system shall allow updates to a course name
+        - **R4.1.3.2** The system shall allow updates to a course degree
+        - **R4.1.3.3** The system shall allow modules to be added to courses
 
     ### FR 4.2 Module management for university admins
 
     - **R4.2.1** The system shall provide tools to create modules for universities using the API system or PDF system
     - **R4.2.2** The system shall provide tools to delete modules from universities
     - **R4.2.3** The system shall provide tools to modify modules for universities
-        - **4.2.3.1** The system will shall allow updates to a module name
-        - **4.2.3.1** The system will shall allow updates to a module Code
-        - **4.2.3.3** The system will shall allow events to be added to modules
+        - **R4.2.3.1** The system shall allow updates to a module name
+        - **R4.2.3.2** The system shall allow updates to a module code
+        - **R4.2.3.3** The system shall allow events to be added to modules
 
     ### FR 4.3 Event management for university admins
 
     - **R4.3.1** The system shall provide tools to create events for universities using the API system or PDF system or directly using the interface
     - **R4.3.2** The system shall provide tools to delete events from universities
     - **R4.3.3** The system shall provide tools to modify events for universities
-        - **4.3.3.1** The system will shall allow updates to a Event name
-        - **4.3.3.2** The system will shall allow updates to a Event Code
-        - **4.3.3.3** The system will shall allow updates to a Event times
-        - **4.3.3.4** The system will shall allow updates to a Event type
-        - **4.3.3.5** The system will shall allow updates to a Event date
-        - **4.3.3.6** The system will shall allow updates to a Event day of week
+        - **R4.3.3.1** The system shall allow updates to an event name
+        - **R4.3.3.2** The system shall allow updates to an event code
+        - **R4.3.3.3** The system shall allow updates to event times
+        - **R4.3.3.4** The system shall allow updates to an event type
+        - **R4.3.3.5** The system shall allow updates to an event date
+        - **R4.3.3.6** The system shall allow updates to an event day of week
 
     ### FR 4.4 Role management for admins and role applications
 
     - **R4.4.1** The system shall allow for users to apply for a particular role, defaulted to students
     - **R4.4.2** The system shall allow for university admins to approve roles for a univeristy
     - **R4.4.3** The system shall allow for university admins to revoke privileges of users
+    - **R4.4.4** The system shall grant or deny university-scoped actions according to the user's approved role at the selected university.
 
     ### FR 4.5 Calendar Management for university applications
 

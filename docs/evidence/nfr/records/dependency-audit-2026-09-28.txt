@@ -1,0 +1,11 @@
+NFR-Sec-3 production dependency audit
+Date: 2026-09-28 22:45 SAST
+Branch: feat/demo4-doc-polish
+Base commit: 7931c224
+Tree: local working tree with updated nodemailer and multer dependency bounds and lockfile; not yet merged to main.
+Command: pnpm audit --audit-level=moderate --prod
+Exit code: 0
+Output:
+No known vulnerabilities found
+
+This records the local branch result. Retain the main CI audit output for the assessed Demo 4 release.

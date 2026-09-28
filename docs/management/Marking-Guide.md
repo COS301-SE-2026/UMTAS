@@ -12,4 +12,3 @@
 | User manual | [User manual](UserManual.md) |
 | Team profiles | [Profiles and LinkedIn links](Team-Profiles.md) |
 | Brand style | [Brand Style Guide](https://brand.capstone-vigil.dns.net.za/) |
-| Demo 3 documents | [Archive](https://cos301-se-2026.github.io/UMTAS/demo3/) · [Demo 3 marking guide](https://cos301-se-2026.github.io/UMTAS/demo3/management/Marking-Guide/) |

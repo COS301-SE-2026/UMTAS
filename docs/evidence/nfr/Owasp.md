@@ -8,4 +8,10 @@ not demonstrate a pass. It also does not replace the specified authenticated sta
 
 After remediation, retain a new baseline and authenticated scan report with the target, date,
 scan configuration and alert summary.
+
+The current branch configures anti-clickjacking headers in the frontend and API. CSP remains
+open: a policy permitting inline scripts or styles would itself trigger Medium ZAP alerts, while
+a nonce-based policy needs application-wide browser verification. The archived scan predates the
+header change. A safe CSP and a staging rescan are required before NFR-Sec-2 can be marked as
+passing; the header change alone is not scan evidence.
 [Open the complete OWASP ZAP PDF report](ZAP_REPORT.pdf).

@@ -38,7 +38,5 @@ university-adapter modifiability.
 | Local integration database | PGLite | Provides isolated local and CI database flows. |
 | Monorepo tooling | pnpm, Turborepo | Provides one workflow for applications and shared packages. |
 
-Current same-user solver-result reuse uses semantic job records in PostgreSQL. A separate solution
-cache is planned for later work alongside additional solver heuristics; it is not yet implemented.
-Google Calendar API synchronisation is also planned, while Demo 2 calendar interoperability uses
-browser-generated iCalendar export.
+Same-user solver-result reuse uses semantic job records in PostgreSQL. Calendar interoperability
+uses browser-generated iCalendar export.

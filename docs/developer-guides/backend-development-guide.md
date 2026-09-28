@@ -37,7 +37,7 @@
     - [ ] Unit and Integration tests are passed.
     - [ ] Drizzle migrations are generated and tested.
     - [ ] CI passes successfully.
-    - [ ] Code follows the [Core-and-Adapter](../diagrams/architecture/Adapter-Pattern.md) pattern.
+    - [ ] Code follows the [Core-and-Adapter](../sas/architecture/ARCHITECTURAL_PATTERNS.md#core-and-adapter) pattern.
 
 ---
 
