@@ -66,6 +66,10 @@ const steps = [
     content: "Create a new course for your institute.",
   },
   {
+    target: "#btn-edit-course",
+    content: "Edit course name and degree.",
+  },
+  {
     target: "#btn-view-modules",
     content: "View the modules available for the selected course.",
   },
@@ -299,6 +303,7 @@ export default function CourseManagementTemplate() {
               </Select>
               {isStudent === false && (
                 <Button
+                  id="btn-add-course"
                   data-testid="show-add-course"
                   onClick={() => {
                     if (
@@ -371,6 +376,7 @@ export default function CourseManagementTemplate() {
                           <div className="flex justify-end gap-2">
                             {isStudent == false ? (
                               <Button
+                                id="btn-edit-course"
                                 size="sm"
                                 variant="outline"
                                 onClick={() => setCourseToEdit(course)}
