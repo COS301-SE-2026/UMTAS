@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { AdvancedMarker, Pin } from "@vis.gl/react-google-maps";
+import { Building2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { MapScreen } from "@/components/organisms/map/MapScreen";
@@ -381,7 +382,9 @@ export function UniMap() {
                     onClick={() => handleMarkerClick(building)}
                   >
                     <Pin
-                      background={building.displayColour}
+                      background="#000000"
+                      borderColor="#000000"
+                      glyphColor="#ffffff"
                       scale={building.venueCount === 0 ? 0.85 : 1}
                     />
                   </AdvancedMarker>
