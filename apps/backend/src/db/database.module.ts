@@ -16,11 +16,13 @@ import { AdminTeachingSeedService } from './seeding/services/admin-teaching.seed
 import { AttendanceDemoAdminsSeedService } from './seeding/services/attendance-demo-admins.seed.service';
 import { EventModule } from 'src/Events/event.module';
 import { TimetableSeedService } from './seeding/services/timetable.seed.service';
+import { WipeSeedService } from './seeding/services/wipe.seed.service';
 
 @Global()
 @Module({
   imports: [EventModule],
   providers: [
+    WipeSeedService,
     SeedPersistenceService,
     SeedQueryService,
     DatabaseService,

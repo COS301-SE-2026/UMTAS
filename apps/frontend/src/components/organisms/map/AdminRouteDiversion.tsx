@@ -18,12 +18,33 @@ import {
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Slider } from "@/components/atoms/baseShadcn/slider";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/atoms/baseShadcn/sheet";
+import { Separator } from "@/components/atoms/baseShadcn/separator";
+import { GitFork } from "lucide-react";
 
 export function AdminRouteDiversion({
   buildings,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  showTrigger = true,
 }: {
   buildings: BuildingType[];
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  showTrigger?: boolean;
 }) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setIsOpen = controlledOnOpenChange || setInternalOpen;
+
   const [originBuildingId, setOriginBuildingId] = useState("");
   const [destinationBuildingId, setDestinationBuildingId] = useState("");
   const [toIndex, setToIndex] = useState(1);
@@ -111,130 +132,173 @@ export function AdminRouteDiversion({
   }
 
   return (
-    <div className="flex flex-col gap-2 p-4 rounded-xl border border-(--border) bg-(--bg-surface)">
-      <p className="text-sm">Reroute traffic between buildings</p>
-      <div className="flex gap-2">
-        <Select
-          value={originBuildingId}
-          onValueChange={(value) => {
-            setOriginBuildingId(value);
-            reset();
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="From building" />
-          </SelectTrigger>
-          <SelectContent>
-            {buildings.map((building) => (
-              <SelectItem key={building.BuildingID} value={building.BuildingID}>
-                {building.BuildingName}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select
-          value={destinationBuildingId}
-          onValueChange={(value) => {
-            setDestinationBuildingId(value);
-            reset();
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="To building" />
-          </SelectTrigger>
-          <SelectContent>
-            {buildings.map((building) => (
-              <SelectItem key={building.BuildingID} value={building.BuildingID}>
-                {building.BuildingName}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {originBuildingId &&
-        destinationBuildingId &&
-        originBuildingId === destinationBuildingId && (
-          <p className="text-sm text-(--text-secondary)">
-            Choose two different buildings.
-          </p>
-        )}
-
-      {hasRoute && fromRouteError && (
-        <p className="text-sm text-(--text-secondary)">
-          No route exists between these buildings yet.
-        </p>
-      )}
-
-      {hasRoute && !fromRouteError && !isChecking && !hasAlternatives && (
-        <p className="text-sm text-(--text-secondary)">
-          No viable alternative routes found between these buildings.
-        </p>
-      )}
-
-      {hasRoute && !fromRouteError && hasAlternatives && (
-        <div className="flex flex-col gap-4">
-          <p className="text-sm text-(--text-secondary)">
-            Diverting from original route{" "}
-            {fromRoute ? `(${fromRoute.distanceMetres}m)` : ""}
-          </p>
-
-          <div className="flex flex-col gap-2">
-            <Label>Divert to Route</Label>
-            <Select
-              value={String(toIndex)}
-              onValueChange={(value) => {
-                setToIndex(Number(value));
-                reset();
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {availableVariants.map(({ index, route }) => (
-                  <SelectItem key={index} value={String(index)}>
-                    Route {index}: {route.distanceMetres} metres
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label>Diversion percentage ({diversion}%)</Label>
-            <Slider
-              min={0}
-              max={100}
-              value={[diversion]}
-              onValueChange={(values) => setDiversion(values[0])}
-              className="w-100"
-            />
-          </div>
-
-          <Button
-            onClick={handleSubmit}
-            disabled={isPending || !fromRoute}
-            className="w-fit"
-          >
-            {isPending ? "Saving.." : "Set Diversion"}
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      {showTrigger && (
+        <SheetTrigger asChild>
+          <Button variant="outline" size="sm" className="gap-2 cursor-pointer">
+            <GitFork size={14} strokeWidth={1.5} />
+            Reroute
           </Button>
-
-          {isSuccess && diversionResult && (
-            <p className="text-sm text-(--text-secondary)">
-              New route with distance {diversionResult.toRoute.distanceMetres}m
-              was chosen as the diversion.
-            </p>
-          )}
-
-          {isError && (
-            <p className="text-sm text-(--text-secondary)">
-              Something went wrong setting the diversion.
-            </p>
-          )}
-        </div>
+        </SheetTrigger>
       )}
-    </div>
+
+      <SheetContent
+        side="right"
+        className="w-[340px] sm:w-[420px] flex flex-col justify-between p-6 bg-bg-surface"
+      >
+        <div className="flex flex-col gap-4 overflow-y-auto pr-2">
+          <SheetHeader className="text-left">
+            <SheetTitle className="text-lg">Reroute Traffic</SheetTitle>
+            <SheetDescription>
+              Divert foot traffic and routes between campus buildings.
+            </SheetDescription>
+          </SheetHeader>
+
+          <Separator />
+
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1">
+              <Label className="text-sm">From building</Label>
+              <Select
+                value={originBuildingId}
+                onValueChange={(value) => {
+                  setOriginBuildingId(value);
+                  reset();
+                }}
+              >
+                <SelectTrigger className="w-full bg-bg-base">
+                  <SelectValue placeholder="From building" />
+                </SelectTrigger>
+                <SelectContent>
+                  {buildings.map((building) => (
+                    <SelectItem
+                      key={building.BuildingID}
+                      value={building.BuildingID}
+                    >
+                      {building.BuildingName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <Label className="text-sm">To building</Label>
+              <Select
+                value={destinationBuildingId}
+                onValueChange={(value) => {
+                  setDestinationBuildingId(value);
+                  reset();
+                }}
+              >
+                <SelectTrigger className="w-full bg-bg-base">
+                  <SelectValue placeholder="To building" />
+                </SelectTrigger>
+                <SelectContent>
+                  {buildings.map((building) => (
+                    <SelectItem
+                      key={building.BuildingID}
+                      value={building.BuildingID}
+                    >
+                      {building.BuildingName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {originBuildingId &&
+              destinationBuildingId &&
+              originBuildingId === destinationBuildingId && (
+                <p className="text-sm text-(--text-secondary)">
+                  Choose two different buildings.
+                </p>
+              )}
+
+            {hasRoute && fromRouteError && (
+              <p className="text-sm text-(--text-secondary)">
+                No route exists between these buildings yet.
+              </p>
+            )}
+
+            {hasRoute && !fromRouteError && !isChecking && !hasAlternatives && (
+              <p className="text-sm text-(--text-secondary)">
+                No viable alternative routes found between these buildings.
+              </p>
+            )}
+
+            {hasRoute && !fromRouteError && hasAlternatives && (
+              <div className="flex flex-col gap-4 pt-2">
+                <p className="text-sm text-(--text-secondary)">
+                  Diverting from original route{" "}
+                  {fromRoute ? `(${fromRoute.distanceMetres}m)` : ""}
+                </p>
+
+                <div className="flex flex-col gap-2">
+                  <Label>Divert to Route</Label>
+                  <Select
+                    value={String(toIndex)}
+                    onValueChange={(value) => {
+                      setToIndex(Number(value));
+                      reset();
+                    }}
+                  >
+                    <SelectTrigger className="bg-bg-base">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableVariants.map(({ index, route }) => (
+                        <SelectItem key={index} value={String(index)}>
+                          Route {index}: {route.distanceMetres} metres
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <Label>Diversion percentage ({diversion}%)</Label>
+                  <Slider
+                    min={0}
+                    max={100}
+                    value={[diversion]}
+                    onValueChange={(values) => setDiversion(values[0])}
+                    className="w-full"
+                  />
+                </div>
+
+                <Button
+                  onClick={handleSubmit}
+                  disabled={isPending || !fromRoute}
+                  className="w-fit"
+                >
+                  {isPending ? "Saving.." : "Set Diversion"}
+                </Button>
+
+                {isSuccess && diversionResult && (
+                  <p className="text-sm text-(--text-secondary)">
+                    New route with distance{" "}
+                    {diversionResult.toRoute.distanceMetres}m was chosen as the
+                    diversion.
+                  </p>
+                )}
+
+                {isError && (
+                  <p className="text-sm text-(--text-secondary)">
+                    Something went wrong setting the diversion.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <SheetFooter className="pt-4 border-t flex flex-row gap-2 justify-end">
+          <Button variant="ghost" onClick={() => setIsOpen(false)}>
+            Close
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }

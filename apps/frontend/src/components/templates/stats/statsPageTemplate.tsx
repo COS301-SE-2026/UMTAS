@@ -70,7 +70,7 @@ export default function StatsPageTemplate() {
       <div className="container mx-auto py-10 space-y-6 px-8 bg-(--bg-base)">
         <div className="border-b border-[var(--border)] pb-4">
           <h1 className="text-xl font-bold tracking-tight text-[var(--text-primary)] pb-2 ">
-            Stats Dashboard
+            Statistics Dashboard
           </h1>
           <p className="text-sm text-[var(--text-secondary)]">
             View various statistics and metrics related to the UMTAS system.

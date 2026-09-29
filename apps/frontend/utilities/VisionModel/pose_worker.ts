@@ -5,17 +5,30 @@ import * as ort from "onnxruntime-web";
 
 let wasmLoaded = false;
 let DetectSession: ort.InferenceSession | null = null;
+let loadedModelSize: string | null = null;
 
 async function initWasm() {
   await init();
   wasmLoaded = true;
 }
-async function initDetection() {
-  const fullUrl = `${location.origin}/models/yolo26n-pose.onnx`;
+async function initDetection(modelSize: "nano" | "small" | "medium") {
+  if (DetectSession && loadedModelSize === modelSize) {
+    return;
+  }
+
+  const modelNames = {
+    nano: "yolo26n-pose.onnx",
+    small: "yolo26s-pose.onnx",
+    medium: "yolo26m-pose.onnx",
+  };
+
+  const fullUrl = `${location.origin}/models/${modelNames[modelSize]}`;
 
   DetectSession = await ort.InferenceSession.create(fullUrl, {
     executionProviders: ["webgpu", "wasm"],
   });
+
+  loadedModelSize = modelSize;
 }
 async function createSlices(payload: PIXEL_PAYLOAD): Promise<Float32Array[]> {
   const wasmPixels = new Uint8Array(
@@ -64,7 +77,7 @@ self.onmessage = async (event: MessageEvent) => {
     }
 
     if (!DetectSession) {
-      await initDetection();
+      await initDetection(payload.modelSize);
     }
 
     const slices = await createSlices(payload);

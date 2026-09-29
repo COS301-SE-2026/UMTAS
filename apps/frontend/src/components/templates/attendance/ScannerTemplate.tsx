@@ -12,6 +12,18 @@ import {
   UniversityStateLoading,
   useUniversityState,
 } from "@/hooks/useUniversityState";
+import Tutorial from "@/components/organisms/nav/Tutorial";
+
+const steps = [
+  {
+    target: "#attendance-scanner-header",
+    content: "Use the scanner to record student attendance.",
+  },
+  {
+    target: "#btn-start-scanner",
+    content: "Start scanning barcodes.",
+  },
+];
 
 export default function ScannerTemplate() {
   const { university, isLoading } = useUniversityState();
@@ -30,21 +42,25 @@ export default function ScannerTemplate() {
     if (!hasRole) return <NoRoleSelected />;
 
     return (
-      <div className="flex w-full flex-col items-center gap-6 px-6 pt-6">
-        <AttendancePageHeader
-          className="w-full max-w-6xl py-4"
-          title="Attendance Scanner"
-          description="Upload a student list and scan student cards to record attendance."
-          action={
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/attendance">
-                <ArrowLeft size={14} aria-hidden="true" /> Back to attendance
-              </Link>
-            </Button>
-          }
-        />
+      <div className="w-full px-8 pt-6">
+        <Tutorial steps={steps} wait={true} />
+        <div
+          id="attendance-scanner-header"
+          className="mx-auto flex w-full max-w-6xl flex-col gap-6"
+        >
+          <AttendancePageHeader
+            className="w-full border-b border-[var(--border)] pb-4"
+            title="Attendance Scanner"
+            description="Upload a student list and scan student cards to record attendance."
+            action={
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/attendance">
+                  <ArrowLeft size={14} aria-hidden="true" /> Back to attendance
+                </Link>
+              </Button>
+            }
+          />
 
-        <div className="w-full max-w-6xl">
           <AttendanceScanner />
         </div>
       </div>

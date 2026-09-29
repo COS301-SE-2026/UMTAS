@@ -1,4 +1,4 @@
-import { DayOfWeek } from 'shared-types';
+import { DayOfWeek } from 'src/Events/dto/event.types';
 
 export type SeedEvent = {
   moduleCode: string;

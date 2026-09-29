@@ -4,6 +4,7 @@ import { DataTable } from "@/components/molecules/roleManagement/DataTable";
 import { getAllApplicationsQ } from "@/app/role-management/queries/applyQueries";
 import { useQuery } from "@tanstack/react-query";
 import { UserDetails } from "@/lib/userclass/userClass";
+import RoleControl from "@/components/atoms/roleManagement/roleControl";
 
 export default function UserDirectoryCard() {
   const Uni = UserDetails.getUniDetails();

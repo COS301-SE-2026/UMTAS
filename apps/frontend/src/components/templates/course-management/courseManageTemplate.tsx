@@ -77,6 +77,19 @@ const steps = [
 
 export default function CourseManagementTemplate() {
   const { university, isLoading: isUniversityLoading } = useUniversityState();
+
+  const isExternalUniversity = Boolean(
+    university?.ApiIdentifier || university?.BaseApiUrl || university?.ApiKey,
+  );
+
+  // console.log("[CourseManagementTemplate] university object:", university);
+  // console.log(
+  //   "[CourseManagementTemplate] isExternalUniversity:",
+  //   isExternalUniversity,
+  // );
+
+  // ...
+  // const { university, isLoading: isUniversityLoading } = useUniversityState();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDegree, setSelectedDegree] = useState("All");
   const [selectedModulePrefix, setSelectedModulePrefix] = useState("All");
@@ -239,6 +252,10 @@ export default function CourseManagementTemplate() {
 
   const enrolledCourse = courseData.find((course) => course.isEnrolled);
 
+  //const isExternalUniversity = Boolean(
+  //   university?.ApiIdentifier || university?.BaseApiUrl || university?.ApiKey,
+  // );
+
   return (
     <>
       <Tutorial steps={steps} wait={true} />
@@ -304,18 +321,14 @@ export default function CourseManagementTemplate() {
                 id="btn-add-course"
                 data-testid="show-add-course"
                 onClick={() => {
-                  if (
-                    // updated to be more agnostic
-                    university?.ApiKey != null ||
-                    university?.ApiKey != undefined
-                  ) {
+                  if (isExternalUniversity) {
                     setExternalCourses(true);
                   } else {
                     setShowAddCourse(true);
                   }
                 }}
               >
-                Add Courses
+                {isExternalUniversity ? "Fetch courses" : "Add Courses"}
               </Button>
             )}
             {showAddCourse && isStudent === false && (
@@ -457,16 +470,16 @@ export default function CourseManagementTemplate() {
                                   )}
                               </div>
                             ) : (
-                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                              <div className="flex flex-col">
                                 {modules.map((module) => (
                                   <div
                                     key={module.moduleID}
-                                    className="bg-[var(--background)] p-3 border border-[var(--border)] rounded-lg shadow-sm"
+                                    className="flex items-center gap-4 py-4 border-b border-[var(--border)] last:border-b-0"
                                   >
-                                    <div className="font-bold text-[var(--text-primary)]">
+                                    <div className="w-28 font-bold text-[var(--text-primary)]">
                                       {module.moduleCode}
                                     </div>
-                                    <div className="text-[var(--text-secondary)] h-8 text-xs mt-1 overflow-y-auto">
+                                    <div className="text-sm text-[var(--text-secondary)]">
                                       {module.moduleName}
                                     </div>
                                   </div>

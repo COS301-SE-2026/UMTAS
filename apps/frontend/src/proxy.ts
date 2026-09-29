@@ -31,10 +31,11 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const nonce = btoa(crypto.randomUUID());
+
   const policy = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
-    `style-src 'self' 'nonce-${nonce}'`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'wasm-unsafe-eval'${isDevelopment ? " 'unsafe-eval'" : ""}`,
+    "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     `connect-src 'self' https: wss:${isDevelopment ? " http://localhost:* ws://localhost:*" : ""}`,
@@ -42,9 +43,11 @@ export function proxy(request: NextRequest) {
     "base-uri 'self'",
     "frame-ancestors 'none'",
   ].join("; ");
+
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
   requestHeaders.set("Content-Security-Policy", policy);
+
   const withPolicy = (response: NextResponse) => {
     response.headers.set("Content-Security-Policy", policy);
     return response;
@@ -55,23 +58,27 @@ export function proxy(request: NextRequest) {
       NextResponse.redirect(new URL("/dashboard", request.url)),
     );
   }
+
   const isPublicPath =
     pathname === "/attendance/check-in" ||
     PUBLIC_PATHS.some((path) => pathname.startsWith(path));
+
   const isAuthApiPath = pathname.startsWith("/api/auth");
   const isHealthApiPath = pathname.startsWith("/api/health");
   const isApiRoute = pathname.startsWith("/api");
 
-  if (isPublicPath || isAuthApiPath || isHealthApiPath || isApiRoute)
+  if (isPublicPath || isAuthApiPath || isHealthApiPath || isApiRoute) {
     return withPolicy(
       NextResponse.next({ request: { headers: requestHeaders } }),
     );
+  }
 
   const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
 
   if (!sessionCookie?.value) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
+
     return withPolicy(NextResponse.redirect(loginUrl));
   }
 

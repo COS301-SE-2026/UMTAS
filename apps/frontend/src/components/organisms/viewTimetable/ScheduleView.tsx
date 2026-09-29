@@ -820,7 +820,7 @@ export function ScheduleView({
                     aria-label="Edit Timetable"
                     id="btn-edit"
                     type="button"
-                    variant="outline"
+                    variant="secondary"
                     className="h-8 px-3 text-xs hover:opacity-90 cursor-pointer"
                     onClick={editTimetable}
                     title="Edit Timetable"
@@ -833,12 +833,12 @@ export function ScheduleView({
                     id="btn-delete"
                     data-testid="schedules-Delete-Btn"
                     type="button"
-                    variant={"destructive"}
-                    className="h-8 px-3 text-xs hover:opacity-90 cursor-pointer"
+                    variant={"link"}
+                    className="flex-shrink-0 border border-[var(--error-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-[var(--error-bg)]"
                     onClick={deleteDialog}
                     title="Delete Timetable"
                   >
-                    <Trash2 />
+                    <Trash2 className="text-[var(--error-text)]" />
                   </Button>
                 </div>
               </div>

@@ -3,14 +3,12 @@
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogCancel,
-} from "@/components/atoms/customise/alert-dialog-customise";
-import { X } from "lucide-react";
-import EventsShell from "./CustomiseEventShell";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/atoms/baseShadcn/dialog";
+import EventsOnlyShell from "./CustomiseEventOnlyShell";
 
 interface CustomiseEventPopupProps {
   event: EventResponse;
@@ -26,23 +24,20 @@ export default function CustomiseEventPopup({
   onClose,
 }: CustomiseEventPopupProps) {
   return (
-    <AlertDialog open onOpenChange={(open) => !open && onClose()}>
-      <AlertDialogContent className="w-fit flex flex-col pr-14 pl-2">
-        <AlertDialogHeader className="flex flex-row justify-between items-center">
-          <AlertDialogTitle className="text-xl font-bold pl-6">
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="w-[768px] max-w-[95vw] sm:max-w-[768px] bg-[var(--bg-surface)]">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold">
             Customise Events
-          </AlertDialogTitle>
-          <AlertDialogCancel className="cursor-pointer h-8 w-8 rounded-full bg-transparent border-transparent">
-            <X className="h-4 w-4" />
-          </AlertDialogCancel>
-        </AlertDialogHeader>
+          </DialogTitle>
+        </DialogHeader>
 
-        <EventsShell
+        <EventsOnlyShell
           events={events}
           modules={modules}
           initialEventId={event.eventId}
         />
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 }

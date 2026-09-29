@@ -7,7 +7,8 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/e2e/package.json ./apps/e2e/package.json
 RUN pnpm install --frozen-lockfile --filter e2e... \
     --network-concurrency=8 --fetch-retries=5 --fetch-timeout=60000
-RUN pnpm --filter e2e exec playwright install msedge
+# Microsoft publishes no Edge build for Linux ARM; run the edge project on x64.
+RUN [ "$(uname -m)" = aarch64 ] || pnpm --filter e2e exec playwright install msedge
 
 COPY apps/e2e ./apps/e2e
 

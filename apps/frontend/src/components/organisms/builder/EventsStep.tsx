@@ -493,7 +493,7 @@ export function EventsStep({
           <Button
             id="btn-delete-event"
             type="button"
-            variant="ghost"
+            variant="link"
             size="icon"
             onClick={() => handleRemove(event.eventId)}
             aria-label={"Remove event " + (index + 1)}

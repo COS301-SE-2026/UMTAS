@@ -29,7 +29,7 @@ export default function VisionModule({
 }: VisionModuleProps) {
   if (!moduleSelected) {
     return (
-      <div className="flex items-center justify-center text-text-secondary">
+      <div className="flex items-center justify-center py-10 text-text-secondary">
         Please Select a Module with the Filter Above
       </div>
     );

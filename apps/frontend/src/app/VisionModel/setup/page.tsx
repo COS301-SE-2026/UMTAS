@@ -7,11 +7,14 @@ import {
 } from "@/components/atoms/baseShadcn/alert";
 import { Badge } from "@/components/atoms/baseShadcn/badge";
 import { Button } from "@/components/atoms/baseShadcn/button";
+
 import { Progress } from "@/components/atoms/baseShadcn/progress";
-import { Download, Loader2 } from "lucide-react";
+import Popup from "@/components/atoms/utility/floatContainer";
+import { BookOpen, Download, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import VM_GUIDE from "./setupGuide";
 
 type NavigatorWithGPU = Navigator & {
   gpu?: {
@@ -21,17 +24,33 @@ type NavigatorWithGPU = Navigator & {
 
 type SetupStatus = "idle" | "installing" | "ready" | "error";
 
-const MODEL_KEY = "vision-model-ready";
-const CACHE_NAME = "vision-models-v1";
+const MODEL_KEY = "vision-model-ready-v3";
+const CACHE_NAME = "vision-models-v3";
 
 const MODELS = [
   {
-    name: "Person Detection Model",
+    name: "Nano Detection Model",
     url: "/models/yolo26n.onnx",
   },
   {
-    name: "Pose Estimation Model",
+    name: "Nano Pose Model",
     url: "/models/yolo26n-pose.onnx",
+  },
+  {
+    name: "Small Detection Model",
+    url: "/models/yolo26s.onnx",
+  },
+  {
+    name: "Small Pose Model",
+    url: "/models/yolo26s-pose.onnx",
+  },
+  {
+    name: "Medium Detection Model",
+    url: "/models/yolo26m.onnx",
+  },
+  {
+    name: "Medium Pose Model",
+    url: "/models/yolo26m-pose.onnx",
   },
 ];
 
@@ -44,6 +63,7 @@ export default function VisionModelSetupPage() {
   const [currentModel, setCurrentModel] = useState<string | null>(null);
   const [downloadedMb, setDownloadedMb] = useState(0);
   const [totalMb, setTotalMb] = useState<number | null>(null);
+  const [showGuide, setShowGuide] = useState<boolean>(false);
 
   useEffect(() => {
     async function checkExistingCache() {
@@ -203,121 +223,118 @@ export default function VisionModelSetupPage() {
     if (status === "error") return "Not ready";
 
     if (status === "installing") {
-      if (requirement === "webgpu") return "Verified";
+      if (requirement === "webgpu") {
+        return "Verified";
+      }
 
-      if (
-        requirement === "detection" &&
-        currentModel === "Person Detection Model"
-      ) {
+      if (requirement === "detection" && currentModel?.includes("Detection")) {
         return "Downloading";
       }
 
-      if (requirement === "pose" && currentModel === "Pose Estimation Model") {
+      if (requirement === "pose" && currentModel?.includes("Pose")) {
         return "Downloading";
       }
 
-      if (
-        requirement === "detection" &&
-        currentModel === "Pose Estimation Model"
-      ) {
-        return "Ready";
-      }
+      return "Preparing";
     }
 
     return "Pending";
   }
-
+  const currentModelNumber = currentModel
+    ? MODELS.findIndex((model) => model.name === currentModel) + 1
+    : 0;
   return (
-    <main className="flex w-full flex-col items-center gap-6 px-6 pt-6">
-      <div className="w-full max-w-2xl py-4">
-        <h1 className="text-lg font-semibold text-[var(--text-primary)]">
-          Prepare Lecture Watch
-        </h1>
-        <p className="mt-1 text-sm text-[var(--text-secondary)]">
-          Check this device and download the models needed for people detection
-          and lecture analysis.
-        </p>
-      </div>
+    <main className="w-full px-8 pt-6">
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+        <div className="w-full border-b border-[var(--border)] pb-4">
+          <h1 className="text-lg font-semibold text-[var(--text-primary)]">
+            Prepare Lecture Watch
+          </h1>
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">
+            Check this device and download the models needed for people
+            detection and lecture analysis.
+          </p>
+        </div>
 
-      <div className="w-full max-w-2xl space-y-6">
-        <section className="space-y-2">
-          <RequirementRow
-            label="WebGPU"
-            description="Lets Lecture Watch run the models using your GPU."
-            status={getRequirementStatus("webgpu")}
-          />
-
-          <RequirementRow
-            label="Person Detection"
-            description="Finds and tracks people in the current input."
-            status={getRequirementStatus("detection")}
-          />
-
-          <RequirementRow
-            label="Lecture Analysis"
-            description="Analyses pose, movement and attention signals."
-            status={getRequirementStatus("pose")}
-          />
-        </section>
-
-        {status === "installing" && (
-          <section className="space-y-3" aria-label="Vision model progress">
-            <div className="flex items-center justify-between gap-4 text-sm">
-              <div className="min-w-0">
-                <p className="truncate font-medium text-[var(--text-primary)]">
-                  {currentModel
-                    ? `Preparing ${currentModel}`
-                    : "Preparing vision models"}
-                </p>
-
-                <p className="text-xs text-[var(--text-secondary)]">
-                  Keep this page open until setup is complete.
-                </p>
-              </div>
-
-              <span className="shrink-0 text-sm font-medium text-[var(--text-primary)]">
-                {progress.toFixed(0)}%
-              </span>
-            </div>
-
-            <Progress
-              value={progress}
-              className="h-2 w-full"
-              aria-label={`Vision model setup ${progress.toFixed(0)}% complete`}
+        <div className="space-y-6">
+          <section className="space-y-2">
+            <RequirementRow
+              label="WebGPU"
+              description="Lets Lecture Watch run the models using your GPU."
+              status={getRequirementStatus("webgpu")}
             />
 
-            <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
-              <span>
-                {downloadedMb.toFixed(1)} MB
-                {totalMb !== null && ` / ${totalMb.toFixed(1)} MB`}
-              </span>
+            <RequirementRow
+              label="Person Detection"
+              description="Finds and tracks people in the current input."
+              status={getRequirementStatus("detection")}
+            />
 
-              <span>
-                Model {currentModel === "Pose Estimation Model" ? "2" : "1"} of{" "}
-                {MODELS.length}
-              </span>
-            </div>
+            <RequirementRow
+              label="Lecture Analysis"
+              description="Analyses pose, movement and attention signals."
+              status={getRequirementStatus("pose")}
+            />
           </section>
-        )}
 
-        {status === "error" && error && (
-          <Alert variant="destructive">
-            <AlertTitle>Setup could not finish</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
+          {status === "installing" && (
+            <section className="space-y-3" aria-label="Vision model progress">
+              <div className="flex items-center justify-between gap-4 text-sm">
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-[var(--text-primary)]">
+                    {currentModel
+                      ? `Preparing ${currentModel}`
+                      : "Preparing vision models"}
+                  </p>
 
-        {status === "ready" && (
-          <Alert variant="success">
-            <AlertTitle>Ready to continue</AlertTitle>
-            <AlertDescription>
-              The vision models are available on this device. You can now start
-              a Lecture Watch session.
-            </AlertDescription>
-          </Alert>
-        )}
+                  <p className="text-xs text-[var(--text-secondary)]">
+                    Keep this page open until setup is complete.
+                  </p>
+                </div>
 
-        <div className="flex justify-end">
+                <span className="shrink-0 text-sm font-medium text-[var(--text-primary)]">
+                  {progress.toFixed(0)}%
+                </span>
+              </div>
+
+              <Progress
+                value={progress}
+                className="h-2 w-full"
+                aria-label={`Vision model setup ${progress.toFixed(0)}% complete`}
+              />
+
+              <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
+                <span>
+                  {downloadedMb.toFixed(1)} MB
+                  {totalMb !== null && ` / ${totalMb.toFixed(1)} MB`}
+                </span>
+
+                <span>
+                  Model {currentModelNumber} of {MODELS.length}
+                </span>
+              </div>
+            </section>
+          )}
+
+          {status === "error" && error && (
+            <Alert variant="destructive">
+              <AlertTitle>Setup could not finish</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {status === "ready" && (
+            <Alert variant="success">
+              <AlertTitle>Ready to continue</AlertTitle>
+              <AlertDescription>
+                The vision models are available on this device. You can now
+                start a Lecture Watch session.
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+
+        <div className="flex justify-center gap-x-2">
           {status === "ready" ? (
             <Button onClick={() => router.push("/VisionModel")}>
               Continue
@@ -337,8 +354,17 @@ export default function VisionModelSetupPage() {
               )}
             </Button>
           )}
+          <Button onClick={() => setShowGuide(true)}>
+            <BookOpen />
+            Setup Guide
+          </Button>
         </div>
       </div>
+      {showGuide && (
+        <Popup onClose={() => setShowGuide(false)}>
+          <VM_GUIDE></VM_GUIDE>
+        </Popup>
+      )}
     </main>
   );
 }
@@ -353,9 +379,9 @@ function RequirementRow({
   status: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-lg border border-[var(--border)] p-4">
-      <div className="min-w-0">
-        <p className="text-sm font-medium text-[var(--text-primary)]">
+    <div className="flex min-h-20 w-full items-center justify-between gap-4 rounded-lg border border-[var(--border)] bg-(--bg-surface) p-4">
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold text-[var(--text-primary)]">
           {label}
         </p>
 
@@ -366,7 +392,7 @@ function RequirementRow({
 
       <Badge
         variant="outline"
-        className="shrink-0 text-[var(--text-secondary)]"
+        className="whitespace-nowrap text-[var(--text-secondary)]"
       >
         {status}
       </Badge>

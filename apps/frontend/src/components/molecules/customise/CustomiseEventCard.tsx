@@ -135,7 +135,7 @@ export function CustomiseEventCard({
   return (
     <div className="flex flex-col gap-4">
       {/*name, code en venue*/}
-      <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+      <div>
         <div className="flex flex-col gap-4">
           <Label className="text-sm font-medium text-[var(--text-primary)]">
             General
@@ -186,7 +186,7 @@ export function CustomiseEventCard({
           </div>
         </div>
       </div>
-      <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+      <div>
         <div className="flex flex-col gap-4">
           <Label className="text-sm font-medium text-[var(--text-primary)]">
             Location
@@ -339,8 +339,16 @@ export function CustomiseEventCard({
         )}
       </div>
 
+      <TimeSlotSelect
+        value={timeSlotValue}
+        onChange={handleTimeChange}
+        onRemove={() => {}}
+        error={errors?.time}
+        hideDaySelect
+      />
+
       {/*event type and module*/}
-      <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+      <div>
         <div className="flex flex-col gap-4">
           <Label className="text-sm font-medium text-[var(--text-primary)]">
             Event Type / Module Assignment

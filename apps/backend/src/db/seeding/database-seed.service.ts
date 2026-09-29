@@ -17,12 +17,14 @@ import { UniversitySeedService } from './services/university.seed.service';
 import { UserSeedService } from './services/users.seed.service';
 import { VenuesSeedService } from './services/venues.seed.service';
 import { TimetableSeedService } from './services/timetable.seed.service';
+import { WipeSeedService } from './services/wipe.seed.service';
 
 @Injectable()
 export class DatabaseSeedService {
   private readonly logger = new Logger(DatabaseSeedService.name);
 
   constructor(
+    private readonly wipeDb: WipeSeedService,
     private readonly universitySeedService: UniversitySeedService,
     private readonly userSeedService: UserSeedService,
     private readonly courseSeedService: CourseSeedService,
@@ -40,6 +42,7 @@ export class DatabaseSeedService {
 
   async seed(db: AppDatabase): Promise<void> {
     const tasks = [
+      ['Wipe Database', (tx: AppDatabase) => this.wipeDb.seed(tx)],
       ['COS admin', (tx: AppDatabase) => this.seedCOSAdmin(tx)],
       ['system admin', (tx: AppDatabase) => this.seedSystemAdmin(tx)],
       [
