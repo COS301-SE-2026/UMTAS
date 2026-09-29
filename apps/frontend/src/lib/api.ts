@@ -2538,6 +2538,58 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/vision-sessions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get vision sessions
+     * @description Returns vision sessions matching the supplied module, event, date, and name filters.
+     */
+    get: operations["getAllVisionSessions"];
+    put?: never;
+    /**
+     * Create a vision session
+     * @description Create a vision session. This Vision Sessions operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["createVisionSession"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/vision-sessions/{sessionId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a vision session by ID
+     * @description Get a vision session by ID. This Vision Sessions operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getVisionSessionById"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete a vision session
+     * @description Delete a vision session. This Vision Sessions operation is part of the versioned UMTAS HTTP contract.
+     */
+    delete: operations["deleteVisionSession"];
+    options?: never;
+    head?: never;
+    /**
+     * Update a vision session
+     * @description Updates the supplied session fields. Session ID, module, creator, and creation timestamp cannot be changed.
+     */
+    patch: operations["updateVisionSession"];
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -5757,6 +5809,153 @@ export interface components {
        * @example 00000000-0000-0000-0000-000000000000
        */
       ModuleID: string;
+    };
+    SessionInferenceResultDto: {
+      /**
+       * @description Number of questions asked during the session
+       * @example 12
+       */
+      questions_asked: number;
+      /** @example 40 */
+      total_restless_frames: number;
+      /** @example 100 */
+      total_stable_frames: number;
+      /** @example 80 */
+      total_paying_attention: number;
+      /** @example 20 */
+      total_no_attention: number;
+      /** @example 140 */
+      total_frames: number;
+    };
+    CreateVisionSessionDto: {
+      /**
+       * Format: uuid
+       * @description Module the session belongs to
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      ModuleID: string;
+      /**
+       * Format: uuid
+       * @description Event the session is linked to, if any
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      EventID?: string | null;
+      /**
+       * Format: date
+       * @description Date the session occurred on
+       * @example 2026-01-02
+       */
+      Date: string;
+      /**
+       * @description Human readable name for the session
+       * @example Lecture 3
+       */
+      SessionName: string;
+      /**
+       * @description Short session description
+       * @example Covers chapter 4 and 5
+       */
+      SessionDsc?: string | null;
+      /** @description Aggregated inference results from the vision model */
+      Data: components["schemas"]["SessionInferenceResultDto"];
+    };
+    VisionSessionDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a vision session
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      SessionID: string;
+      /**
+       * Format: uuid
+       * @description Module the session belongs to
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      ModuleID: string;
+      /**
+       * Format: uuid
+       * @description Event the session is linked to, if any
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      EventID?: string | null;
+      /**
+       * Format: date
+       * @description Date the session occurred on
+       * @example 2026-01-02
+       */
+      Date: string;
+      /**
+       * @description Human readable name for the session
+       * @example Lecture 3
+       */
+      SessionName: string;
+      /**
+       * @description Short session description
+       * @example Covers chapter 4 and 5
+       */
+      SessionDsc?: string | null;
+      /** @description Aggregated inference results from the vision model */
+      Data: components["schemas"]["SessionInferenceResultDto"];
+      /**
+       * Format: uuid
+       * @description User who uploaded the session
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CreatedBy?: string | null;
+      /**
+       * @description When the session was created
+       * @example 2026-01-02T08:00:00.000Z
+       */
+      CreatedAt: string;
+    };
+    VisionSessionSingleResponseDto: {
+      session: components["schemas"]["VisionSessionDto"];
+      message?: string;
+    };
+    VisionSessionListResponseDto: {
+      sessions: components["schemas"]["VisionSessionDto"][];
+      message?: string;
+    };
+    UpdateVisionSessionDto: {
+      /**
+       * Format: uuid
+       * @description Event the session is linked to, if any
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      EventID?: string | null;
+      /**
+       * Format: date
+       * @description Date the session occurred on
+       * @example 2026-01-02
+       */
+      Date?: string;
+      /**
+       * @description Human readable name for the session
+       * @example Lecture 3
+       */
+      SessionName?: string;
+      /**
+       * @description Short session description
+       * @example Covers chapter 4 and 5
+       */
+      SessionDsc?: string | null;
+      /** @description Aggregated inference results from the vision model */
+      Data?: components["schemas"]["SessionInferenceResultDto"];
+    };
+    DeleteVisionSessionResponseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a vision session
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      SessionID: string;
+      /**
+       * @description Human readable name for the session
+       * @example Lecture 3
+       */
+      SessionName: string;
+      /** @example true */
+      success: Record<string, never>;
     };
     /** @description Stable UMTAS error envelope. */
     ErrorResponse: {
@@ -12047,6 +12246,246 @@ export interface operations {
       401: components["responses"]["UnauthorizedError"];
       403: components["responses"]["ForbiddenError"];
       409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getAllVisionSessions: {
+    parameters: {
+      query?: {
+        /** @description Filter by module ID */
+        moduleId?: string;
+        /** @description Filter by event ID */
+        eventId?: string;
+        /** @description Filter sessions from this date onward (inclusive) */
+        from?: string;
+        /** @description Filter sessions up to this date (inclusive) */
+        to?: string;
+        /** @description Search on session name */
+        search?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Vision sessions returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VisionSessionListResponseDto"];
+        };
+      };
+      /** @description One or more query filters are invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  createVisionSession: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateVisionSessionDto"];
+      };
+    };
+    responses: {
+      /** @description Vision session created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VisionSessionSingleResponseDto"];
+        };
+      };
+      /** @description Invalid vision session payload or session date */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description A vision session with the same name already exists for the module on the specified date */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getVisionSessionById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        sessionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Vision session returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VisionSessionSingleResponseDto"];
+        };
+      };
+      /** @description Invalid vision session ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Vision session not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  deleteVisionSession: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        sessionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Vision session deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeleteVisionSessionResponseDto"];
+        };
+      };
+      /** @description Invalid vision session ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Vision session not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  updateVisionSession: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        sessionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateVisionSessionDto"];
+      };
+    };
+    responses: {
+      /** @description Vision session updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VisionSessionSingleResponseDto"];
+        };
+      };
+      /** @description Invalid vision session ID, payload, or session date */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Vision session or linked event not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description A vision session with the same name already exists for the module on the specified date */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
       500: components["responses"]["InternalError"];
     };
   };

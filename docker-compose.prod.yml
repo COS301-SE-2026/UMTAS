@@ -47,6 +47,8 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      RUSTFS_ACCESS_KEY: ${MINIO_ROOT_USER}
+      RUSTFS_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
     volumes:
       - minio_data:/data
     healthcheck:
@@ -214,6 +216,16 @@ services:
       - "traefik.http.routers.backend-prod.tls.certresolver=myresolver"
       - "traefik.http.services.backend-prod.loadbalancer.server.port=${BACKEND_PORT}"
       - "traefik.http.routers.backend-prod.priority=100"
+      - "traefik.http.routers.backend-guest-prod.rule=Host(`capstone-vigil.dns.net.za`) && Method(`POST`) && PathPrefix(`/api/auth/sign-in/guest`)"
+      - "traefik.http.routers.backend-guest-prod.entrypoints=websecure"
+      - "traefik.http.routers.backend-guest-prod.tls=true"
+      - "traefik.http.routers.backend-guest-prod.tls.certresolver=myresolver"
+      - "traefik.http.routers.backend-guest-prod.service=backend-prod"
+      - "traefik.http.routers.backend-guest-prod.priority=110"
+      - "traefik.http.routers.backend-guest-prod.middlewares=backend-guest-rate-limit"
+      - "traefik.http.middlewares.backend-guest-rate-limit.ratelimit.average=3"
+      - "traefik.http.middlewares.backend-guest-rate-limit.ratelimit.period=1m"
+      - "traefik.http.middlewares.backend-guest-rate-limit.ratelimit.burst=5"
 
   frontend:
     image: ${DOCKER_REGISTRY:-vigilcs/umtas}:frontend-${IMAGE_TAG:?IMAGE_TAG is required}

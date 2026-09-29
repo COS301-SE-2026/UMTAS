@@ -222,6 +222,77 @@ describe('RouteService', () => {
     });
   }); //END_Test_getRouteVariant
 
+  describe('Test_getVariantOrNull', () => {
+    const uniId = 'uni-1';
+    const origin = 'building-1';
+    const destination = 'building-2';
+    const routeIndex = 0;
+
+    it('should return null when getRouteVariant throws NotFoundException', async () => {
+      //Arrange
+      jest
+        .spyOn(service, 'getRouteVariant')
+        .mockRejectedValue(new NotFoundException());
+
+      //Act
+      const result = await service.getVariantOrNull(
+        uniId,
+        origin,
+        destination,
+        routeIndex,
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toBeNull();
+    });
+
+    it('should throw error when getRouteVariant throws', async () => {
+      // Arrange
+      jest
+        .spyOn(service, 'getRouteVariant')
+        .mockRejectedValue(new Error('test error'));
+
+      // Act & Assert
+      await expect(
+        service.getVariantOrNull(
+          uniId,
+          origin,
+          destination,
+          routeIndex,
+          mockDb,
+        ),
+      ).rejects.toThrow('test error');
+    });
+
+    it('should return the route when getRouteVariant succeeds', async () => {
+      //Arrange
+      const route = createRouteDto();
+      const spy = jest
+        .spyOn(service, 'getRouteVariant')
+        .mockResolvedValue(route);
+
+      //Act
+      const result = await service.getVariantOrNull(
+        uniId,
+        origin,
+        destination,
+        routeIndex,
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toBe(route);
+      expect(spy).toHaveBeenCalledWith(
+        uniId,
+        origin,
+        destination,
+        routeIndex,
+        mockDb,
+      );
+    });
+  }); //END_Test_getVariantOrNull
+
   describe('Test_getOrCreateRoute', () => {
     const origin = buildingId;
     const destination = destinationBuildingId;
@@ -257,8 +328,8 @@ describe('RouteService', () => {
         ],
       });
       mockSequentialResults(mockDb.select, [
-        [], // direct lookup — none
-        [reverse], // reverse lookup — found
+        [], // direct lookup, none
+        [reverse], // reverse lookup, found
       ]);
 
       //Act

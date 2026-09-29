@@ -36,10 +36,6 @@ plugins:
   - mkdocs-pdf
   - minify:
       minify_html: true
-  - git-revision-date-localized:
-      enable_creation_date: true
-      type: timeago
-      fallback_to_build_date: true
   - include-markdown
 
 markdown_extensions:
@@ -69,7 +65,6 @@ nav:
       - Use Cases + Traceability Matrix: srs/USE_CASES.md
       - Functional Requirements: srs/FUNCTIONAL_REQUIREMENTS.md
       - Non-Functional Requirements: srs/NON-FUNCTIONAL_REQUIREMENTS.md
-      - Non-Functional Requirements Testing & Traceability Matrix: srs/NON-FUNCTIONAL_TESTING.md
       - Domain Model: srs/DOMAIN_MODEL.md
 
   - SAS:
@@ -80,6 +75,7 @@ nav:
       - Constraints: sas/architecture/CONSTRAINTS.md
       - Architectural Diagram: sas/architecture/ARCHITECTURAL_DIAGRAM.md
       - Quality Requirement Mapping: sas/architecture/QUALITY_REQUIREMENT_MAPPING.md
+      - REST Endpoint Catalogue: sas/architecture/REST_ENDPOINT_CATALOGUE.md
       - Technology Requirements: sas/architecture/TECHNOLOGY_REQUIREMENTS.md
       - Service Contracts: sas/architecture/SERVICE_CONTRACTS.md
       - Deployment:
@@ -91,6 +87,31 @@ nav:
           - Rollback Strategy: sas/deployment/RollBackStrategy.md
           - Deployment Diagram: sas/deployment/DeploymentDiagram.md
           - CI/CD Pipeline Diagram: sas/deployment/PipelineDiagram.md
+  - Evidence:
+      - NFR Traceability Matrix: evidence/nfr/NON-FUNCTIONAL_TESTING.md
+      - Adapter Case Study: evidence/nfr/API_ADAPTER_CASE_STUDY.md
+      - Accessibility Reports: evidence/nfr/Lighthouse.md
+      - Security Scan: evidence/nfr/Owasp.md
+      - Availability Monitor: evidence/nfr/Availability.md
   - Admin:
       - Marking Guide: management/Marking-Guide.md
       - Team Profiles: management/Team-Profiles.md
+      - User Manual: management/UserManual.md
+  - Developer Guides:
+      - Overview: developer-guides/index.md
+      - Repository Setup: developer-guides/Repo-Setup-Guide.md
+      - Server Setup: developer-guides/Server-Setup-Guide.md
+      - Master Guide: developer-guides/master-development-guide.md
+      - Git Strategy: developer-guides/git-strategy-guide.md
+      - Coding Standards: developer-guides/coding-standards.md
+      - Backend Development: developer-guides/backend-development-guide.md
+      - Frontend Development: developer-guides/frontend-development-guide.md
+      - Testing Policy: developer-guides/testing-policy.md
+      - Unit Testing: developer-guides/unit-testing-guide.md
+      - Integration Testing: developer-guides/integration-testing-guide.md
+      - End-to-End Testing: developer-guides/e2e-testing-guide.md
+      - Local CI/CD: developer-guides/local-cicd-guide.md
+      - Server Guide: developer-guides/server-guide.md
+  - Design:
+      - Brand Style: design/Brand-Style.md
+      - Wireframes: design/Wireframes.md

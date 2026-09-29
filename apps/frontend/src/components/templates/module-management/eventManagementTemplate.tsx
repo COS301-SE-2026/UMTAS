@@ -20,15 +20,11 @@ import { eventCols } from "@/components/organisms/module-management/eventsColumn
 import CustomiseEventPopup from "@/components/organisms/customise/customiseEventPopup";
 const steps = [
   {
-    target: "#input-search-event",
+    target: "#input-search-event-code",
     content: "Search for an event by name, activity code, or module code.",
   },
   {
-    target: "#select-event-type",
-    content: "Filter events using type or prefix filters.",
-  },
-  {
-    target: "#row-event-row",
+    target: "#event-row",
     content: "Select an event to open its specific customization options.",
   },
 ];
@@ -85,31 +81,22 @@ export default function EventManagementTemplate() {
   }
 
   return (
-    <div className="flex w-full flex-col items-center gap-6 px-6 pt-6">
+    <div className="flex w-full flex-col items-center gap-6 px-6 pt-4">
       <Tutorial steps={steps} wait={true} />
 
+      <div className="flex w-full max-w-6xl flex-col items-start gap-4 md:flex-row md:justify-between">
+        <div className="w-full md:max-w-sm flex-1">
+          <Input
+            id="input-search-event-code"
+            placeholder="Search events..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-[var(--background)]"
+          />
+        </div>
+      </div>
+
       <div className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
-        <div className="border-b border-[var(--border)] px-5 py-4">
-          <h1 className="text-lg font-semibold text-[var(--text-primary)]">
-            Event Management
-          </h1>
-          <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            Search and filter events and their modules.
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-4 bg-[var(--bg-surface)] p-5 md:flex-row md:items-start md:justify-between">
-          <div className="w-full md:max-w-sm flex-1">
-            <Input
-              id="input-search-event-code"
-              placeholder="Search events..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[var(--background)]"
-            />
-          </div>
-        </div>
-
         <EventsTable
           columns={eventCols}
           data={filteredEvents}

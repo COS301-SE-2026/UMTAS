@@ -16,7 +16,7 @@ export default function CustomiseEventPanel({
 }: EventPanelProps) {
   const assignedModule = modules.find(
     (module: ModuleResponseDto) =>
-      module.moduleCode === event.eventCriteria.moduleId,
+      module.moduleID === event.eventCriteria.moduleId,
   );
   return (
     <div className="flex flex-col gap-2">
@@ -24,7 +24,7 @@ export default function CustomiseEventPanel({
         <button
           type="button"
           onClick={onClick}
-          className={`flex flex-1 items-center gap-3 rounded-lg border px-4 py-4 text-left transition-colors ${
+          className={`flex flex-1 items-center gap-3 rounded-lg border px-3 py-2 text-left transition-colors ${
             isSelected
               ? "bg-[var(--bg-elevated)] border-[var(--text-disabled)]"
               : "border-[var(--border)] bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)] cursor-pointer"
@@ -37,14 +37,14 @@ export default function CustomiseEventPanel({
             }}
           />
           <div className="flex-1 min-w-0">
-            <p className="text-base font-medium text-[var(--text-primary)] truncate">
+            <p className="text-sm font-medium text-[var(--text-primary)] truncate">
               {event.eventName}
             </p>
             <div className="flex flex-wrap items-center gap-2 mt-0.5">
-              <p className="text-sm text-[var(--text-secondary)]">
+              <p className="text-xs text-[var(--text-secondary)]">
                 {event.eventCriteria.startTime}
               </p>
-              <p className="text-sm font-mono text-[var(--text-secondary)]">
+              <p className="text-xs font-mono text-[var(--text-secondary)]">
                 {event.activityCode}
               </p>
             </div>

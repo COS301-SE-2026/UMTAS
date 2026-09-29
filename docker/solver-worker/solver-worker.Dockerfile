@@ -6,35 +6,52 @@ ARG NODE_IMAGE=node:22-bookworm-slim
 ARG ORTOOLS_VERSION=9.12.4544
 
 FROM ${NODE_IMAGE} AS node-base
+
 WORKDIR /workspace
+
 RUN corepack enable && corepack prepare pnpm@10.33.2 --activate
 
+
 FROM node-base AS node-deps
+
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/solver-worker/package.json ./apps/solver-worker/package.json
 COPY packages/bullmq-worker-core/package.json ./packages/bullmq-worker-core/package.json
 COPY packages/shared-types/package.json ./packages/shared-types/package.json
+
 RUN pnpm install --frozen-lockfile --filter solver-worker...
 
+
 FROM node-deps AS node-build
+
 COPY apps/solver-worker ./apps/solver-worker
 COPY packages/bullmq-worker-core ./packages/bullmq-worker-core
 COPY packages/shared-types ./packages/shared-types
+
 RUN pnpm --filter shared-types build \
     && pnpm --filter bullmq-worker-core build \
     && pnpm --filter solver-worker build \
     && pnpm --filter solver-worker deploy --prod --legacy /deploy \
     && cp -R apps/solver-worker/dist /deploy/dist
 
+
 FROM vigilcs/umtas:ortools-base-${ORTOOLS_VERSION} AS solver-build
+
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends python3 \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /workspace
 
 COPY apps/preference-solver /workspace/apps/preference-solver
+
 WORKDIR /workspace/apps/preference-solver
+
 ENV LD_LIBRARY_PATH=/opt/ortools/lib
-#Download first
-RUN make lib/openGA.hpp lib/nlohmann/json.hpp 
-    
+
+# Download first
+RUN make lib/openGA.hpp lib/nlohmann/json.hpp
+
 RUN make clean \
     && make --jobs="$(nproc)" \
       ORTOOLS_PREFIX=/opt/ortools \
@@ -53,11 +70,14 @@ RUN make clean \
     && find /out/lib -type f ! -name '*.so*' -delete \
     && rm -rf /out/lib/pkgconfig
 
+
 FROM ${NODE_IMAGE} AS runtime
+
 ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION=dev
 ARG ORTOOLS_VERSION=9.12.4544
+
 LABEL org.opencontainers.image.title="UMTAS solver worker" \
       org.opencontainers.image.description="BullMQ worker for timetable optimization" \
       org.opencontainers.image.source="https://github.com/Vigilant-Computation/UMTAS" \
@@ -76,6 +96,7 @@ RUN apt-get update \
     && chown -R node:node /app /tmp/umtas-worker
 
 WORKDIR /app
+
 ENV NODE_ENV=production \
     LD_LIBRARY_PATH=/app/lib \
     SOLVER_CLI_COMMAND=/app/bin/solver-cli \
@@ -87,5 +108,7 @@ COPY --from=solver-build /out/lib/ /app/lib/
 COPY --from=solver-build --chown=node:node /out/image-smoke-ok /app/.image-smoke-ok
 
 USER node
+
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+
 CMD ["node", "/app/dist/index.js"]

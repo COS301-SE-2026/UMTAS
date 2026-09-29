@@ -820,7 +820,7 @@ export function ScheduleView({
                     aria-label="Edit Timetable"
                     id="btn-edit"
                     type="button"
-                    variant="outline"
+                    variant="secondary"
                     className="h-8 px-3 text-xs hover:opacity-90 cursor-pointer"
                     onClick={editTimetable}
                     title="Edit Timetable"
@@ -833,12 +833,12 @@ export function ScheduleView({
                     id="btn-delete"
                     data-testid="schedules-Delete-Btn"
                     type="button"
-                    variant={"destructive"}
-                    className="h-8 px-3 text-xs hover:opacity-90 cursor-pointer"
+                    variant={"link"}
+                    className="flex-shrink-0 border border-[var(--error-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-[var(--error-bg)]"
                     onClick={deleteDialog}
                     title="Delete Timetable"
                   >
-                    <Trash2 />
+                    <Trash2 className="text-[var(--error-text)]" />
                   </Button>
                 </div>
               </div>
@@ -867,9 +867,33 @@ export function ScheduleView({
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
+              <div className="grid grid-cols-7 gap-2 pb-2 sm:hidden">
+                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                  (day, index) => {
+                    const date = new Date(currentWeekStart);
+                    date.setDate(currentWeekStart.getDate() + index);
+
+                    const selected =
+                      date.toDateString() === selectedDate.toDateString();
+
+                    return (
+                      <Button
+                        key={day}
+                        type="button"
+                        variant={selected ? "default" : "outline"}
+                        className="h-8 px-0 text-xs"
+                        onClick={() => setSelectedDate(date)}
+                      >
+                        {day}
+                      </Button>
+                    );
+                  },
+                )}
+              </div>
               <WeeklyGrid
                 events={resolvedEvents}
                 weekStart={currentWeekStart}
+                selectedDate={selectedDate}
               />
             </div>
           )}

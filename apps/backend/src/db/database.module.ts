@@ -4,7 +4,6 @@ import { DatabaseSeedService } from './seeding/database-seed.service';
 import { CourseSeedService } from './seeding/services/courses.seed.service';
 import { ModuleSeedService } from './seeding/services/modules.seed.service';
 import { UniversitySeedService } from './seeding/services/university.seed.service';
-import { UniRolesSeedService } from './seeding/services/universityRoles.seed.service';
 import { UserSeedService } from './seeding/services/users.seed.service';
 import { SeedPersistenceService } from './seeding/seed-persistence.service';
 import { AcademicCalendarSeedService } from './seeding/services/academic-calendar.seed.service';
@@ -13,11 +12,17 @@ import { BuildingSeedService } from './seeding/services/buildings.seed.service';
 import { EventsSeedService } from './seeding/services/events.seed.service';
 import { SeedQueryService } from './seeding/services/seed-query.service';
 import { VenuesSeedService } from './seeding/services/venues.seed.service';
-import { EventVenuesSeedService } from './seeding/services/eventVenue.seed.service';
+import { AdminTeachingSeedService } from './seeding/services/admin-teaching.seed.service';
+import { AttendanceDemoAdminsSeedService } from './seeding/services/attendance-demo-admins.seed.service';
+import { EventModule } from 'src/Events/event.module';
+import { TimetableSeedService } from './seeding/services/timetable.seed.service';
+import { WipeSeedService } from './seeding/services/wipe.seed.service';
 
 @Global()
 @Module({
+  imports: [EventModule],
   providers: [
+    WipeSeedService,
     SeedPersistenceService,
     SeedQueryService,
     DatabaseService,
@@ -26,13 +31,14 @@ import { EventVenuesSeedService } from './seeding/services/eventVenue.seed.servi
     ModuleSeedService,
     EventsSeedService,
     UniversitySeedService,
-    UniRolesSeedService,
     UserSeedService,
     PublicCalendarSeedService,
     AcademicCalendarSeedService,
     BuildingSeedService,
     VenuesSeedService,
-    EventVenuesSeedService,
+    AdminTeachingSeedService,
+    AttendanceDemoAdminsSeedService,
+    TimetableSeedService,
   ],
   exports: [DatabaseService, SeedPersistenceService],
 })

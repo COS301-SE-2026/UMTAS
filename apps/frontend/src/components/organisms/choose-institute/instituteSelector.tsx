@@ -124,11 +124,12 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
       },
       {
         onSuccess: () => {
-          UserDetails.storeUniDetails({
-            UniversityID: selectedInstitute.UniversityID,
-            UniversityName: selectedInstitute.UniversityName,
+          const payloadToStore = {
+            ...selectedInstitute,
             role: role as uniDtoRoles,
-          });
+          };
+          //console.log("[InstituteSelector] Storing payload:", payloadToStore);
+          UserDetails.storeUniDetails(payloadToStore);
 
           getQueryClient().clear();
 
@@ -302,7 +303,7 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
         )}
 
         <div className="flex w-full flex-col gap-3 border-t pt-4">
-          <div className="flex w-full items-center justify-center gap-4">
+          <div className="flex w-full min-w-0 flex-col items-center justify-center gap-4">
             {!selectedInstitute && (
               <Button type="button" variant="outline" disabled>
                 Select an institute to continue

@@ -33,7 +33,7 @@ jobs:
       - name: Deploy Production
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          sed -i 's|site_url: .*|site_url: https://cos301-se-2026.github.io/UMTAS/latest//|' mkdocs.yml
+          sed -i 's|site_url: .*|site_url: https://cos301-se-2026.github.io/UMTAS/latest/|' mkdocs.yml
           mkdocs build
           mkdir -p site_mapping
           mv site site_mapping/latest
@@ -44,6 +44,15 @@ jobs:
           git remote add origin $remote_repo
           git fetch origin gh-pages
           git reset origin/gh-pages
+          if ! git cat-file -e origin/gh-pages:demo3/index.html 2>/dev/null; then
+            # Build the Demo 3 archive once from the fixed pre-Demo-4 revision.
+            demo3_source="$(mktemp -d)"
+            git -C .. archive 3b62980155e9f5f61a22bb4df2c6b6257712e58c | tar -x -C "$demo3_source"
+            sed -i 's|site_url: .*|site_url: https://cos301-se-2026.github.io/UMTAS/demo3/|' "$demo3_source/mkdocs.yml"
+            mkdocs build --config-file "$demo3_source/mkdocs.yml" --site-dir "$demo3_source/site"
+            cp -R "$demo3_source/site" demo3
+            git add demo3/
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add latest/

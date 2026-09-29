@@ -2,18 +2,17 @@
 import CustomiseShell from "@/components/templates/customise/CustomiseShell";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-  AlertDialogCancel,
-} from "@/components/atoms/customise/alert-dialog-customise";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/atoms/baseShadcn/dialog";
 
 import { useQuery } from "@tanstack/react-query";
 import { getAllModulesQ } from "@/components/templates/builder/Queries/moduleQueries";
 import { getAllEventsQ } from "@/components/templates/builder/Queries/eventQueries";
-import { X } from "lucide-react";
+import { SquarePen } from "lucide-react";
 
 export default function CustomiseShellPopup() {
   const { data: modules, isLoading: modulesLoading } =
@@ -24,22 +23,23 @@ export default function CustomiseShellPopup() {
 
   return (
     <div className="">
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button id="btn-customise-schedule" variant="default">
-            Customise
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button
+            id="btn-customise-schedule"
+            variant="secondary"
+            className="h-8 px-3 text-xs hover:opacity-90 cursor-pointer border border-1 border-(--bg-surface)"
+          >
+            <SquarePen />
           </Button>
-        </AlertDialogTrigger>
+        </DialogTrigger>
 
-        <AlertDialogContent className="w-[768px] max-w-[95vw] p-0 flex flex-col gap-3">
-          <AlertDialogHeader className="flex flex-row justify-between items-center space-y-0 px-6 pt-6 pb-0">
-            <AlertDialogTitle className="text-xl font-bold">
+        <DialogContent className="w-[768px] max-w-[95vw] sm:max-w-[768px] p-0 flex flex-col gap-3 bg-(--bg-surface)">
+          <DialogHeader className="flex flex-row justify-between items-center space-y-0 px-6 pt-6 pb-0">
+            <DialogTitle className="text-xl font-bold">
               Customise Events and Modules
-            </AlertDialogTitle>
-            <AlertDialogCancel className="mt-0 cursor-pointer h-8 w-8 p-0 rounded-full bg-transparent border-transparent">
-              <X className="h-4 w-4" />
-            </AlertDialogCancel>
-          </AlertDialogHeader>
+            </DialogTitle>
+          </DialogHeader>
 
           <div className="overflow-auto max-h-[80vh]">
             {isLoading ? (
@@ -48,8 +48,8 @@ export default function CustomiseShellPopup() {
               <CustomiseShell events={events ?? []} modules={modules ?? []} />
             )}
           </div>
-        </AlertDialogContent>
-      </AlertDialog>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

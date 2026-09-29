@@ -1,4 +1,4 @@
-use crate::pose_inference::{DetectedPersonPose, Keypoint};
+use crate::pose_inference::DetectedPersonPose;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
@@ -36,6 +36,7 @@ pub fn attach_id_first(
             last_seen_frame: frame,
             last_seen_timestamp: timestamp,
             hand_up: is_hands_up(&new_person),
+            gaze: analyze_gaze(&new_person),
         });
     }
 
@@ -87,23 +88,46 @@ pub fn attach_id(
 
     // finding matches
     for (new_index, new_person) in new_frame_people.iter().enumerate() {
-        let mut best_iou: f32 = IOU_THRESHOLD;
+        let mut best_score = -1.0;
         let mut best_index_prev_idx: Option<usize> = None;
+
         for (prev_index, prev_person) in prev_frame.people.iter().enumerate() {
             if matched_prev_indices[prev_index] {
                 continue;
             }
 
-            let iou = intersection_over_union(&new_person.person, &prev_person.pose_data.person);
-            if best_iou < iou {
+            let iou =
+                intersection_over_union(&new_person.person, &prev_person.pose_data.person);
+
+            let dx =
+                new_person.person.center_x - prev_person.pose_data.person.center_x;
+            let dy =
+                new_person.person.center_y - prev_person.pose_data.person.center_y;
+            let distance = (dx.powi(2) + dy.powi(2)).sqrt();
+
+            let max_distance = prev_person
+                .pose_data
+                .person
+                .width
+                .max(prev_person.pose_data.person.height)
+                * 0.4;
+
+            let score = if iou >= IOU_THRESHOLD {
+                1.0 + iou
+            } else if distance <= max_distance {
+                1.0 - (distance / max_distance)
+            } else {
+                continue;
+            };
+
+            if score > best_score {
+                best_score = score;
                 best_index_prev_idx = Some(prev_index);
-                best_iou = iou;
             }
         }
 
         if let Some(prev_idx) = best_index_prev_idx {
-            if best_iou >= IOU_THRESHOLD
-                && matched_new_indices[new_index] == false
+            if matched_new_indices[new_index] == false
                 && matched_prev_indices[prev_idx] == false
             {
                 matched_new_indices[new_index] = true;
@@ -116,6 +140,7 @@ pub fn attach_id(
                     last_seen_frame: frame,
                     last_seen_timestamp: timestamp,
                     hand_up: is_hands_up(new_person),
+                    gaze: analyze_gaze(new_person),
                 });
             }
         }
@@ -124,6 +149,10 @@ pub fn attach_id(
         if matched_prev_indices[prev_index] == false {
             matched_prev_indices[prev_index] = true;
 
+            if timestamp - prev_person.last_seen_timestamp > 1500.0 {
+                continue;
+            }
+
             new_people.push(SinglePersonSessionData {
                 pose_data: prev_person.pose_data.clone(),
                 assigned_id: prev_person.assigned_id,
@@ -131,7 +160,12 @@ pub fn attach_id(
                 last_seen_frame: prev_person.last_seen_frame,
                 last_seen_timestamp: prev_person.last_seen_timestamp,
                 hand_up: false,
-                // we do not look at hands up of inferred frames
+                gaze: GazeDirection {
+                    looking_left: false,
+                    looking_right: false,
+                    looking_straight: false,
+                },
+                // we do not look at hands up or gaze of inferred frames
             });
         }
     }
@@ -149,6 +183,7 @@ pub fn attach_id(
                 last_seen_frame: frame,
                 last_seen_timestamp: timestamp,
                 hand_up: is_hands_up(new_person),
+                gaze: analyze_gaze(new_person),
             });
         }
     }
@@ -161,14 +196,81 @@ pub fn attach_id(
 }
 
 pub fn is_hands_up(new_person: &DetectedPersonPose) -> bool {
-    let bottom_boundary = (new_person.center_mass.y + new_person.nose.y) / 2.0;
+    const KEYPOINT_CONFIDENCE_THRESHOLD: f32 = 0.4;
+    let head_boundary = new_person.nose.y;
 
-    let right_hand_up =
-        new_person.right_arm.len() > 1 && new_person.right_arm[1].y <= bottom_boundary;
+    let right_hand_up = new_person.right_arm.len() > 1
+        && new_person.right_arm[0].score >= KEYPOINT_CONFIDENCE_THRESHOLD
+        && new_person.right_arm[1].score >= KEYPOINT_CONFIDENCE_THRESHOLD
+        && new_person.right_arm[1].y <= head_boundary;
 
-    let left_hand_up = new_person.left_arm.len() > 1 && new_person.left_arm[1].y <= bottom_boundary;
+    let left_hand_up = new_person.left_arm.len() > 1
+        && new_person.left_arm[0].score >= KEYPOINT_CONFIDENCE_THRESHOLD
+        && new_person.left_arm[1].score >= KEYPOINT_CONFIDENCE_THRESHOLD
+        && new_person.left_arm[1].y <= head_boundary;
 
-    right_hand_up || left_hand_up
+    if right_hand_up && left_hand_up {
+        return false;
+    }
+
+    return right_hand_up || left_hand_up;
+}
+pub fn analyze_gaze(person: &DetectedPersonPose) -> GazeDirection {
+    let confidence_threshold = 0.25;
+
+    if person.nose.score < confidence_threshold
+        || person.left_eye.score < confidence_threshold
+        || person.right_eye.score < confidence_threshold
+    {
+        return GazeDirection {
+            looking_left: false,
+            looking_right: false,
+            looking_straight: false,
+        };
+    }
+
+    let eye_span = ((person.left_eye.x - person.right_eye.x).powi(2)
+        + (person.left_eye.y - person.right_eye.y).powi(2))
+    .sqrt();
+
+    if eye_span <= 0.0 {
+        return GazeDirection {
+            looking_left: false,
+            looking_right: false,
+            looking_straight: false,
+        };
+    }
+
+    let eye_center_x = (person.left_eye.x + person.right_eye.x) / 2.0;
+    let nose_ratio = (person.nose.x - eye_center_x) / eye_span;
+
+    let left_ear_visible = person.left_ear.score > confidence_threshold;
+    let right_ear_visible = person.right_ear.score > confidence_threshold;
+
+    let mut looking_left = false;
+    let mut looking_right = false;
+    let mut looking_straight = true;
+
+    if left_ear_visible && !right_ear_visible && nose_ratio < -0.15 {
+        looking_left = true;
+        looking_straight = false;
+    } else if right_ear_visible && !left_ear_visible && nose_ratio > 0.15 {
+        looking_right = true;
+        looking_straight = false;
+    }
+
+    GazeDirection {
+        looking_left,
+        looking_right,
+        looking_straight,
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct GazeDirection {
+    pub looking_left: bool,
+    pub looking_right: bool,
+    pub looking_straight: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -179,6 +281,7 @@ pub struct SinglePersonSessionData {
     pub last_seen_frame: usize,
     pub last_seen_timestamp: f64,
     pub hand_up: bool,
+    pub gaze: GazeDirection,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

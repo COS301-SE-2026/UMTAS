@@ -3,25 +3,30 @@ import { hashPassword } from 'better-auth/crypto';
 import { eq, sql } from 'drizzle-orm'; // Added 'sql' import
 import { usersTable } from '../../entities';
 import type { AppDatabase } from '../database.service';
+import { getCosAdminEmail, getSystemAdminEmail } from './Constants';
 import { SeedPersistenceService } from './seed-persistence.service';
 import { AcademicCalendarSeedService } from './services/academic-calendar.seed.service';
+import { AttendanceDemoAdminsSeedService } from './services/attendance-demo-admins.seed.service';
+import { AdminTeachingSeedService } from './services/admin-teaching.seed.service';
 import { BuildingSeedService } from './services/buildings.seed.service';
 import { CourseSeedService } from './services/courses.seed.service';
+import { EventsSeedService } from './services/events.seed.service';
 import { ModuleSeedService } from './services/modules.seed.service';
 import { PublicCalendarSeedService } from './services/public-calendar.seed.service';
 import { UniversitySeedService } from './services/university.seed.service';
-import { UniRolesSeedService } from './services/universityRoles.seed.service';
 import { UserSeedService } from './services/users.seed.service';
 import { VenuesSeedService } from './services/venues.seed.service';
+import { TimetableSeedService } from './services/timetable.seed.service';
+import { WipeSeedService } from './services/wipe.seed.service';
 
 @Injectable()
 export class DatabaseSeedService {
   private readonly logger = new Logger(DatabaseSeedService.name);
 
   constructor(
+    private readonly wipeDb: WipeSeedService,
     private readonly universitySeedService: UniversitySeedService,
     private readonly userSeedService: UserSeedService,
-    private readonly universityRolesSeedService: UniRolesSeedService,
     private readonly courseSeedService: CourseSeedService,
     private readonly moduleSeedService: ModuleSeedService,
     private readonly publicCalendarSeedService: PublicCalendarSeedService,
@@ -29,10 +34,15 @@ export class DatabaseSeedService {
     private readonly persistence: SeedPersistenceService,
     private readonly buildingSeedService: BuildingSeedService,
     private readonly venueSeedService: VenuesSeedService,
+    private readonly adminTeachingSeedService: AdminTeachingSeedService,
+    private readonly eventsSeedService: EventsSeedService,
+    private readonly attendanceDemoAdminsSeedService: AttendanceDemoAdminsSeedService,
+    private readonly timetableSeedService: TimetableSeedService,
   ) {}
 
   async seed(db: AppDatabase): Promise<void> {
     const tasks = [
+      ['Wipe Database', (tx: AppDatabase) => this.wipeDb.seed(tx)],
       ['COS admin', (tx: AppDatabase) => this.seedCOSAdmin(tx)],
       ['system admin', (tx: AppDatabase) => this.seedSystemAdmin(tx)],
       [
@@ -40,12 +50,12 @@ export class DatabaseSeedService {
         (tx: AppDatabase) => this.universitySeedService.seed(tx),
       ],
       ['users', (tx: AppDatabase) => this.userSeedService.seed(tx)],
-      [
-        'university roles',
-        (tx: AppDatabase) => this.universityRolesSeedService.seed(tx),
-      ],
       ['courses', (tx: AppDatabase) => this.courseSeedService.seed(tx)],
       ['modules', (tx: AppDatabase) => this.moduleSeedService.seed(tx)],
+      [
+        'admin teaching',
+        (tx: AppDatabase) => this.adminTeachingSeedService.seed(tx),
+      ],
       [
         'public calendars',
         (tx: AppDatabase) => this.publicCalendarSeedService.seed(tx),
@@ -60,6 +70,12 @@ export class DatabaseSeedService {
         (tx: AppDatabase) => this.buildingSeedService.seed(tx),
       ],
       ['Venues', (tx: AppDatabase) => this.venueSeedService.seed(tx)],
+      ['Events', (tx: AppDatabase) => this.eventsSeedService.seed(tx)],
+      [
+        'attendance demo admins',
+        (tx: AppDatabase) => this.attendanceDemoAdminsSeedService.seed(tx),
+      ],
+      ['Timetables', (tx: AppDatabase) => this.timetableSeedService.seed(tx)],
     ] as const;
 
     this.logger.log(`Starting database seeding (${tasks.length} tasks)`);
@@ -76,8 +92,7 @@ export class DatabaseSeedService {
 
   private async seedCOSAdmin(db: AppDatabase): Promise<void> {
     const name = 'Admin301';
-    const email =
-      process.env.SEED_COS_ADMIN_EMAIL?.toLowerCase() ?? 'admin301@local.umtas';
+    const email = getCosAdminEmail();
     const password = process.env.SEED_COS_ADMIN_PASSWORD ?? 'Admin@UMTAS2024!';
 
     const [existing] = await db
@@ -131,8 +146,7 @@ export class DatabaseSeedService {
 
   private async seedSystemAdmin(db: AppDatabase): Promise<void> {
     const name = process.env.SEED_SYSTEM_ADMIN_NAME ?? 'System Admin';
-    const email =
-      process.env.SEED_SYSTEM_ADMIN_EMAIL ?? 'system-admin@local.umtas';
+    const email = getSystemAdminEmail();
     const password =
       process.env.SEED_SYSTEM_ADMIN_PASSWORD ?? 'Admin@UMTAS2024!';
 

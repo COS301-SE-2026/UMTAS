@@ -5,6 +5,7 @@ import { AppShellTemplate } from "@/components/templates/app/AppShellTemplate";
 import "./globals.css";
 import { Toaster } from "sonner";
 import Script from "next/script";
+import { headers } from "next/headers";
 import TanstackProvider from "@/components/tanstack/tanstackProvider";
 import { HelpCommandPalette } from "@/components/organisms/nav/HelpCommandPallete";
 import { MapProvider } from "@/components/organisms/map/MapProvider";
@@ -31,6 +32,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   let userName: string | null = null;
 
   try {
@@ -51,6 +53,7 @@ export default async function RootLayout({
       <head suppressHydrationWarning>
         <Script
           id="veryUnIqueIDBro"
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `
             (function() {

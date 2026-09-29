@@ -1,4 +1,9 @@
-import { MessageType, POSE_DATA_MESSAGE, POSE_MESSAGE } from "./messageTypes";
+import {
+  MessageType,
+  POSE_DATA_MESSAGE,
+  POSE_MESSAGE,
+  VisionModelSize,
+} from "./messageTypes";
 
 class PoseManager {
   private worker: Worker | null = null;
@@ -19,6 +24,7 @@ class PoseManager {
     PixelData: Uint8ClampedArray,
     width: number,
     height: number,
+    modelSize: VisionModelSize,
   ): Promise<Float32Array[] | null> {
     if (this.isProcessing || !this.worker) {
       return Promise.resolve(null);
@@ -35,7 +41,6 @@ class PoseManager {
           this.isProcessing = false;
 
           const durationSeconds = (performance.now() - startTime) / 1000;
-          console.log(`Pose pipeline took: ${durationSeconds.toFixed(3)}s`);
 
           resolve(message.payload.results);
         }
@@ -48,6 +53,7 @@ class PoseManager {
           height: height,
           pixelData: PixelData,
           width: width,
+          modelSize: modelSize,
         },
       };
 

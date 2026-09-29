@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import {
@@ -10,29 +11,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
-import { TimeSlotSelect } from "@/components/atoms/builder/TimeSlotSelect";
-import type { TimeSlot } from "@/components/atoms/builder/TimeSlotSelect";
-import { EventTypeDropdown } from "@/components/atoms/builder/eventDropdown";
-import type { EventType } from "@/components/atoms/builder/eventDropdown";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import {
   EventResponse,
   EventCriteria,
 } from "@/app/builder/utils/events/eventRequestBuilder";
-import { UserDetails } from "@/lib/userclass/userClass";
 
-//NOTE
-//copied from event card and changed slightly for customisation
-//this was copied and altered to also be used for the solver. will be decoupled
-//once I figure out a better way for permissions (admin vs student for example)
-// used for tracking editablilty
 export interface EventErrors {
   name?: string;
   code?: string;
   date?: string;
   time?: string;
   moduleId?: string;
-  venue?: string;
 }
 
 interface EventCardProps {
@@ -55,26 +45,24 @@ export function NoPermissionsEventCard({
   errors,
 }: EventCardProps) {
   const inputClass =
-    "h-10 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] " +
+    "h-10 bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)] " +
     "placeholder:text-[var(--text-disabled)] focus-visible:ring-2 focus-visible:ring-offset-2 " +
     "focus-visible:ring-[var(--ring)] text-sm";
 
-  // console.log(event.eventCriteria, "Event being inserted into timeslot");
-  const timeSlotValue: TimeSlot = {
-    day: "",
-    startTime: event.eventCriteria?.startTime || "",
-    endTime: event.eventCriteria?.endTime || "no end",
-  };
+  const cardClass =
+    "h-full rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4";
 
-  function handleTimeChange(slot: TimeSlot) {
-    onUpdate(event.eventId, "startTime", slot.startTime);
-    onUpdate(event.eventId, "endTime", slot.endTime);
-  }
+  const cardContentClass = "flex h-full flex-col gap-4";
+
+  const titleClass = "text-sm font-semibold text-[var(--text-primary)]";
+
+  const labelClass = "text-sm text-[var(--text-secondary)]";
 
   function getInputClass(hasError: boolean) {
     if (hasError) {
       return inputClass + " border-[var(--error-text)]";
     }
+
     return inputClass;
   }
 
@@ -84,7 +72,7 @@ export function NoPermissionsEventCard({
         <button
           type="button"
           onClick={onGoToModules}
-          className="text-sm underline text-[var(--text-secondary)] text-left transition-colors duration-[var(--duration-fast)] hover:text-[var(--text-primary)]"
+          className="text-left text-sm text-[var(--text-secondary)] underline hover:text-[var(--text-primary)]"
         >
           No modules found.
         </button>
@@ -93,25 +81,27 @@ export function NoPermissionsEventCard({
 
     return (
       <Select
-        disabled
         value={String(event.eventCriteria?.moduleId || "")}
-        onValueChange={(v) => onUpdate(event.eventId, "moduleId", v)}
+        onValueChange={(value) => onUpdate(event.eventId, "moduleId", value)}
       >
         <SelectTrigger
           className={getInputClass(!!errors?.moduleId) + " w-full"}
         >
           <SelectValue placeholder="Select a Module" />
         </SelectTrigger>
-        <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
-          {modules.map((m) => {
-            let label = m.moduleName;
-            if (m.moduleCode) {
-              label = m.moduleCode + " - " + m.moduleName;
+
+        <SelectContent className="border-[var(--border)] bg-[var(--bg-surface)]">
+          {modules.map((module) => {
+            let label = module.moduleName;
+
+            if (module.moduleCode) {
+              label = module.moduleCode + " - " + module.moduleName;
             }
+
             return (
               <SelectItem
-                key={m.moduleID}
-                value={String(m.moduleID)}
+                key={module.moduleID}
+                value={String(module.moduleID)}
                 className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
               >
                 {label}
@@ -130,10 +120,10 @@ export function NoPermissionsEventCard({
 
     return (
       <div className="flex flex-col gap-2">
-        <Label className="text-sm font-medium text-[var(--text-secondary)]">
-          Module
-        </Label>
+        <Label className={labelClass}>Module</Label>
+
         {renderModuleField()}
+
         {errors?.moduleId && (
           <p className="text-sm text-[var(--error-text)]">{errors.moduleId}</p>
         )}
@@ -142,22 +132,20 @@ export function NoPermissionsEventCard({
   }
 
   return (
-    <div className="grid grid-cols-3 gap-4">
-      {/*name, code en venue*/}
-      <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
-        <div className="flex flex-col gap-4">
-          <Label className="text-sm font-medium text-[var(--text-primary)]">
-            General
-          </Label>
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 bg-(--bg-surface)">
+      <div className={cardClass}>
+        <div className={cardContentClass}>
+          <Label className={titleClass}>General</Label>
+
           <div className="flex flex-col gap-2">
             <Label
               htmlFor={"event-name-" + event.eventId}
-              className="text-sm font-medium text-[var(--text-secondary)]"
+              className={labelClass}
             >
               Name
             </Label>
+
             <Input
-              readOnly
               id={"event-name-" + event.eventId}
               value={event.eventName || ""}
               onChange={(e) =>
@@ -166,6 +154,7 @@ export function NoPermissionsEventCard({
               placeholder="e.g. COS301 Lecture Group A"
               className={getInputClass(!!errors?.name)}
             />
+
             {errors?.name && (
               <p className="text-sm text-[var(--error-text)]">{errors.name}</p>
             )}
@@ -174,12 +163,12 @@ export function NoPermissionsEventCard({
           <div className="flex flex-col gap-2">
             <Label
               htmlFor={"event-code-" + event.eventId}
-              className="text-sm font-medium text-[var(--text-secondary)]"
+              className={labelClass}
             >
               Code
             </Label>
+
             <Input
-              readOnly
               id={"event-code-" + event.eventId}
               value={event.activityCode || ""}
               onChange={(e) =>
@@ -189,107 +178,123 @@ export function NoPermissionsEventCard({
               maxLength={20}
               className={getInputClass(!!errors?.code)}
             />
+
             {errors?.code && (
               <p className="text-sm text-[var(--error-text)]">{errors.code}</p>
             )}
           </div>
+        </div>
+      </div>
+
+      <div className={cardClass}>
+        <div className={cardContentClass}>
+          <Label className={titleClass}>Date & Time</Label>
+
+          {event.eventCriteria?.date && (
+            <div className="flex flex-col gap-2">
+              <Label
+                htmlFor={"event-date-" + event.eventId}
+                className={labelClass}
+              >
+                Date
+              </Label>
+
+              <Input
+                id={"event-date-" + event.eventId}
+                type="date"
+                value={event.eventCriteria.date || ""}
+                onChange={(e) =>
+                  onUpdate(event.eventId, "date", e.target.value)
+                }
+                className={getInputClass(!!errors?.date)}
+              />
+            </div>
+          )}
+
+          {event.eventCriteria?.dayOfWeek && (
+            <div className="flex flex-col gap-2">
+              <Label
+                htmlFor={"event-day-" + event.eventId}
+                className={labelClass}
+              >
+                Day
+              </Label>
+
+              <Input
+                id={"event-day-" + event.eventId}
+                value={event.eventCriteria.dayOfWeek}
+                onChange={(e) =>
+                  onUpdate(event.eventId, "dayOfWeek", e.target.value)
+                }
+                className={inputClass}
+              />
+            </div>
+          )}
+
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Label
+                htmlFor={"event-start-time-" + event.eventId}
+                className={labelClass}
+              >
+                Start Time
+              </Label>
+
+              <Input
+                id={"event-start-time-" + event.eventId}
+                type="time"
+                value={event.eventCriteria?.startTime || ""}
+                onChange={(e) =>
+                  onUpdate(event.eventId, "startTime", e.target.value)
+                }
+                className={getInputClass(!!errors?.time)}
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label
+                htmlFor={"event-end-time-" + event.eventId}
+                className={labelClass}
+              >
+                End Time
+              </Label>
+
+              <Input
+                id={"event-end-time-" + event.eventId}
+                type="time"
+                value={event.eventCriteria?.endTime || ""}
+                onChange={(e) =>
+                  onUpdate(event.eventId, "endTime", e.target.value)
+                }
+                className={getInputClass(!!errors?.time)}
+              />
+            </div>
+          </div>
+
+          {errors?.date && (
+            <p className="text-sm text-[var(--error-text)]">{errors.date}</p>
+          )}
+
+          {errors?.time && (
+            <p className="text-sm text-[var(--error-text)]">{errors.time}</p>
+          )}
+        </div>
+      </div>
+
+      <div className={cardClass}>
+        <div className={cardContentClass}>
+          <Label className={titleClass}>Event Type / Module</Label>
 
           <div className="flex flex-col gap-2">
-            <Label
-              htmlFor={"event-venue-" + event.eventId}
-              className="text-sm font-medium text-[var(--text-secondary)]"
-            >
-              Venue
-            </Label>
-            {/* <Input
-              id={"event-venue-" + event.eventId}
-              value={event.eventCriteria?.venue || ""}
-              onChange={(e) => onUpdate(event.eventId, "venue", e.target.value)}
-              placeholder="e.g. IT 2-26"
-              className={getInputClass(!!errors?.venue)}
+            <Label className={labelClass}>Event Type</Label>
+
+            <Input
+              value={event.activityType || ""}
+              onChange={(e) =>
+                onUpdate(event.eventId, "activityType", e.target.value)
+              }
+              className={inputClass}
             />
-            {errors?.venue && (
-              <p className="text-sm text-[var(--error-text)]">{errors.venue}</p>
-            )} */}
-          </div>
-        </div>
-      </div>
-
-      {/*date and time*/}
-      <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
-        <div className="flex flex-col gap-4">
-          <Label className="text-sm font-medium text-[var(--text-primary)]">
-            Date & Time
-          </Label>
-          <div className="flex flex-col gap-2">
-            {event.eventCriteria.date && (
-              <>
-                <Label
-                  htmlFor={"event-date-" + event.eventId}
-                  className="text-sm font-medium text-[var(--text-secondary)]"
-                >
-                  Date
-                </Label>
-                <Input
-                  readOnly
-                  id={"event-date-" + event.eventId}
-                  type="date"
-                  value={event.eventCriteria?.date || ""}
-                  onChange={(e) =>
-                    onUpdate(event.eventId, "date", e.target.value)
-                  }
-                  className={getInputClass(!!errors?.date)}
-                />
-              </>
-            )}
-            {event.eventCriteria.dayOfWeek && (
-              <>
-                <Label
-                  htmlFor={"event-date-" + event.eventId}
-                  className="text-sm font-medium text-[var(--text-secondary)]"
-                >
-                  Date
-                </Label>
-                <Input readOnly value={event.eventCriteria.dayOfWeek} />
-              </>
-            )}
-            {errors?.date && (
-              <p className="text-sm text-[var(--error-text)]">{errors.date}</p>
-            )}
-          </div>
-
-          <Label
-            htmlFor={"event-date-" + event.eventId}
-            className="text-sm font-medium text-[var(--text-secondary)]"
-          >
-            Times
-          </Label>
-          <div className="flex flex-row w-full p-2 gap-x-2 justify-around">
-            <Input readOnly value={event.eventCriteria.startTime} />
-            <Input readOnly value={event.eventCriteria.endTime} />
-          </div>
-          {/*<TimeSlotSelect
-            disabled={true}
-            value={timeSlotValue}
-            onChange={handleTimeChange}
-            onRemove={() => { }}
-            error={errors?.time}
-            hideDaySelect
-          />*/}
-        </div>
-      </div>
-
-      {/*event type and module*/}
-      <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
-        <div className="flex flex-col gap-4">
-          <Label className="text-sm font-medium text-[var(--text-primary)]">
-            Event Type / Module Assignment
-          </Label>
-          <div className="flex flex-col gap-2">
-            <Label className="text-sm font-medium text-[var(--text-secondary)]">
-              Event type
-            </Label>
-            <Input readOnly value={event.activityType} />
           </div>
 
           {renderModuleSection()}

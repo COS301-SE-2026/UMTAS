@@ -42,16 +42,14 @@ overrides:
   linkify-it@<=5.0.0: ">=5.0.1"
   linkify-it@<=5.0.1: ">=5.0.2"
   liquidjs@<=10.27.0: ">=10.27.1"
-  multer@>=1.0.0 <2.2.0: ">=2.2.0"
-  multer@>=2.0.0-alpha.1 <2.2.0: ">=2.2.0"
+  multer@<2.3.0: ">=2.3.0"
   nanoid@<3.3.16: ">=3.3.16"
   nanoid@<3.3.18: ">=3.3.18"
   next@>=16.0.0 <16.2.11: ">=16.2.11"
   next@>=16.0.0 <16.2.5: ">=16.2.5"
   next@>=16.0.0 <16.2.6: ">=16.2.6"
-  nodemailer@<=8.0.7: ">=8.0.8"
-  nodemailer@<=8.0.8: ">=8.0.9"
-  nodemailer@<=9.0.0: ">=9.0.1"
+  nodemailer@<9.1.1: ">=9.1.1"
+  nodemailer@>=9.1.1 <10.0.2: ">=10.0.2"
   postcss-selector-parser@>=7.1.0 <7.1.3: ">=7.1.3"
   postcss@<8.5.10: ">=8.5.10"
   postcss@<=8.5.11: ">=8.5.12"
@@ -61,9 +59,15 @@ overrides:
   svgo@>=4.0.0 <4.0.2: ">=4.0.2"
   undici@<6.27.0: ">=6.27.0"
   undici@<6.28.0: ">=6.28.0"
+  undici@>=7.0.0 <7.29.1: ">=7.29.1 <8"
+  undici@>=8.0.0 <8.10.2: ">=8.10.2 <9"
+  undici@8.10.1: 8.10.2
+  cheerio>undici: 8.10.2
   uuid@<11.1.1: ">=11.1.1"
   ws@>=8.0.0 <8.21.0: ">=8.21.0"
   drizzle-orm: 0.45.2
+  "@redocly/openapi-core>js-yaml": 4.3.2
+  "@nestjs/swagger>js-yaml": 5.4.1
 
 importers:
   .:
@@ -134,7 +138,7 @@ importers:
         version: 0.4.6
       "@nestjs-modules/mailer":
         specifier: ^2.3.6
-        version: 2.3.7(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.3)(@nestjs/terminus@11.1.1(@nestjs/axios@4.0.1(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.20.0)(rxjs@7.8.2))(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.3)(reflect-metadata@0.2.2)(rxjs@7.8.2))(bullmq@5.81.4)(chokidar@4.0.3)(nodemailer@9.1.1)(relateurl@0.2.7)(svgo@4.1.0)(terser@5.51.2)
+        version: 2.3.7(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.3)(@nestjs/terminus@11.1.1(@nestjs/axios@4.0.1(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.20.0)(rxjs@7.8.2))(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.3)(reflect-metadata@0.2.2)(rxjs@7.8.2))(bullmq@5.81.4)(chokidar@4.0.3)(nodemailer@10.0.12)(relateurl@0.2.7)(svgo@4.1.0)(terser@5.51.2)
       "@nestjs/axios":
         specifier: ^4.0.1
         version: 4.0.1(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.20.0)(rxjs@7.8.2)
@@ -199,8 +203,8 @@ importers:
         specifier: ^4.18.1
         version: 4.18.1
       nodemailer:
-        specifier: ">=9.0.1"
-        version: 9.1.1
+        specifier: ^10.0.2
+        version: 10.0.12
       pg:
         specifier: ^8.21.0
         version: 8.23.0
@@ -3351,7 +3355,7 @@ packages:
       "@nestjs/event-emitter": ">=2.0.0"
       "@nestjs/terminus": ">=10.0.0"
       bullmq: ">=4.0.0"
-      nodemailer: ">=9.0.1"
+      nodemailer: ">=9.1.1"
     peerDependenciesMeta:
       "@nestjs/event-emitter":
         optional: true
@@ -7738,13 +7742,6 @@ packages:
         integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==,
       }
 
-  concat-stream@2.0.0:
-    resolution:
-      {
-        integrity: sha512-MWufYdFw53ccGjCA+Ol7XJYpAlW6/prSMzuPOTRnJGcGzuhLn4Scrz7qf6o8bROZ514ltazcIFJZevcfbo0x7A==,
-      }
-    engines: { "0": node >= 6.0 }
-
   concurrently@10.0.5:
     resolution:
       {
@@ -11265,24 +11262,10 @@ packages:
         integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==,
       }
 
-  js-yaml@4.3.1:
-    resolution:
-      {
-        integrity: sha512-CY6crGq313MX8GkwvB7tzgp99vjQxY1++5y10/BKN/GUfHqWaOGQMNZkBvqSzsZKWk/ijwHlWzzkLulsGHhjWQ==,
-      }
-    hasBin: true
-
   js-yaml@4.3.2:
     resolution:
       {
         integrity: sha512-SFNOvSJ+Dgf/9An904Yx+CgSlIPCkIpao4qo51lpee25TIRejdH3rhR4EZMGoNx3/TP3O+wzWuiTFl4sqbltzA==,
-      }
-    hasBin: true
-
-  js-yaml@5.3.0:
-    resolution:
-      {
-        integrity: sha512-muutsYr+e2+d3rTgUGslq5rxbBlUy3cJ61IsHag2QNDQV+7zXWjkUpmALIajhrlLlrgRUiymj6U3zUr/TMK84Q==,
       }
     hasBin: true
 
@@ -12272,10 +12255,10 @@ packages:
         integrity: sha512-cef05H/dSYpLpqp3sj/qyZh5vhUYCalnaLO7j1yOmpsR0y/XwLVtK7r5gn+U/F7CTEfMowcGhlUQJDLcLf7jcA==,
       }
 
-  multer@2.2.0:
+  multer@2.4.0:
     resolution:
       {
-        integrity: sha512-6rdyFg2kLrMh9Jee7/BMPuV9lEAd7lLW2YUpF9/YxR7njyoUwwQ0ZPh3TaIY50Sw6vlyD2HW3wGOkTS4P79xrQ==,
+        integrity: sha512-7dqa0ZcFfzbefdTuIkzOSMvZWC0J7FLqBOjJUZvDCXShIURWKxAyTT1wHhnE5q19c7jOJf43IYYKjBmZVZmvhg==,
       }
     engines: { node: ">= 10.16.0" }
 
@@ -12427,19 +12410,12 @@ packages:
       }
     engines: { node: ">=18" }
 
-  nodemailer@9.0.6:
+  nodemailer@10.0.12:
     resolution:
       {
-        integrity: sha512-IQUGFdhdGwI9+AWX+FpUt4DLmvFaOjTMEoneTIWX/RXxuy1TdenPwWrvFMSfLkPKl+HQEXWuSAxEMMbPYXtBmg==,
+        integrity: sha512-PQ46oNbNMuH/Sno7B5IWIU9etytwrO0xdTFvWXpIQFRXhBAXtzD48243AS+BCbQQTPD8y3fqUrgLn0tSo77gvg==,
       }
-    engines: { node: ">=6.0.0" }
-
-  nodemailer@9.1.1:
-    resolution:
-      {
-        integrity: sha512-izw9mVKFix6YSnC9eLgV6g1opl9DUlRio9ZNcq+Wu9Ujn2UwF+8Nl0B8nz22kEC+CTZCvinkxwJ0DeFbb6NwcQ==,
-      }
-    engines: { node: ">=6.0.0" }
+    engines: { node: ">=20.0.0" }
 
   nopt@7.2.1:
     resolution:
@@ -15306,12 +15282,6 @@ packages:
       }
     engines: { node: ">= 0.4" }
 
-  typedarray@0.0.6:
-    resolution:
-      {
-        integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==,
-      }
-
   typescript-eslint@8.69.0:
     resolution:
       {
@@ -15391,17 +15361,17 @@ packages:
         integrity: sha512-WRNW+sJgj5OBN4/0JpHFqtqzhpbnV0GuB+OozA9gCL7a993SmU+1JBZCzLNxYsbMfIeDL+lTsphD5jN5N+n0zg==,
       }
 
-  undici@7.29.0:
+  undici@7.30.0:
     resolution:
       {
-        integrity: sha512-IDxfleLmmbSskfWSUATiN1nfn2rDuvnMOqb5CWR92iIfojA0Ud+ulOAAEQ57LPr9rWmsreUyf5lwyao+7GNNVw==,
+        integrity: sha512-dkrQXeHSaoamnItlYbmzG0wFYrM0ZwDxCIg0A7aKjTyyhh9svRzCNFEzV+Vm05/yehjCzjDZ31KXfGEjYSztDQ==,
       }
     engines: { node: ">=20.18.1" }
 
-  undici@8.10.1:
+  undici@8.10.2:
     resolution:
       {
-        integrity: sha512-YQ3WlbqjYMmNpdvDH64jAgLjxuAR9+649calDWhbshYaeQGO2bR4nI94ORJmwI3J9YhoKQnpyGOK+0zlWS5N5Q==,
+        integrity: sha512-/y4/bH9YNU5hi9NIrpOuvGXFcxrj3CMrV+/AYpowAYTpHn8gX/XPFjNy766FPoYY0miQhdW977JFWKGNhBdwyQ==,
       }
     engines: { node: ">=22.19.0" }
 
@@ -16841,7 +16811,7 @@ snapshots:
       open: 8.4.2
       picomatch: 4.0.7
       systeminformation: 5.33.7
-      undici: 7.29.0
+      undici: 7.30.0
       which: 4.0.0
       yocto-spinner: 1.2.2
 
@@ -18014,13 +17984,13 @@ snapshots:
       "@tybys/wasm-util": 0.10.3
     optional: true
 
-  "@nestjs-modules/mailer@2.3.7(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.3)(@nestjs/terminus@11.1.1(@nestjs/axios@4.0.1(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.20.0)(rxjs@7.8.2))(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.3)(reflect-metadata@0.2.2)(rxjs@7.8.2))(bullmq@5.81.4)(chokidar@4.0.3)(nodemailer@9.1.1)(relateurl@0.2.7)(svgo@4.1.0)(terser@5.51.2)":
+  "@nestjs-modules/mailer@2.3.7(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.3)(@nestjs/terminus@11.1.1(@nestjs/axios@4.0.1(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.20.0)(rxjs@7.8.2))(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.3)(reflect-metadata@0.2.2)(rxjs@7.8.2))(bullmq@5.81.4)(chokidar@4.0.3)(nodemailer@10.0.12)(relateurl@0.2.7)(svgo@4.1.0)(terser@5.51.2)":
     dependencies:
       "@css-inline/css-inline": 0.20.0
       "@nestjs/common": 11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       "@nestjs/core": 11.2.3(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.2.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       glob: 13.0.6
-      nodemailer: 9.1.1
+      nodemailer: 10.0.12
       tslib: 2.8.1
     optionalDependencies:
       "@nestjs/terminus": 11.1.1(@nestjs/axios@4.0.1(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.20.0)(rxjs@7.8.2))(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -18144,7 +18114,7 @@ snapshots:
       "@nestjs/core": 11.2.3(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.2.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       cors: 2.8.6
       express: 5.2.1
-      multer: 2.2.0
+      multer: 2.4.0
       path-to-regexp: 8.4.2
       tslib: 2.8.1
     transitivePeerDependencies:
@@ -18169,7 +18139,7 @@ snapshots:
       "@nestjs/common": 11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       "@nestjs/core": 11.2.3(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.2.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       "@nestjs/mapped-types": 2.1.1(@nestjs/common@11.2.3(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
-      js-yaml: 5.3.0
+      js-yaml: 5.4.1
       lodash: 4.18.1
       path-to-regexp: 8.4.2
       reflect-metadata: 0.2.2
@@ -19207,7 +19177,7 @@ snapshots:
       colorette: 1.4.0
       https-proxy-agent: 7.0.6(supports-color@10.2.2)
       js-levenshtein: 1.1.6
-      js-yaml: 4.3.1
+      js-yaml: 4.3.2
       minimatch: 5.1.9
       pluralize: 8.0.0
       yaml-ast-parser: 0.0.43
@@ -20780,7 +20750,7 @@ snapshots:
       parse5: 7.3.0
       parse5-htmlparser2-tree-adapter: 7.1.0
       parse5-parser-stream: 7.1.2
-      undici: 8.10.1
+      undici: 8.10.2
       whatwg-mimetype: 4.0.0
     optional: true
 
@@ -20928,13 +20898,6 @@ snapshots:
   component-emitter@1.3.1: {}
 
   concat-map@0.0.1: {}
-
-  concat-stream@2.0.0:
-    dependencies:
-      buffer-from: 1.1.2
-      inherits: 2.0.4
-      readable-stream: 3.6.2
-      typedarray: 0.0.6
 
   concurrently@10.0.5:
     dependencies:
@@ -23789,15 +23752,7 @@ snapshots:
 
   js-tokens@4.0.0: {}
 
-  js-yaml@4.3.1:
-    dependencies:
-      argparse: 2.0.1
-
   js-yaml@4.3.2:
-    dependencies:
-      argparse: 2.0.1
-
-  js-yaml@5.3.0:
     dependencies:
       argparse: 2.0.1
 
@@ -24125,7 +24080,7 @@ snapshots:
       iconv-lite: 0.7.3
       libmime: 5.4.2
       linkify-it: 5.0.2
-      nodemailer: 9.0.6
+      nodemailer: 10.0.12
       punycode.js: 2.3.1
       tlds: 1.261.0
     optional: true
@@ -24699,11 +24654,10 @@ snapshots:
     optionalDependencies:
       msgpackr-extract: 3.0.4
 
-  multer@2.2.0:
+  multer@2.4.0:
     dependencies:
       append-field: 1.0.0
       busboy: 1.6.0
-      concat-stream: 2.0.0
       type-is: 1.6.18
 
   mute-stream@2.0.0: {}
@@ -24819,10 +24773,7 @@ snapshots:
 
   node-releases@2.0.54: {}
 
-  nodemailer@9.0.6:
-    optional: true
-
-  nodemailer@9.1.1: {}
+  nodemailer@10.0.12: {}
 
   nopt@7.2.1:
     dependencies:
@@ -25512,7 +25463,7 @@ snapshots:
       fixpack: 4.0.0
       get-port: 5.1.1
       mailparser: 3.9.17
-      nodemailer: 9.1.1
+      nodemailer: 10.0.12
       open: 7.4.2
       p-event: 4.2.0
       p-wait-for: 3.2.0
@@ -26182,7 +26133,7 @@ snapshots:
       tailwind-merge: 3.6.0
       ts-morph: 26.0.0
       tsconfig-paths: 4.2.0
-      undici: 7.29.0
+      undici: 7.30.0
       validate-npm-package-name: 7.0.2
       zod: 3.25.76
       zod-to-json-schema: 3.25.2(zod@3.25.76)
@@ -26925,8 +26876,6 @@ snapshots:
       possible-typed-array-names: 1.1.0
       reflect.getprototypeof: 1.0.10
 
-  typedarray@0.0.6: {}
-
   typescript-eslint@8.69.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3):
     dependencies:
       "@typescript-eslint/eslint-plugin": 8.69.0(@typescript-eslint/parser@8.69.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
@@ -26967,9 +26916,9 @@ snapshots:
 
   undici-types@7.24.6: {}
 
-  undici@7.29.0: {}
+  undici@7.30.0: {}
 
-  undici@8.10.1:
+  undici@8.10.2:
     optional: true
 
   unicorn-magic@0.3.0: {}

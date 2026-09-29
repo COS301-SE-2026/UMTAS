@@ -26,6 +26,12 @@ import { CourseSelect } from "./selectedCourse";
 import { useMutation } from "@tanstack/react-query";
 import { addModuleToCourseQ } from "@/app/course-management/queries/courses/courseQueries";
 import EditModuleEvent from "./editModuleEvent";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/atoms/baseShadcn/dialog";
 
 interface DataTableProps<TData> {
   columns: (ColumnDef<TData, string> | ColumnDef<TData, EventResponse[]>)[];
@@ -61,14 +67,20 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
       </Table>
 
       {showModPopup && (
-        <Popup>
-          <div className="w-full h-full flex flex-col items-center justify-center p-4">
+        <Dialog open onOpenChange={(open) => !open && updateModPopup(false)}>
+          <DialogContent className="w-[480px] max-w-[95vw] sm:max-w-[480px] bg-[var(--bg-surface)]">
+            {" "}
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold">
+                Edit Module and Events
+              </DialogTitle>
+            </DialogHeader>
             <EditModuleEvent
               data={dataState}
               onClose={() => updateModPopup(false)}
             />
-          </div>
-        </Popup>
+          </DialogContent>
+        </Dialog>
       )}
     </>
   );

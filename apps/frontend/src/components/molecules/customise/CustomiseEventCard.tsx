@@ -82,18 +82,6 @@ export function CustomiseEventCard({
   }
 
   function renderModuleField() {
-    if (modules.length === 0) {
-      return (
-        <button
-          type="button"
-          onClick={onGoToModules}
-          className="text-sm underline text-[var(--text-secondary)] text-left transition-colors duration-[var(--duration-fast)] hover:text-[var(--text-primary)]"
-        >
-          No modules yet, go back to Step 1 to create some.
-        </button>
-      );
-    }
-
     return (
       <Select
         value={String(event.eventCriteria?.moduleId || "")}
@@ -147,7 +135,7 @@ export function CustomiseEventCard({
   return (
     <div className="flex flex-col gap-4">
       {/*name, code en venue*/}
-      <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+      <div>
         <div className="flex flex-col gap-4">
           <Label className="text-sm font-medium text-[var(--text-primary)]">
             General
@@ -198,7 +186,7 @@ export function CustomiseEventCard({
           </div>
         </div>
       </div>
-      <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+      <div>
         <div className="flex flex-col gap-4">
           <Label className="text-sm font-medium text-[var(--text-primary)]">
             Location
@@ -351,8 +339,16 @@ export function CustomiseEventCard({
         )}
       </div>
 
+      <TimeSlotSelect
+        value={timeSlotValue}
+        onChange={handleTimeChange}
+        onRemove={() => {}}
+        error={errors?.time}
+        hideDaySelect
+      />
+
       {/*event type and module*/}
-      <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+      <div>
         <div className="flex flex-col gap-4">
           <Label className="text-sm font-medium text-[var(--text-primary)]">
             Event Type / Module Assignment

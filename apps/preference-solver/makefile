@@ -49,6 +49,7 @@ SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)\
 
 
 OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_FILES))
+-include $(OBJS:.o=.d)
 
 OPEN_GA_URL := https://github.com/Arash-codedev/openGA/archive/v1.0.5.zip
 OPEN_GA_HEADER := $(LIB_DIR)/openGA.hpp
@@ -74,7 +75,7 @@ $(TARGET): $(OBJS) | $(DEPENDENCY_HEADERS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(DEPENDENCY_HEADERS)
 	@mkdir -p $(dir $@)
-	$(CXX) $(CFLAGS) -c $< -o $@
+	$(CXX) $(CFLAGS) -MMD -MP -c $< -o $@
 
 $(LOCAL_ORTOOLS_HEADER):
 	@echo "OR-Tools not found on system. Downloading C++ binaries to $(LOCAL_ORTOOLS_DIR)..."

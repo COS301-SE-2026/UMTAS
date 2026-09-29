@@ -2,6 +2,7 @@ import {
   DETECT_DATA_MESSAGE,
   DETECT_MESSAGE,
   MessageType,
+  VisionModelSize,
 } from "./messageTypes";
 
 class DetectionManager {
@@ -23,6 +24,7 @@ class DetectionManager {
     PixelData: Uint8ClampedArray,
     width: number,
     height: number,
+    modelSize: VisionModelSize,
   ): Promise<Float32Array[] | null> {
     if (this.isProcessing || !this.worker) {
       return Promise.resolve(null);
@@ -39,9 +41,6 @@ class DetectionManager {
           this.isProcessing = false;
 
           const durationSeconds = (performance.now() - startTime) / 1000;
-          console.log(
-            `Detection pipeline took: ${durationSeconds.toFixed(3)}s`,
-          );
 
           resolve(message.payload.results);
         }
@@ -54,6 +53,7 @@ class DetectionManager {
           height: height,
           pixelData: PixelData,
           width: width,
+          modelSize: modelSize,
         },
       };
 

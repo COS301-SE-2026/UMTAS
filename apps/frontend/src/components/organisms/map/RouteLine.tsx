@@ -4,10 +4,19 @@ import { AdvancedMarker } from "@vis.gl/react-google-maps";
 interface RouteLineProps {
   path: { lat: number; lng: number }[];
   colour?: string;
+  onClick?: () => void;
+  onHover?: (position: { x: number; y: number }) => void;
+  onHoverEnd?: () => void;
 }
 
-export function RouteLine({ path, colour }: RouteLineProps) {
-  useRouteLine({ path, colour });
+export function RouteLine({
+  path,
+  colour,
+  onClick,
+  onHover,
+  onHoverEnd,
+}: RouteLineProps) {
+  useRouteLine({ path, colour, onClick, onHover, onHoverEnd });
 
   if (!path || path.length <= 0) {
     return null;

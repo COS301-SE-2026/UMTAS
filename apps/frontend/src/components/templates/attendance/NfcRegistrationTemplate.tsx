@@ -11,6 +11,18 @@ import {
   UniversityStateLoading,
   useUniversityState,
 } from "@/hooks/useUniversityState";
+import Tutorial from "@/components/organisms/nav/Tutorial";
+
+const steps = [
+  {
+    target: "#nfc-registration-header",
+    content: "Register and manage the NFC sticker used for attendance.",
+  },
+  {
+    target: "#btn-register-sticker",
+    content: "Register your nfc sticker.",
+  },
+];
 
 export default function NfcRegistrationTemplate() {
   const { university, isLoading } = useUniversityState();
@@ -34,10 +46,11 @@ export default function NfcRegistrationTemplate() {
   }
 
   return (
-    <div className="flex w-full flex-col items-center gap-6 px-6 pt-6">
-      <div className="w-full max-w-6xl overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
+    <div className="w-full px-8 pt-6">
+      <Tutorial steps={steps} wait={true} />
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
         <AttendancePageHeader
-          className="px-5 py-4"
+          className="w-full border-b border-[var(--border)] pb-4"
           title="Register NFC sticker"
           description="Set up, replace and test the NFC sticker used for attendance."
           action={
@@ -50,9 +63,7 @@ export default function NfcRegistrationTemplate() {
           }
         />
 
-        <div className="mx-auto w-full max-w-3xl p-5">
-          <NfcTagRegistrationPanel />
-        </div>
+        <NfcTagRegistrationPanel />
       </div>
     </div>
   );

@@ -1,1 +1,7 @@
-export { ALL_SEED_MODULES } from './Modules.constants';
+export {
+  ALL_SEED_MODULES,
+  ATTENDANCE_DEMO_MODULE_CODES,
+  ALL_CS_SEED_MODULES,
+  ALL_AS_SEED_MODULES,
+  ALL_PH_SEED_MODULES,
+} from './Modules.constants';

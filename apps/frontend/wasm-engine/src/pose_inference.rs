@@ -19,6 +19,10 @@ pub struct DetectedPersonPose {
     pub left_arm: Vec<Keypoint>, // 2 points
     pub right_shoulder: Keypoint,
     pub right_arm: Vec<Keypoint>, // 2 points
+    pub left_eye: Keypoint,
+    pub right_eye: Keypoint,
+    pub left_ear: Keypoint,
+    pub right_ear: Keypoint,
 }
 
 #[wasm_bindgen]
@@ -65,6 +69,12 @@ pub fn infer_pose_data(
 
     all_people.extend(full_image_people);
     all_people.extend(quadrant_people);
+    all_people.sort_by(|a, b| {
+        b.person
+            .confidence
+            .partial_cmp(&a.person.confidence)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
 
     let res_people = non_maximum_sepression(all_people, 0.30);
 
@@ -83,8 +93,8 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
     let mut people: Vec<DetectedPersonPose> = Vec::new();
 
     const NUM_FEATURES: usize = 56;
-    const CONFIDENCE_THRESHOLD: f32 = 0.15;
-    const KEYPOINT_CONFIDENCE_THRESHOLD: f32 = 0.1;
+    const CONFIDENCE_THRESHOLD: f32 = 0.05;
+    const KEYPOINT_CONFIDENCE_THRESHOLD: f32 = 0.4;
 
     if slice_data.is_empty() || slice_data.len() % NUM_FEATURES != 0 {
         return Err(format!(
@@ -109,6 +119,10 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
             let top_left_y = center_y - height / 2.0;
 
             let nose = get_kp(slice_data, 0, anchor_idx, num_anchors);
+            let left_eye = get_kp(slice_data, 1, anchor_idx, num_anchors);
+            let right_eye = get_kp(slice_data, 2, anchor_idx, num_anchors);
+            let left_ear = get_kp(slice_data, 3, anchor_idx, num_anchors);
+            let right_ear = get_kp(slice_data, 4, anchor_idx, num_anchors);
             let left_shoulder = get_kp(slice_data, 5, anchor_idx, num_anchors);
             let right_shoulder = get_kp(slice_data, 6, anchor_idx, num_anchors);
 
@@ -146,6 +160,10 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
                 right_arm: vec![right_elbow, right_wrist],
                 center_mass: shoulder_midpoint,
                 nose,
+                left_eye,
+                right_eye,
+                left_ear,
+                right_ear,
             });
         }
     }
@@ -160,6 +178,8 @@ pub fn map_to_global(
     let (offset_x, offset_y) = match quad_idx {
         0 => (0.0, 0.0),
         1 => (640.0, 0.0),
+        2 => (0.0, 640.0),
+        3 => (640.0, 640.0),
         _ => (0.0, 0.0),
     };
 
@@ -175,6 +195,10 @@ pub fn map_to_global(
         transform_keypoint(&mut person.center_mass, offset_x, offset_y);
         transform_keypoint(&mut person.left_shoulder, offset_x, offset_y);
         transform_keypoint(&mut person.right_shoulder, offset_x, offset_y);
+        transform_keypoint(&mut person.left_eye, offset_x, offset_y);
+        transform_keypoint(&mut person.right_eye, offset_x, offset_y);
+        transform_keypoint(&mut person.left_ear, offset_x, offset_y);
+        transform_keypoint(&mut person.right_ear, offset_x, offset_y);
 
         for kp in &mut person.left_arm {
             transform_keypoint(kp, offset_x, offset_y);

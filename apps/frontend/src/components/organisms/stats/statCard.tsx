@@ -31,7 +31,7 @@ export default function StatCard({
   value,
 }: StatsProps) {
   return (
-    <Card className={className}>
+    <Card className="bg-(--bg-surface) shadow-md">
       <CardHeader className="flex flex-row justify-between items-center pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         {icon}

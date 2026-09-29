@@ -82,18 +82,6 @@ export function EventCard({
   }
 
   function renderModuleField() {
-    if (modules.length === 0) {
-      return (
-        <button
-          type="button"
-          onClick={onGoToModules}
-          className="text-sm underline text-[var(--text-secondary)] text-left transition-colors duration-[var(--duration-fast)] hover:text-[var(--text-primary)]"
-        >
-          No modules yet, go back to Step 1 to create some.
-        </button>
-      );
-    }
-
     return (
       <Select
         value={String(event.eventCriteria?.moduleId)}

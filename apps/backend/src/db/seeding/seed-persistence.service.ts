@@ -25,6 +25,7 @@ import {
   UserTimetable,
   Venue,
   Building,
+  EventAttendance,
 } from '../../entities';
 
 @Injectable()
@@ -265,6 +266,16 @@ export class SeedPersistenceService {
   ) {
     return db
       .insert(Building)
+      .values([...values])
+      .returning();
+  }
+
+  insertEventAttendances(
+    db: AppDatabase,
+    values: readonly (typeof EventAttendance.$inferInsert)[],
+  ) {
+    return db
+      .insert(EventAttendance)
       .values([...values])
       .returning();
   }

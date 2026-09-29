@@ -103,7 +103,15 @@ export interface SinglePersonSessionData {
 
   hand_up: boolean; // used if their hand is up wasm sets this to yes
   // main inference function on all session data will use this to detect when
+  gaze: GazeDir;
 }
+
+export interface GazeDir {
+  looking_left: boolean;
+  looking_right: boolean;
+  looking_straight: boolean;
+}
+
 // returned by the wasm once all analysis is done
 export interface frameStore {
   frame_number: number;

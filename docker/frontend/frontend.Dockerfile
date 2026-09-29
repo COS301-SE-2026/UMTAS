@@ -15,7 +15,12 @@ WORKDIR /app
 
 COPY apps/frontend/public/models ./apps/frontend/public/models
 
-RUN if [ ! -f apps/frontend/public/models/yolo26n.onnx ] || [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ]; then \
+# Set to any value to use empty placeholder models (e.g. e2e builds, which never load them).
+ARG SKIP_ML_MODELS=""
+RUN if [ -n "$SKIP_ML_MODELS" ]; then \
+    mkdir -p apps/frontend/public/models && \
+    touch apps/frontend/public/models/yolo26n.onnx apps/frontend/public/models/yolo26n-pose.onnx; \
+    elif [ ! -f apps/frontend/public/models/yolo26n.onnx ] || [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ]; then \
     python3 -m venv .venv && \
     .venv/bin/pip install --no-cache-dir ultralytics onnx onnxruntime && \
     if [ ! -f apps/frontend/public/models/yolo26n.onnx ]; then \

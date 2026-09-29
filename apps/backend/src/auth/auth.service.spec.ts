@@ -17,6 +17,7 @@ import {
   mockTransaction,
 } from '../Testing/Mocks/database.helpers';
 import { MockUserRole } from './auth.dto';
+import { ServiceUnavailableException } from '@nestjs/common';
 
 jest.mock('../redis/redis');
 
@@ -433,7 +434,7 @@ describe('AuthService', () => {
       const { mockDb: database } = createMockDatabase();
       mockTransaction(database, ops);
       const local = new AuthService(
-        { db: database } as never,
+        { db: database, dbMode: 'DATABASE' } as never,
         {
           sendResetPasswordEmail: jest.fn(),
           sendVerificationEmail: jest.fn(),
@@ -539,7 +540,161 @@ describe('AuthService', () => {
       });
       expect(database.delete).toHaveBeenCalledTimes(1);
     });
+
+    it('returns an existing user without creating a new one', async () => {
+      const { local, createUser } = mockUserHarness({
+        select: [[{ id: 'existing-user', email: 'existing@simulation.com' }]],
+      });
+
+      await expect(
+        local.createMockUser({
+          email: 'existing@simulation.com',
+          password: 'Existing!Password',
+        }),
+      ).resolves.toEqual({
+        email: 'existing@simulation.com',
+        password: 'Existing!Password',
+        uniId: undefined,
+      });
+      expect(createUser).not.toHaveBeenCalled();
+    });
+
+    it('compensates by deleting the created user when the university is missing', async () => {
+      const { database, local } = mockUserHarness({
+        select: [[{ total: 0 }], [], []],
+        update: [[]],
+        delete: [[]],
+      });
+
+      await expect(local.createGuestUser()).rejects.toThrow(
+        ServiceUnavailableException,
+      );
+      expect(database.delete).toHaveBeenCalled();
+    });
+
+    it('logs a warning when the compensation delete also fails', async () => {
+      const { database, local } = mockUserHarness({
+        select: [[{ total: 0 }], [], []],
+        update: [[]],
+      });
+      (database.delete as jest.Mock).mockImplementation(() => {
+        throw new Error('compensation failed');
+      });
+
+      await expect(local.createGuestUser()).rejects.toThrow(
+        ServiceUnavailableException,
+      );
+      expect(database.delete).toHaveBeenCalled();
+    });
+
+    it('resolves a provisioned university by name when provided', async () => {
+      const { local } = mockUserHarness({
+        select: [[{ total: 0 }], [], [{ uniID: 'pretoria-uni' }]],
+        update: [[]],
+        insert: [[{ UserID: 'created-user' }]],
+      });
+
+      await expect(local.createGuestUser()).resolves.toEqual({
+        email: expect.stringMatching(/^guest\+.+@simulation\.com$/),
+        password: expect.any(String),
+        userId: 'created-user',
+        uniId: 'pretoria-uni',
+      });
+    });
+
+    it('rejects guest creation once 200 guests exist in the last day', async () => {
+      const { database, local, createUser } = mockUserHarness({
+        select: [[{ total: 200 }]],
+      });
+
+      await expect(local.createGuestUser()).rejects.toThrow(
+        ServiceUnavailableException,
+      );
+      expect(database.execute).toHaveBeenCalledTimes(1);
+      expect(createUser).not.toHaveBeenCalled();
+    });
   });
+
+  describe('Test_removeProvisionedUser', () => {
+    it('should delete the user without throwing', async () => {
+      //Arrange
+      const { mockDb: database } = createMockDatabase();
+      mockDbResult(database.delete, []);
+      const local = new AuthService(
+        { db: database } as never,
+        {
+          sendResetPasswordEmail: jest.fn(),
+          sendVerificationEmail: jest.fn(),
+        } as never,
+      );
+
+      //Act + Assert
+      await expect(
+        local.removeProvisionedUser('user-1'),
+      ).resolves.toBeUndefined();
+      expect(database.delete).toHaveBeenCalled();
+    });
+
+    it('should swallow errors when the delete fails', async () => {
+      //Arrange
+      const { mockDb: database } = createMockDatabase();
+      (database.delete as jest.Mock).mockImplementation(() => {
+        throw new Error('db down');
+      });
+      const local = new AuthService(
+        { db: database } as never,
+        {
+          sendResetPasswordEmail: jest.fn(),
+          sendVerificationEmail: jest.fn(),
+        } as never,
+      );
+
+      //Act + Assert
+      await expect(
+        local.removeProvisionedUser('user-1'),
+      ).resolves.toBeUndefined();
+    });
+  }); //END_Test_removeProvisionedUser
+
+  describe('Test_deleteMockUsers', () => {
+    it('should run in a transaction when no tx is provided', async () => {
+      //Arrange
+      const { mockDb: database } = createMockDatabase();
+      mockTransaction(database, { delete: [[{ id: 'one' }, { id: 'two' }]] });
+      const local = new AuthService(
+        { db: database } as never,
+        {
+          sendResetPasswordEmail: jest.fn(),
+          sendVerificationEmail: jest.fn(),
+        } as never,
+      );
+
+      //Act
+      const result = await local.deleteMockUsers();
+
+      //Assert
+      expect(result).toEqual({ success: true, message: 'Deleted 2 users.' });
+    });
+
+    it('should use the provided tx directly', async () => {
+      //Arrange
+      const { mockDb: database } = createMockDatabase();
+      mockDbResult(database.delete, [{ id: 'one' }]);
+      const local = new AuthService(
+        { db: {} as never } as never,
+        {
+          sendResetPasswordEmail: jest.fn(),
+          sendVerificationEmail: jest.fn(),
+        } as never,
+      );
+
+      //Act
+      const result = await local.deleteMockUsers(database);
+
+      //Assert
+      expect(result.message).toBe('Deleted 1 users.');
+    });
+  }); //END_Test_deleteMockUsers
 
   function roleHarness(results: unknown[][]) {
     const { mockDb } = createMockDatabase();

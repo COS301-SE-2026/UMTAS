@@ -1,20 +1,20 @@
 "use client";
 
-import { Alert, AlertDescription } from "@/components/atoms/baseShadcn/alert";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/atoms/baseShadcn/alert";
 import { Badge } from "@/components/atoms/baseShadcn/badge";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/atoms/baseShadcn/card";
+
 import { Progress } from "@/components/atoms/baseShadcn/progress";
-import { Download, Loader2 } from "lucide-react";
+import Popup from "@/components/atoms/utility/floatContainer";
+import { BookOpen, Download, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import VM_GUIDE from "./setupGuide";
 
 type NavigatorWithGPU = Navigator & {
   gpu?: {
@@ -24,16 +24,33 @@ type NavigatorWithGPU = Navigator & {
 
 type SetupStatus = "idle" | "installing" | "ready" | "error";
 
-const MODEL_KEY = "vision-model-ready";
+const MODEL_KEY = "vision-model-ready-v3";
+const CACHE_NAME = "vision-models-v3";
 
 const MODELS = [
   {
-    name: "Person Detection Model",
-    url: "https://huggingface.co/zwh20081/yolo26-onnx/resolve/main/yolo26n.onnx",
+    name: "Nano Detection Model",
+    url: "/models/yolo26n.onnx",
   },
   {
-    name: "Pose Estimation Model",
-    url: "https://huggingface.co/zwh20081/yolo26-onnx/resolve/main/yolo26n-pose.onnx",
+    name: "Nano Pose Model",
+    url: "/models/yolo26n-pose.onnx",
+  },
+  {
+    name: "Small Detection Model",
+    url: "/models/yolo26s.onnx",
+  },
+  {
+    name: "Small Pose Model",
+    url: "/models/yolo26s-pose.onnx",
+  },
+  {
+    name: "Medium Detection Model",
+    url: "/models/yolo26m.onnx",
+  },
+  {
+    name: "Medium Pose Model",
+    url: "/models/yolo26m-pose.onnx",
   },
 ];
 
@@ -42,34 +59,57 @@ export default function VisionModelSetupPage() {
 
   const [status, setStatus] = useState<SetupStatus>("idle");
   const [error, setError] = useState<string | null>(null);
-
   const [progress, setProgress] = useState(0);
   const [currentModel, setCurrentModel] = useState<string | null>(null);
   const [downloadedMb, setDownloadedMb] = useState(0);
   const [totalMb, setTotalMb] = useState<number | null>(null);
+  const [showGuide, setShowGuide] = useState<boolean>(false);
 
-  async function downloadModel(
-    url: string,
-    modelIndex: number,
-  ): Promise<ArrayBuffer> {
-    const response = await fetch(url, {
-      cache: "force-cache",
-    });
+  useEffect(() => {
+    async function checkExistingCache() {
+      if (localStorage.getItem(MODEL_KEY) !== "true") return;
+
+      try {
+        const cache = await caches.open(CACHE_NAME);
+        const cachedModels = await Promise.all(
+          MODELS.map((model) => cache.match(model.url)),
+        );
+
+        if (cachedModels.every(Boolean)) {
+          setStatus("ready");
+          setProgress(100);
+          return;
+        }
+
+        localStorage.removeItem(MODEL_KEY);
+      } catch {
+        localStorage.removeItem(MODEL_KEY);
+      }
+    }
+
+    void checkExistingCache();
+  }, []);
+
+  async function cacheModel(url: string, modelIndex: number): Promise<void> {
+    const cache = await caches.open(CACHE_NAME);
+    const cachedResponse = await cache.match(url);
+
+    if (cachedResponse) return;
+
+    const response = await fetch(url);
 
     if (!response.ok) {
       throw new Error(
-        `Model download failed with ${response.status} ${response.statusText}. Please check your connection and try again.`,
+        `The vision model could not be downloaded (${response.status}).`,
       );
     }
 
     if (!response.body) {
-      throw new Error(
-        "Your browser does not support streamed downloads. Please use a supported browser.",
-      );
+      throw new Error("This browser cannot stream the vision model download.");
     }
 
+    const cachePromise = cache.put(url, response.clone());
     const reader = response.body.getReader();
-
     const contentLength = response.headers.get("content-length");
     const totalBytes = contentLength ? Number(contentLength) : null;
 
@@ -80,21 +120,17 @@ export default function VisionModelSetupPage() {
     );
 
     let receivedBytes = 0;
-    const chunks: Uint8Array[] = [];
 
     while (true) {
       const { done, value } = await reader.read();
 
       if (done) break;
 
-      chunks.push(value);
       receivedBytes += value.length;
-
       setDownloadedMb(Number((receivedBytes / 1024 / 1024).toFixed(1)));
 
       if (totalBytes) {
         const modelProgress = receivedBytes / totalBytes;
-
         const overallProgress =
           (modelIndex / MODELS.length) * 100 +
           modelProgress * (100 / MODELS.length);
@@ -103,16 +139,7 @@ export default function VisionModelSetupPage() {
       }
     }
 
-    const combined = new Uint8Array(receivedBytes);
-
-    let offset = 0;
-
-    for (const chunk of chunks) {
-      combined.set(chunk, offset);
-      offset += chunk.length;
-    }
-
-    return combined.buffer;
+    await cachePromise;
   }
 
   async function prepareModels() {
@@ -122,12 +149,22 @@ export default function VisionModelSetupPage() {
     setDownloadedMb(0);
     setTotalMb(null);
 
+    const toastId = toast.loading("Preparing Lecture Watch", {
+      description: "Checking WebGPU and preparing the vision models.",
+    });
+
     try {
+      if (!window.isSecureContext) {
+        throw new Error(
+          "Lecture Watch requires HTTPS or localhost so the browser can use WebGPU safely.",
+        );
+      }
+
       const gpu = (navigator as NavigatorWithGPU).gpu;
 
       if (!gpu) {
         throw new Error(
-          "WebGPU is not available in this browser. Please use a browser with WebGPU support.",
+          "WebGPU is not available. Use an up-to-date Chrome browser with graphics acceleration enabled.",
         );
       }
 
@@ -135,7 +172,7 @@ export default function VisionModelSetupPage() {
 
       if (!adapter) {
         throw new Error(
-          "A compatible graphics adapter could not be found. Try updating your browser or device drivers.",
+          "Chrome could not access a compatible GPU. Check hardware acceleration and the WebGPU demo settings below.",
         );
       }
 
@@ -146,8 +183,7 @@ export default function VisionModelSetupPage() {
         setDownloadedMb(0);
         setTotalMb(null);
 
-        await downloadModel(model.url, i);
-
+        await cacheModel(model.url, i);
         setProgress(((i + 1) / MODELS.length) * 100);
       }
 
@@ -156,96 +192,93 @@ export default function VisionModelSetupPage() {
       setCurrentModel(null);
       setProgress(100);
       setStatus("ready");
+
+      toast.success("Lecture Watch is ready", {
+        id: toastId,
+        description: "The required vision models are available on this device.",
+      });
     } catch (err) {
       console.error(err);
 
       localStorage.removeItem(MODEL_KEY);
 
-      setError(
+      const message =
         err instanceof Error
           ? err.message
-          : "Vision model setup failed. Please try again.",
-      );
+          : "Vision model setup failed. Please try again.";
 
+      setError(message);
       setCurrentModel(null);
       setStatus("error");
+
+      toast.error("Vision model setup failed", {
+        id: toastId,
+        description: message,
+      });
     }
   }
 
   function getRequirementStatus(requirement: "webgpu" | "detection" | "pose") {
-    if (status === "ready") {
-      return "Ready";
-    }
-
-    if (status === "error") {
-      return "Not Ready";
-    }
+    if (status === "ready") return "Ready";
+    if (status === "error") return "Not ready";
 
     if (status === "installing") {
       if (requirement === "webgpu") {
         return "Verified";
       }
 
-      if (
-        requirement === "detection" &&
-        currentModel === "Person Detection Model"
-      ) {
+      if (requirement === "detection" && currentModel?.includes("Detection")) {
         return "Downloading";
       }
 
-      if (requirement === "pose" && currentModel === "Pose Estimation Model") {
+      if (requirement === "pose" && currentModel?.includes("Pose")) {
         return "Downloading";
       }
 
-      if (
-        requirement === "detection" &&
-        currentModel === "Pose Estimation Model"
-      ) {
-        return "Ready";
-      }
+      return "Preparing";
     }
 
     return "Pending";
   }
-
+  const currentModelNumber = currentModel
+    ? MODELS.findIndex((model) => model.name === currentModel) + 1
+    : 0;
   return (
-    <main className="flex min-h-[80vh] w-full items-center justify-center px-4">
-      <Card className="w-full max-w-xl border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
-        <CardHeader className="space-y-2">
-          <CardTitle className="text-xl font-semibold text-[var(--text-primary)]">
-            Vision Model Setup
-          </CardTitle>
+    <main className="w-full px-8 pt-6">
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+        <div className="w-full border-b border-[var(--border)] pb-4">
+          <h1 className="text-lg font-semibold text-[var(--text-primary)]">
+            Prepare Lecture Watch
+          </h1>
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">
+            Check this device and download the models needed for people
+            detection and lecture analysis.
+          </p>
+        </div>
 
-          <CardDescription className="text-sm text-[var(--text-secondary)]">
-            Prepare the required vision models before using vision analytics.
-            This only needs to be completed once per browser unless site data is
-            cleared.
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent className="space-y-6">
+        <div className="space-y-6">
           <section className="space-y-2">
             <RequirementRow
               label="WebGPU"
-              description="Required for accelerated vision processing."
+              description="Lets Lecture Watch run the models using your GPU."
               status={getRequirementStatus("webgpu")}
             />
 
             <RequirementRow
-              label="Person Detection Model"
-              description="Detects people within camera and uploaded content."
+              label="Person Detection"
+              description="Finds and tracks people in the current input."
               status={getRequirementStatus("detection")}
             />
 
             <RequirementRow
-              label="Pose Estimation Model"
-              description="Identifies body position and movement."
+              label="Lecture Analysis"
+              description="Analyses pose, movement and attention signals."
               status={getRequirementStatus("pose")}
             />
           </section>
 
           {status === "installing" && (
-            <section className="space-y-3" aria-label="Model download progress">
+            <section className="space-y-3" aria-label="Vision model progress">
               <div className="flex items-center justify-between gap-4 text-sm">
                 <div className="min-w-0">
                   <p className="truncate font-medium text-[var(--text-primary)]">
@@ -277,8 +310,7 @@ export default function VisionModelSetupPage() {
                 </span>
 
                 <span>
-                  Model {currentModel === "Pose Estimation Model" ? "2" : "1"}{" "}
-                  of {MODELS.length}
+                  Model {currentModelNumber} of {MODELS.length}
                 </span>
               </div>
             </section>
@@ -286,20 +318,23 @@ export default function VisionModelSetupPage() {
 
           {status === "error" && error && (
             <Alert variant="destructive">
+              <AlertTitle>Setup could not finish</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
 
           {status === "ready" && (
-            <Alert>
+            <Alert variant="success">
+              <AlertTitle>Ready to continue</AlertTitle>
               <AlertDescription>
-                Vision models are ready. You can continue to the session.
+                The vision models are available on this device. You can now
+                start a Lecture Watch session.
               </AlertDescription>
             </Alert>
           )}
-        </CardContent>
+        </div>
 
-        <CardFooter className="flex justify-center">
+        <div className="flex justify-center gap-x-2">
           {status === "ready" ? (
             <Button onClick={() => router.push("/VisionModel")}>
               Continue
@@ -319,8 +354,17 @@ export default function VisionModelSetupPage() {
               )}
             </Button>
           )}
-        </CardFooter>
-      </Card>
+          <Button onClick={() => setShowGuide(true)}>
+            <BookOpen />
+            Setup Guide
+          </Button>
+        </div>
+      </div>
+      {showGuide && (
+        <Popup onClose={() => setShowGuide(false)}>
+          <VM_GUIDE></VM_GUIDE>
+        </Popup>
+      )}
     </main>
   );
 }
@@ -335,9 +379,9 @@ function RequirementRow({
   status: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-lg border border-[var(--border)] p-4">
-      <div className="min-w-0">
-        <p className="text-sm font-medium text-[var(--text-primary)]">
+    <div className="flex min-h-20 w-full items-center justify-between gap-4 rounded-lg border border-[var(--border)] bg-(--bg-surface) p-4">
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold text-[var(--text-primary)]">
           {label}
         </p>
 
@@ -348,7 +392,7 @@ function RequirementRow({
 
       <Badge
         variant="outline"
-        className="shrink-0 text-[var(--text-secondary)]"
+        className="whitespace-nowrap text-[var(--text-secondary)]"
       >
         {status}
       </Badge>

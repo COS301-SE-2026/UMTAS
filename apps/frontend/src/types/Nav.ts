@@ -118,7 +118,7 @@ export const navigationItems: NavigationItem[] = [
 
   {
     id: "module-management",
-    label: "Module Management",
+    label: "Event/Module Management",
     href: "/module-management",
     section: "actions",
     icon: "BookOpenIcon",
@@ -197,7 +197,26 @@ export const navigationItems: NavigationItem[] = [
     showInNavbar: true,
     showInCommandPalette: true,
   },
-
+  {
+    id: "VisionStats",
+    label: "Lecture Watch Statistics",
+    href: "/vision-stats",
+    section: "admin",
+    icon: "ChartBarIcon",
+    tourContent: "Gain lecture insights for vision recordings",
+    keywords: [
+      "statistics",
+      "stats",
+      "analytics",
+      "insights",
+      "vision",
+      "model",
+    ],
+    roles: ["LECTURER", "UNIVERSITY_ADMIN"],
+    requiresUniversity: true,
+    showInNavbar: true,
+    showInCommandPalette: true,
+  },
   {
     id: "attendance",
     label: "Attendance",

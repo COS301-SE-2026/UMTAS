@@ -71,6 +71,13 @@
       "when": 1790244216124,
       "tag": "0009_attendance",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1790432674271,
+      "tag": "0010_VISION_TABLE",
+      "breakpoints": true
     }
   ]
 }

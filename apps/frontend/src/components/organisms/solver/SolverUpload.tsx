@@ -127,6 +127,32 @@ export default function SolverUpload({
     await setJobID(result.jobId);
   }
 
+  const [isDragging, setIsDragging] = useState(false);
+
+  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+
+    if (!isDragging) setIsDragging(true);
+  } //END_handleDragOver
+
+  function handleDragLeave(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setIsDragging(false);
+  } //END)handleDragLeave
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+
+    if (!file || file.type !== "application/pdf") {
+      return;
+    }
+
+    selectFile(file);
+  } //END_handleDrop
+
   return (
     <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)] w-full h-full flex flex-col">
       <CardHeader>
@@ -139,11 +165,18 @@ export default function SolverUpload({
       </CardDescription>
 
       <CardContent className="flex min-h-0 flex-1 flex-col gap-6">
-        <div className="min-h-0 flex-1 overflow-hidden border-2 border-dashed border-[var(--border)] rounded-lg p-8 flex flex-col items-center justify-center gap-4 bg-[var(--bg-base)] text-[var(--text-secondary)]">
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`min-h-0 flex-1 overflow-hidden border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center gap-4 bg-[var(--bg-base)] text-[var(--text-secondary)] transition-all duration-200 ${
+            isDragging
+              ? "border-primary scale-[1.01]"
+              : "border-[var(--border)]"
+          }`}
+        >
           <p className="w-full text-sm text-center font-mono leading-relaxed">
-            {!selectedFile && (
-              <>Upload a PDF file to start the timetable creation process.</>
-            )}
+            {!selectedFile && <>Drag & drop a PDF or browse files.</>}
             {selectedFile && (
               <>
                 <span className="block truncate" title={selectedFile.name}>

@@ -15,6 +15,7 @@ import type {
   RegistrationMethod,
   RegistrationStage,
 } from "@/lib/nfc_attendance/types";
+import { useState } from "react";
 
 export function RegistrationStepper({
   stage,
@@ -56,6 +57,9 @@ export function RegistrationStepper({
   const activationStage = ["WRITTEN", "CONFIRM_FAILED", "CONFIRMING"].includes(
     stage,
   );
+  const [copiedTagId, setCopiedTagId] = useState<string | null>(null);
+
+  const linkCopied = prepared ? copiedTagId === prepared.tagId : false;
 
   const currentStep =
     stage === "READY"
@@ -82,7 +86,21 @@ export function RegistrationStepper({
             </p>
           </div>
 
-          <AttendanceStatusPill status={stage} />
+          <div className="flex items-center gap-2">
+            <AttendanceStatusPill status={stage} />
+
+            {stage !== "READY" && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onCancel}
+                disabled={busy}
+                aria-label="Cancel registration"
+              >
+                <X size={16} aria-hidden="true" />
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -233,6 +251,7 @@ export function RegistrationStepper({
               registration={prepared}
               expired={expired}
               onExpire={onExpire}
+              onCopied={() => setCopiedTagId(prepared.tagId)}
             />
 
             {expired ? (
@@ -300,72 +319,49 @@ export function RegistrationStepper({
                 ) : null}
               </div>
             ) : (
-              <div className="space-y-5">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)]">
-                    Step 3
-                  </p>
+              <div className="space-y-4">
+                {linkCopied && !manuallyVerified && (
+                  <>
+                    <div>
+                      <h3 className="text-[15px] font-medium text-[var(--text-primary)]">
+                        Write the sticker
+                      </h3>
 
-                  <h3 className="mt-1 text-[15px] font-medium text-[var(--text-primary)]">
-                    Write and verify the sticker
-                  </h3>
-                </div>
+                      <p className="mt-1 text-sm text-[var(--text-secondary)]">
+                        Open NFC Tools, add a URL record, paste the copied link
+                        and write it to the sticker.
+                      </p>
+                    </div>
 
-                <div className="grid gap-3">
-                  <InstructionRow
-                    number={1}
-                    title="Copy the registration link"
-                    description="Use the Copy URL button above."
-                  />
+                    <label className="flex items-center gap-3 rounded-lg border border-[var(--border)] p-3 text-sm text-[var(--text-primary)]">
+                      <Checkbox
+                        checked={manuallyVerified}
+                        onCheckedChange={(checked) =>
+                          onManualVerifiedChange(checked === true)
+                        }
+                      />
 
-                  <InstructionRow
-                    number={2}
-                    title="Write it with NFC Tools"
-                    description="Add a URL record, paste the complete link, and write it to the sticker."
-                  />
+                      <span>
+                        I wrote the sticker and verified the saved URL.
+                      </span>
+                    </label>
+                  </>
+                )}
 
-                  <InstructionRow
-                    number={3}
-                    title="Read the sticker back"
-                    description="Use the Read function and confirm that the saved link matches the UMTAS link."
-                  />
-                </div>
+                {manuallyVerified && (
+                  <div className="space-y-3">
+                    <div>
+                      <h3 className="text-[15px] font-medium text-[var(--text-primary)]">
+                        Activate the sticker
+                      </h3>
 
-                <label className="flex items-start gap-3 rounded-lg border border-[var(--border)] p-4 text-sm text-[var(--text-primary)]">
-                  <Checkbox
-                    checked={manuallyVerified}
-                    onCheckedChange={(checked) =>
-                      onManualVerifiedChange(checked === true)
-                    }
-                  />
+                      <p className="mt-1 text-sm text-[var(--text-secondary)]">
+                        Your sticker is ready to activate.
+                      </p>
+                    </div>
 
-                  <span>
-                    I checked the saved link and confirmed that the correct
-                    sticker was written.
-                  </span>
-                </label>
-
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)]">
-                      Step 4
-                    </p>
-
-                    <h3 className="mt-1 text-[15px] font-medium text-[var(--text-primary)]">
-                      Activate the sticker
-                    </h3>
+                    <Button onClick={onConfirm}>Activate sticker</Button>
                   </div>
-
-                  <Button onClick={onConfirm} disabled={!manuallyVerified}>
-                    Activate sticker
-                  </Button>
-                </div>
-
-                {hasCurrentTag && (
-                  <p className="text-xs text-[var(--text-secondary)]">
-                    Your existing sticker remains active until this activation
-                    succeeds.
-                  </p>
                 )}
               </div>
             )}
@@ -379,7 +375,7 @@ export function RegistrationStepper({
               </p>
             )}
 
-            <div className="flex flex-wrap gap-2 border-t border-[var(--border)] pt-4">
+            <div className="flex flex-wrap gap-2 pt-2">
               <Button variant="outline" size="sm" onClick={onOpenTutorial}>
                 <BookOpen size={16} aria-hidden="true" />
                 Open setup guide
@@ -395,7 +391,7 @@ export function RegistrationStepper({
         )}
 
         {stage === "READY" && (
-          <Alert variant="success">
+          <Alert variant="success" className="bg-(--bg-surface)">
             <AlertTitle>Sticker registered</AlertTitle>
 
             <AlertDescription>
@@ -410,20 +406,6 @@ export function RegistrationStepper({
             <BookOpen size={16} aria-hidden="true" />
             View setup guide
           </Button>
-        )}
-
-        {stage !== "READY" && (
-          <div className="border-t border-[var(--border)] pt-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onCancel}
-              disabled={busy}
-              className="text-[var(--text-secondary)]"
-            >
-              Cancel registration
-            </Button>
-          </div>
         )}
       </CardContent>
     </Card>

@@ -1342,50 +1342,567 @@
         "description": "Select current university. This Auth operation is part of the versioned UMTAS HTTP contract."
       }
     },
-    "/api/health": {
-      "get": {
-        "operationId": "HealthController_live",
+    "/api/events/v2": {
+      "post": {
+        "operationId": "createEventV2",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEventDtoV2"
+              }
+            }
+          }
+        },
         "responses": {
-          "200": {
-            "description": "HTTP 200 response."
+          "201": {
+            "description": "Event created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventSingleResponseDto"
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
           }
         },
+        "summary": "Create an event - V2",
         "tags": [
-          "Health"
+          "Events"
         ],
-        "summary": "GET /api/health",
-        "description": "GET /api/health. This Health operation is part of the versioned UMTAS HTTP contract.",
-        "security": []
+        "description": "Create an event - V2. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
       }
     },
-    "/api/health/check": {
-      "get": {
-        "operationId": "HealthController_check",
+    "/api/events": {
+      "post": {
+        "operationId": "createEvent",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Event created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid event payload"
+          },
+          "401": {
+            "description": "No active session"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "description": "Event was not created"
+          }
+        },
+        "summary": "Create an event",
+        "tags": [
+          "Events"
+        ],
+        "description": "Create an event. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      },
+      "get": {
+        "description": "Apply filters - Enable stats mode with filters.stats=TRUE",
+        "operationId": "getAllEvents",
+        "parameters": [
+          {
+            "name": "moduleId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "timetableId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "all",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "Stats",
+            "required": false,
+            "in": "query",
+            "description": "Enable stats = TRUE",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "HTTP 200 response."
+            "description": "Events fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventListResponseDtoV2"
+                }
+              }
+            }
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "description": "No active session"
+          },
+          "403": {
+            "description": "Insufficient permissions"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
           }
         },
+        "summary": "Get all events",
         "tags": [
-          "Health"
+          "Events"
         ],
-        "summary": "GET /api/health/check",
-        "description": "GET /api/health/check. This Health operation is part of the versioned UMTAS HTTP contract.",
-        "security": []
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/events/{eventId}": {
+      "get": {
+        "operationId": "getEventById",
+        "parameters": [
+          {
+            "name": "eventId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Event not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Get event by ID",
+        "tags": [
+          "Events"
+        ],
+        "description": "Get event by ID. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}": {
+      "patch": {
+        "operationId": "updateEvent",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid update payload"
+          },
+          "401": {
+            "description": "No active session"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Event or referenced module not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "description": "Event was not updated"
+          }
+        },
+        "summary": "Update an event",
+        "tags": [
+          "Events"
+        ],
+        "description": "Update an event. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteEvent",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "description": "No active session"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Event not found"
+          },
+          "500": {
+            "description": "Event was not deleted"
+          }
+        },
+        "summary": "Delete an event",
+        "tags": [
+          "Events"
+        ],
+        "description": "Delete an event. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/events/validate/{id}": {
+      "patch": {
+        "operationId": "validateEvent",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event[${updated.eventName}] validated=[${updated.validated}]",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateEventResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Event not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Validate an event",
+        "tags": [
+          "Events"
+        ],
+        "description": "Validate an event. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/events/statistics/week": {
+      "get": {
+        "operationId": "eventStatisticsWeek",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Count of events on each day of the week",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventStatsWeeklyResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No university selected"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "University not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Event statistics - week",
+        "tags": [
+          "Events"
+        ],
+        "description": "Event statistics - week. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/events/statistics/venue": {
+      "get": {
+        "operationId": "eventStatisticsVenue",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Count of events for each venue",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventStatsVenueResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No university selected"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "University not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Event statistics - venue",
+        "tags": [
+          "Events"
+        ],
+        "description": "Event statistics - venue. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/events/{id}/venue": {
+      "patch": {
+        "operationId": "updateEventVenue",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEventVenueDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Venue updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Event not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Attach or clear an event's venue",
+        "tags": [
+          "Events"
+        ],
+        "description": "Attach or clear an event's venue. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
       }
     },
     "/api/modules": {
@@ -3393,567 +3910,50 @@
         ]
       }
     },
-    "/api/events/v2": {
-      "post": {
-        "operationId": "createEventV2",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateEventDtoV2"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Event created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventSingleResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
-          "409": {
-            "$ref": "#/components/responses/ConflictError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          }
-        },
-        "summary": "Create an event - V2",
-        "tags": [
-          "Events"
-        ],
-        "description": "Create an event - V2. This Events operation is part of the versioned UMTAS HTTP contract.",
-        "security": [
-          {
-            "cookie": []
-          }
-        ]
-      }
-    },
-    "/api/events": {
-      "post": {
-        "operationId": "createEvent",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateEventDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Event created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventSingleResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Missing or invalid event payload"
-          },
-          "401": {
-            "description": "No active session"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "409": {
-            "$ref": "#/components/responses/ConflictError"
-          },
-          "500": {
-            "description": "Event was not created"
-          }
-        },
-        "summary": "Create an event",
-        "tags": [
-          "Events"
-        ],
-        "description": "Create an event. This Events operation is part of the versioned UMTAS HTTP contract.",
-        "security": [
-          {
-            "cookie": []
-          }
-        ]
-      },
+    "/api/health": {
       "get": {
-        "description": "Apply filters - Enable stats mode with filters.stats=TRUE",
-        "operationId": "getAllEvents",
-        "parameters": [
-          {
-            "name": "moduleId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "timetableId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "all",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "Stats",
-            "required": false,
-            "in": "query",
-            "description": "Enable stats = TRUE",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Events fetched successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventListResponseDtoV2"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "description": "No active session"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          }
-        },
-        "summary": "Get all events",
-        "tags": [
-          "Events"
-        ],
-        "security": [
-          {
-            "cookie": []
-          }
-        ]
-      }
-    },
-    "/api/events/{eventId}": {
-      "get": {
-        "operationId": "getEventById",
-        "parameters": [
-          {
-            "name": "eventId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Event fetched successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventSingleResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
-          "404": {
-            "description": "Event not found"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          }
-        },
-        "summary": "Get event by ID",
-        "tags": [
-          "Events"
-        ],
-        "description": "Get event by ID. This Events operation is part of the versioned UMTAS HTTP contract.",
-        "security": [
-          {
-            "cookie": []
-          }
-        ]
-      }
-    },
-    "/api/events/{id}": {
-      "patch": {
-        "operationId": "updateEvent",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateEventDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Event updated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventSingleResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Missing or invalid update payload"
-          },
-          "401": {
-            "description": "No active session"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Event or referenced module not found"
-          },
-          "409": {
-            "$ref": "#/components/responses/ConflictError"
-          },
-          "500": {
-            "description": "Event was not updated"
-          }
-        },
-        "summary": "Update an event",
-        "tags": [
-          "Events"
-        ],
-        "description": "Update an event. This Events operation is part of the versioned UMTAS HTTP contract.",
-        "security": [
-          {
-            "cookie": []
-          }
-        ]
-      },
-      "delete": {
-        "operationId": "deleteEvent",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Event deleted successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DeleteResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "description": "No active session"
-          },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Event not found"
-          },
-          "500": {
-            "description": "Event was not deleted"
-          }
-        },
-        "summary": "Delete an event",
-        "tags": [
-          "Events"
-        ],
-        "description": "Delete an event. This Events operation is part of the versioned UMTAS HTTP contract.",
-        "security": [
-          {
-            "cookie": []
-          }
-        ]
-      }
-    },
-    "/api/events/validate/{id}": {
-      "patch": {
-        "operationId": "validateEvent",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ValidateEventDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Event[${updated.eventName}] validated=[${updated.validated}]",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidateEventResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequestError"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
-          "404": {
-            "description": "Event not found"
-          },
-          "409": {
-            "$ref": "#/components/responses/ConflictError"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          }
-        },
-        "summary": "Validate an event",
-        "tags": [
-          "Events"
-        ],
-        "description": "Validate an event. This Events operation is part of the versioned UMTAS HTTP contract.",
-        "security": [
-          {
-            "cookie": []
-          }
-        ]
-      }
-    },
-    "/api/events/statistics/week": {
-      "get": {
-        "operationId": "eventStatisticsWeek",
+        "operationId": "HealthController_live",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Count of events on each day of the week",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventStatsWeeklyResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "No university selected"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
-          "404": {
-            "description": "University not found"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          }
-        },
-        "summary": "Event statistics - week",
-        "tags": [
-          "Events"
-        ],
-        "description": "Event statistics - week. This Events operation is part of the versioned UMTAS HTTP contract.",
-        "security": [
-          {
-            "cookie": []
-          }
-        ]
-      }
-    },
-    "/api/events/statistics/venue": {
-      "get": {
-        "operationId": "eventStatisticsVenue",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Count of events for each venue",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventStatsVenueResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "No university selected"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenError"
-          },
-          "404": {
-            "description": "University not found"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalError"
-          }
-        },
-        "summary": "Event statistics - venue",
-        "tags": [
-          "Events"
-        ],
-        "description": "Event statistics - venue. This Events operation is part of the versioned UMTAS HTTP contract.",
-        "security": [
-          {
-            "cookie": []
-          }
-        ]
-      }
-    },
-    "/api/events/{id}/venue": {
-      "patch": {
-        "operationId": "updateEventVenue",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateEventVenueDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Venue updated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventSingleResponseDto"
-                }
-              }
-            }
+            "description": "HTTP 200 response."
           },
           "400": {
             "$ref": "#/components/responses/BadRequestError"
           },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "tags": [
+          "Health"
+        ],
+        "summary": "GET /api/health",
+        "description": "GET /api/health. This Health operation is part of the versioned UMTAS HTTP contract.",
+        "security": []
+      }
+    },
+    "/api/health/check": {
+      "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "HTTP 200 response."
           },
-          "403": {
-            "description": "Insufficient permissions"
-          },
-          "404": {
-            "description": "Event not found"
-          },
-          "409": {
-            "$ref": "#/components/responses/ConflictError"
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
           }
         },
-        "summary": "Attach or clear an event's venue",
         "tags": [
-          "Events"
+          "Health"
         ],
-        "description": "Attach or clear an event's venue. This Events operation is part of the versioned UMTAS HTTP contract.",
-        "security": [
-          {
-            "cookie": []
-          }
-        ]
+        "summary": "GET /api/health/check",
+        "description": "GET /api/health/check. This Health operation is part of the versioned UMTAS HTTP contract.",
+        "security": []
       }
     },
     "/api/timetables": {
@@ -8932,6 +8932,314 @@
           }
         ]
       }
+    },
+    "/api/vision-sessions": {
+      "post": {
+        "operationId": "createVisionSession",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVisionSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Vision session created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisionSessionSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid vision session payload or session date"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "409": {
+            "description": "A vision session with the same name already exists for the module on the specified date"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Create a vision session",
+        "tags": [
+          "Vision Sessions"
+        ],
+        "description": "Create a vision session. This Vision Sessions operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      },
+      "get": {
+        "description": "Returns vision sessions matching the supplied module, event, date, and name filters.",
+        "operationId": "getAllVisionSessions",
+        "parameters": [
+          {
+            "name": "moduleId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by module ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "eventId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by event ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "Filter sessions from this date onward (inclusive)",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "Filter sessions up to this date (inclusive)",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search on session name",
+            "schema": {
+              "minLength": 1,
+              "maxLength": 256,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vision sessions returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisionSessionListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "One or more query filters are invalid"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Get vision sessions",
+        "tags": [
+          "Vision Sessions"
+        ],
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/vision-sessions/{sessionId}": {
+      "get": {
+        "operationId": "getVisionSessionById",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vision session returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisionSessionSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid vision session ID"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Vision session not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Get a vision session by ID",
+        "tags": [
+          "Vision Sessions"
+        ],
+        "description": "Get a vision session by ID. This Vision Sessions operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      },
+      "patch": {
+        "description": "Updates the supplied session fields. Session ID, module, creator, and creation timestamp cannot be changed.",
+        "operationId": "updateVisionSession",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVisionSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vision session updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisionSessionSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid vision session ID, payload, or session date"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Vision session or linked event not found"
+          },
+          "409": {
+            "description": "A vision session with the same name already exists for the module on the specified date"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Update a vision session",
+        "tags": [
+          "Vision Sessions"
+        ],
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteVisionSession",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vision session deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteVisionSessionResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid vision session ID"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Vision session not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Delete a vision session",
+        "tags": [
+          "Vision Sessions"
+        ],
+        "description": "Delete a vision session. This Vision Sessions operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -9571,6 +9879,509 @@
           "uniId"
         ]
       },
+      "VenueDto": {
+        "type": "object",
+        "properties": {
+          "venueId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "venueName": {
+            "type": "string"
+          },
+          "buildingId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "description": "The ID of the building the venue belongs to"
+          }
+        },
+        "required": [
+          "venueId",
+          "venueName"
+        ]
+      },
+      "EventCriteriaDtoV2": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-02-17",
+            "description": "Required when the event is not recurring."
+          },
+          "dayOfWeek": {
+            "type": "string",
+            "enum": [
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday",
+              "sunday"
+            ],
+            "description": "Required when the event is recurring."
+          },
+          "startTime": {
+            "type": "string",
+            "example": "08:30"
+          },
+          "endTime": {
+            "type": "string",
+            "example": "10:20"
+          },
+          "moduleId": {
+            "type": "string",
+            "format": "uuid",
+            "default": false,
+            "description": "moduleId required in V2 - whomp whomp",
+            "nullable": false
+          }
+        }
+      },
+      "CreateEventDtoV2": {
+        "type": "object",
+        "properties": {
+          "eventName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "activityCode": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "activityType": {
+            "type": "string",
+            "enum": [
+              "lecture",
+              "tutorial",
+              "prac",
+              "test",
+              "exam"
+            ]
+          },
+          "isRecurring": {
+            "type": "boolean"
+          },
+          "validated": {
+            "type": "boolean"
+          },
+          "venues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VenueDto"
+            }
+          },
+          "eventCriteria": {
+            "$ref": "#/components/schemas/EventCriteriaDtoV2"
+          },
+          "venueName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30,
+            "description": "Name of venue",
+            "example": "Main Hall"
+          }
+        },
+        "required": [
+          "eventCriteria"
+        ]
+      },
+      "EventCriteriaDto": {
+        "type": "object",
+        "properties": {
+          "eventSource": {
+            "enum": [
+              "university",
+              "personal"
+            ],
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "example": "2026-02-17",
+            "description": "Required when the event is not recurring."
+          },
+          "dayOfWeek": {
+            "type": "string",
+            "enum": [
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday",
+              "sunday"
+            ],
+            "description": "Required when the event is recurring."
+          },
+          "startTime": {
+            "type": "string",
+            "example": "08:30"
+          },
+          "endTime": {
+            "type": "string",
+            "example": "10:20"
+          },
+          "moduleId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "eventSource",
+          "startTime",
+          "endTime"
+        ]
+      },
+      "EventDto": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "activityCode": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "activityType": {
+            "type": "string",
+            "enum": [
+              "lecture",
+              "tutorial",
+              "prac",
+              "test",
+              "exam"
+            ]
+          },
+          "eventCriteria": {
+            "$ref": "#/components/schemas/EventCriteriaDto"
+          },
+          "isRecurring": {
+            "type": "boolean"
+          },
+          "validated": {
+            "type": "boolean"
+          },
+          "venues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VenueDto"
+            }
+          }
+        },
+        "required": [
+          "eventId",
+          "eventCriteria"
+        ]
+      },
+      "EventSingleResponseDto": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/EventDto"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "CreateEventDto": {
+        "type": "object",
+        "properties": {
+          "eventName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "activityCode": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "eventCriteria": {
+            "$ref": "#/components/schemas/EventCriteriaDto"
+          },
+          "isRecurring": {
+            "type": "boolean"
+          },
+          "validated": {
+            "type": "boolean"
+          },
+          "venues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VenueDto"
+            }
+          },
+          "activityType": {
+            "type": "string",
+            "enum": [
+              "lecture",
+              "tutorial",
+              "prac",
+              "test",
+              "exam"
+            ],
+            "description": "Required when eventCriteria.moduleId is provided."
+          }
+        },
+        "required": [
+          "eventCriteria"
+        ]
+      },
+      "EventListResponseDtoV2": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventDto"
+            }
+          },
+          "count": {
+            "type": "number",
+            "example": 68,
+            "description": "Count of Modules"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "events"
+        ]
+      },
+      "UpdateEventCriteriaDto": {
+        "type": "object",
+        "properties": {
+          "eventSource": {
+            "enum": [
+              "university",
+              "personal"
+            ],
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "example": "2026-02-17",
+            "description": "Required when the event is not recurring."
+          },
+          "dayOfWeek": {
+            "type": "string",
+            "enum": [
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday",
+              "sunday"
+            ],
+            "description": "Required when the event is recurring."
+          },
+          "startTime": {
+            "type": "string",
+            "example": "08:30"
+          },
+          "endTime": {
+            "type": "string",
+            "example": "10:20"
+          },
+          "moduleId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "UpdateEventDto": {
+        "type": "object",
+        "properties": {
+          "eventName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "activityCode": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "activityType": {
+            "type": "string",
+            "enum": [
+              "lecture",
+              "tutorial",
+              "prac",
+              "test",
+              "exam"
+            ]
+          },
+          "isRecurring": {
+            "type": "boolean"
+          },
+          "validated": {
+            "type": "boolean"
+          },
+          "eventCriteria": {
+            "$ref": "#/components/schemas/UpdateEventCriteriaDto"
+          }
+        }
+      },
+      "DeleteResponseDto": {
+        "type": "object",
+        "properties": {
+          "eventName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "activityCode": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success"
+        ]
+      },
+      "ValidateEventDto": {
+        "type": "object",
+        "properties": {
+          "validated": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ValidateEventResponseDto": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/EventDto"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "event"
+        ]
+      },
+      "EventStatsWeekDayDto": {
+        "type": "object",
+        "properties": {
+          "dayOfWeek": {
+            "type": "string",
+            "enum": [
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday",
+              "sunday"
+            ]
+          },
+          "EventCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "dayOfWeek",
+          "EventCount"
+        ]
+      },
+      "EventStatsWeeklyResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventStatsWeekDayDto"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "EventStatsVenueDto": {
+        "type": "object",
+        "properties": {
+          "VenueID": {
+            "type": "string"
+          },
+          "VenueName": {
+            "type": "string"
+          },
+          "EventCount": {
+            "type": "number"
+          },
+          "ProjectedAttendance": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "VenueID",
+          "VenueName",
+          "EventCount",
+          "ProjectedAttendance"
+        ]
+      },
+      "EventStatsVenueResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventStatsVenueDto"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "UpdateEventVenueDto": {
+        "type": "object",
+        "properties": {
+          "venueName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "The venue name"
+          },
+          "buildingId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The selected buildingdD"
+          }
+        },
+        "required": [
+          "venueName"
+        ]
+      },
       "AcademicSemester": {
         "type": "string",
         "enum": [
@@ -9742,124 +10553,6 @@
           "CourseModuleID",
           "GroupModuleID",
           "CourseID"
-        ]
-      },
-      "EventCriteriaDto": {
-        "type": "object",
-        "properties": {
-          "eventSource": {
-            "enum": [
-              "university",
-              "personal"
-            ],
-            "type": "string"
-          },
-          "date": {
-            "type": "string",
-            "example": "2026-02-17",
-            "description": "Required when the event is not recurring."
-          },
-          "dayOfWeek": {
-            "type": "string",
-            "enum": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ],
-            "description": "Required when the event is recurring."
-          },
-          "startTime": {
-            "type": "string",
-            "example": "08:30"
-          },
-          "endTime": {
-            "type": "string",
-            "example": "10:20"
-          },
-          "moduleId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "required": [
-          "eventSource",
-          "startTime",
-          "endTime"
-        ]
-      },
-      "VenueDto": {
-        "type": "object",
-        "properties": {
-          "venueId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "venueName": {
-            "type": "string"
-          },
-          "buildingId": {
-            "type": "string",
-            "nullable": true,
-            "format": "uuid",
-            "description": "The ID of the building the venue belongs to"
-          }
-        },
-        "required": [
-          "venueId",
-          "venueName"
-        ]
-      },
-      "EventDto": {
-        "type": "object",
-        "properties": {
-          "eventId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "eventName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32
-          },
-          "activityCode": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1,
-            "maxLength": 10
-          },
-          "activityType": {
-            "type": "string",
-            "enum": [
-              "lecture",
-              "tutorial",
-              "prac",
-              "test",
-              "exam"
-            ]
-          },
-          "eventCriteria": {
-            "$ref": "#/components/schemas/EventCriteriaDto"
-          },
-          "isRecurring": {
-            "type": "boolean"
-          },
-          "validated": {
-            "type": "boolean"
-          },
-          "venues": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VenueDto"
-            }
-          }
-        },
-        "required": [
-          "eventId",
-          "eventCriteria"
         ]
       },
       "ModuleSingleResponseDto": {
@@ -11253,391 +11946,6 @@
         },
         "required": [
           "GroupID"
-        ]
-      },
-      "EventCriteriaDtoV2": {
-        "type": "object",
-        "properties": {
-          "date": {
-            "type": "string",
-            "example": "2026-02-17",
-            "description": "Required when the event is not recurring."
-          },
-          "dayOfWeek": {
-            "type": "string",
-            "enum": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ],
-            "description": "Required when the event is recurring."
-          },
-          "startTime": {
-            "type": "string",
-            "example": "08:30"
-          },
-          "endTime": {
-            "type": "string",
-            "example": "10:20"
-          },
-          "moduleId": {
-            "type": "string",
-            "format": "uuid",
-            "default": false,
-            "description": "moduleId required in V2 - whomp whomp",
-            "nullable": false
-          }
-        }
-      },
-      "CreateEventDtoV2": {
-        "type": "object",
-        "properties": {
-          "eventName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32
-          },
-          "activityCode": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1,
-            "maxLength": 10
-          },
-          "activityType": {
-            "type": "string",
-            "enum": [
-              "lecture",
-              "tutorial",
-              "prac",
-              "test",
-              "exam"
-            ]
-          },
-          "isRecurring": {
-            "type": "boolean"
-          },
-          "validated": {
-            "type": "boolean"
-          },
-          "venues": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VenueDto"
-            }
-          },
-          "eventCriteria": {
-            "$ref": "#/components/schemas/EventCriteriaDtoV2"
-          },
-          "venueName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 30,
-            "description": "Name of venue",
-            "example": "Main Hall"
-          }
-        },
-        "required": [
-          "eventCriteria"
-        ]
-      },
-      "EventSingleResponseDto": {
-        "type": "object",
-        "properties": {
-          "event": {
-            "$ref": "#/components/schemas/EventDto"
-          },
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "event"
-        ]
-      },
-      "CreateEventDto": {
-        "type": "object",
-        "properties": {
-          "eventName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32
-          },
-          "activityCode": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1,
-            "maxLength": 10
-          },
-          "eventCriteria": {
-            "$ref": "#/components/schemas/EventCriteriaDto"
-          },
-          "isRecurring": {
-            "type": "boolean"
-          },
-          "validated": {
-            "type": "boolean"
-          },
-          "venues": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VenueDto"
-            }
-          },
-          "activityType": {
-            "type": "string",
-            "enum": [
-              "lecture",
-              "tutorial",
-              "prac",
-              "test",
-              "exam"
-            ],
-            "description": "Required when eventCriteria.moduleId is provided."
-          }
-        },
-        "required": [
-          "eventCriteria"
-        ]
-      },
-      "EventListResponseDtoV2": {
-        "type": "object",
-        "properties": {
-          "events": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EventDto"
-            }
-          },
-          "count": {
-            "type": "number",
-            "example": 68,
-            "description": "Count of Modules"
-          },
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "events"
-        ]
-      },
-      "UpdateEventCriteriaDto": {
-        "type": "object",
-        "properties": {
-          "eventSource": {
-            "enum": [
-              "university",
-              "personal"
-            ],
-            "type": "string"
-          },
-          "date": {
-            "type": "string",
-            "example": "2026-02-17",
-            "description": "Required when the event is not recurring."
-          },
-          "dayOfWeek": {
-            "type": "string",
-            "enum": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ],
-            "description": "Required when the event is recurring."
-          },
-          "startTime": {
-            "type": "string",
-            "example": "08:30"
-          },
-          "endTime": {
-            "type": "string",
-            "example": "10:20"
-          },
-          "moduleId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        }
-      },
-      "UpdateEventDto": {
-        "type": "object",
-        "properties": {
-          "eventName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32
-          },
-          "activityCode": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1,
-            "maxLength": 10
-          },
-          "activityType": {
-            "type": "string",
-            "enum": [
-              "lecture",
-              "tutorial",
-              "prac",
-              "test",
-              "exam"
-            ]
-          },
-          "isRecurring": {
-            "type": "boolean"
-          },
-          "validated": {
-            "type": "boolean"
-          },
-          "eventCriteria": {
-            "$ref": "#/components/schemas/UpdateEventCriteriaDto"
-          }
-        }
-      },
-      "DeleteResponseDto": {
-        "type": "object",
-        "properties": {
-          "eventName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32
-          },
-          "activityCode": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1,
-            "maxLength": 10
-          },
-          "success": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "success"
-        ]
-      },
-      "ValidateEventDto": {
-        "type": "object",
-        "properties": {
-          "validated": {
-            "type": "boolean"
-          }
-        }
-      },
-      "ValidateEventResponseDto": {
-        "type": "object",
-        "properties": {
-          "event": {
-            "$ref": "#/components/schemas/EventDto"
-          },
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "event"
-        ]
-      },
-      "EventStatsWeekDayDto": {
-        "type": "object",
-        "properties": {
-          "dayOfWeek": {
-            "type": "string",
-            "enum": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ]
-          },
-          "EventCount": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "dayOfWeek",
-          "EventCount"
-        ]
-      },
-      "EventStatsWeeklyResponseDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EventStatsWeekDayDto"
-            }
-          }
-        },
-        "required": [
-          "data"
-        ]
-      },
-      "EventStatsVenueDto": {
-        "type": "object",
-        "properties": {
-          "VenueID": {
-            "type": "string"
-          },
-          "VenueName": {
-            "type": "string"
-          },
-          "EventCount": {
-            "type": "number"
-          },
-          "ProjectedAttendance": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "VenueID",
-          "VenueName",
-          "EventCount",
-          "ProjectedAttendance"
-        ]
-      },
-      "EventStatsVenueResponseDto": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EventStatsVenueDto"
-            }
-          }
-        },
-        "required": [
-          "data"
-        ]
-      },
-      "UpdateEventVenueDto": {
-        "type": "object",
-        "properties": {
-          "venueName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 100,
-            "description": "The venue name"
-          },
-          "buildingId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "The selected buildingdD"
-          }
-        },
-        "required": [
-          "venueName"
         ]
       },
       "CreateTimetableDto": {
@@ -15610,6 +15918,269 @@
         },
         "required": [
           "ModuleID"
+        ]
+      },
+      "SessionInferenceResultDto": {
+        "type": "object",
+        "properties": {
+          "questions_asked": {
+            "minimum": 0,
+            "type": "number",
+            "example": 12,
+            "description": "Number of questions asked during the session"
+          },
+          "total_restless_frames": {
+            "minimum": 0,
+            "type": "number",
+            "example": 40
+          },
+          "total_stable_frames": {
+            "minimum": 0,
+            "type": "number",
+            "example": 100
+          },
+          "total_paying_attention": {
+            "minimum": 0,
+            "type": "number",
+            "example": 80
+          },
+          "total_no_attention": {
+            "minimum": 0,
+            "type": "number",
+            "example": 20
+          },
+          "total_frames": {
+            "minimum": 0,
+            "type": "number",
+            "example": 140
+          }
+        },
+        "required": [
+          "questions_asked",
+          "total_restless_frames",
+          "total_stable_frames",
+          "total_paying_attention",
+          "total_no_attention",
+          "total_frames"
+        ]
+      },
+      "CreateVisionSessionDto": {
+        "type": "object",
+        "properties": {
+          "ModuleID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Module the session belongs to"
+          },
+          "EventID": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Event the session is linked to, if any"
+          },
+          "Date": {
+            "type": "string",
+            "example": "2026-01-02",
+            "description": "Date the session occurred on",
+            "format": "date"
+          },
+          "SessionName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "example": "Lecture 3",
+            "description": "Human readable name for the session"
+          },
+          "SessionDsc": {
+            "type": "string",
+            "nullable": true,
+            "example": "Covers chapter 4 and 5",
+            "description": "Short session description"
+          },
+          "Data": {
+            "description": "Aggregated inference results from the vision model",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SessionInferenceResultDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "ModuleID",
+          "Date",
+          "SessionName",
+          "Data"
+        ]
+      },
+      "VisionSessionDto": {
+        "type": "object",
+        "properties": {
+          "SessionID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Unique identifier for a vision session"
+          },
+          "ModuleID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Module the session belongs to"
+          },
+          "EventID": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Event the session is linked to, if any"
+          },
+          "Date": {
+            "type": "string",
+            "example": "2026-01-02",
+            "description": "Date the session occurred on",
+            "format": "date"
+          },
+          "SessionName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "example": "Lecture 3",
+            "description": "Human readable name for the session"
+          },
+          "SessionDsc": {
+            "type": "string",
+            "nullable": true,
+            "example": "Covers chapter 4 and 5",
+            "description": "Short session description"
+          },
+          "Data": {
+            "description": "Aggregated inference results from the vision model",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SessionInferenceResultDto"
+              }
+            ]
+          },
+          "CreatedBy": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "User who uploaded the session"
+          },
+          "CreatedAt": {
+            "type": "string",
+            "example": "2026-01-02T08:00:00.000Z",
+            "description": "When the session was created"
+          }
+        },
+        "required": [
+          "SessionID",
+          "ModuleID",
+          "Date",
+          "SessionName",
+          "Data",
+          "CreatedAt"
+        ]
+      },
+      "VisionSessionSingleResponseDto": {
+        "type": "object",
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/VisionSessionDto"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session"
+        ]
+      },
+      "VisionSessionListResponseDto": {
+        "type": "object",
+        "properties": {
+          "sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VisionSessionDto"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sessions"
+        ]
+      },
+      "UpdateVisionSessionDto": {
+        "type": "object",
+        "properties": {
+          "EventID": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Event the session is linked to, if any"
+          },
+          "Date": {
+            "type": "string",
+            "example": "2026-01-02",
+            "description": "Date the session occurred on",
+            "format": "date"
+          },
+          "SessionName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "example": "Lecture 3",
+            "description": "Human readable name for the session"
+          },
+          "SessionDsc": {
+            "type": "string",
+            "nullable": true,
+            "example": "Covers chapter 4 and 5",
+            "description": "Short session description"
+          },
+          "Data": {
+            "description": "Aggregated inference results from the vision model",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SessionInferenceResultDto"
+              }
+            ]
+          }
+        }
+      },
+      "DeleteVisionSessionResponseDto": {
+        "type": "object",
+        "properties": {
+          "SessionID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Unique identifier for a vision session"
+          },
+          "SessionName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "example": "Lecture 3",
+            "description": "Human readable name for the session"
+          },
+          "success": {
+            "type": "object",
+            "example": true
+          }
+        },
+        "required": [
+          "SessionID",
+          "SessionName",
+          "success"
         ]
       },
       "ErrorResponse": {

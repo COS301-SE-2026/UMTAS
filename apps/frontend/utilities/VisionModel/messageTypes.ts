@@ -15,10 +15,13 @@ export type VisionModelEvent<Tmessage extends MessageType, PayloadType> = {
   payload: PayloadType;
 };
 
+export type VisionModelSize = "nano" | "small" | "medium";
+
 export type PIXEL_PAYLOAD = {
   pixelData: Uint8ClampedArray;
   width: number;
   height: number;
+  modelSize: VisionModelSize;
 };
 
 export type DETECT_MESSAGE = VisionModelEvent<"DETECT", PIXEL_PAYLOAD>;
@@ -88,10 +91,17 @@ export interface DetectedPersonPose {
   left_arm: Keypoint[]; // [left_elbow, left_wrist]
   right_shoulder: Keypoint;
   right_arm: Keypoint[]; // [right_elbow, right_wrist]
+  left_eye: Keypoint;
+  right_eye: Keypoint;
+  left_ear: Keypoint;
+  right_ear: Keypoint;
 }
 
 export interface SessionInferenceResult {
   questions_asked: number;
-  detected_restless: number;
-  restless_ids: number[];
+  total_restless_frames: number;
+  total_stable_frames: number;
+  total_paying_attention: number;
+  total_no_attention: number;
+  total_frames: number;
 }
