@@ -240,7 +240,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
             data-testid="btn-delete-module"
             id="btn-delete-module"
             type="button"
-            variant="ghost"
+            variant="link"
             size="icon"
             onClick={() => deleteModule.mutate(module.moduleID)}
             disabled={deleteModule.isPending}

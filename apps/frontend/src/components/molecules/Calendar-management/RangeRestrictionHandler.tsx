@@ -165,7 +165,7 @@ function RangeDateHTML({
           data-testid="btn-delete-restriction"
           id="btn-delete-restriction"
           type="button"
-          variant="ghost"
+          variant="link"
           size="icon"
           hidden={restriction.id === ""}
           onClick={deleteRes}
