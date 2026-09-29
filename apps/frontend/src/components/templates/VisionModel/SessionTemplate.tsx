@@ -385,7 +385,7 @@ export default function VM_SessionTemplate() {
               </SettingsCard>
 
               <SettingsCard
-                title="Camera"
+                title="Camera Input"
                 description="Use a live camera as the current input."
                 status={cameraStarting ? "Starting…" : cameraOn ? "On" : "Off"}
               >
@@ -663,7 +663,7 @@ function SettingsCard({
           {status && (
             <Badge
               variant="outline"
-              className="whitespace-nowrap text-[var(--text-secondary)]"
+              className="w-24 justify-center whitespace-nowrap text-[var(--text-secondary)]"
             >
               {status}
             </Badge>
