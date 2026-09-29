@@ -22,10 +22,39 @@ export default function VM_GUIDE() {
       <CardContent className="space-y-6 p-4">
         <div>
           <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
-            Use existing session
+            GPU Guide
           </h2>
-          <p className="mt-1 text-xs leading-[1.5] text-[var(--text-secondary)]">
-            Continue analysing an existing session and save new results to it.
+          <p className="mt-1 text-sm leading-[1.5] text-[var(--text-secondary)]">
+            The lecture watch feature is a computationally heavy task and a
+            computers GPU is required. The GPU functionality should be enabled
+            by default by any modern browser, however if you run into issues
+            these can be altered in the settings of your browser. The vision
+            model runs best on chrome and on windows and mac OS. On linux
+            depending on the distribution some settings must be enabled to
+            achieve functionality of the feature.
+          </p>
+          <br />
+          <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
+            Chrome features to enable.
+          </h2>
+          <p className="mt-1 text-sm font-bold leading-relaxed text-[var(--text-secondary)]">
+            A URL is provided to find the setting to enable:
+            <br />• Vulkan: Enabled{" "}
+            <code className="rounded bg-black/10 px-1.5 py-0.5 font-mono text-xs font-normal select-all dark:bg-white/10">
+              chrome://flags/#enable-vulkan
+            </code>
+            <br />• Force enable WebGPU interop: Enabled{" "}
+            <code className="rounded bg-black/10 px-1.5 py-0.5 font-mono text-xs font-normal select-all dark:bg-white/10">
+              chrome://flags/#force-enable-webgpu-interop
+            </code>
+            <br />• Default ANGLE Vulkan: Enabled{" "}
+            <code className="rounded bg-black/10 px-1.5 py-0.5 font-mono text-xs font-normal select-all dark:bg-white/10">
+              chrome://flags/#default-angle-vulkan
+            </code>
+            <br />• Vulkan from ANGLE:{" "}
+            <code className="rounded bg-black/10 px-1.5 py-0.5 font-mono text-xs font-normal select-all dark:bg-white/10">
+              chrome://flags/#vulkan-from-angle
+            </code>
           </p>
         </div>
       </CardContent>
