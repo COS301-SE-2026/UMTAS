@@ -236,303 +236,305 @@ export default function VM_SessionTemplate() {
 
   return (
     <>
-      <main className="flex w-full flex-col items-center gap-6 px-6 pt-6">
-        <div className="w-full max-w-7xl py-4">
-          <h1 className="text-lg font-semibold text-[var(--text-primary)]">
-            Lecture Watch
-          </h1>
-          <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            Choose a camera, image or video, then run people detection or
-            lecture analysis
-          </p>
-        </div>
+      <main className="w-full px-8 pt-6">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+          <div className="w-full border-b border-[var(--border)] pb-4">
+            <h1 className="text-lg font-semibold text-[var(--text-primary)]">
+              Lecture Watch
+            </h1>
+            <p className="mt-1 text-sm text-[var(--text-secondary)]">
+              Choose a camera, image or video, then run people detection or
+              lecture analysis.
+            </p>
+          </div>
 
-        <div className="w-full max-w-7xl space-y-6">
-          <section
-            aria-label="Vision preview"
-            className="w-full overflow-hidden"
-          >
-            <div className="w-full">
-              <CameraCanvas
-                isCameraActive={cameraOn}
-                detectionSettings={detectionSettings}
-                inferenceSettings={inferenceSettings}
-                imageFile={imageUpload}
-                deviceId={selectedDeviceId}
-              />
-            </div>
-          </section>
-
-          <section
-            aria-label="Vision session settings"
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
-          >
-            <SettingsCard
-              title="Input"
-              description="Choose what Lecture Watch should analyse."
-              status={
-                imageUpload
-                  ? "Image selected"
-                  : cameraOn
-                    ? "Live camera"
-                    : "No input"
-              }
+          <div className="space-y-6">
+            <section
+              aria-label="Vision preview"
+              className="w-full overflow-hidden rounded-lg border border-[var(--border)]"
             >
-              <div className="flex flex-col gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
-                    setInferenceSettings((settings) => ({
-                      ...settings,
-                      runInference: false,
-                    }));
-                    setDetectionSettings((settings) => ({
-                      ...settings,
-                      runDetection: false,
-                    }));
-                    setCameraOn(false);
-                    setImageUpload(null);
-                    setShowVideoPopUp(true);
-                  }}
-                >
-                  Analyse Video
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
-                    if (imageUpload === null) {
-                      uploadImageRef.current?.click();
-                      return;
-                    }
-
-                    setImageUpload(null);
-                    setDetectionSettings((settings) => ({
-                      ...settings,
-                      runDetection: false,
-                    }));
-                    setInferenceSettings((settings) => ({
-                      ...settings,
-                      runInference: false,
-                    }));
-
-                    if (uploadImageRef.current) {
-                      uploadImageRef.current.value = "";
-                    }
-
-                    toast.info("Image removed");
-                  }}
-                >
-                  {imageUpload === null ? "Upload Image" : "Remove Image"}
-                </Button>
-
-                <Input
-                  ref={uploadImageRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0];
-
-                    if (!file) return;
-
-                    if (!file.type.startsWith("image/")) {
-                      toast.error("Unsupported file", {
-                        description: "Choose an image file to continue.",
-                      });
-                      return;
-                    }
-
-                    setImageUpload(file);
-                    setCameraOn(false);
-                    setDetectionSettings((settings) => ({
-                      ...settings,
-                      runDetection: false,
-                    }));
-                    setInferenceSettings((settings) => ({
-                      ...settings,
-                      runInference: false,
-                    }));
-
-                    toast.success("Image loaded", {
-                      description: `${file.name} is ready for analysis.`,
-                    });
-                  }}
+              <div className="w-full aspect-video">
+                <CameraCanvas
+                  isCameraActive={cameraOn}
+                  detectionSettings={detectionSettings}
+                  inferenceSettings={inferenceSettings}
+                  imageFile={imageUpload}
+                  deviceId={selectedDeviceId}
                 />
-
-                {imageUpload && (
-                  <p className="truncate text-xs text-[var(--text-secondary)]">
-                    {imageUpload.name}
-                  </p>
-                )}
               </div>
-            </SettingsCard>
+            </section>
 
-            <SettingsCard
-              title="Camera"
-              description="Use a live camera as the current input."
-              status={cameraStarting ? "Starting…" : cameraOn ? "On" : "Off"}
+            <section
+              aria-label="Vision session settings"
+              className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
             >
-              <div className="space-y-4">
-                <SettingRow label="Live camera">
-                  <div className="flex items-center gap-2">
-                    {cameraStarting && (
-                      <Loader2
-                        className="size-4 animate-spin text-[var(--text-secondary)]"
-                        aria-hidden="true"
-                      />
-                    )}
-                    <Switch
-                      checked={cameraOn}
-                      disabled={cameraStarting}
-                      aria-label="Toggle camera"
-                      onCheckedChange={(checked) => {
-                        void handleCameraToggle(checked);
-                      }}
-                    />
-                  </div>
-                </SettingRow>
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="camera-select"
-                    className="text-sm font-medium text-[var(--text-primary)]"
-                  >
-                    Camera device
-                  </Label>
-
-                  <Select
-                    disabled={!cameraOn || devices.length === 0}
-                    value={selectedDeviceId}
-                    onValueChange={setSelectedDeviceId}
-                  >
-                    <SelectTrigger id="camera-select" className="w-full">
-                      <SelectValue placeholder="Select a camera" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {devices.map((device, index) => (
-                        <SelectItem
-                          key={device.deviceId}
-                          value={device.deviceId}
-                        >
-                          {device.label || `Camera ${index + 1}`}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <p className="text-xs text-[var(--text-secondary)]">
-                    If a camera is busy, close other apps or browser tabs using
-                    it and try again.
-                  </p>
-                </div>
-              </div>
-            </SettingsCard>
-
-            <SettingsCard
-              title="People Detection"
-              description="Find and track people in the current input."
-              status={detectionSettings.runDetection ? "Detecting" : "Off"}
-            >
-              <div className="space-y-4">
-                <SettingRow label="Detection">
-                  <Switch
-                    checked={detectionSettings.runDetection}
-                    disabled={!hasInput}
-                    aria-label="Toggle people detection"
-                    onCheckedChange={handleDetectionToggle}
-                  />
-                </SettingRow>
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="detection-interval"
-                    className="text-sm font-medium text-[var(--text-primary)]"
-                  >
-                    Analysis interval
-                  </Label>
-
-                  <Input
-                    id="detection-interval"
-                    value={detectionSettings.DetectionInterval}
-                    disabled={!hasInput}
-                    onChange={(event) => {
-                      const value = Math.max(0.2, Number(event.target.value));
-                      setDetectionSettings((settings) => ({
-                        ...settings,
-                        DetectionInterval: value,
-                      }));
-                    }}
-                    min={0.2}
-                    max={100}
-                    step={0.1}
-                    type="number"
-                    placeholder="0.5"
+              <SettingsCard
+                title="Input"
+                description="Choose what Lecture Watch should analyse."
+                status={
+                  imageUpload
+                    ? "Image selected"
+                    : cameraOn
+                      ? "Live camera"
+                      : "No input"
+                }
+              >
+                <div className="flex flex-col gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
                     className="w-full"
-                  />
-
-                  <p className="text-xs text-[var(--text-secondary)]">
-                    Seconds between detection runs. A larger value uses less
-                    processing power.
-                  </p>
-                </div>
-              </div>
-            </SettingsCard>
-
-            <SettingsCard
-              title="Lecture Analysis"
-              description="Analyse attention, movement and participation."
-              status={inferenceSettings.runInference ? "Analysing" : "Off"}
-            >
-              <div className="space-y-4">
-                <SettingRow label="Analysis">
-                  <Switch
-                    checked={inferenceSettings.runInference}
-                    disabled={!hasInput}
-                    aria-label="Toggle lecture analysis"
-                    onCheckedChange={handleInferenceToggle}
-                  />
-                </SettingRow>
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="inference-interval"
-                    className="text-sm font-medium text-[var(--text-primary)]"
-                  >
-                    Analysis interval
-                  </Label>
-
-                  <Input
-                    id="inference-interval"
-                    value={inferenceSettings.InferenceInterval}
-                    disabled={!hasInput}
-                    onChange={(event) => {
-                      const value = Math.max(0.2, Number(event.target.value));
+                    onClick={() => {
                       setInferenceSettings((settings) => ({
                         ...settings,
-                        InferenceInterval: value,
+                        runInference: false,
                       }));
+                      setDetectionSettings((settings) => ({
+                        ...settings,
+                        runDetection: false,
+                      }));
+                      setCameraOn(false);
+                      setImageUpload(null);
+                      setShowVideoPopUp(true);
                     }}
-                    min={0.2}
-                    max={100}
-                    step={0.1}
-                    type="number"
-                    placeholder="0.5"
+                  >
+                    Analyse Video
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
                     className="w-full"
+                    onClick={() => {
+                      if (imageUpload === null) {
+                        uploadImageRef.current?.click();
+                        return;
+                      }
+
+                      setImageUpload(null);
+                      setDetectionSettings((settings) => ({
+                        ...settings,
+                        runDetection: false,
+                      }));
+                      setInferenceSettings((settings) => ({
+                        ...settings,
+                        runInference: false,
+                      }));
+
+                      if (uploadImageRef.current) {
+                        uploadImageRef.current.value = "";
+                      }
+
+                      toast.info("Image removed");
+                    }}
+                  >
+                    {imageUpload === null ? "Upload Image" : "Remove Image"}
+                  </Button>
+
+                  <Input
+                    ref={uploadImageRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+
+                      if (!file) return;
+
+                      if (!file.type.startsWith("image/")) {
+                        toast.error("Unsupported file", {
+                          description: "Choose an image file to continue.",
+                        });
+                        return;
+                      }
+
+                      setImageUpload(file);
+                      setCameraOn(false);
+                      setDetectionSettings((settings) => ({
+                        ...settings,
+                        runDetection: false,
+                      }));
+                      setInferenceSettings((settings) => ({
+                        ...settings,
+                        runInference: false,
+                      }));
+
+                      toast.success("Image loaded", {
+                        description: `${file.name} is ready for analysis.`,
+                      });
+                    }}
                   />
 
-                  <p className="text-xs text-[var(--text-secondary)]">
-                    Seconds between analysis runs. Increase this on slower
-                    devices.
-                  </p>
+                  {imageUpload && (
+                    <p className="truncate text-xs text-[var(--text-secondary)]">
+                      {imageUpload.name}
+                    </p>
+                  )}
                 </div>
-              </div>
-            </SettingsCard>
-          </section>
+              </SettingsCard>
+
+              <SettingsCard
+                title="Camera"
+                description="Use a live camera as the current input."
+                status={cameraStarting ? "Starting…" : cameraOn ? "On" : "Off"}
+              >
+                <div className="space-y-4">
+                  <SettingRow label="Live camera">
+                    <div className="flex items-center gap-2">
+                      {cameraStarting && (
+                        <Loader2
+                          className="size-4 animate-spin text-[var(--text-secondary)]"
+                          aria-hidden="true"
+                        />
+                      )}
+                      <Switch
+                        checked={cameraOn}
+                        disabled={cameraStarting}
+                        aria-label="Toggle camera"
+                        onCheckedChange={(checked) => {
+                          void handleCameraToggle(checked);
+                        }}
+                      />
+                    </div>
+                  </SettingRow>
+
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="camera-select"
+                      className="text-sm font-medium text-[var(--text-primary)]"
+                    >
+                      Camera device
+                    </Label>
+
+                    <Select
+                      disabled={!cameraOn || devices.length === 0}
+                      value={selectedDeviceId}
+                      onValueChange={setSelectedDeviceId}
+                    >
+                      <SelectTrigger id="camera-select" className="w-full">
+                        <SelectValue placeholder="Select a camera" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {devices.map((device, index) => (
+                          <SelectItem
+                            key={device.deviceId}
+                            value={device.deviceId}
+                          >
+                            {device.label || `Camera ${index + 1}`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <p className="text-xs text-[var(--text-secondary)]">
+                      If a camera is busy, close other apps or browser tabs
+                      using it and try again.
+                    </p>
+                  </div>
+                </div>
+              </SettingsCard>
+
+              <SettingsCard
+                title="People Detection"
+                description="Find and track people in the current input."
+                status={detectionSettings.runDetection ? "Detecting" : "Off"}
+              >
+                <div className="space-y-4">
+                  <SettingRow label="Detection">
+                    <Switch
+                      checked={detectionSettings.runDetection}
+                      disabled={!hasInput}
+                      aria-label="Toggle people detection"
+                      onCheckedChange={handleDetectionToggle}
+                    />
+                  </SettingRow>
+
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="detection-interval"
+                      className="text-sm font-medium text-[var(--text-primary)]"
+                    >
+                      Analysis interval
+                    </Label>
+
+                    <Input
+                      id="detection-interval"
+                      value={detectionSettings.DetectionInterval}
+                      disabled={!hasInput}
+                      onChange={(event) => {
+                        const value = Math.max(0.2, Number(event.target.value));
+                        setDetectionSettings((settings) => ({
+                          ...settings,
+                          DetectionInterval: value,
+                        }));
+                      }}
+                      min={0.2}
+                      max={100}
+                      step={0.1}
+                      type="number"
+                      placeholder="0.5"
+                      className="w-full"
+                    />
+
+                    <p className="text-xs text-[var(--text-secondary)]">
+                      Seconds between detection runs. A larger value uses less
+                      processing power.
+                    </p>
+                  </div>
+                </div>
+              </SettingsCard>
+
+              <SettingsCard
+                title="Lecture Analysis"
+                description="Analyse attention, movement and participation."
+                status={inferenceSettings.runInference ? "Analysing" : "Off"}
+              >
+                <div className="space-y-4">
+                  <SettingRow label="Analysis">
+                    <Switch
+                      checked={inferenceSettings.runInference}
+                      disabled={!hasInput}
+                      aria-label="Toggle lecture analysis"
+                      onCheckedChange={handleInferenceToggle}
+                    />
+                  </SettingRow>
+
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="inference-interval"
+                      className="text-sm font-medium text-[var(--text-primary)]"
+                    >
+                      Analysis interval
+                    </Label>
+
+                    <Input
+                      id="inference-interval"
+                      value={inferenceSettings.InferenceInterval}
+                      disabled={!hasInput}
+                      onChange={(event) => {
+                        const value = Math.max(0.2, Number(event.target.value));
+                        setInferenceSettings((settings) => ({
+                          ...settings,
+                          InferenceInterval: value,
+                        }));
+                      }}
+                      min={0.2}
+                      max={100}
+                      step={0.1}
+                      type="number"
+                      placeholder="0.5"
+                      className="w-full"
+                    />
+
+                    <p className="text-xs text-[var(--text-secondary)]">
+                      Seconds between analysis runs. Increase this on slower
+                      devices.
+                    </p>
+                  </div>
+                </div>
+              </SettingsCard>
+            </section>
+          </div>
         </div>
       </main>
 
