@@ -26,7 +26,7 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 UMTAS automates the timetabling lifecycle - from ingesting supported PDF schedules and resolving hard and soft scheduling constraints to delivering personalised timetable options.
 
-The system is designed for university-specific adapters: a Core-and-Adapter architecture separates scheduling logic from institution-specific data formats. Support for another university still requires an implemented and verified adapter.
+The system is designed for university-specific adapters: a Core-and-Adapter architecture separates scheduling logic from institution-specific data formats. Support for another university is provided by adding an adapter behind the shared contract.
 
 ---
 
