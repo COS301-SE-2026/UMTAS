@@ -10,12 +10,14 @@ import {
   updateVenueMut,
 } from "../../../../utilities/venue/venueQueries";
 import {
+  createBuildingMut,
   deleteBuildingMut,
   updateBuildingMut,
 } from "../../../../utilities/building/buildingQueries";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from "@/components/atoms/baseShadcn/sheet";
@@ -27,7 +29,15 @@ import { Badge } from "@/components/atoms/baseShadcn/badge";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import { Check, CircleCheck, Pencil, Plus, Trash2, X } from "lucide-react";
+import {
+  Check,
+  CircleCheck,
+  MapPin,
+  Pencil,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -45,12 +55,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/atoms/customise/alert-dialog-customise";
+import { Separator } from "@/components/atoms/baseShadcn/separator";
 
 interface BuildingSheetProps {
   building: BuildingType | null;
   buildings: BuildingType[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSelectBuilding: (building: BuildingType | null) => void;
+  onStartPin: (buildingId: string | null) => void;
+  pendingPinLocation: { lat: number; lng: number } | null;
 }
 
 export function BuildingSheet({
@@ -58,11 +72,21 @@ export function BuildingSheet({
   buildings,
   open,
   onOpenChange,
+  onSelectBuilding,
+  onStartPin,
+  pendingPinLocation,
 }: BuildingSheetProps) {
   //building stuff
   const [buildingName, setBuildingName] = useState("");
-  const [buildingColour, setBuildingColour] = useState("#0000FF");
+  //const [buildingColour, setBuildingColour] = useState("#0000FF");
   const [isDeleteBuildingOpen, setIsDeleteBuildingOpen] = useState(false);
+  const DEFAULT_BUILDING_COLOUR = "#0000FF";
+
+  //create building state
+  const [newBuildingName, setNewBuildingName] = useState("");
+  const [newBuildingIcon, setNewBuildingIcon] = useState("");
+  //const [newBuildingColour, setNewBuildingColour] = useState("blue");
+  const [duplicateError, setDuplicateError] = useState(false);
 
   //venue stuff
   //updating venues
@@ -82,13 +106,16 @@ export function BuildingSheet({
   if (building && building.BuildingID !== prevBuildingId) {
     setPrevBuildingId(building.BuildingID);
     setBuildingName(building.BuildingName);
-    setBuildingColour(building.displayColour || "#0000FF");
+    //setBuildingColour(building.displayColour || "#0000FF");
   }
 
   const { data: venues = [] } = useQuery({
     ...getAllVenuesQ({ buildingId: building?.BuildingID }),
     enabled: !!building,
   });
+
+  const { mutate: createBuilding, isPending: creatingBuilding } =
+    useMutation(createBuildingMut());
 
   const { mutate: saveBuilding, isPending: savingBuilding } =
     useMutation(updateBuildingMut());
@@ -105,17 +132,42 @@ export function BuildingSheet({
   const { mutate: deleteVenue, isPending: deletingVenue } =
     useMutation(deleteVenueMut());
 
-  if (!building) {
-    return (
-      <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="right" />
-      </Sheet>
+  function resetNewBuilding() {
+    setNewBuildingName("");
+    setNewBuildingIcon("");
+    //setNewBuildingColour("blue");
+    setDuplicateError(false);
+  }
+
+  function handleCreateBuilding(event: React.FormEvent) {
+    event.preventDefault();
+    setDuplicateError(false);
+
+    createBuilding(
+      {
+        body: {
+          BuildingName: newBuildingName,
+          icon: newBuildingIcon || null,
+          displayColour: DEFAULT_BUILDING_COLOUR,
+          ...(pendingPinLocation ? { location: pendingPinLocation } : {}),
+        },
+      },
+      {
+        onSuccess: () => {
+          resetNewBuilding();
+          onOpenChange(false);
+        },
+        onError: (error) => {
+          //building with same name exists vro
+          if ((error as { status?: number })?.status === 409) {
+            setDuplicateError(true);
+          }
+        },
+      },
     );
   }
 
-  const hasChanges =
-    buildingName !== building.BuildingName ||
-    buildingColour !== (building.displayColour || "#0000FF");
+  const hasChanges = building && buildingName !== building.BuildingName;
 
   function handleSaveBuilding() {
     if (!building) {
@@ -127,9 +179,6 @@ export function BuildingSheet({
       body: {
         ...(buildingName !== building.BuildingName
           ? { BuildingName: buildingName }
-          : {}),
-        ...(buildingColour !== building.displayColour
-          ? { displayColour: buildingColour }
           : {}),
       },
     });
@@ -146,6 +195,7 @@ export function BuildingSheet({
         onSuccess: () => {
           setIsDeleteBuildingOpen(false);
           onOpenChange(false);
+          onSelectBuilding(null);
         },
       },
     );
@@ -222,174 +272,336 @@ export function BuildingSheet({
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent
           side="right"
-          className="flex flex-col gap-4 overflow-y-auto bg-bg-surface"
+          className="w-[340px] sm:w-[420px] flex flex-col justify-between p-6 bg-bg-surface"
         >
-          <SheetHeader>
-            <SheetTitle className="flex items-center gap-2 text-lg">
-              {building.BuildingName}
-              <Badge variant="secondary">{venues.length} venues</Badge>
-            </SheetTitle>
-          </SheetHeader>
-          <div className="flex flex-col gap-2 px-4">
-            <Label className="text-lg">Edit Details</Label>
-            <div className="flex flex-col gap-2">
-              <Label>Building Name</Label>
-              <Input
-                value={buildingName}
-                onChange={(e) => setBuildingName(e.target.value)}
-                maxLength={100}
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label>Building Colour</Label>
-              <Input
-                type="color"
-                value={buildingColour}
-                onChange={(e) => setBuildingColour(e.target.value)}
-                maxLength={100}
-              />
+          <div className="flex flex-col gap-4 overflow-y-auto pr-2">
+            <SheetHeader className="text-left">
+              <SheetTitle className="text-lg">
+                {building ? (
+                  <div className="flex items-center gap-2">
+                    {building.BuildingName}
+                    <Badge variant="secondary">{venues.length} venues</Badge>
+                  </div>
+                ) : (
+                  "Create Building"
+                )}
+              </SheetTitle>
+              <SheetDescription>
+                {building
+                  ? "Update building details, pin location, and manage assigned venues."
+                  : "Create a new campus building and drop a pin on the map."}
+              </SheetDescription>
+            </SheetHeader>
+
+            <Separator />
+
+            <div className="flex flex-col gap-1">
+              <Label className="text-sm">Select building to map</Label>
+              <Select
+                value={building?.BuildingID ?? "new"}
+                onValueChange={(val) => {
+                  if (val === "new") {
+                    onSelectBuilding(null);
+                  } else {
+                    const found = buildings.find((b) => b.BuildingID === val);
+                    if (found) onSelectBuilding(found);
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full bg-bg-base">
+                  <SelectValue placeholder="Choose a building to map" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="new">+ Create New Building</SelectItem>
+                  {buildings.map((b) => (
+                    <SelectItem key={b.BuildingID} value={b.BuildingID}>
+                      {b.BuildingName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="flex gap-2">
-              <Button
-                variant="default"
-                onClick={handleSaveBuilding}
-                disabled={!hasChanges || savingBuilding}
-                className="cursor-pointer"
+            {!building ? (
+              <form
+                onSubmit={handleCreateBuilding}
+                className="flex flex-col gap-3"
               >
-                <CircleCheck />
-                {savingBuilding ? "Saving.." : "Save"}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => setIsDeleteBuildingOpen(true)}
-                className="cursor-pointer"
-              >
-                <Trash2 />
-                Delete
-              </Button>
-            </div>
-          </div>
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor="create-building-name" className="text-sm">
+                    Building name
+                  </Label>
+                  <Input
+                    id="create-building-name"
+                    value={newBuildingName}
+                    onChange={(event) => {
+                      setNewBuildingName(event.target.value);
+                      setDuplicateError(false);
+                    }}
+                    placeholder="e.g. Thuto"
+                    required={true}
+                    maxLength={100}
+                    className="bg-bg-base"
+                  />
+                  {duplicateError && (
+                    <p className="text-sm text-[var(--error-text)]">
+                      A building named &quot;{newBuildingName}&quot; already
+                      exists.
+                    </p>
+                  )}
+                </div>
 
-          <div className="flex flex-col gap-2 pb-2 px-4 pt-4">
-            <Label className="text-lg">Venues</Label>
+                {/* <div className="flex flex-col gap-2">
+                  <Label htmlFor="building-icon">Icon (optional)</Label>
+                  <Input
+                    id="building-icon"
+                    value={newBuildingIcon}
+                    onChange={(event) => setNewBuildingIcon(event.target.value)}
+                    placeholder="e.g. icon"
+                  />
+                </div> */}
 
-            {venues.map((venue) => (
-              <div
-                className="flex flex-col gap-2 p-2 border-t-1"
-                key={venue.VenueID}
-              >
-                {editingVenueId === venue.VenueID ? (
-                  <>
+                {/* <div className="flex flex-col gap-1">
+                  <Label htmlFor="create-building-colour" className="text-sm">
+                    Display colour
+                  </Label>
+                  <Input
+                    id="create-building-colour"
+                    type="color"
+                    value={newBuildingColour}
+                    onChange={(event) =>
+                      setNewBuildingColour(event.target.value)
+                    }
+                    className="bg-bg-base"
+                  />
+                </div> */}
+
+                <div className="flex flex-col gap-1">
+                  <Label className="text-sm">Pin Location</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 cursor-pointer w-fit"
+                    onClick={() => {
+                      onOpenChange(false);
+                      onStartPin(null);
+                    }}
+                  >
+                    <MapPin size={14} strokeWidth={1.5} />
+                    {pendingPinLocation ? "Change Pin Location" : "Drop Pin"}
+                  </Button>
+                  {pendingPinLocation && (
+                    <p className="text-xs text-[var(--text-secondary)]">
+                      Pin placed ({pendingPinLocation.lat.toFixed(5)},{" "}
+                      {pendingPinLocation.lng.toFixed(5)})
+                    </p>
+                  )}
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={creatingBuilding || !newBuildingName.trim()}
+                  className="w-full gap-2 cursor-pointer"
+                >
+                  <Plus size={14} strokeWidth={1} />
+                  {creatingBuilding ? "Creating..." : "Create Building"}
+                </Button>
+              </form>
+            ) : (
+              <>
+                <div className="flex flex-col gap-3">
+                  <Label className="text-base font-semibold">
+                    Edit Details
+                  </Label>
+                  <div className="flex flex-col gap-1">
+                    <Label className="text-sm">Building Name</Label>
                     <Input
-                      value={venueTempName}
-                      placeholder="Venue Name"
+                      value={buildingName}
+                      onChange={(e) => setBuildingName(e.target.value)}
+                      maxLength={100}
+                      className="bg-bg-base"
+                    />
+                  </div>
+                  {/* <div className="flex flex-col gap-1">
+                    <Label className="text-sm">Building Colour</Label>
+                    <Input
+                      type="color"
+                      value={buildingColour}
+                      onChange={(e) => setBuildingColour(e.target.value)}
+                      maxLength={100}
+                      className="bg-bg-base"
+                    />
+                  </div> */}
+
+                  <div className="flex flex-col gap-1">
+                    <Label className="text-sm">Location Pin</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="gap-2 cursor-pointer w-fit"
+                      onClick={() => {
+                        onOpenChange(false);
+                        onStartPin(building.BuildingID);
+                      }}
+                    >
+                      <MapPin size={14} strokeWidth={1.5} />
+                      {building.location ? "Change Pin" : "Drop Pin"}
+                    </Button>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      variant="default"
+                      onClick={handleSaveBuilding}
+                      disabled={!hasChanges || savingBuilding}
+                      className="cursor-pointer"
+                    >
+                      <CircleCheck />
+                      {savingBuilding ? "Saving.." : "Save"}
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => setIsDeleteBuildingOpen(true)}
+                      className="cursor-pointer"
+                    >
+                      <Trash2 />
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="flex flex-col gap-3">
+                  <Label className="text-base font-semibold">Venues</Label>
+
+                  {venues.map((venue) => (
+                    <div
+                      className="flex flex-col gap-2 p-2 border-t-1"
+                      key={venue.VenueID}
+                    >
+                      {editingVenueId === venue.VenueID ? (
+                        <>
+                          <Input
+                            value={venueTempName}
+                            placeholder="Venue Name"
+                            maxLength={50}
+                            onChange={(e) => setVenueTempName(e.target.value)}
+                            className="bg-bg-base"
+                          />
+                          <Input
+                            type="number"
+                            value={venueTempCapacity}
+                            placeholder="Venue Capacity"
+                            onChange={(e) =>
+                              setVenueTempCapacity(Number(e.target.value))
+                            }
+                            className="bg-bg-base"
+                          />
+                          <Select
+                            value={venueTempBuildingId}
+                            onValueChange={setVenueTempBuildingId}
+                          >
+                            <SelectTrigger className="bg-bg-base">
+                              <SelectValue placeholder="Building" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {buildings.map((b) => (
+                                <SelectItem
+                                  key={b.BuildingID}
+                                  value={b.BuildingID}
+                                >
+                                  {b.BuildingName}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              onClick={() => handleSaveVenue(venue)}
+                              disabled={updatingVenue}
+                              className="cursor-pointer"
+                            >
+                              <Check />
+                              Save
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              onClick={() => setEditingVenueId(null)}
+                              className="cursor-pointer"
+                            >
+                              <X />
+                              Cancel
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="text-sm text-(--text-primary)">
+                              {venue.VenueName}
+                            </p>
+                            <p className="text-xs text-(--text-primary)">
+                              <strong>Cap:</strong> {venue.Capacity}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              onClick={() => startEditingVenue(venue)}
+                              className="cursor-pointer"
+                            >
+                              <Pencil />
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              onClick={() => setVenueToDelete(venue.VenueID)}
+                              className="cursor-pointer"
+                            >
+                              <Trash2 />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  <div className="flex flex-col items-start gap-2 border-t-1 pt-4">
+                    <Label className="text-sm font-semibold">
+                      Add New Venue
+                    </Label>
+                    <Input
+                      value={newVenueName}
                       maxLength={50}
-                      onChange={(e) => setVenueTempName(e.target.value)}
+                      onChange={(e) => setNewVenueName(e.target.value)}
+                      placeholder="New Venue Name"
+                      className="bg-bg-base"
                     />
                     <Input
                       type="number"
-                      value={venueTempCapacity}
-                      placeholder="Venue Capacity"
+                      value={newVenueCapacity}
+                      min={0}
                       onChange={(e) =>
-                        setVenueTempCapacity(Number(e.target.value))
+                        setNewVenueCapacity(Number(e.target.value))
                       }
+                      placeholder="New Venue Capacity"
+                      className="bg-bg-base"
                     />
-                    <Select
-                      value={venueTempBuildingId}
-                      onValueChange={setVenueTempBuildingId}
+                    <Button
+                      onClick={handleAddVenue}
+                      disabled={creatingVenue || !newVenueName.trim()}
+                      variant="default"
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Building" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {buildings.map((building) => (
-                          <SelectItem
-                            key={building.BuildingID}
-                            value={building.BuildingID}
-                          >
-                            {building.BuildingName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        onClick={() => handleSaveVenue(venue)}
-                        disabled={updatingVenue}
-                        className="cursor-pointer"
-                      >
-                        <Check />
-                        Save
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        onClick={() => setEditingVenueId(null)}
-                        className="cursor-pointer"
-                      >
-                        <X />
-                        Cancel
-                      </Button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-sm text-(--text-primary)">
-                          {venue.VenueName}
-                        </p>
-                        <p className="text-xs text-(--text-primary)">
-                          <strong>Cap:</strong> {venue.Capacity}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          onClick={() => startEditingVenue(venue)}
-                          className="cursor-pointer"
-                        >
-                          <Pencil />
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          onClick={() => setVenueToDelete(venue.VenueID)}
-                          className="cursor-pointer"
-                        >
-                          <Trash2 />
-                        </Button>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
-
-            <div className="flex flex-col items-start gap-2 border-t-1 pt-4">
-              <Label className="text-lg">Add New Venue</Label>
-              <Input
-                value={newVenueName}
-                maxLength={50}
-                onChange={(e) => setNewVenueName(e.target.value)}
-                placeholder="New Venue Name"
-              />
-              <Input
-                type="number"
-                value={newVenueCapacity}
-                min={0}
-                onChange={(e) => setNewVenueCapacity(Number(e.target.value))}
-                placeholder="New Venue Capacity"
-              />
-              <Button
-                onClick={handleAddVenue}
-                disabled={creatingVenue || !newVenueName.trim()}
-                variant="default"
-              >
-                <Plus />
-                Add Venue
-              </Button>
-            </div>
+                      <Plus />
+                      Add Venue
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </SheetContent>
       </Sheet>
