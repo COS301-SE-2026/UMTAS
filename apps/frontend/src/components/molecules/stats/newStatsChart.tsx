@@ -198,6 +198,9 @@ export default function DynamicChart({
             <XAxis dataKey={xKey} tickLine={false} axisLine={false} />
             <YAxis axisLine={false} tickLine={false} />
             <ChartTooltip content={<ChartTooltipContent />} />
+            {yKey.length > 1 && (
+              <ChartLegend content={<ChartLegendContent />} />
+            )}
             {yKey.map((key) => (
               <Line
                 key={key}

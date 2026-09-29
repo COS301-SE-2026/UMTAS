@@ -217,3 +217,29 @@ The Traceability Matrices for the functional requirements to use cases can be fo
         - **R5.5.2** The system shall simulate uploading timetable PDF files, polling for parser job status, and retrieving results.
         - **R5.5.3** The system shall simulate users browsing enrolled modules, available events, and existing timetables.
         - **R5.5.4** The system shall simulate submitting custom scheduling jobs to the solver and polling for execution status.
+
+---
+
+??? info "**FR 6 - Vision Model Service**"
+
+    ### R6 Vision Model Service
+
+    - **R6.1** Session Creation
+        - **R6.1.1** The System shall allow lecturers and admins to persist sessions created using lecture watch
+            - **R6.1.1.1** The System shall allow lecturers to attach a module and a specific event to the session
+            - **R6.1.1.2** The System shall allow lecturers to attach a name and a description to the session
+    - **R6.2** Live Sessions
+        - **R6.2.1** The System shall allow lecturers to run inference on a live session using a camera feed from an available media device.
+            - **R6.2.1.1** The System shall record inference based on students movement
+            - **R6.2.1.2** The System shall record inference based on students gaze direction
+            - **R6.2.1.3** The System shall record inference based on students interaction with lecturer based on questions
+    - **R6.3** Recorded Sessions
+        - **R6.3.1** The System shall allow lecturers to run inference on a recorded session using a selected mp4 video.
+            - **R6.3.1.1** The System shall record inference based on students movement
+            - **R6.3.1.2** The System shall record inference based on students gaze direction
+            - **R6.3.1.3** The System shall record inference based on students interaction with lecturer based on questions
+    - **R6.4** Session Statistics 
+        - **R6.4.1** The System shall allow admins and lecturers to view statistics based on a module and a particular event across date ranges
+            - **R6.4.1.1** The System shall display grouped inference statistics based on students movement
+            - **R6.4.1.2** The System shall display grouped inference statistics based on students gaze direction
+            - **R6.4.1.3** The System shall display grouped inference statistics based on students interaction with lecturer based on questions

@@ -131,7 +131,7 @@ export default function ModulesTab({
         />
       </div>
 
-      <div className="rounded-lg border">
+      <div className="rounded-lg border bg-(--bg-surface)">
         <h2 className="font-bold text-[var(--text-primary)] p-4">
           All Modules
         </h2>

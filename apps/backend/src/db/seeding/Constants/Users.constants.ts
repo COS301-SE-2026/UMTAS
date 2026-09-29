@@ -2,11 +2,13 @@ import { randomUUID } from 'crypto';
 
 //Users
 export const UserIDs: string[] = [randomUUID(), randomUUID(), randomUUID()];
+
 export const UserNames: string[] = [
   'Jannie Bloekom',
   'Sarrie Jammer Gat',
   'Piet Pierneef',
 ];
+
 export const UserEmails: string[] = [
   'JannieBloekom@FlyAtUP.com',
   'SarrieJammerGat@FlyAtUP.com',

@@ -16,12 +16,11 @@ import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { useState } from "react";
+import { toast } from "sonner";
 import { moduleDTO } from "@/app/course-management/queries/modules/moduleBuilder";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
-import { useErrorListener } from "@/hooks/errorListener";
-import { errorName } from "../../../../utilities/errorCries";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import {
   createSessionMut,
@@ -79,13 +78,9 @@ export default function CreateVmSession({
       return sesh.Date == selectedDate && sesh.SessionName == sessionName;
     });
     if (foundSession) {
-      window.dispatchEvent(
-        new CustomEvent(errorName, {
-          detail: {
-            userMessage: "A session already exists with this name on this date",
-          },
-        }),
-      );
+      toast.error("Session already exists", {
+        description: "Choose a different session name or date.",
+      });
       return false;
     }
 
@@ -112,7 +107,6 @@ export default function CreateVmSession({
     });
   }
 
-  useErrorListener();
   const DAYS = [
     "sunday",
     "monday",
@@ -137,13 +131,9 @@ export default function CreateVmSession({
         if (new Date(date).getDay() === targetIndex) {
           setSelectedDate(date);
         } else {
-          window.dispatchEvent(
-            new CustomEvent(errorName, {
-              detail: {
-                userMessage: `Please ensure a date is selected on a ${requiredDay}`,
-              },
-            }),
-          );
+          toast.error("Invalid session date", {
+            description: `This event runs on ${requiredDay}. Choose a ${requiredDay}.`,
+          });
         }
       }
     }
@@ -166,8 +156,13 @@ export default function CreateVmSession({
   }
 
   function findSetModule(modID: string) {
-    const UniModule = allModules.find((mod) => mod.moduleID === modID);
-    if (UniModule) setSelectedModule(UniModule);
+    const universityModule = allModules.find((mod) => mod.moduleID === modID);
+
+    if (universityModule) {
+      setSelectedModule(universityModule);
+      setSelectedEvent(null);
+      setSelectedDate("");
+    }
   }
 
   function findSetEvent(key: string) {
@@ -183,10 +178,13 @@ export default function CreateVmSession({
     });
 
     if (uniEvent) {
+      setSelectedEvent(uniEvent);
+
       if (uniEvent.eventCriteria.date) {
         setSelectedDate(uniEvent.eventCriteria.date);
+      } else {
+        setSelectedDate("");
       }
-      setSelectedEvent(uniEvent);
     }
   }
 
@@ -194,35 +192,36 @@ export default function CreateVmSession({
     <Card className="w-[min(90vw,960px)] max-h-[85vh] overflow-auto border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
       <CardHeader className="space-y-1 border-b border-[var(--border)]">
         <CardTitle className="text-lg font-semibold text-[var(--text-primary)]">
-          Create or update a session
+          Choose a Lecture Watch session
         </CardTitle>
         <CardDescription className="text-sm text-[var(--text-secondary)]">
-          A session will hold everything captured from a video or live session
+          Select an existing session or create a new one to save Lecture Watch
+          results.
         </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-6 p-4">
         <section
-          aria-label="Re-capture session"
+          aria-label="Use existing session"
           className="space-y-4 rounded-lg border border-[var(--border)] p-4"
         >
           <div>
             <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
-              Re-capture session
+              Use existing session
             </h2>
             <p className="mt-1 text-xs leading-[1.5] text-[var(--text-secondary)]">
-              Select an existing session to re-capture data.
+              Continue analysing an existing session and save new results to it.
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label className="text-sm font-medium text-[var(--text-primary)]">
-                Filter Session
+                Filter sessions
               </Label>
               <Input
                 type="text"
-                placeholder="Filter Sessions..."
+                placeholder="Search sessions..."
                 value={SessionfilterText}
                 onChange={(e) => setSessionFilterText(e.target.value)}
                 className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
@@ -231,15 +230,21 @@ export default function CreateVmSession({
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-[var(--text-primary)]">
-                Select Session
+                Select session
               </Label>
               <Select
-                disabled={allSessions.length == 0}
+                disabled={sessionsLoading || allSessions.length == 0}
                 value={selectedSession?.SessionID}
                 onValueChange={(v) => findSetSession(v)}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a session" />
+                  <SelectValue
+                    placeholder={
+                      sessionsLoading
+                        ? "Loading sessions..."
+                        : "Select a session"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
                   {filterSession(SessionfilterText).map((sesh) => {
@@ -266,14 +271,30 @@ export default function CreateVmSession({
               type="button"
               variant="outline"
               className=""
-              onClick={() => {
-                if (selectedSession?.SessionID)
-                  deleteSessionFunction({
+              onClick={async () => {
+                if (!selectedSession?.SessionID) return;
+
+                const sessionNameToDelete = selectedSession.SessionName;
+
+                try {
+                  await deleteSessionFunction({
                     path: {
                       sessionId: selectedSession.SessionID,
                     },
                   });
-                setSelectedSession(null);
+
+                  setSelectedSession(null);
+
+                  toast.success("Session deleted", {
+                    description: `${sessionNameToDelete} was removed.`,
+                  });
+                } catch (error) {
+                  console.error("Could not delete session:", error);
+
+                  toast.error("Session could not be deleted", {
+                    description: "Please try again.",
+                  });
+                }
               }}
             >
               {!deleteIsPending ? (
@@ -290,32 +311,38 @@ export default function CreateVmSession({
               variant="outline"
               className=""
               onClick={() => {
-                if (selectedSession?.SessionID)
-                  updateSessionID(selectedSession?.SessionID);
+                if (!selectedSession?.SessionID) return;
+
+                updateSessionID(selectedSession.SessionID);
+
+                toast.success("Session selected", {
+                  description: `${selectedSession.SessionName} is ready for analysis.`,
+                });
               }}
             >
-              Re-capture Session
+              Use Session
             </Button>
           </div>
         </section>
 
         <section
-          aria-label="Create new session"
+          aria-label="Create a new session"
           className="space-y-4 rounded-lg border border-[var(--border)] p-4"
         >
           <div>
             <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
-              Create new session
+              Create a new session
             </h2>
             <p className="mt-1 text-xs leading-[1.5] text-[var(--text-secondary)]">
-              Choose a module, event type, and configure your session details.
+              Choose the class this analysis belongs to, then give the session a
+              name.
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-2">
               <Label className="text-sm font-medium text-[var(--text-primary)]">
-                Filter Modules
+                Filter modules
               </Label>
               <Input
                 type="text"
@@ -328,7 +355,7 @@ export default function CreateVmSession({
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-[var(--text-primary)]">
-                Select Module
+                Select module
               </Label>
               <Select
                 value={String(selectedModule?.moduleID ?? "")}
@@ -359,7 +386,7 @@ export default function CreateVmSession({
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-[var(--text-primary)]">
-                Select Event Type
+                Select event
               </Label>
               <Select
                 disabled={selectedModule == null}
@@ -403,7 +430,7 @@ export default function CreateVmSession({
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-[var(--text-primary)]">
-                Select Date
+                Session date
               </Label>
               <Input
                 type="date"
@@ -419,11 +446,11 @@ export default function CreateVmSession({
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-[var(--text-primary)]">
-                Name Session
+                Session name
               </Label>
               <Input
                 type="text"
-                placeholder="name your session"
+                placeholder="e.g. Monday Lecture"
                 value={sessionName}
                 onChange={(e) => setSessionName(e.target.value)}
                 className="w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
@@ -432,7 +459,7 @@ export default function CreateVmSession({
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-[var(--text-primary)]">
-                Describe Session
+                Description
               </Label>
               <Input
                 type="text"
@@ -448,13 +475,16 @@ export default function CreateVmSession({
             <Button
               variant="outline"
               onClick={async () => {
-                if (verifyDetails()) {
+                if (!verifyDetails()) return;
+
+                try {
                   const result = await createSessionFunction({
                     Date: selectedDate,
                     ModuleID: selectedModule?.moduleID ?? "",
                     EventID: selectedEvent?.eventId,
-                    SessionName: sessionName,
-                    SessionDsc: sessionDsc == "" ? undefined : sessionDsc,
+                    SessionName: sessionName.trim(),
+                    SessionDsc:
+                      sessionDsc.trim() === "" ? undefined : sessionDsc.trim(),
                     Data: {
                       questions_asked: 0,
                       total_frames: 0,
@@ -467,7 +497,17 @@ export default function CreateVmSession({
 
                   if (result.session) {
                     updateSessionID(result.session.SessionID);
+
+                    toast.success("Session created", {
+                      description: `${sessionName.trim()} is ready for analysis.`,
+                    });
                   }
+                } catch (error) {
+                  console.error("Could not create session:", error);
+
+                  toast.error("Session could not be created", {
+                    description: "Check the details and try again.",
+                  });
                 }
               }}
               type="button"

@@ -33,7 +33,7 @@ export default function CoursesTab({
   if (isError === true) {
     return (
       <div className="flex items-center justify-center text-[var(--destructive)]">
-        Could not load chart
+        Could not load stats
       </div>
     );
   }
@@ -152,8 +152,8 @@ export default function CoursesTab({
         />
       </div>
 
-      <div className="rounded-lg border">
-        <h2 className="font-bold text-[var(--text-primary)] p-4">
+      <div className="rounded-lg border bg-(--bg-surface)">
+        <h2 className="font-bold text-[var(--text-primary)] py-4 px-2">
           All Courses
         </h2>
         {isLoading ? (

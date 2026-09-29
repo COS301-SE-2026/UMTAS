@@ -31,23 +31,21 @@ export default function ScannerTemplate() {
 
     return (
       <div className="flex w-full flex-col items-center gap-6 px-6 pt-6">
-        <div className="w-full max-w-6xl overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
-          <AttendancePageHeader
-            className="px-5 py-4"
-            title="Attendance Scanner"
-            description="Upload a student list and scan student cards to record attendance."
-            action={
-              <Button asChild variant="ghost" size="sm">
-                <Link href="/attendance">
-                  <ArrowLeft size={14} aria-hidden="true" /> Back to attendance
-                </Link>
-              </Button>
-            }
-          />
+        <AttendancePageHeader
+          className="w-full max-w-6xl py-4"
+          title="Attendance Scanner"
+          description="Upload a student list and scan student cards to record attendance."
+          action={
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/attendance">
+                <ArrowLeft size={14} aria-hidden="true" /> Back to attendance
+              </Link>
+            </Button>
+          }
+        />
 
-          <div className="mx-auto w-full max-w-3xl p-5">
-            <AttendanceScanner />
-          </div>
+        <div className="w-full max-w-6xl">
+          <AttendanceScanner />
         </div>
       </div>
     );
