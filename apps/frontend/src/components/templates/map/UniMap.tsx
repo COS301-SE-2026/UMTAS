@@ -159,6 +159,21 @@ export function UniMap() {
     }, 7000);
   }, []);
 
+  function useTimeoutFlag(active: boolean, ms: number = 3000) {
+    const [timedOut, setTimedOut] = useState(false);
+
+    useEffect(() => {
+      if (!active) {
+        setTimedOut(false);
+        return;
+      }
+      const timer = setTimeout(() => setTimedOut(true), ms);
+      return () => clearTimeout(timer);
+    }, [active, ms]);
+
+    return timedOut;
+  }
+
   const handleUndoRoute = useCallback(() => {
     if (!routeUndo) return;
 
@@ -345,7 +360,12 @@ export function UniMap() {
     setIsBuildingSheetOpen(true);
   }
 
-  if (isLoading || (isRoutesLoading && mapMode === "route")) {
+  const routesTimedOut = useTimeoutFlag(isRoutesLoading, 3000);
+
+  if (
+    isLoading ||
+    (isRoutesLoading && !routesTimedOut && mapMode === "route")
+  ) {
     return <UniversityStateLoading />;
   }
 
