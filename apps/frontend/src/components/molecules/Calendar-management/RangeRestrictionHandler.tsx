@@ -201,7 +201,7 @@ function RangeDateHTML({
             data-testid="btn-save-restriction"
             id="btn-save-restriction"
             type="button"
-            variant="ghost"
+            variant="link"
             size="icon"
             onClick={() => {
               const check = ValidateRes(restriction);

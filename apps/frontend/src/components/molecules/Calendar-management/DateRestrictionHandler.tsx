@@ -178,7 +178,7 @@ function DateRestrictionHTML({
             id="btn-save-restriction"
             data-testid="btn-save-restriction"
             type="button"
-            variant="ghost"
+            variant="link"
             size="icon"
             onClick={() => {
               const check = ValidateRes(restriction);
