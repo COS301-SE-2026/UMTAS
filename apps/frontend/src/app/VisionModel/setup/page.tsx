@@ -14,6 +14,7 @@ import { Download, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import VM_GUIDE from "./setupGuide";
 
 type NavigatorWithGPU = Navigator & {
   gpu?: {
@@ -353,10 +354,14 @@ export default function VisionModelSetupPage() {
               )}
             </Button>
           )}
-          <Button>Setup Guide</Button>
+          <Button onClick={() => setShowGuide(true)}>Setup Guide</Button>
         </div>
       </div>
-      {showGuide && <Popup onClose={() => setShowGuide(false)}></Popup>}
+      {showGuide && (
+        <Popup onClose={() => setShowGuide(false)}>
+          <VM_GUIDE></VM_GUIDE>
+        </Popup>
+      )}
     </main>
   );
 }
