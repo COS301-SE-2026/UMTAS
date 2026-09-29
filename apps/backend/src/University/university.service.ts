@@ -83,8 +83,8 @@ export class UniversityService {
         UniversityID: University.UniversityID,
         UniversityName: University.UniversityName,
         ApiIdentifier: University.ApiIdentifier,
-        BaseApiUrl: University.BaseApiUrl,
-        ApiKey: University.ApiKey,
+        // BaseApiUrl: University.BaseApiUrl,
+        // ApiKey: University.ApiKey,
         role: UniversityRole.role,
       })
       .from(University)
