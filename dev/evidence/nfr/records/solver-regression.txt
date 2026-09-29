@@ -1,14 +1,11 @@
 Command: make -C apps/preference-solver test
 Exit code: 0
 Environment: macOS-27.0-arm64-arm-64bit
-c++ -std=c++17 -g -DOR_PROTO_DLL= -Ilib -I/opt/homebrew/opt/or-tools/include -I/opt/homebrew/Cellar/abseil/20260107.1/include -I/opt/homebrew/Cellar/protobuf/35.1/include  -MMD -MP -c src/CP_SOLVER/CP.cpp -o build/CP_SOLVER/CP.o
-c++ -std=c++17 -g -DOR_PROTO_DLL= -Ilib -I/opt/homebrew/opt/or-tools/include -I/opt/homebrew/Cellar/abseil/20260107.1/include -I/opt/homebrew/Cellar/protobuf/35.1/include  -o GA_BIN build/main.o build/data/API/API-data.o build/data/Events/event.o build/data/GA-data/chromosome.o build/data/Modules/module.o build/filecreator/filecreator.o build/GA_handler/GA.o build/CP_SOLVER/CP.o build/heuristic/Decorators/Decorators.o build/heuristic/Handlers/getHeuristic.o build/heuristic/Handlers/handler.o  -L/opt/homebrew/opt/or-tools/lib -L/opt/homebrew/opt/or-tools/lib64 -lortools -L/opt/homebrew/Cellar/abseil/20260107.1/lib -L/opt/homebrew/Cellar/abseil/20260107.1/lib64 -labsl_raw_hash_set -labsl_raw_logging_internal -labsl_log_internal_check_op -labsl_log_internal_message -Wl,-rpath,/opt/homebrew/opt/or-tools/lib,-rpath,/opt/homebrew/opt/or-tools/lib64 -Wl,-rpath,/opt/homebrew/Cellar/abseil/20260107.1/lib,-rpath,/opt/homebrew/Cellar/abseil/20260107.1/lib64
-c++ -std=c++17 -g -DOR_PROTO_DLL= -Ilib -I/opt/homebrew/opt/or-tools/include -I/opt/homebrew/Cellar/abseil/20260107.1/include -I/opt/homebrew/Cellar/protobuf/35.1/include  -o build/count-pattern-regression tests/count-pattern-regression.cpp build/data/API/API-data.o build/data/Events/event.o build/data/GA-data/chromosome.o build/data/Modules/module.o build/filecreator/filecreator.o build/GA_handler/GA.o build/CP_SOLVER/CP.o build/heuristic/Decorators/Decorators.o build/heuristic/Handlers/getHeuristic.o build/heuristic/Handlers/handler.o  -L/opt/homebrew/opt/or-tools/lib -L/opt/homebrew/opt/or-tools/lib64 -lortools -L/opt/homebrew/Cellar/abseil/20260107.1/lib -L/opt/homebrew/Cellar/abseil/20260107.1/lib64 -labsl_raw_hash_set -labsl_raw_logging_internal -labsl_log_internal_check_op -labsl_log_internal_message -Wl,-rpath,/opt/homebrew/opt/or-tools/lib,-rpath,/opt/homebrew/opt/or-tools/lib64 -Wl,-rpath,/opt/homebrew/Cellar/abseil/20260107.1/lib,-rpath,/opt/homebrew/Cellar/abseil/20260107.1/lib64
 ./tests/run-cli-regressions.sh
 Target time heuristic ran
-PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.K6Cyp6g21Y/cp-sat.json
+PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.RUekDwJyTu/cp-sat.json
 Target time heuristic ran
-PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.K6Cyp6g21Y/preferred-start-time.json
+PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.RUekDwJyTu/preferred-start-time.json
 Starting GA
 Generation 0
 Best fitness 0
@@ -46,7 +43,7 @@ Number of collisions 0
 Generation 11
 Best fitness 0
 Number of collisions 0
-PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.K6Cyp6g21Y/ga-feasibility.json
+PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.RUekDwJyTu/ga-feasibility.json
 Starting GA
 Generation 0
 Best fitness 0
@@ -84,7 +81,7 @@ Number of collisions 0
 Generation 11
 Best fitness 0
 Number of collisions 0
-PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.K6Cyp6g21Y/ga-avoidable-conflict.json
+PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.RUekDwJyTu/ga-avoidable-conflict.json
 Starting GA
 Target time heuristic ran
 Target time heuristic ran
@@ -1107,7 +1104,7 @@ Target time heuristic ran
 Generation 11
 Best fitness 0
 Number of collisions 0
-PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.K6Cyp6g21Y/ga-optimization.json
+PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.RUekDwJyTu/ga-optimization.json
 Starting GA
 Target time heuristic ran
 Target time heuristic ran
@@ -2130,7 +2127,7 @@ Target time heuristic ran
 Generation 11
 Best fitness 490
 Number of collisions 0
-PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.K6Cyp6g21Y/exact-interval-overlap.json
+PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.RUekDwJyTu/exact-interval-overlap.json
 Starting GA
 Generation 0
 Best fitness 1.79769e+308
@@ -2168,7 +2165,7 @@ Number of collisions 0
 Generation 11
 Best fitness 1.79769e+308
 Number of collisions 0
-PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.K6Cyp6g21Y/dated.json
+PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.RUekDwJyTu/dated.json
 Starting GA
 Generation 0
 Best fitness 1.79769e+308
@@ -2243,7 +2240,7 @@ Number of collisions 1
 Generation 11
 Best fitness 1
 Number of collisions 1
-PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.K6Cyp6g21Y/empty.json
+PASS: independent hard-constraint validation for /var/folders/76/gfz667q51dj0nr5vj81_5g_40000gn/T/tmp.RUekDwJyTu/empty.json
 ./build/count-pattern-regression
 Starting handler test
 Decorator created
@@ -5416,8 +5413,4 @@ Best fitness 900
 Number of collisions 0
 Output successfully created
 end small gap test
-ld: warning: search path '/opt/homebrew/opt/or-tools/lib64' not found
-ld: warning: search path '/opt/homebrew/Cellar/abseil/20260107.1/lib64' not found
-ld: warning: search path '/opt/homebrew/opt/or-tools/lib64' not found
-ld: warning: search path '/opt/homebrew/Cellar/abseil/20260107.1/lib64' not found
-./tests/run-cli-regressions.sh: line 53: 65925 Terminated: 15          ./GA_BIN --input "$input" --output "$tmp_dir/ga-sigterm.json" --engine ga > "$tmp_dir/ga-sigterm.log" 2>&1
+./tests/run-cli-regressions.sh: line 53: 57936 Terminated: 15          ./GA_BIN --input "$input" --output "$tmp_dir/ga-sigterm.json" --engine ga > "$tmp_dir/ga-sigterm.log" 2>&1
