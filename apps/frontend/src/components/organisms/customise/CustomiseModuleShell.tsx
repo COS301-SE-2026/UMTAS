@@ -153,7 +153,7 @@ export default function ModulesShell({
             </Button>
             <Button
               size="sm"
-              variant="secondary"
+              variant="default"
               className="h-7 text-xs flex-1 font-semibold cursor-pointer"
             >
               Modules

@@ -25,7 +25,7 @@ export function AttendanceConflictSelector({
   onSelect: (slot: AttendanceSlot) => void;
 }) {
   return (
-    <Alert className="mt-5 border-[var(--border)] bg-[var(--bg-base)]">
+    <Alert className="mt-5 border-[var(--border)] bg-[var(--bg-surface)]">
       <AlertCircle size={16} aria-hidden="true" />
 
       <AlertTitle>Choose the class you are attending</AlertTitle>

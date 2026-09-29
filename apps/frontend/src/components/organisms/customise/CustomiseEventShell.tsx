@@ -185,14 +185,14 @@ export default function EventsShell({
           <div className="flex gap-1 bg-muted p-1 rounded-md mb-2 flex-shrink-0">
             <Button
               size="sm"
-              variant="secondary"
+              variant="default"
               className="h-7 text-xs flex-1 font-semibold cursor-pointer"
             >
               Events
             </Button>
             <Button
               size="sm"
-              variant="ghost"
+              variant="secondary"
               className="h-7 text-xs flex-1 text-muted-foreground cursor-pointer"
               onClick={() => onViewModeChange?.("Modules")}
             >
