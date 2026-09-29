@@ -11,6 +11,7 @@ import {
   ModuleTeaches,
   NfcTag,
   UniversityEvent,
+  UniversityRole,
   Venue,
   modules,
   usersTable,
@@ -47,6 +48,16 @@ type SeededVenue = {
   name: string;
 };
 
+type SeededUser = {
+  id: string;
+  email: string;
+};
+
+type SeedUsers = {
+  users: SeededUser[];
+  fullAccessIds: Set<string>;
+};
+
 const ATTENDANCE_WEEKS = 12;
 
 const DAY_OFFSETS: Record<string, number> = {
@@ -70,6 +81,15 @@ export class EventsSeedService extends BaseSeedService {
   }
 
   async seed(db: AppDatabase): Promise<void> {
+    const universityId = await this.query.getUniversityIDByName(db, 'Pretoria');
+
+    if (!universityId) {
+      this.logger.warn(
+        'University of Pretoria is missing; skipping event seed.',
+      );
+      return;
+    }
+
     // Get all first-year module codes
     const moduleCodes = [
       ...new Set(FIRST_YEAR_EVENTS.map((event) => event.moduleCode)),
@@ -88,10 +108,14 @@ export class EventsSeedService extends BaseSeedService {
     // Validate that every module and venue exists
     this.validateReferences(modulesByCode, venuesByName);
 
-    // Enroll every user in every module that has seeded events
-    await this.enrollAllUsersInModules(
+    // Resolve who gets everything and who gets a random selection
+    const seedUsers = await this.getSeedUsers(db, universityId);
+
+    // Enroll the full access users in everything and the rest in a random selection
+    await this.seedUserModuleEnrollments(
       db,
-      [...modulesByCode.values()].map((module) => module.id),
+      [...modulesByCode.values()],
+      seedUsers,
     );
 
     let eventsCreated = 0;
@@ -127,17 +151,13 @@ export class EventsSeedService extends BaseSeedService {
       }
     }
 
-    const universityId = await this.query.getUniversityIDByName(db, 'Pretoria');
-    if (universityId) {
-      await this.seedAttendanceConflictDemo(db, modulesByCode, universityId);
-    } else {
-      this.logger.warn('University of Pretoria is missing; skipping demo');
-    }
+    await this.seedAttendanceConflictDemo(db, modulesByCode, universityId);
 
-    // Every user attends every seeded event
+    // Every enrolled user attends the seeded events of their modules
     const attendancesCreated = await this.seedAttendanceForAllUsers(
       db,
       seededEvents,
+      seedUsers,
     );
 
     this.logResult('First-year events', eventsCreated);
@@ -301,7 +321,7 @@ export class EventsSeedService extends BaseSeedService {
     this.logger.log(
       `Seeded recurring attendance conflict demo for ${lecturerEmail}; active on ${date}`,
     );
-  }
+  } //END_seedAttendanceConflictDemo
 
   private async getSeededModulesByCode(
     db: AppDatabase,
@@ -520,22 +540,86 @@ export class EventsSeedService extends BaseSeedService {
     return true;
   } //END_ensureEventVenueRelationship
 
-  private async enrollAllUsersInModules(
+  private async getSeedUsers(
     db: AppDatabase,
-    moduleIds: string[],
+    universityId: string,
+  ): Promise<SeedUsers> {
+    const seededUsers = await db
+      .select({
+        id: usersTable.id,
+        email: usersTable.email,
+      })
+      .from(usersTable)
+      .where(inArray(usersTable.email, this.constants.UserEmails));
+
+    const universityAdmins = await db
+      .select({
+        id: usersTable.id,
+        email: usersTable.email,
+      })
+      .from(usersTable)
+      .innerJoin(UniversityRole, eq(UniversityRole.UserID, usersTable.id))
+      .where(
+        and(
+          eq(UniversityRole.UniversityID, universityId),
+          eq(UniversityRole.role, 'UNIVERSITY_ADMIN'),
+        ),
+      );
+
+    const templateEmail = this.constants.UserEmails[0];
+    const lecturerEmail = this.constants.UserEmails[1];
+
+    const usersById = new Map(seededUsers.map((user) => [user.id, user]));
+
+    for (const admin of universityAdmins) {
+      usersById.set(admin.id, admin);
+    }
+
+    // University admins, the template user and the lecturer get everything
+    const fullAccessIds = new Set<string>(
+      universityAdmins.map((admin) => admin.id),
+    );
+
+    for (const user of usersById.values()) {
+      if (user.email === templateEmail || user.email === lecturerEmail) {
+        fullAccessIds.add(user.id);
+      }
+    }
+
+    return {
+      users: [...usersById.values()],
+      fullAccessIds,
+    };
+  } //END_getSeedUsers
+
+  private async seedUserModuleEnrollments(
+    db: AppDatabase,
+    seededModules: SeededModule[],
+    seedUsers: SeedUsers,
   ): Promise<number> {
-    if (moduleIds.length === 0) {
+    if (seededModules.length === 0) {
       return 0;
     }
 
-    // Get all users
-    const users = await db.select({ id: usersTable.id }).from(usersTable);
+    const { users, fullAccessIds } = seedUsers;
 
-    if (users.length === 0) {
-      return 0;
+    const moduleIds = seededModules.map((module) => module.id);
+
+    // Work out which modules every seeded user should be enrolled in
+    const desiredModuleIds = new Map<string, Set<string>>();
+
+    for (const user of users) {
+      const selectedModules = fullAccessIds.has(user.id)
+        ? seededModules
+        : this.getDeterministicModuleSelection(user.email, seededModules);
+
+      desiredModuleIds.set(
+        user.id,
+        new Set(selectedModules.map((module) => module.id)),
+      );
     }
 
-    // Get existing enrollments for these modules
+    // Only look at enrollments for the seeded modules
     const existingEnrollments = await db
       .select({
         moduleId: ModuleEnrollment.ModuleID,
@@ -546,25 +630,53 @@ export class EventsSeedService extends BaseSeedService {
 
     const existingKeys = new Set(
       existingEnrollments.map(
-        (enrollment) => `${enrollment.moduleId}:${enrollment.userId}`,
+        ({ moduleId, userId }) => `${moduleId}:${userId}`,
       ),
     );
 
-    // Only enroll the missing user/module pairs
+    // Remove stale enrollments left over from the old "everyone gets everything" seed
+    const staleModulesByUser = new Map<string, string[]>();
+
+    for (const { moduleId, userId } of existingEnrollments) {
+      const desired = desiredModuleIds.get(userId);
+
+      if (!desired || fullAccessIds.has(userId) || desired.has(moduleId)) {
+        continue;
+      }
+
+      const staleModules = staleModulesByUser.get(userId) ?? [];
+
+      staleModules.push(moduleId);
+
+      staleModulesByUser.set(userId, staleModules);
+    }
+
+    for (const [userId, staleModuleIds] of staleModulesByUser) {
+      await db
+        .delete(ModuleEnrollment)
+        .where(
+          and(
+            eq(ModuleEnrollment.UserID, userId),
+            inArray(ModuleEnrollment.ModuleID, staleModuleIds),
+          ),
+        );
+    }
+
+    // Only create the missing user/module rows
     const missingEnrollments: (typeof ModuleEnrollment.$inferInsert)[] = [];
 
-    for (const moduleId of moduleIds) {
-      for (const user of users) {
-        if (existingKeys.has(`${moduleId}:${user.id}`)) {
+    for (const [userId, desired] of desiredModuleIds) {
+      for (const moduleId of desired) {
+        if (existingKeys.has(`${moduleId}:${userId}`)) {
           continue;
         }
 
         missingEnrollments.push({
           ModuleID: moduleId,
-          UserID: user.id,
+          UserID: userId,
         });
-      } //END_user
-    } //END_moduleId
+      } //END_moduleId
+    } //END_user
 
     if (missingEnrollments.length === 0) {
       return 0;
@@ -576,24 +688,60 @@ export class EventsSeedService extends BaseSeedService {
     );
 
     return created.length;
-  } //END_enrollAllUsersInModules
+  } //END_seedUserModuleEnrollments
 
   private async seedAttendanceForAllUsers(
     db: AppDatabase,
     seededEvents: { eventId: string; event: SeedEvent }[],
+    seedUsers: SeedUsers,
   ): Promise<number> {
     if (seededEvents.length === 0) {
       return 0;
     }
 
-    // Get all users
-    const users = await db.select({ id: usersTable.id }).from(usersTable);
+    const eventIds = seededEvents.map((seeded) => seeded.eventId);
 
-    if (users.length === 0) {
+    // Users that receive a random selection instead of everything
+    const randomUserIds = new Set(
+      seedUsers.users
+        .filter((user) => !seedUsers.fullAccessIds.has(user.id))
+        .map((user) => user.id),
+    );
+
+    const eventModules = await db
+      .select({
+        eventId: UniversityEvent.eventID,
+        moduleId: UniversityEvent.moduleID,
+      })
+      .from(UniversityEvent)
+      .where(inArray(UniversityEvent.eventID, eventIds));
+
+    if (eventModules.length === 0) {
       return 0;
     }
 
-    const eventIds = seededEvents.map((seeded) => seeded.eventId);
+    const moduleUsers = await db
+      .select({
+        moduleId: ModuleEnrollment.ModuleID,
+        userId: ModuleEnrollment.UserID,
+      })
+      .from(ModuleEnrollment)
+      .where(
+        inArray(
+          ModuleEnrollment.ModuleID,
+          eventModules.map((eventModule) => eventModule.moduleId),
+        ),
+      );
+
+    const usersByModule = new Map<string, string[]>();
+
+    for (const enrollment of moduleUsers) {
+      const users = usersByModule.get(enrollment.moduleId) ?? [];
+
+      users.push(enrollment.userId);
+
+      usersByModule.set(enrollment.moduleId, users);
+    }
 
     // Get existing attendance rows for these events
     const existingAttendances = await db
@@ -615,24 +763,86 @@ export class EventsSeedService extends BaseSeedService {
     // Only create the missing user/event/date rows
     const missingAttendances: (typeof EventAttendance.$inferInsert)[] = [];
 
+    // Every attendance row the random users should have
+    const desiredRandomKeys = new Set<string>();
+
     for (const { eventId, event } of seededEvents) {
       const dates = this.getOccurrenceDates(event.dayOfWeek);
 
-      for (const user of users) {
+      const moduleId = eventModules.find(
+        (eventModule) => eventModule.eventId === eventId,
+      )?.moduleId;
+
+      if (!moduleId) {
+        continue;
+      }
+
+      const enrolledUsers = usersByModule.get(moduleId) ?? [];
+
+      for (const userId of enrolledUsers) {
+        const isRandomUser = randomUserIds.has(userId);
+
         for (const eventDate of dates) {
-          if (existingKeys.has(`${eventId}:${user.id}:${eventDate}`)) {
+          const key = `${eventId}:${userId}:${eventDate}`;
+
+          if (isRandomUser) {
+            // Random users miss a few occurrences
+            if (this.isOccurrenceSkipped(userId, eventId, eventDate)) {
+              continue;
+            }
+
+            desiredRandomKeys.add(key);
+          }
+
+          if (existingKeys.has(key)) {
             continue;
           }
 
           missingAttendances.push({
             eventID: eventId,
-            UserID: user.id,
+            UserID: userId,
             eventDate,
             state: 'ATTENDING',
           });
         } //END_eventDate
       } //END_user
     } //END_seededEvents
+
+    // Remove stale attendance for random users (not enrolled or skipped occurrences)
+    const staleByUser = new Map<string, Map<string, string[]>>();
+
+    for (const attendance of existingAttendances) {
+      const key = `${attendance.eventId}:${attendance.userId}:${attendance.eventDate}`;
+
+      if (!randomUserIds.has(attendance.userId) || desiredRandomKeys.has(key)) {
+        continue;
+      }
+
+      const staleEvents =
+        staleByUser.get(attendance.userId) ?? new Map<string, string[]>();
+
+      const staleDates = staleEvents.get(attendance.eventId) ?? [];
+
+      staleDates.push(String(attendance.eventDate));
+
+      staleEvents.set(attendance.eventId, staleDates);
+
+      staleByUser.set(attendance.userId, staleEvents);
+    } //END_existingAttendances
+
+    for (const [userId, staleEvents] of staleByUser) {
+      for (const [eventId, staleDates] of staleEvents) {
+        await db
+          .delete(EventAttendance)
+          .where(
+            and(
+              eq(EventAttendance.UserID, userId),
+              eq(EventAttendance.eventID, eventId),
+              inArray(EventAttendance.eventDate, staleDates),
+            ),
+          );
+      }
+    } //END_staleByUser
 
     // Insert in batches to stay well under Postgres' parameter limit
     const BATCH_SIZE = 1000;
@@ -660,6 +870,24 @@ export class EventsSeedService extends BaseSeedService {
     return created;
   } //END_seedAttendanceForAllUsers
 
+  private isOccurrenceSkipped(
+    userId: string,
+    eventId: string,
+    eventDate: string,
+  ): boolean {
+    // Deterministic hash so reseeding always gives the same result.
+    const key = `${userId}:${eventId}:${eventDate}`;
+
+    let hash = 0;
+
+    for (let i = 0; i < key.length; i++) {
+      hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+    }
+
+    // Roughly 1 in 10 occurrences is skipped.
+    return hash % 10 === 0;
+  } //END_isOccurrenceSkipped
+
   private getOccurrenceDates(dayOfWeek: string): string[] {
     const offset = DAY_OFFSETS[dayOfWeek.toLowerCase()] ?? 0;
 
@@ -679,4 +907,52 @@ export class EventsSeedService extends BaseSeedService {
 
     return dates;
   } //END_getOccurrenceDates
+
+  private getDeterministicModuleSelection(
+    userEmail: string,
+    seededModules: SeededModule[],
+  ): SeededModule[] {
+    if (seededModules.length === 0) {
+      return [];
+    }
+
+    // UserEmails[0] remains enrolled in every module.
+    if (userEmail === this.constants.UserEmails[0]) {
+      return seededModules;
+    }
+
+    // Deterministic seed based on the user's email.
+    let seed = 0;
+
+    for (let i = 0; i < userEmail.length; i++) {
+      seed = (seed * 31 + userEmail.charCodeAt(i)) >>> 0;
+    }
+
+    // Deterministic pseudo-random number generator.
+    const random = (): number => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 0x100000000;
+    };
+
+    // Ensure every user gets between 8 and 12 modules,
+    // or all available modules if there are fewer than 8.
+    const minModules = Math.min(seededModules.length, 8);
+    const maxModules = Math.min(seededModules.length, 12);
+
+    const moduleCount =
+      minModules + Math.floor(random() * (maxModules - minModules + 1));
+
+    const shuffled = [...seededModules].sort((a, b) =>
+      a.code.localeCompare(b.code),
+    );
+
+    // Deterministic Fisher-Yates shuffle.
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    return shuffled.slice(0, moduleCount);
+  } //END_getDeterministicModuleSelection
 } //END_EventsSeedService
