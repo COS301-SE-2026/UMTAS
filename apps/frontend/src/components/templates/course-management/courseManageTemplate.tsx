@@ -77,6 +77,19 @@ const steps = [
 
 export default function CourseManagementTemplate() {
   const { university, isLoading: isUniversityLoading } = useUniversityState();
+
+  const isExternalUniversity = Boolean(
+    university?.ApiIdentifier || university?.BaseApiUrl || university?.ApiKey,
+  );
+
+  // console.log("[CourseManagementTemplate] university object:", university);
+  // console.log(
+  //   "[CourseManagementTemplate] isExternalUniversity:",
+  //   isExternalUniversity,
+  // );
+
+  // ...
+  // const { university, isLoading: isUniversityLoading } = useUniversityState();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDegree, setSelectedDegree] = useState("All");
   const [selectedModulePrefix, setSelectedModulePrefix] = useState("All");
@@ -239,6 +252,10 @@ export default function CourseManagementTemplate() {
 
   const enrolledCourse = courseData.find((course) => course.isEnrolled);
 
+  //const isExternalUniversity = Boolean(
+  //   university?.ApiIdentifier || university?.BaseApiUrl || university?.ApiKey,
+  // );
+
   return (
     <>
       <Tutorial steps={steps} wait={true} />
@@ -304,18 +321,14 @@ export default function CourseManagementTemplate() {
                 id="btn-add-course"
                 data-testid="show-add-course"
                 onClick={() => {
-                  if (
-                    // updated to be more agnostic
-                    university?.ApiKey != null ||
-                    university?.ApiKey != undefined
-                  ) {
+                  if (isExternalUniversity) {
                     setExternalCourses(true);
                   } else {
                     setShowAddCourse(true);
                   }
                 }}
               >
-                Add Courses
+                {isExternalUniversity ? "Fetch courses" : "Add Courses"}
               </Button>
             )}
             {showAddCourse && isStudent === false && (

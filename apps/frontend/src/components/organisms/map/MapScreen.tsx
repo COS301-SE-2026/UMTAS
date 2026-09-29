@@ -81,7 +81,8 @@ export function MapScreen({
         <AlertCircle size={16} />
         <AlertDescription>
           Could not load your campus map. Please select a role by clicking on
-          the top right, on your initials.
+          the top right, on your initials. If it still fails, your university
+          admin has not set up the map.
         </AlertDescription>
       </Alert>
     );
