@@ -124,11 +124,12 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
       },
       {
         onSuccess: () => {
-          UserDetails.storeUniDetails({
-            UniversityID: selectedInstitute.UniversityID,
-            UniversityName: selectedInstitute.UniversityName,
+          const payloadToStore = {
+            ...selectedInstitute,
             role: role as uniDtoRoles,
-          });
+          };
+          //console.log("[InstituteSelector] Storing payload:", payloadToStore);
+          UserDetails.storeUniDetails(payloadToStore);
 
           getQueryClient().clear();
 
