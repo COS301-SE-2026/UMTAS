@@ -11,6 +11,7 @@ import { solverSection } from "../solver/HelpPage";
 import { vmSection } from "../VisionModel/HelpPage";
 import { mapSection } from "../map/HelpPage";
 import { attendanceSection } from "../attendance/HelpPage";
+import { calendarSection } from "../calendar-management/HelpPage";
 const allTutorialSections = [
   dashboardSection,
   solverSection,
@@ -19,6 +20,7 @@ const allTutorialSections = [
   moduleManagementSection,
   roleManagementSection,
   courseSection,
+  calendarSection,
   vmSection,
   mapSection,
   attendanceSection,
