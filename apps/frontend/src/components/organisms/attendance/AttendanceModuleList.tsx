@@ -79,7 +79,10 @@ export function AttendanceModuleList({
           ))}
         </div>
       ) : groups.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--bg-base)] px-4 py-8 text-center text-sm text-[var(--text-secondary)]">
+        <div
+          id="classes"
+          className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--bg-base)] px-4 py-8 text-center text-sm text-[var(--text-secondary)]"
+        >
           No classes are scheduled for today.
         </div>
       ) : (

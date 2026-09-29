@@ -109,7 +109,12 @@ export function NfcTagStatusCard({
                   <Link href={registerHref}>Register sticker</Link>
                 </Button>
               ) : (
-                <Button size="sm" onClick={onRegister} disabled={busy}>
+                <Button
+                  id="btn-register-sticker"
+                  size="sm"
+                  onClick={onRegister}
+                  disabled={busy}
+                >
                   Register sticker
                 </Button>
               )}
