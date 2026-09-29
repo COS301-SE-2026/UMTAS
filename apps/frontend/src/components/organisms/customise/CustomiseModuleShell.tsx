@@ -137,7 +137,7 @@ export default function ModulesShell({
   }
 
   return (
-    <Card className="w-[792px] h-[600px] m-6 p-4 flex flex-col overflow-hidden">
+    <div className="w-[792px] h-[600px] p-4 flex flex-col overflow-hidden bg-(--bg-surface)">
       <div className="flex flex-col md:flex-row gap-6 h-full min-h-0">
         <div className="flex flex-col gap-2 w-full md:min-w-[240px] md:w-auto h-auto md:h-full flex-shrink-0">
           <div className="flex gap-1 bg-muted p-1 rounded-md mb-2 flex-shrink-0">
@@ -260,6 +260,6 @@ export default function ModulesShell({
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

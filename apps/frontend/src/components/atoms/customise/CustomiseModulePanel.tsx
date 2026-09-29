@@ -17,7 +17,7 @@ export default function CustomiseModulePanel({
         <button
           type="button"
           onClick={onClick}
-          className={`flex flex-1 items-center gap-3 rounded-lg border px-4 py-4 text-left transition-colors ${
+          className={`flex flex-1 items-center gap-3 rounded-lg border px-3 py-2 text-left transition-colors ${
             isSelected
               ? "bg-[var(--bg-elevated)] border-[var(--text-disabled)]"
               : "border-[var(--border)] bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)] cursor-pointer"
@@ -28,10 +28,10 @@ export default function CustomiseModulePanel({
             style={{ backgroundColor: module.styling?.colour ?? "transparent" }}
           />
           <div className="flex-1 min-w-0">
-            <p className="text-base font-medium text-[var(--text-primary)] truncate">
+            <p className="text-sm font-medium text-[var(--text-primary)] truncate">
               {module.moduleName}
             </p>
-            <p className="text-sm font-mono text-[var(--text-secondary)]">
+            <p className="text-xs font-mono text-[var(--text-secondary)]">
               {module.moduleCode}
             </p>
           </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Card } from "@/components/atoms/baseShadcn/card";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import CustomiseEventPanel from "@/components/atoms/customise/CustomiseEventPanel";
@@ -24,19 +23,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/atoms/baseShadcn/dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 
 interface CustomiseShellProps {
   events: EventResponse[];
   modules: ModuleResponseDto[];
-  onViewModeChange?: (tab: "Modules" | "Events") => void;
   initialEventId?: string;
 }
 
-export default function EventsShell({
+export default function EventsOnlyShell({
   events,
   modules,
   initialEventId,
-  onViewModeChange,
 }: CustomiseShellProps) {
   const { data: buildingsList } = useQuery(getAllBuildingsQ());
   const buildings = buildingsList ?? [];
@@ -141,24 +139,35 @@ export default function EventsShell({
         : tempEvent.venues?.[0]?.venueName;
 
     if (selectedVenueName?.trim()) {
-      updateEventVenue({
-        path: { id: tempEvent.eventId },
-        body: {
-          venueName: selectedVenueName.trim(),
-          buildingId: selectedBuildingId || undefined,
+      updateEventVenue(
+        {
+          path: { id: tempEvent.eventId },
+          body: {
+            venueName: selectedVenueName.trim(),
+            buildingId: selectedBuildingId || undefined,
+          },
         },
-      });
+        {
+          onError: () => toast.error("Failed to save venue"),
+        },
+      );
     }
 
-    saveEvent({
-      path: { id: tempEvent.eventId },
-      body: {
-        eventName: tempEvent.eventName,
-        activityCode: tempEvent.activityCode,
-        eventCriteria: thisEventCriteria,
-        isRecurring: tempEvent.isRecurring,
+    saveEvent(
+      {
+        path: { id: tempEvent.eventId },
+        body: {
+          eventName: tempEvent.eventName,
+          activityCode: tempEvent.activityCode,
+          eventCriteria: thisEventCriteria,
+          isRecurring: tempEvent.isRecurring,
+        },
       },
-    });
+      {
+        onSuccess: () => toast.success("Event saved"),
+        onError: () => toast.error("Failed to save event"),
+      },
+    );
   }
 
   function handleDiscard() {
@@ -179,27 +188,9 @@ export default function EventsShell({
   }
 
   return (
-    <div className="w-full h-[600px] p-4 flex flex-col overflow-hidden bg-(--bg-surface) border-none">
+    <div className="w-full h-[600px] flex flex-col overflow-hidden">
       <div className="flex flex-col md:flex-row gap-6 h-full min-h-0">
         <div className="flex flex-col gap-2 w-full md:min-w-[240px] md:w-auto h-auto md:h-full flex-shrink-0">
-          <div className="flex gap-1 bg-muted p-1 rounded-md mb-2 flex-shrink-0">
-            <Button
-              size="sm"
-              variant="secondary"
-              className="h-7 text-xs flex-1 font-semibold cursor-pointer"
-            >
-              Events
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-7 text-xs flex-1 text-muted-foreground cursor-pointer"
-              onClick={() => onViewModeChange?.("Modules")}
-            >
-              Modules
-            </Button>
-          </div>
-
           <div className="md:hidden flex flex-row items-center gap-2 flex-shrink-0 mb-2">
             <div className="flex-1 min-w-0">
               <Input

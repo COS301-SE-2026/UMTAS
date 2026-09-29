@@ -35,7 +35,7 @@ export function CourseSelect({
     <div className="flex flex-col h-fit w-full">
       <div className="flex gap-4 w-full">
         <div className="flex-1 flex flex-col space-y-2">
-          <label className="text-sm font-medium text-[var(--text-primary)]">
+          <label className="text-sm text-[var(--text-secondary)]">
             Search for course
           </label>
           <Input
@@ -49,7 +49,7 @@ export function CourseSelect({
         </div>
 
         <div className="flex-1 flex flex-col space-y-2">
-          <label className="text-sm font-medium text-[var(--text-primary)]">
+          <label className="text-sm font-medium text-[var(--text-secondary)]">
             Select Course
           </label>
           <Select
