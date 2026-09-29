@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { createHmac } from 'node:crypto';
 
 import { and, eq, inArray, ne } from 'drizzle-orm';
 
@@ -7,6 +8,8 @@ import {
   EventAttendance,
   EventVenue,
   ModuleEnrollment,
+  ModuleTeaches,
+  NfcTag,
   UniversityEvent,
   Venue,
   modules,
@@ -17,6 +20,11 @@ import type { AppDatabase } from '../../database.service';
 
 import { BaseSeedService } from '../base.seed.service';
 import { SeedPersistenceService } from '../seed-persistence.service';
+import { SeedQueryService } from './seed-query.service';
+import {
+  DEFAULT_ATTENDANCE_TIME_ZONE,
+  localDateAt,
+} from '../../../Attendance/attendance-occurrence';
 
 import {
   EventSource,
@@ -55,6 +63,7 @@ const DAY_OFFSETS: Record<string, number> = {
 export class EventsSeedService extends BaseSeedService {
   constructor(
     private readonly persistence: SeedPersistenceService,
+    private readonly query: SeedQueryService,
     private readonly eventFingerprintService: EventImportFingerprintService,
   ) {
     super();
@@ -118,6 +127,13 @@ export class EventsSeedService extends BaseSeedService {
       }
     }
 
+    const universityId = await this.query.getUniversityIDByName(db, 'Pretoria');
+    if (universityId) {
+      await this.seedAttendanceConflictDemo(db, modulesByCode, universityId);
+    } else {
+      this.logger.warn('University of Pretoria is missing; skipping demo');
+    }
+
     // Every user attends every seeded event
     const attendancesCreated = await this.seedAttendanceForAllUsers(
       db,
@@ -132,6 +148,160 @@ export class EventsSeedService extends BaseSeedService {
 
     this.logResult('Event attendances', attendancesCreated);
   } //END_seed
+
+  private async seedAttendanceConflictDemo(
+    db: AppDatabase,
+    modulesByCode: Map<string, { id: string; code: string }>,
+    universityId: string,
+  ): Promise<void> {
+    const lecturerEmail = this.constants.UserEmails[1];
+    const [lecturer] = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.email, lecturerEmail))
+      .limit(1);
+    const demoModules = this.constants.ATTENDANCE_DEMO_MODULE_CODES.map(
+      (code) => modulesByCode.get(code),
+    ).filter(
+      (module): module is { id: string; code: string } => module !== undefined,
+    );
+
+    if (!lecturer || demoModules.length < 2) {
+      this.logger.warn(
+        'Attendance conflict demo requires the seeded lecturer and two modules',
+      );
+      return;
+    }
+
+    await db
+      .insert(ModuleTeaches)
+      .values(
+        demoModules.map((module) => ({
+          ModuleID: module.id,
+          UserID: lecturer.id,
+        })),
+      )
+      .onConflictDoNothing();
+
+    const [student] = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.email, this.constants.UserEmails[0]))
+      .limit(1);
+    if (student) {
+      await db
+        .insert(ModuleEnrollment)
+        .values(
+          demoModules.map((module) => ({
+            ModuleID: module.id,
+            UserID: student.id,
+          })),
+        )
+        .onConflictDoNothing();
+    }
+
+    const secret = process.env.BETTER_AUTH_SECRET;
+    if (secret) {
+      const tokenHash = createHmac('sha256', secret)
+        .update('attendance-conflict-demo-token-2026')
+        .digest('hex');
+      await db
+        .insert(NfcTag)
+        .values({
+          tagId: '00000000-0000-4000-8000-0000000000a1',
+          ownerUserId: lecturer.id,
+          universityId,
+          tokenHash,
+        })
+        .onConflictDoUpdate({
+          target: NfcTag.ownerUserId,
+          set: {
+            tagId: '00000000-0000-4000-8000-0000000000a1',
+            tokenHash,
+            universityId,
+            updatedAt: new Date(),
+          },
+        });
+    }
+
+    const date = localDateAt(
+      new Date(),
+      process.env.ATTENDANCE_TIME_ZONE ?? DEFAULT_ATTENDANCE_TIME_ZONE,
+    );
+
+    const weekdays = [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ] as const;
+    for (const [index, module] of demoModules.entries()) {
+      for (const dayOfWeek of weekdays) {
+        const eventName = `Attendance demo ${index + 1}`;
+        const criteria: UniversityEventCriteria = {
+          eventSource: EventSource.UNIVERSITY,
+          moduleId: module.id,
+          activityType: 'lecture',
+          dayOfWeek,
+          startTime: '00:00',
+          endTime: '23:59',
+        };
+
+        const importFingerprint =
+          this.eventFingerprintService.buildForModuleEvent({
+            moduleId: module.id,
+            activityType: 'lecture',
+            activityCode: module.code,
+            eventCriteria: criteria,
+            eventName,
+          });
+
+        const [existing] = await db
+          .select({ id: Event.eventID })
+          .from(Event)
+          .where(eq(Event.importFingerprint, importFingerprint))
+          .limit(1);
+        const eventId = existing
+          ? existing.id
+          : (
+              await this.persistence.insertEvents(db, [
+                {
+                  eventName,
+                  activityCode: module.code,
+                  activityType: 'lecture',
+                  eventCriteria: criteria,
+                  isRecurring: true,
+                  validated: true,
+                  importFingerprint,
+                },
+              ])
+            )[0]?.eventID;
+
+        if (!eventId) continue;
+        if (existing) {
+          await db
+            .update(Event)
+            .set({
+              eventName,
+              activityCode: module.code,
+              activityType: 'lecture',
+              eventCriteria: criteria,
+              isRecurring: true,
+              validated: true,
+            })
+            .where(eq(Event.eventID, eventId));
+        }
+        await this.ensureModuleEventRelationship(db, eventId, module.id);
+      }
+    }
+
+    this.logger.log(
+      `Seeded recurring attendance conflict demo for ${lecturerEmail}; active on ${date}`,
+    );
+  }
 
   private async getSeededModulesByCode(
     db: AppDatabase,

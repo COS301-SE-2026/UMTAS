@@ -484,7 +484,7 @@ describe('VenueService', () => {
       //Arrange
       mockTransaction(mockDb, {
         select: [
-          [{ id: 'venue-1' }], // validVenues only — no building check
+          [{ id: 'venue-1' }], // validVenues only, no building check
         ],
         update: [[]],
       });

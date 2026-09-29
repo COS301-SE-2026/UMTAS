@@ -10,6 +10,7 @@ import {
 
 import EventManagementTemplate from "./eventManagementTemplate";
 import ModManagementTemplate from "./moduleManagementTemplate";
+import { useSearchParams } from "next/navigation";
 
 const headings = {
   events: {
@@ -23,7 +24,10 @@ const headings = {
 };
 
 export default function ModuleEventTemplateTabs() {
-  const [activeTab, setActiveTab] = useState<keyof typeof headings>("events");
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState<keyof typeof headings>(
+    searchParams.get("tab") === "modules" ? "modules" : "events",
+  );
 
   return (
     <div className="w-full">

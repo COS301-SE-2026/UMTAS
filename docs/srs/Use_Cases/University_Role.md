@@ -19,6 +19,7 @@
         <div align="center">
         ![](./Traceability_Matrix/FR4_4.svg)
         </div>
+        The current text mapping adds **R4.4.4 → UC-UNI-03** for university-scoped authorisation.
 
     ---
     ??? "UC-UNI-01: Apply for Role"
@@ -78,4 +79,4 @@
         | **Basic Flow** | 1. User requests an endpoint requiring a university role.<br>2. System checks the user has selected a university.<br>3. System retrieves the user's approved role for that university.<br>4. System compares the user's role against the endpoint's required role.<br>5. System grants access if the role satisfies the requirement. |
         | **Alternate Flow** | **A1: No University Selected**<br>System denies access and prompts the user to select a university.<br><br>**A2: No Approved Role**<br>System denies access and informs the user their application is pending or not approved. |
         | **Postcondition** | User is granted or denied access to the requested endpoint based on their university role |
-        | **Requirements Covered** | TBD |
+        | **Requirements Covered** | R4.4.4 |

@@ -11,7 +11,7 @@
 ## Client-Server
 
 Browsers use the Core API for all application workflows. They do not access workers, the message
-queue, blob storage, or the relational database directly. The Core is the authorization,
+queue, blob storage, or the relational database directly. The Core is the authorisation,
 orchestration, and persistence boundary.
 
 ## Core-and-Adapter

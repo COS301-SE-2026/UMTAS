@@ -2,7 +2,7 @@
 
 This static catalogue is generated from `apps/backend/docs/openapi.json`. Request and response schemas, parameters, examples, security requirements, and standard error bodies remain normative in that committed OpenAPI document. The live Swagger UI is a rendered convenience.
 
-**Source reviewed:** 3 September 2026  
+**Source reviewed:** the release  
 **Operations:** 115
 
 ## Academic Calendar

@@ -87,7 +87,7 @@
     |---|---|---|
     | US-30 | As a user, I want to import a supported timetable PDF so that I do not have to manually re-enter my academic events. | UC-PDF-01 |
     | US-31 | As a user, I want to review imported timetable data so that I can correct any parsing errors before it is saved. | UC-PDF-02 |
-    | US-32 | As a university administrator, I want to verify imported data so that unverified parser output becomes trusted academic data. | UC-PDF-02 |
+    | US-32 | As a university administrator, I want to verify imported data so that unverified parser output becomes trusted academic data. | UC-PDF-03 |
 
 ---
 ??? info "**API Import**"

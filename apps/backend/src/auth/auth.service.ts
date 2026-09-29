@@ -5,7 +5,7 @@ import {
   OnModuleInit,
   ServiceUnavailableException,
 } from '@nestjs/common';
-import { and, eq, ilike, ne } from 'drizzle-orm';
+import { and, count, eq, gte, ilike, like, ne, sql } from 'drizzle-orm';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { MailerService } from '../mail/mailer.service';
 import * as appSchema from '../entities';
@@ -37,6 +37,9 @@ interface ProvisioningOptions {
   role: appSchema.RoleTypeType;
   universityName?: string;
 }
+
+const MAX_GUESTS_PER_DAY = 200;
+const GUEST_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -208,16 +211,44 @@ export class AuthService implements OnModuleInit {
   } //END_selectUniversity
 
   async createGuestUser(): Promise<ProvisionedUser> {
-    const email = `guest+${randomUUID()}@simulation.com`;
-    const password = randomBytes(32).toString('base64url');
+    const guest = await this.databaseService.db.transaction(
+      async (tx: AppDatabase) => {
+        // Serialize the count and creation across backend instances in production.
+        if (this.databaseService.dbMode === 'DATABASE') {
+          await tx.execute(sql`SELECT pg_advisory_xact_lock(24819, 1)`);
+        }
 
-    const guest = await this.createProvisionedTestUser({
-      email,
-      password,
-      name: 'Guest',
-      role: 'STUDENT',
-      universityName: 'University of Pretoria',
-    });
+        const [{ total }] = await tx
+          .select({ total: count() })
+          .from(appSchema.usersTable)
+          .where(
+            and(
+              like(appSchema.usersTable.email, 'guest+%@simulation.com'),
+              gte(
+                appSchema.usersTable.createdAt,
+                new Date(Date.now() - GUEST_WINDOW_MS),
+              ),
+            ),
+          );
+
+        if (total >= MAX_GUESTS_PER_DAY) {
+          throw new ServiceUnavailableException(
+            'Guest login is currently unavailable',
+          );
+        }
+
+        return this.createProvisionedTestUser(
+          {
+            email: `guest+${randomUUID()}@simulation.com`,
+            password: randomBytes(32).toString('base64url'),
+            name: 'Guest',
+            role: 'STUDENT',
+            universityName: 'University of Pretoria',
+          },
+          tx,
+        );
+      },
+    );
 
     try {
       await this.databaseService.db.transaction((tx: AppDatabase) =>

@@ -26,7 +26,7 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 UMTAS automates the timetabling lifecycle - from ingesting supported PDF schedules and resolving hard and soft scheduling constraints to delivering personalised timetable options.
 
-The system is university-agnostic by design: a Core-and-Adapter architecture cleanly separates scheduling logic from institution-specific data formats, allowing any university to plug in without changes to the core.
+The system is designed for university-specific adapters: a Core-and-Adapter architecture separates scheduling logic from institution-specific data formats. Support for another university still requires an implemented and verified adapter.
 
 ---
 
@@ -36,11 +36,11 @@ Get up and running with the UMTAS platform in minutes.
 
 <div class="grid cards" markdown>
 
--   :material-presentation-play:{ .lg .middle } __Demo 3 Deliverables__
+-   :material-presentation-play:{ .lg .middle } __Demo 4 Marking Guide__
 
     ---
 
-    Navigate directly to the five documentation items assessed for Demo 3.
+    Find direct links to the current documentation, application and assessment resources.
 
     [:octicons-arrow-right-24: Open Marking Guide](management/Marking-Guide.md)
 
