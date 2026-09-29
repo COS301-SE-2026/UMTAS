@@ -63,7 +63,7 @@ export default function VM_GUIDE() {
           <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
             GPU Guide
           </h2>
-          <p className="mt-1 text-lg font-normal leading-relaxed text-[var(--text-secondary)]">
+          <p className="mt-1 text-sm font-normal leading-relaxed text-[var(--text-secondary)]">
             The lecture watch feature is a computationally heavy task and a
             computers GPU is required. The GPU functionality should be enabled
             by default by any modern browser, however if you run into issues
