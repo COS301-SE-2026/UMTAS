@@ -94,3 +94,21 @@ nav:
       - Marking Guide: management/Marking-Guide.md
       - Team Profiles: management/Team-Profiles.md
       - User Manual: management/UserManual.md
+  - Developer Guides:
+      - Overview: developer-guides/index.md
+      - Repository Setup: developer-guides/Repo-Setup-Guide.md
+      - Server Setup: developer-guides/Server-Setup-Guide.md
+      - Master Guide: developer-guides/master-development-guide.md
+      - Git Strategy: developer-guides/git-strategy-guide.md
+      - Coding Standards: developer-guides/coding-standards.md
+      - Backend Development: developer-guides/backend-development-guide.md
+      - Frontend Development: developer-guides/frontend-development-guide.md
+      - Testing Policy: developer-guides/testing-policy.md
+      - Unit Testing: developer-guides/unit-testing-guide.md
+      - Integration Testing: developer-guides/integration-testing-guide.md
+      - End-to-End Testing: developer-guides/e2e-testing-guide.md
+      - Local CI/CD: developer-guides/local-cicd-guide.md
+      - Server Guide: developer-guides/server-guide.md
+  - Design:
+      - Brand Style: design/Brand-Style.md
+      - Wireframes: design/Wireframes.md
