@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
@@ -20,7 +21,8 @@ import {
 import { updateEventMut } from "@/components/templates/builder/Queries/eventQueries";
 
 import { ModuleTableData } from "@/components/organisms/module-management/ModuleColumns";
-import { CustomiseModuleCard } from "@/components/molecules/customise/CustomiseModuleCard";
+import { EditModuleCard } from "@/components/molecules/customise/EditModuleCard";
+import { Separator } from "@/components/atoms/baseShadcn/separator";
 import { CustomiseEventCard } from "@/components/molecules/customise/CustomiseEventCard";
 import { UserDetails } from "@/lib/userclass/userClass";
 import {
@@ -235,6 +237,7 @@ export default function EditModuleEvent({
           });
       }
       setFeedback({ type: "success", message: "Changes saved successfully!" });
+      toast.success("Changes saved successfully!");
 
       // setTimeout(() => {
       //   onClose();
@@ -246,17 +249,12 @@ export default function EditModuleEvent({
         type: "error",
         message: "Changes failed to save. Try again?",
       });
+      toast.error("Changes failed to save. Try again?");
     }
   };
 
   return (
-    <div className="flex flex-col gap-4 p-6 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl shadow-sm w-full max-w-2xl mx-auto h-[80vh] max-h-[91vh] overflow-hidden">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-          Edit Module and Events
-        </h2>
-      </div>
-
+    <div className="flex flex-col gap-4 w-full h-[70vh] overflow-hidden">
       <Tabs
         defaultValue="module"
         className="flex-1 overflow-hidden flex flex-col"
@@ -276,19 +274,20 @@ export default function EditModuleEvent({
           </TabsTrigger>
         </TabsList>
 
-        <div className="flex-1 overflow-y-auto mt-4 pr-2 flex flex-col gap-4">
+        <div className="flex-1 overflow-y-auto mt-4 pr-2 flex flex-col gap-4 [scrollbar-width:thin] [scrollbar-color:var(--border)_transparent]">
           <TabsContent value="module" className="mt-0 flex flex-col gap-4">
-            <CustomiseModuleCard
+            <EditModuleCard
               module={moduleState}
               onUpdate={handleModuleUpdate}
             />
+            <Separator className="bg-[var(--border)]" />
             {isAttendanceOperator ? (
-              <div className="flex flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+              <div className="flex flex-col gap-2">
                 <Label className="text-sm font-medium text-[var(--text-primary)]">
                   Teaching Assignment
                 </Label>
 
-                <Label className="text-sm font-medium text-[var(--text-secondary)]">
+                <Label className="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)]">
                   I teach this module
                   <Checkbox
                     checked={teachesModule}
@@ -302,7 +301,7 @@ export default function EditModuleEvent({
                 </Label>
               </div>
             ) : (
-              <div className="flex flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+              <div className="flex flex-col gap-2">
                 <Label
                   htmlFor="module-description-input"
                   className="text-sm font-medium text-[var(--text-primary)]"
@@ -311,7 +310,7 @@ export default function EditModuleEvent({
                 </Label>
                 <Label
                   htmlFor="module-description-input"
-                  className="text-sm font-medium text-[var(--text-secondary)]"
+                  className="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)]"
                 >
                   Enroll
                   <Checkbox
@@ -327,7 +326,8 @@ export default function EditModuleEvent({
                 </Label>
               </div>
             )}
-            <div className="flex flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+            <Separator className="bg-[var(--border)]" />
+            <div className="flex flex-col gap-2">
               <Label
                 htmlFor="module-description-input"
                 className="text-sm font-medium text-[var(--text-primary)]"
@@ -351,9 +351,57 @@ export default function EditModuleEvent({
                   )
                 }
                 placeholder="Enter module description..."
-                className="bg-[var(--background)] border-[var(--border)] text-[var(--text-primary)]"
+                className="max-w-sm bg-[var(--background)] border-[var(--border)] text-[var(--text-primary)]"
               />
             </div>
+            {UserDetails.getUniDetails()?.role !== "STUDENT" && (
+              <Card className="w-full p-0 gap-0 border-0 ring-0 bg-transparent shadow-none">
+                <Separator className="bg-[var(--border)] mb-4" />
+                <Label className="text-sm font-medium text-[var(--text-primary)] pb-4">
+                  Add Module to Course
+                </Label>
+                <CourseSelect
+                  CourseState={selectedCourse}
+                  updateCourseState={setSelectedCourse}
+                >
+                  <Button
+                    disabled={
+                      !selectedCourse.CourseID || isAdding || isAddSuccess
+                    }
+                    onClick={() => {
+                      resetAdd();
+                      addModuleToCourseMut(
+                        {
+                          body: { modules: [moduleState.moduleID] },
+                          path: { CourseID: selectedCourse.CourseID },
+                        },
+                        {
+                          onSuccess: () =>
+                            toast.success("Module added to course"),
+                          onError: () =>
+                            toast.error("Failed to add module to course"),
+                        },
+                      );
+                    }}
+                    className={`w-fit mt-4 ${
+                      isAddSuccess
+                        ? "bg-[var(--success-bg)] text-[var(--success-text)]"
+                        : isAddError
+                          ? "bg-[var(--error-bg)] text-[var(--error-text)]"
+                          : ""
+                    }`}
+                  >
+                    {isAdding
+                      ? "Adding.."
+                      : isAddSuccess
+                        ? "Successfully Added Module to Course"
+                        : isAddError
+                          ? "Failed to Add Module To Course"
+                          : "Add Module to Course"}
+                  </Button>
+                </CourseSelect>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="events" className="mt-0 flex flex-col gap-6">
@@ -376,75 +424,25 @@ export default function EditModuleEvent({
         </div>
       </Tabs>
 
-      {UserDetails.getUniDetails()?.role !== "STUDENT" && (
-        <Card className="w-full mt-2 p-4 border-[var(--border)] bg-[var(--bg-surface)] shadow-md">
-          <Label className="text-sm font-medium text-[var(--text-primary)]">
-            Add Module to Course
-          </Label>
-          <CourseSelect
-            CourseState={selectedCourse}
-            updateCourseState={setSelectedCourse}
+      <div className="flex flex-col items-center gap-2 mt-4 pt-4 border-t border-[var(--border)]">
+        {feedback && (
+          <p
+            className={`text-sm font-medium ${
+              feedback.type === "success"
+                ? "text-[var(--success-text)]"
+                : "text-[var(--error-text)]"
+            }`}
           >
-            <Button
-              disabled={!selectedCourse.CourseID || isAdding || isAddSuccess}
-              onClick={() => {
-                resetAdd();
-                addModuleToCourseMut({
-                  body: { modules: [moduleState.moduleID] },
-                  path: { CourseID: selectedCourse.CourseID },
-                });
-              }}
-              className={`w-fit mt-4 ${
-                isAddSuccess
-                  ? "bg-[var(--success-bg)] text-[var(--success-text)]"
-                  : isAddError
-                    ? "bg-[var(--error-bg)] text-[var(--error-text)]"
-                    : ""
-              }`}
-            >
-              {isAdding
-                ? "Adding.."
-                : isAddSuccess
-                  ? "Successfully Added Module to Course"
-                  : isAddError
-                    ? "Failed to Add Module To Course"
-                    : "Add Module to Course"}
-            </Button>
-          </CourseSelect>
-        </Card>
-      )}
-
-      <div className="flex justify-between items-center mt-4 pt-4 border-t border-[var(--border)]">
-        <div className="flex-1">
-          {feedback && (
-            <p
-              className={`text-sm font-medium ${
-                feedback.type === "success"
-                  ? "text-[var(--success-text)]"
-                  : "text-[var(--error-text)]"
-              }`}
-            >
-              {feedback.message}
-            </p>
-          )}
-        </div>
-        <div className="flex justify-end gap-3">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            disabled={isPending}
-            className="bg-[var(--background)] hover:bg-[var(--bg-elevated)] text-[var(--text-primary)] border-[var(--border)]"
-          >
-            Cancel
-          </Button>
-          <Button
-            data-testid="save-changes-btn"
-            onClick={handleSave}
-            disabled={isPending}
-          >
-            {isPending ? "Saving" : "Save Changes"}
-          </Button>
-        </div>
+            {feedback.message}
+          </p>
+        )}
+        <Button
+          data-testid="save-changes-btn"
+          onClick={handleSave}
+          disabled={isPending}
+        >
+          {isPending ? "Saving" : "Save Changes"}
+        </Button>
       </div>
     </div>
   );

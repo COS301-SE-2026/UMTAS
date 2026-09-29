@@ -46,27 +46,23 @@ export default function NfcRegistrationTemplate() {
   }
 
   return (
-    <div
-      id="nfc-registration-header"
-      className="flex w-full flex-col items-center gap-6 px-6 pt-6"
-    >
+    <div className="w-full px-8 pt-6">
       <Tutorial steps={steps} wait={true} />
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+        <AttendancePageHeader
+          className="w-full border-b border-[var(--border)] pb-4"
+          title="Register NFC sticker"
+          description="Set up, replace and test the NFC sticker used for attendance."
+          action={
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/attendance">
+                <ArrowLeft size={14} aria-hidden="true" />
+                Back to attendance
+              </Link>
+            </Button>
+          }
+        />
 
-      <AttendancePageHeader
-        className="w-full max-w-6xl py-4"
-        title="Register NFC sticker"
-        description="Set up, replace and test the NFC sticker used for attendance."
-        action={
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/attendance">
-              <ArrowLeft size={14} aria-hidden="true" />
-              Back to attendance
-            </Link>
-          </Button>
-        }
-      />
-
-      <div id="nfc-registration-panel" className="mx-auto w-full max-w-5xl">
         <NfcTagRegistrationPanel />
       </div>
     </div>

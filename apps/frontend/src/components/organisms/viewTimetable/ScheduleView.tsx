@@ -820,7 +820,7 @@ export function ScheduleView({
                     aria-label="Edit Timetable"
                     id="btn-edit"
                     type="button"
-                    variant="outline"
+                    variant="secondary"
                     className="h-8 px-3 text-xs hover:opacity-90 cursor-pointer"
                     onClick={editTimetable}
                     title="Edit Timetable"

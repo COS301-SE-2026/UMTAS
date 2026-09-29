@@ -14,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
-import { CreateBuilding } from "@/components/organisms/map/CreateBuilding";
 
 interface AdminDrawControlsProps {
   buildings: BuildingType[];
@@ -111,8 +110,6 @@ export function AdminDrawControls({
             ? `Drawing (${polygonPath.length} points)`
             : "Draw outline"}
         </Button> */}
-
-        <CreateBuilding />
       </div>
 
       {mode === "draw" && polygonPath.length >= 3 && (

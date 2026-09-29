@@ -111,16 +111,15 @@ export function CreateBuilding() {
             />
           </div> */}
 
-          <div className="flex flex-col gap-2">
+          {/* <div className="flex flex-col gap-2">
             <Label htmlFor="building-colour">Display colour</Label>
-            {/* This will be changed to the colour picker component (but expanded to have more colours) that I have created */}
             <Input
               id="building-colour"
               type="color"
               value={colour}
               onChange={(event) => setColour(event.target.value)}
             />
-          </div>
+          </div> */}
 
           <DialogFooter>
             <Button type="submit" disabled={isPending || !name.trim()}>

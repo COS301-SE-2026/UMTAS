@@ -46,7 +46,7 @@ export function CheckInResultCard({
         )}
 
         {result?.slot && (
-          <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-base)] p-4">
+          <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
             <p className="text-sm font-medium text-[var(--text-primary)]">
               {result.slot.moduleCode} · {result.slot.moduleName}
             </p>

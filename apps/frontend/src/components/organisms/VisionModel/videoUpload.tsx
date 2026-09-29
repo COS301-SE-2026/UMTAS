@@ -22,8 +22,13 @@ import {
 } from "../../../../utilities/VisionModel/backend/persistance";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { VisionModelSize } from "../../../../utilities/VisionModel/messageTypes";
 
-export default function VideoUploadComp() {
+export default function VideoUploadComp({
+  modelSize,
+}: {
+  modelSize: VisionModelSize;
+}) {
   const [video, setVideo] = useState<File | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -153,6 +158,7 @@ export default function VideoUploadComp() {
           imageData.data,
           canvas.width,
           canvas.height,
+          modelSize,
         );
 
         if (!isProcessingRef.current) break;

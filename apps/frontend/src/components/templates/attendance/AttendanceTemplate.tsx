@@ -30,19 +30,18 @@ export default function AttendanceTemplate() {
     return <NotFound />;
   }
   return (
-    <div
-      id="attendance-header"
-      className="flex w-full flex-col items-center gap-6 px-6 pt-6"
-    >
+    <div className="w-full px-8 pt-6">
       <Tutorial steps={steps} wait={true} />
+      <div
+        id="attendance-header"
+        className="mx-auto flex w-full max-w-6xl flex-col gap-6"
+      >
+        <AttendancePageHeader
+          className="w-full border-b border-[var(--border)] pb-4"
+          title="Attendance"
+          meta={<AttendanceDateStamp date={new Date()} />}
+        />
 
-      <AttendancePageHeader
-        className="w-full max-w-6xl py-4"
-        title="Attendance"
-        meta={<AttendanceDateStamp date={new Date()} />}
-      />
-
-      <div id="attendance-overview-panel" className="w-full max-w-6xl">
         <AttendanceOverviewPanel />
       </div>
     </div>

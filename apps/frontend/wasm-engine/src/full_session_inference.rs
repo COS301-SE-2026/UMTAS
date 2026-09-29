@@ -148,6 +148,8 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
 
     for (&id, &total) in &total_frames_count {
         let inferred = *inferred_frames_count.get(&id).unwrap_or(&0);
+        let real_detections = total - inferred;
+
         if (inferred as f32 / total as f32) > MAX_INFERRED_RATIO {
             excluded_ids.insert(id);
         }
@@ -185,15 +187,16 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
                     stored_person.highest_nose = person.pose_data.nose;
                 }
 
-                // Accumulate gaze frame counts directly
-                if !person.is_inferred {
-                    if is_paying {
-                        stored_person.gaze_paying_attention_count += 1;
+                    // Accumulate gaze frame counts directly
+                    if !person.is_inferred {
+                        if is_paying {
+                            stored_person.gaze_paying_attention_count += 1;
+                        }
+
+                        if is_no_attention {
+                            stored_person.gaze_no_attention_count += 1;
+                        }
                     }
-                    if is_no_attention {
-                        stored_person.gaze_no_attention_count += 1;
-                    }
-                }
 
                 // question logic
 
@@ -251,7 +254,7 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
                     person.assigned_id,
                     SessionPerson {
                         highest_nose: person.pose_data.nose,
-                        count_hand_up: if person.hand_up { 1 } else { 0 },
+                        count_hand_up: 0,
                         first_frame_hand_up: if person.hand_up {
                             Some(frame.frame_number)
                         } else {
@@ -263,16 +266,8 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
                             None
                         },
                         frame_hand_down: None,
-                        gaze_paying_attention_count: if is_paying && !person.is_inferred {
-                            1
-                        } else {
-                            0
-                        },
-                        gaze_no_attention_count: if is_no_attention && !person.is_inferred {
-                            1
-                        } else {
-                            0
-                        },
+                        gaze_paying_attention_count: 0,
+                        gaze_no_attention_count: 0,
                         assigned_id: person.assigned_id,
                         all_center_mass: [person.pose_data.center_mass].to_vec(),
                         left_shoulder: [person.pose_data.left_shoulder].to_vec(),

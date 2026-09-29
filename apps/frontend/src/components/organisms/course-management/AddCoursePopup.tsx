@@ -9,6 +9,7 @@ import Popup from "@/components/atoms/utility/floatContainer";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createCourseQ } from "@/app/course-management/queries/courses/courseQueries";
 import { UserDetails } from "@/lib/userclass/userClass";
+import { X } from "lucide-react";
 
 interface AddCoursePopupProps {
   onClose: () => void;
@@ -51,7 +52,18 @@ export function AddCoursePopup({ onClose }: AddCoursePopupProps) {
   return (
     <Popup>
       <div className="w-full h-full flex flex-col items-center justify-center p-4">
-        <Card className="w-full max-w-md p-6 flex flex-col gap-4 border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
+        <Card className="relative w-full max-w-md p-6 flex flex-col gap-4 border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            onClick={onClose}
+            disabled={isPending || !!successMessage}
+            className="absolute top-2 right-2"
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </Button>
           <h2 className="text-lg font-semibold text-[var(--text-primary)]">
             Create New Course
           </h2>
@@ -86,14 +98,7 @@ export function AddCoursePopup({ onClose }: AddCoursePopupProps) {
             />
           </div>
 
-          <div className="flex justify-end gap-3 mt-4">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              disabled={isPending || !!successMessage}
-            >
-              Cancel
-            </Button>
+          <div className="flex justify-center gap-3 mt-4">
             <Button
               data-testid="add-course-confirm"
               onClick={handleSave}

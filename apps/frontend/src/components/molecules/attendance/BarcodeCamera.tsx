@@ -2,8 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { BrowserMultiFormatReader } from "@zxing/browser";
-import { BarcodeFormat, DecodeHintType } from "@zxing/library";
 import { readBarcodes } from "zxing-wasm/reader";
 
 interface BarcodeCameraProps {
@@ -21,13 +19,10 @@ type CameraCapabilities = MediaTrackCapabilities & {
 type CameraState =
   "starting" | "ready" | "not-found" | "permission-denied" | "error";
 
-type DecoderSource = "ZXING_JS" | "ZXING_WASM";
-
 export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const [cameraState, setCameraState] = useState<CameraState>("starting");
-
   const [scanFlash, setScanFlash] = useState(false);
 
   const lastScanRef = useRef<{
@@ -37,15 +32,12 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
 
   useEffect(() => {
     let stream: MediaStream | null = null;
-
-    let jsControls: { stop: () => void } | undefined;
-
-    let wasmInterval: ReturnType<typeof setInterval> | undefined;
+    let wasmInterval: number | undefined;
 
     let cancelled = false;
     let wasmBusy = false;
 
-    function handleDecodedValue(value: string, source: DecoderSource) {
+    function handleDecodedValue(value: string) {
       const now = Date.now();
 
       if (
@@ -60,8 +52,6 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
         time: now,
       };
 
-      // console.log(`Barcode decoded by ${source}:`, value);
-
       setScanFlash(true);
 
       window.setTimeout(() => {
@@ -72,7 +62,7 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
     }
 
     async function scanWithWasm() {
-      if (wasmBusy) {
+      if (cancelled || wasmBusy) {
         return;
       }
 
@@ -83,7 +73,6 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
       }
 
       const width = video.videoWidth;
-
       const height = video.videoHeight;
 
       if (!width || !height) {
@@ -94,7 +83,6 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
 
       try {
         const cropHeight = Math.floor(height * 0.3);
-
         const cropY = Math.floor((height - cropHeight) / 2);
 
         const canvas = document.createElement("canvas");
@@ -129,14 +117,19 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
           tryHarder: true,
         });
 
+        if (cancelled) {
+          return;
+        }
+
         const result = results[0];
 
         if (!result?.text) {
           return;
         }
 
-        handleDecodedValue(result.text, "ZXING_WASM");
-      } catch {
+        handleDecodedValue(result.text);
+      } catch (error) {
+        console.error("Barcode WASM scan failed:", error);
       } finally {
         wasmBusy = false;
       }
@@ -161,7 +154,6 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
 
         if (cancelled || !videoRef.current) {
           stream.getTracks().forEach((track) => track.stop());
-
           return;
         }
 
@@ -187,49 +179,29 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
 
         await videoRef.current.play();
 
+        if (cancelled) {
+          return;
+        }
+
         setCameraState("ready");
 
-        const hints = new Map();
-
-        hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.CODE_39]);
-
-        hints.set(DecodeHintType.TRY_HARDER, true);
-
-        const jsReader = new BrowserMultiFormatReader(hints, {
-          delayBetweenScanAttempts: 100,
-          delayBetweenScanSuccess: 1000,
-        });
-
-        jsControls = await jsReader.decodeFromStream(
-          stream,
-          videoRef.current,
-          (result) => {
-            if (!result) {
-              return;
-            }
-
-            handleDecodedValue(result.getText(), "ZXING_JS");
-          },
-        );
-
-        const wasmInterval = window.setInterval(() => {
+        wasmInterval = window.setInterval(() => {
           void scanWithWasm();
         }, 200);
       } catch (error) {
         if (error instanceof DOMException) {
           if (error.name === "NotFoundError") {
             setCameraState("not-found");
-
             return;
           }
 
           if (error.name === "NotAllowedError") {
             setCameraState("permission-denied");
-
             return;
           }
         }
 
+        console.error("Camera error:", error);
         setCameraState("error");
       }
     }
@@ -239,8 +211,6 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
     return () => {
       cancelled = true;
 
-      jsControls?.stop();
-
       if (wasmInterval) {
         clearInterval(wasmInterval);
       }
@@ -248,6 +218,10 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
       stream?.getTracks().forEach((track) => {
         track.stop();
       });
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
     };
   }, [onScan]);
 
