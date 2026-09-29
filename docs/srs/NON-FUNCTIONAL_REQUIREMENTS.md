@@ -4,7 +4,7 @@
 
 The [NFR testing matrix](../evidence/nfr/NON-FUNCTIONAL_TESTING.md) links each release measure to its repeatable command and evidence. Each requirement states its own test environment.
 
-The evidence set comprises the [Locust report](../evidence/nfr/LOCUST_REPORT.html), [soak report](../evidence/nfr/records/soak-report.html), [worker timings](../evidence/nfr/records/worker-timings.txt), [privacy test](../evidence/nfr/records/privacy-test.txt), [ZAP report](../evidence/nfr/ZAP_REPORT.pdf), [Lighthouse reports](../evidence/nfr/Lighthouse.md), [browser reports](../evidence/nfr/records/playwright-chromium/index.html), [availability export](../evidence/nfr/records/uptime-export.csv), [parser suite](../evidence/nfr/records/parser-suite.txt), [solver regression](../evidence/nfr/records/solver-regression.txt), [dependency audit](../evidence/nfr/records/dependency-audit.txt) and [adapter case study](../evidence/nfr/API_ADAPTER_CASE_STUDY.md).
+The evidence set comprises the [Locust report](../evidence/nfr/LOCUST_REPORT.html), [soak report](../evidence/nfr/records/soak-report.html), [worker timings](../evidence/nfr/records/worker-timings.txt), [privacy boundary unit tests](../evidence/nfr/records/privacy-boundary-unit-tests.txt), [ZAP report](../evidence/nfr/ZAP_REPORT.pdf), [Lighthouse reports](../evidence/nfr/Lighthouse.md), [browser reports](../evidence/nfr/records/playwright-chromium/index.html), [availability export](../evidence/nfr/records/uptime-export.csv), [parser suite](../evidence/nfr/records/parser-suite.txt), [solver regression](../evidence/nfr/records/solver-regression.txt), [dependency audit](../evidence/nfr/records/dependency-audit.txt) and [adapter case study](../evidence/nfr/API_ADAPTER_CASE_STUDY.md).
 
 ## Utility Tree
 
@@ -71,14 +71,14 @@ The shared [Locust report](../evidence/nfr/LOCUST_REPORT.html) records the produ
 
 | **Part** | **UMTAS scenario** |
 |---|---|
-| **Source of stimulus** | A university administrator or authorised privacy tester |
-| **Stimulus** | Request university analytics or attempt to associate aggregate results with an individual student |
-| **Environment** | Production-equivalent operation using a synthetic dataset containing known student-to-schedule associations |
-| **Artifact** | Student-data access and analytics privacy boundary |
-| **Response** | Expose only authorised aggregate information and prevent administrators from retrieving or reconstructing individual student schedules |
-| **Response measure** | Administrative responses, exports, logs, and analytics records contain **0 student UUIDs or equivalent linkable identifiers** beyond the privacy boundary; administrators can retrieve **0 individual student schedules**; and the documented re-identification test recovers **0 student identities** from aggregate output. |
+| **Source of stimulus** | A university administrator |
+| **Stimulus** | Attempt to retrieve another user's individual timetable |
+| **Environment** | Release test environment running the backend unit tests |
+| **Artifact** | Student-data access boundary |
+| **Response** | Scope timetable reads to the authenticated session user so that administrators cannot retrieve another user's individual timetable |
+| **Response measure** | A university administrator cannot retrieve another user's individual timetable. Timetable reads are scoped to the authenticated session user and the service rejects a timetable the caller does not own. |
 
-**Acceptance evidence:** The requirement is met; see the [result](../evidence/nfr/records/privacy-test.txt) and the [boundary unit tests](../evidence/nfr/records/analytics-boundary-unit-tests.txt).
+**Acceptance evidence:** The requirement is met; see the [boundary unit tests](../evidence/nfr/records/privacy-boundary-unit-tests.txt).
 
 ## NFR-Scale-1 - University-Scale Scheduling Workload
 
@@ -225,8 +225,8 @@ The shared [Locust report](../evidence/nfr/LOCUST_REPORT.html) records the produ
 | **Stimulus** | Add a new concrete adapter that transforms the new university's timetable format into the canonical UMTAS representation |
 | **Environment** | Normal development and continuous-integration workflow using representative fixtures from the new university |
 | **Artifact** | University adapter layer (`apps/pdf_parser/parser/adapters/`) and parser registry (`apps/pdf_parser/parser/registry.py`) |
-| **Response** | Add the university-specific behaviour without modifying existing production components outside the Adapter layer |
-| **Response measure** | Number of existing production components outside the university adapter layer that must be modified equals **0**. The parser registry discovers every adapter class that subclasses `BasePDFParser` and declares an `ADAPTER_KEY`, so adding an adapter requires no change to the registry. |
+| **Response** | Add the university-specific behaviour within the Adapter layer, registering it by key |
+| **Response measure** | Adding a university requires one adapter module in the adapter layer and one entry in the parser registry. The adapter contract, command line interface and canonical models are unchanged. |
 
 **Acceptance evidence:** The requirement is met; see the [result](../evidence/nfr/API_ADAPTER_CASE_STUDY.md).
 

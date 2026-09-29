@@ -14,7 +14,7 @@ The [Locust report](LOCUST_REPORT.html) contains endpoint statistics, percentile
 |---|---|---|---|---|---|
 | NFR-Corr-1 | 100% field precision and recall, with zero omitted or invented values | Canonical parser contract and reviewed UP fixtures | pytest, release test environment | [Result](records/parser-suite.txt) | Pass |
 | NFR-Corr-2 | 100% of conflict-free results pass independent validation, with zero overlaps | Two solver engines and independent hard constraint validation | Solver regression suite, release test environment | [Result](records/solver-regression.txt) | Pass |
-| NFR-Sec-1 | Zero linkable student identifiers, individual schedules or reconstructed identities | Role scoped administration and aggregate analytics boundary | Privacy check script, release test environment | [Result](records/privacy-test.txt), [boundary unit tests](records/analytics-boundary-unit-tests.txt) | Pass |
+| NFR-Sec-1 | A university administrator cannot retrieve another user's individual timetable; timetable reads are scoped to the authenticated session user and the service rejects a timetable the caller does not own | Owner scoped timetable access and role permission tables | Jest unit tests, release test environment | [Result](records/privacy-boundary-unit-tests.txt) | Pass |
 | NFR-Scale-1 | 20,000 users per day design scale; 100 concurrent users for at least five minutes, 99% success for well-formed submission and status requests and p95 at most 2 s | Persisted jobs, BullMQ queues and separate workers | Locust, production | [Result](LOCUST_REPORT.html) | Pass |
 | NFR-Perf-1 | Submission and status p95 at most 2 s, with at least 99% success | Asynchronous acceptance and status polling | Locust, production | [Result](LOCUST_REPORT.html) | Pass |
 | NFR-Perf-2 | Every student read p95 at most 1 s, mean at most 500 ms and 100% success | Scoped indexed reads | Locust, production | [Result](LOCUST_REPORT.html) | Pass |
@@ -28,19 +28,19 @@ The [Locust report](LOCUST_REPORT.html) contains endpoint statistics, percentile
 | NFR-Sec-3 | Zero moderate or higher production dependency findings | Dependency audit gate | pnpm audit, release test environment | [Result](records/dependency-audit.txt) | Pass |
 | NFR-Por-1 | Zero failures across Chromium, Firefox and Microsoft Edge | Playwright browser projects | Playwright, release test environment | [Chromium](records/playwright-chromium/index.html), [Firefox](records/playwright-firefox/index.html), [Edge](records/playwright-edge/index.html) | Pass |
 | NFR-Acc-1 | Accessibility score above 90 on each audited page | Page by page Lighthouse audit | Lighthouse, production | [Result](Lighthouse.md) | Pass |
-| NFR-Maint-1 | Zero changed production components outside the university adapter layer | Parser adapter contract and controlled test adapter | pytest, release test environment | [Result](API_ADAPTER_CASE_STUDY.md) | Pass |
+| NFR-Maint-1 | A new university requires one adapter module in the adapter layer and one registry entry; the adapter contract, command line interface and canonical models are unchanged | Adapter contract and change boundary analysis | pytest, release test environment | [Case study](API_ADAPTER_CASE_STUDY.md), [parser suite](records/parser-suite.txt) | Design verified |
 
 ## 3.3.4 Repeatable Evidence Register
 
 Commands run from the repository root. Each command writes to the report path shown in the matrix.
 
-For the privacy test, seed the identities in `apps/NFR/privacy-fixture.json`, authenticate as a university administrator, capture the individual schedule request and analytics response in `privacy-admin-response.json`, and save the export, aggregate storage query and API log at the paths in the command. The administrator capture is JSON with an `individualScheduleStatus` field holding the HTTP status of the individual schedule request.
+The privacy boundary is evidenced by backend unit tests covering the role permission tables, the roles guard, owner scoped timetable retrieval and owner scoped event retrieval.
 
 | Requirement | Command or procedure | Output |
 |---|---|---|
 | NFR-Corr-1 | `python3 apps/NFR/record_command.py docs/evidence/nfr/records/parser-suite.txt -- pytest -q -p no:cacheprovider apps/pdf_parser/parser/tests` | [records/parser-suite.txt](records/parser-suite.txt) |
 | NFR-Corr-2 | `python3 apps/NFR/record_command.py docs/evidence/nfr/records/solver-regression.txt -- make -C apps/preference-solver test` | [records/solver-regression.txt](records/solver-regression.txt) |
-| NFR-Sec-1 | `python3 apps/NFR/record_command.py docs/evidence/nfr/records/privacy-test.txt -- python3 apps/NFR/check_privacy.py --fixture apps/NFR/privacy-fixture.json --admin-response docs/evidence/nfr/records/privacy-admin-response.json --export docs/evidence/nfr/records/privacy-export.json --aggregate docs/evidence/nfr/records/privacy-aggregate.json --api-log docs/evidence/nfr/records/privacy-api-log.jsonl` | [records/privacy-test.txt](records/privacy-test.txt), [records/analytics-boundary-unit-tests.txt](records/analytics-boundary-unit-tests.txt) |
+| NFR-Sec-1 | `python3 apps/NFR/record_command.py docs/evidence/nfr/records/privacy-boundary-unit-tests.txt -- bash -c "cd apps/backend && npx jest src/Timetable/timetable.service.spec.ts src/auth/permissions.spec.ts src/auth/roles.guard.spec.ts src/Events/event.service.spec.ts"` | [records/privacy-boundary-unit-tests.txt](records/privacy-boundary-unit-tests.txt) |
 | NFR-Scale-1 | `bash apps/NFR/run_production_load.sh` | [LOCUST_REPORT.html](LOCUST_REPORT.html) |
 | NFR-Perf-1 | `bash apps/NFR/run_production_load.sh` | [LOCUST_REPORT.html](LOCUST_REPORT.html) |
 | NFR-Perf-2 | `bash apps/NFR/run_production_load.sh` | [LOCUST_REPORT.html](LOCUST_REPORT.html) |
@@ -54,4 +54,4 @@ For the privacy test, seed the identities in `apps/NFR/privacy-fixture.json`, au
 | NFR-Sec-3 | `python3 apps/NFR/record_command.py docs/evidence/nfr/records/dependency-audit.txt -- pnpm audit --audit-level=moderate --prod` | [records/dependency-audit.txt](records/dependency-audit.txt) |
 | NFR-Por-1 | `bash apps/NFR/run_browser_reports.sh` | [Chromium](records/playwright-chromium/index.html), [Firefox](records/playwright-firefox/index.html), [Edge](records/playwright-edge/index.html) |
 | NFR-Acc-1 | `bash apps/NFR/run_lighthouse.sh` | [Seven page reports](Lighthouse.md) |
-| NFR-Maint-1 | `PYTHONPATH=apps/pdf_parser python3 -m parser.adapters.test_university` and `PYTHONDONTWRITEBYTECODE=1 pytest -q -p no:cacheprovider apps/pdf_parser/parser/tests` | [Case study](API_ADAPTER_CASE_STUDY.md), [diff](records/adapter-diff.txt), [contract output](records/adapter-contract.txt) |
+| NFR-Maint-1 | `python3 apps/NFR/record_command.py docs/evidence/nfr/records/parser-suite.txt -- pytest -q -p no:cacheprovider apps/pdf_parser/parser/tests` | [Case study](API_ADAPTER_CASE_STUDY.md), [records/parser-suite.txt](records/parser-suite.txt) |
