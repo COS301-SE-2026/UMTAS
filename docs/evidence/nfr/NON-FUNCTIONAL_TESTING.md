@@ -28,7 +28,7 @@ The [Locust report](LOCUST_REPORT.html) contains endpoint statistics, percentile
 | NFR-Sec-3 | Zero moderate or higher production dependency findings | Dependency audit gate | pnpm audit, release test environment | [Result](records/dependency-audit.txt) | Pass |
 | NFR-Por-1 | Zero failures across Chromium, Firefox and Microsoft Edge | Playwright browser projects | Playwright, release test environment | [Chromium](records/playwright-chromium/index.html), [Firefox](records/playwright-firefox/index.html), [Edge](records/playwright-edge/index.html) | Pass |
 | NFR-Acc-1 | Accessibility score above 90 on each audited page | Page by page Lighthouse audit | Lighthouse, production | [Result](Lighthouse.md) | Pass |
-| NFR-Maint-1 | A new university requires one adapter module in the adapter layer and one registry entry; the adapter contract, command line interface and canonical models are unchanged | Adapter contract and change boundary analysis | pytest, release test environment | [Case study](API_ADAPTER_CASE_STUDY.md), [parser suite](records/parser-suite.txt) | Design verified |
+| NFR-Maint-1 | University-specific parsing is confined to adapter modules behind one contract and registry; the canonical models and command line interface contain no university-specific logic | Adapter contract, registry and canonical models | pytest, release test environment | [Case study](API_ADAPTER_CASE_STUDY.md), [parser suite](records/parser-suite.txt) | Pass |
 
 ## 3.3.4 Repeatable Evidence Register
 

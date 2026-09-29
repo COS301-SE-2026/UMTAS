@@ -7,6 +7,6 @@ export PDF_DIR="${PDF_DIR:-$(pwd)/apps/simulation-service/adapters/UMTAS/pdfs}"
 mkdir -p docs/evidence/nfr/records
 locust -f apps/simulation-service/adapters/UMTAS/locust_user.py \
   --headless --host https://capstone-vigil.dns.net.za \
-  --users 100 --spawn-rate 1 --run-time 12m \
+  --users 100 --spawn-rate 0.05 --run-time 35m \
   --html docs/evidence/nfr/LOCUST_REPORT.html \
   --csv docs/evidence/nfr/records/locust-stats --csv-full-history

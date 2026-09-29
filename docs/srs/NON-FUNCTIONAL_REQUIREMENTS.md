@@ -222,11 +222,11 @@ The shared [Locust report](../evidence/nfr/LOCUST_REPORT.html) records the produ
 | **Part** | **UMTAS scenario** |
 |---|---|
 | **Source of stimulus** | A developer adding support for another university |
-| **Stimulus** | Add a new concrete adapter that transforms the new university's timetable format into the canonical UMTAS representation |
-| **Environment** | Normal development and continuous-integration workflow using representative fixtures from the new university |
+| **Stimulus** | Change or extend university-specific timetable parsing for a university format |
+| **Environment** | Normal development and continuous-integration workflow using representative university fixtures |
 | **Artifact** | University adapter layer (`apps/pdf_parser/parser/adapters/`) and parser registry (`apps/pdf_parser/parser/registry.py`) |
-| **Response** | Add the university-specific behaviour within the Adapter layer, registering it by key |
-| **Response measure** | Adding a university requires one adapter module in the adapter layer and one entry in the parser registry. The adapter contract, command line interface and canonical models are unchanged. |
+| **Response** | University-specific behaviour is implemented within the adapter layer and resolved by key |
+| **Response measure** | University-specific parsing is confined to adapter modules that implement one adapter contract and are selected through the parser registry. The canonical models and command line interface contain no university-specific logic. |
 
 **Acceptance evidence:** The requirement is met; see the [result](../evidence/nfr/API_ADAPTER_CASE_STUDY.md).
 
