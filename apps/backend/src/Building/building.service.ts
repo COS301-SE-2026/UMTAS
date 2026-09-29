@@ -327,7 +327,7 @@ export class BuildingService {
       input.icon = null;
     }
 
-    //DisplayColour — normalise to null if absent
+    //DisplayColour, normalise to null if absent
     if (!input.displayColour) {
       input.displayColour = DEFAULT_DISPLAY_COLOUR;
     }

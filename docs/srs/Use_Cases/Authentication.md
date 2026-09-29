@@ -23,6 +23,7 @@
         <div align="center">
         ![](./Traceability_Matrix/FR1_2.svg)
         </div>
+        The current text mapping adds **R1.2.2.3 → UC-AU-06** for email verification.
     ---
     ??? "UC-AU-01: Register Account"
         <a id="uc-au-01"></a>
@@ -142,7 +143,7 @@
         | **Basic Flow** | 1. System sends a verification link or OTP to the user's registered email upon registration.<br>2. User accesses the verification link or enters the OTP.<br>3. System validates the verification token or OTP.<br>4. System marks the user's email as verified.<br>5. System confirms successful verification to the user.<br>6. User gains full access to the system. |
         | **Alternate Flow** | **A1: Expired or Invalid Token**<br>System rejects the verification attempt and prompts the user to request a new verification link.<br><br>**A2: Resend Verification**<br>User requests a new verification email. System invalidates any prior token and issues a new one.<br><br>**A3: Already Verified**<br>System informs the user that their email is already verified and redirects to login.<br><br>**A4: Unverified Access Attempt**<br>System restricts access to certain features and prompts the user to verify their email before continuing. |
         | **Postcondition** | User's email is confirmed and account is fully activated |
-        | **Requirements Covered** | TBD |
+        | **Requirements Covered** | R1.2.2.3 |
 
     ---
     ??? "UC-AU-07: OAuth"
@@ -162,4 +163,4 @@
         | **Basic Flow** | 1. User selects an OAuth provider.<br>2. System redirects the user to the provider's authentication page.<br>3. User authenticates with the provider and grants requested permissions.<br>4. Provider returns an authorisation code or token to the system.<br>5. System exchanges the code/token for the user's identity information.<br>6. System creates a new account or matches the identity to an existing account.<br>7. System creates a user session.<br>8. User is redirected to the dashboard. |
         | **Alternate Flow** | **A1: User Denies Permission**<br>Provider returns a denial response and system informs the user that authentication was cancelled.<br><br>**A2: Account Already Linked**<br>System detects the OAuth identity is already linked to an existing account and authenticates the user directly.<br><br>**A3: Email Already Registered In-House**<br>System detects a matching email on an existing in-house account and prompts the user to link accounts or use an alternate method.<br><br>**A4: Provider Unavailable**<br>System displays an error indicating the OAuth provider is temporarily unavailable and suggests an alternate login method.<br><br>**A5: Token Exchange Failure**<br>System fails to retrieve identity information and prompts the user to retry authentication. |
         | **Postcondition** | User is authenticated and an active session exists, with identity linked via the OAuth provider |
-        | **Requirements Covered** | TBD |
+        | **Requirements Covered** | R1.2.1.1 \| R1.2.2.1 \| R1.2.3 |

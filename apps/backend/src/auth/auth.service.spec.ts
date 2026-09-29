@@ -434,7 +434,7 @@ describe('AuthService', () => {
       const { mockDb: database } = createMockDatabase();
       mockTransaction(database, ops);
       const local = new AuthService(
-        { db: database } as never,
+        { db: database, dbMode: 'DATABASE' } as never,
         {
           sendResetPasswordEmail: jest.fn(),
           sendVerificationEmail: jest.fn(),
@@ -561,7 +561,7 @@ describe('AuthService', () => {
 
     it('compensates by deleting the created user when the university is missing', async () => {
       const { database, local } = mockUserHarness({
-        select: [[], []],
+        select: [[{ total: 0 }], [], []],
         update: [[]],
         delete: [[]],
       });
@@ -574,7 +574,7 @@ describe('AuthService', () => {
 
     it('logs a warning when the compensation delete also fails', async () => {
       const { database, local } = mockUserHarness({
-        select: [[], []],
+        select: [[{ total: 0 }], [], []],
         update: [[]],
       });
       (database.delete as jest.Mock).mockImplementation(() => {
@@ -589,7 +589,7 @@ describe('AuthService', () => {
 
     it('resolves a provisioned university by name when provided', async () => {
       const { local } = mockUserHarness({
-        select: [[], [{ uniID: 'pretoria-uni' }]],
+        select: [[{ total: 0 }], [], [{ uniID: 'pretoria-uni' }]],
         update: [[]],
         insert: [[{ UserID: 'created-user' }]],
       });
@@ -600,6 +600,18 @@ describe('AuthService', () => {
         userId: 'created-user',
         uniId: 'pretoria-uni',
       });
+    });
+
+    it('rejects guest creation once 200 guests exist in the last day', async () => {
+      const { database, local, createUser } = mockUserHarness({
+        select: [[{ total: 200 }]],
+      });
+
+      await expect(local.createGuestUser()).rejects.toThrow(
+        ServiceUnavailableException,
+      );
+      expect(database.execute).toHaveBeenCalledTimes(1);
+      expect(createUser).not.toHaveBeenCalled();
     });
   });
 

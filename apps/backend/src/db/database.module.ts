@@ -12,6 +12,8 @@ import { BuildingSeedService } from './seeding/services/buildings.seed.service';
 import { EventsSeedService } from './seeding/services/events.seed.service';
 import { SeedQueryService } from './seeding/services/seed-query.service';
 import { VenuesSeedService } from './seeding/services/venues.seed.service';
+import { AdminTeachingSeedService } from './seeding/services/admin-teaching.seed.service';
+import { AttendanceDemoAdminsSeedService } from './seeding/services/attendance-demo-admins.seed.service';
 import { EventModule } from 'src/Events/event.module';
 import { TimetableSeedService } from './seeding/services/timetable.seed.service';
 
@@ -32,6 +34,8 @@ import { TimetableSeedService } from './seeding/services/timetable.seed.service'
     AcademicCalendarSeedService,
     BuildingSeedService,
     VenuesSeedService,
+    AdminTeachingSeedService,
+    AttendanceDemoAdminsSeedService,
     TimetableSeedService,
   ],
   exports: [DatabaseService, SeedPersistenceService],

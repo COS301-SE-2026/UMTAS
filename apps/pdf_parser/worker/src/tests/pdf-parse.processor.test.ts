@@ -49,7 +49,13 @@ test("PdfParseProcessor downloads the PDF then parses and returns callback paylo
     },
   };
 
-  const processor = new PdfParseProcessor({ storageClient, parserExecutor });
+  const logs: Array<{ message: string; metadata?: Record<string, unknown> }> =
+    [];
+  const processor = new PdfParseProcessor({
+    storageClient,
+    parserExecutor,
+    getInputBytes: async () => 1024,
+  });
   const payload = await processor.process({
     data: {
       jobId: "parse-1",
@@ -57,7 +63,12 @@ test("PdfParseProcessor downloads the PDF then parses and returns callback paylo
       adapterKey: "up",
     },
     tempDir: "/tmp/parse-1",
-    logger: noopLogger,
+    logger: {
+      ...noopLogger,
+      info: (message: string, metadata?: Record<string, unknown>) => {
+        logs.push(metadata ? { message, metadata } : { message });
+      },
+    },
     abortSignal: new AbortController().signal,
   });
 
@@ -69,6 +80,12 @@ test("PdfParseProcessor downloads the PDF then parses and returns callback paylo
     status: "completed",
     result: parserResult,
   });
+  const timing = logs.find(
+    (log) => log.message === "PDF_PARSER_PROCESSING_DURATION",
+  );
+  assert.ok(timing);
+  assert.equal(timing.metadata?.inputBytes, 1024);
+  assert.equal(timing.metadata?.msPerKb, timing.metadata?.durationMs);
 });
 
 const noopLogger = {

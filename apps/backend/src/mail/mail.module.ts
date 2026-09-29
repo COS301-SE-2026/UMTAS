@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { MailerModule } from '@nestjs-modules/mailer';
+import { MailerModule, type MailerOptions } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.adapter';
 import { join } from 'path';
 import { MailerService } from './mailer.service';
@@ -20,9 +20,11 @@ import type { TransportOptions } from 'nodemailer';
               }
             : undefined,
       } as TransportOptions,
+      // nodemailer 10 moved its typings under dist/, so the mailer's `Options`
+      // union no longer exposes message fields such as `from`.
       defaults: {
         from: process.env.SMTP_FROM ?? 'noreply@umtas.co.za',
-      },
+      } as MailerOptions['defaults'],
       template: {
         dir: join(process.cwd(), 'src/mail/templates'),
         adapter: new HandlebarsAdapter(),
