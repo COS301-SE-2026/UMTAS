@@ -12,25 +12,27 @@
 
 ### University Management & Timetabling Automation System
 
+Team Vigil - UMTAS - A university timetable platform for PDF ingestion, constraint solving and personalised schedules.
+
 **A Strategic Partnership between [Tyto Insights](https://tyto.africa/), [DNS Business](https://dns.africa/c/), and Team Vigil**
 
 _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan Dawson_
 
 <br>
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=3500&pause=1000&color=3B82F6&center=true&vCenter=true&width=580&lines=Automated+timetabling%2C+powered+by+OR-Tools;PDF+schedule+ingestion+%E2%80%94+zero+manual+entry;University-agnostic+by+design;Up+to+20%2C000+concurrent+students)](https://cos301-se-2026.github.io/UMTAS/)
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=3500&pause=1000&color=3B82F6&center=true&vCenter=true&width=580&lines=Automated+timetabling+powered+by+OR-Tools;PDF+schedule+ingestion;University-agnostic+by+design;100-concurrent-user+load+test)](https://cos301-se-2026.github.io/UMTAS/latest/)
 
 <br>
 
-<!-- Status & CI - tracking dev branch where workflows live -->
+<!-- Status and CI -->
 
-[![Docs](https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/UMTAS/deploy-docs.yml?branch=dev&style=for-the-badge&logo=readthedocs&logoColor=white&label=Docs)](https://cos301-se-2026.github.io/UMTAS/)
+[![Docs](https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/UMTAS/deploy-docs.yml?branch=main&style=for-the-badge&logo=readthedocs&logoColor=white&label=Docs)](https://cos301-se-2026.github.io/UMTAS/latest/)
 [![Issues](https://img.shields.io/github/issues/COS301-SE-2026/UMTAS?style=for-the-badge&logo=github&logoColor=white&labelColor=1e293b&color=1d4ed8)](https://github.com/COS301-SE-2026/UMTAS/issues)
 [![Last Commit](https://img.shields.io/github/last-commit/COS301-SE-2026/UMTAS/dev?style=for-the-badge&logo=git&logoColor=white&labelColor=1e293b&color=1d4ed8)](https://github.com/COS301-SE-2026/UMTAS/commits/dev)
 
-<!-- [![CI](https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/UMTAS/ci.yml?branch=dev&style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/COS301-SE-2026/UMTAS/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/codecov/c/github/COS301-SE-2026/UMTAS/dev?style=for-the-badge&logo=codecov&logoColor=white&label=Coverage)](https://codecov.io/gh/COS301-SE-2026/UMTAS)
-[![Quality Gate](https://img.shields.io/sonar/quality_gate/COS301-SE-2026_UMTAS?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge&logo=sonarcloud&logoColor=white)](https://sonarcloud.io/dashboard?id=COS301-SE-2026_UMTAS) -->
+[![Build and Tests](https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/UMTAS/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=Build%20and%20Tests)](https://github.com/COS301-SE-2026/UMTAS/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/COS301-SE-2026/UMTAS/main?style=for-the-badge&logo=codecov&logoColor=white&label=Coverage)](https://codecov.io/gh/COS301-SE-2026/UMTAS)
+[![Requirements](https://img.shields.io/badge/Requirements-SRS%20and%20evidence-1d4ed8?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_REQUIREMENTS/)
 
 [![Uptime](https://img.shields.io/uptimerobot/ratio/m803621896-8c4148150774bc697176b5e2?style=for-the-badge&logo=uptimerobot&logoColor=white&label=Uptime+30d&color=1d4ed8)](https://stats.uptimerobot.com/EfNarUH73Q)
 [![Status](https://img.shields.io/uptimerobot/status/m803621896-8c4148150774bc697176b5e2?style=for-the-badge&logo=uptimerobot&logoColor=white&label=Status&color=1d4ed8)](https://stats.uptimerobot.com/EfNarUH73Q)
@@ -57,7 +59,7 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 <!-- Documentation Links -->
 
-[![Full Documentation](https://img.shields.io/badge/Full_Documentation-Visit_Site-14532d?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/)
+[![Full Documentation](https://img.shields.io/badge/Full_Documentation-Visit_Site-14532d?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/latest/)
 [![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-Visit_Site-14532d?style=for-the-badge&logo=materialdesign&logoColor=white)](https://brand.capstone-vigil.dns.net.za/)
 [![Project Board](https://img.shields.io/badge/Project_Board-View_on_GitHub-14532d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/orgs/COS301-SE-2026/projects/31)
 [![Issue Tracker](https://img.shields.io/badge/Issue_Tracker-GitHub_Issues-14532d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/COS301-SE-2026/UMTAS/issues)
@@ -73,9 +75,9 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 </div>
 
-UMTAS automates the full university timetabling lifecycle - from ingesting raw PDF schedules and extracting hard and soft scheduling constraints, through to delivering conflict-free, optimised timetables to up to **20,000 concurrent students**.
+UMTAS automates the university timetabling lifecycle - from ingesting PDF schedules and extracting scheduling constraints through to generating timetable options. The client scale is **20,000 users per day**; the recorded load test exercises **100 concurrent virtual users**. See the [scalability requirement and evidence](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_REQUIREMENTS/#nfr-scale-1-university-scale-scheduling-workload) for the workload rationale and test limits.
 
-The system is **university-agnostic by design**: a Core-and-Adapter architecture cleanly separates the constraint-solving engine from institution-specific data formats. Onboarding a new university requires only a thin adapter - the core solver remains untouched.
+The system is **university-agnostic by design**: a Core-and-Adapter architecture cleanly separates the constraint-solving engine from institution-specific data formats. A new university parser is one file in the adapters package that follows the canonical contract and declares an `ADAPTER_KEY`; the parser registry discovers it without modification. The core solver uses the canonical result.
 
 <br>
 
@@ -365,66 +367,12 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 </details>
 
-### <img src="https://api.iconify.design/mdi/numeric-3-circle.svg?color=%231d4ed8" width="20" height="20" valign="middle"> Demo 3
+### <img src="https://api.iconify.design/mdi/numeric-4-circle.svg?color=%231e3a8a" width="20" height="20" valign="middle"> Demo 4
 
-<br>
+The [Demo 4 marking guide](https://cos301-se-2026.github.io/UMTAS/latest/management/Marking-Guide/) links to the documentation and assessment resources.
 
-<details>
-<summary>Show Demo 3 documentation</summary>
+Documents: [SRS](https://cos301-se-2026.github.io/UMTAS/latest/srs/), [SAS](https://cos301-se-2026.github.io/UMTAS/latest/sas/), [Non-Functional Requirements](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_REQUIREMENTS/), [NFR traceability matrix and evidence](https://cos301-se-2026.github.io/UMTAS/latest/evidence/nfr/NON-FUNCTIONAL_TESTING/), [quality requirement mapping](https://cos301-se-2026.github.io/UMTAS/latest/sas/architecture/QUALITY_REQUIREMENT_MAPPING/), [user manual](https://cos301-se-2026.github.io/UMTAS/latest/management/UserManual/) and [team profiles with LinkedIn links](https://cos301-se-2026.github.io/UMTAS/latest/management/Team-Profiles/).
 
-<br>
-
-<details>
-<summary><strong>SRS - Updated Use Case Diagrams</strong> &nbsp;-&nbsp; 5 marks</summary>
-<br>
-<div align="center">
-
-[![Use Case Diagrams](https://img.shields.io/badge/Use_Case_Diagrams-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/srs/USE_CASES/)
-
-</div>
-</details>
-
-<details>
-<summary><strong>SAS - Updated Deployment Diagram</strong> &nbsp;-&nbsp; 5 marks</summary>
-<br>
-<div align="center">
-
-[![Deployment Diagram](https://img.shields.io/badge/Deployment_Diagram-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/deployment/DeploymentDiagram/)
-
-</div>
-</details>
-
-<details>
-<summary><strong>SAS - Service Contracts</strong> &nbsp;-&nbsp; 15 marks</summary>
-<br>
-<div align="center">
-
-[![Service Contracts](https://img.shields.io/badge/Service_Contracts-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/architecture/SERVICE_CONTRACTS/)
-
-</div>
-</details>
-
-<details>
-<summary><strong>SAS - NFR Testing</strong> &nbsp;-&nbsp; 10 marks</summary>
-<br>
-<div align="center">
-
-[![NFR Testing](https://img.shields.io/badge/NFR_Testing-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_TESTING/)
-
-</div>
-</details>
-
-<details>
-<summary><strong>SAS - NFR Traceability Matrix</strong> &nbsp;-&nbsp; 15 marks</summary>
-<br>
-<div align="center">
-
-[![NFR Traceability Matrix](https://img.shields.io/badge/NFR_Traceability_Matrix-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_TESTING/)
-
-</div>
-</details>
-
-</details>
 <div align="center">
 
 ## <img src="https://api.iconify.design/mdi/star-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> Features
@@ -566,7 +514,7 @@ UMTAS/
 │   ├── database/             # Shared Drizzle schema & migration tooling
 │   └── shared-types/         # Shared TypeScript types across apps
 ├── infra/
-│   ├── traefik/              # Reverse proxy & TLS termination
+│   ├── traefik/              # Ingress routing & TLS termination
 │   ├── grafana/              # Dashboards & alerting
 │   ├── prometheus/           # Metrics scraping
 │   ├── loki/                 # Log aggregation

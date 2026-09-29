@@ -8,13 +8,13 @@ export class SeedQueryService {
   async getUniversityIDByName(
     tx: AppDatabase,
     uniName: string,
-  ): Promise<string> {
+  ): Promise<string | undefined> {
     const [university] = await tx
       .select({ id: University.UniversityID })
       .from(University)
       .where(ilike(University.UniversityName, `%${uniName}%`))
       .limit(1);
 
-    return university.id;
+    return university?.id;
   } //END_getUniversityIDByName
 } //END_SeedQueryService

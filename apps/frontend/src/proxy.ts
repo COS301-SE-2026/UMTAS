@@ -8,6 +8,8 @@ const useSecureCookies =
   (secureCookiesOverride !== "false" &&
     ["production", "staging"].includes(process.env.NODE_ENV ?? ""));
 
+const isDevelopment = process.env.NODE_ENV === "development";
+
 const SESSION_COOKIE_NAME = `${useSecureCookies ? "__Secure-" : ""}${cookiePrefix}.session_token`;
 
 const PUBLIC_PATHS = [
@@ -28,8 +30,30 @@ const PUBLIC_PATHS = [
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  const nonce = btoa(crypto.randomUUID());
+  const policy = [
+    "default-src 'self'",
+    `script-src 'self' 'unsafe-inline' 'strict-dynamic' 'wasm-unsafe-eval'`,
+    `style-src 'self' 'unsafe-inline'`,
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' data:",
+    `connect-src 'self' https: wss:${isDevelopment ? " http://localhost:* ws://localhost:*" : ""}`,
+    "object-src 'none'",
+    "base-uri 'self'",
+    "frame-ancestors 'none'",
+  ].join("; ");
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("Content-Security-Policy", policy);
+  const withPolicy = (response: NextResponse) => {
+    response.headers.set("Content-Security-Policy", policy);
+    return response;
+  };
+
   if (pathname === "/") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return withPolicy(
+      NextResponse.redirect(new URL("/dashboard", request.url)),
+    );
   }
   const isPublicPath =
     pathname === "/attendance/check-in" ||
@@ -39,14 +63,16 @@ export function proxy(request: NextRequest) {
   const isApiRoute = pathname.startsWith("/api");
 
   if (isPublicPath || isAuthApiPath || isHealthApiPath || isApiRoute)
-    return NextResponse.next();
+    return withPolicy(
+      NextResponse.next({ request: { headers: requestHeaders } }),
+    );
 
   const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
 
   if (!sessionCookie?.value) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
-    return NextResponse.redirect(loginUrl);
+    return withPolicy(NextResponse.redirect(loginUrl));
   }
 
   // Role-based routing stubs - all roles currently go to /dashboard.
@@ -56,7 +82,9 @@ export function proxy(request: NextRequest) {
   //   return NextResponse.redirect(new URL("/admin", request.url));
   // }
 
-  return NextResponse.next();
+  return withPolicy(
+    NextResponse.next({ request: { headers: requestHeaders } }),
+  );
 }
 
 export const config = {

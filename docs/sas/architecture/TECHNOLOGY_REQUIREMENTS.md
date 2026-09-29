@@ -28,7 +28,7 @@ university-adapter modifiability.
 
 | Responsibility | Selected Technology | Reason |
 |---|---|---|
-| Authentication | Better Auth with optional Google OAuth | Supports password flows, Google identity-provider sign-in, account linking, and delegated authorization without hand-built authentication. |
+| Authentication | Better Auth with optional Google OAuth | Supports password flows, Google identity-provider sign-in, account linking, and delegated authorisation without hand-built authentication. |
 | Queue and secondary state | Redis | Supports the message queue and authentication secondary storage. |
 | Object storage | MinIO | Provides an S3-compatible interface without cloud lock-in. |
 | Ingress | Traefik | Provides container routing and HTTPS termination. |
@@ -38,7 +38,5 @@ university-adapter modifiability.
 | Local integration database | PGLite | Provides isolated local and CI database flows. |
 | Monorepo tooling | pnpm, Turborepo | Provides one workflow for applications and shared packages. |
 
-Current same-user solver-result reuse uses semantic job records in PostgreSQL. A separate solution
-cache is planned for later work alongside additional solver heuristics; it is not yet implemented.
-Google Calendar API synchronisation is also planned, while Demo 2 calendar interoperability uses
-browser-generated iCalendar export.
+Same-user solver-result reuse uses semantic job records in PostgreSQL. Calendar interoperability
+uses browser-generated iCalendar export.

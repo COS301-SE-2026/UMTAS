@@ -59,7 +59,7 @@ export function SlotSummaryCard({
       className={`rounded-lg border p-4 ${
         selected
           ? "border-[var(--text-primary)] bg-[var(--bg-elevated)]"
-          : "border-[var(--border)] bg-[var(--bg-base)]"
+          : "border-[var(--border)] bg-[var(--bg-surface)]"
       }`}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

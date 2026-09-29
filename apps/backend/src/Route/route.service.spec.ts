@@ -328,8 +328,8 @@ describe('RouteService', () => {
         ],
       });
       mockSequentialResults(mockDb.select, [
-        [], // direct lookup — none
-        [reverse], // reverse lookup — found
+        [], // direct lookup, none
+        [reverse], // reverse lookup, found
       ]);
 
       //Act

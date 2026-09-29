@@ -106,6 +106,10 @@ test("SolverProcessor falls back to GA only after CP-SAT is infeasible", async (
     "solve:ga:optimization",
   ]);
   assert.deepEqual(payload, { status: "completed", result: gaResult });
+  const timing = logs.pop();
+  assert.equal(timing?.message, "SOLVER_PROCESSING_DURATION");
+  assert.equal(timing.metadata?.eventCount, 0);
+  assert.equal(timing.metadata?.msPerEvent, null);
   assert.deepEqual(logs, [
     {
       message: "Running timetable solver",

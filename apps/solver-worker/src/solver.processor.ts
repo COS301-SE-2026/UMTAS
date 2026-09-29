@@ -44,6 +44,7 @@ export class SolverProcessor implements WorkerProcessor<TimetableSolveJobData> {
     const outputPath = path.join(context.tempDir, "output.json");
     await this.writeInputFile(inputPath, JSON.stringify(input));
 
+    const startedAt = performance.now();
     const result = await this.solve(
       inputPath,
       outputPath,
@@ -51,6 +52,14 @@ export class SolverProcessor implements WorkerProcessor<TimetableSolveJobData> {
       job.engine,
       job.solveMode,
     );
+    const durationMs = performance.now() - startedAt;
+    const eventCount = input.schedulingProblem.events.length;
+    context.logger.info("SOLVER_PROCESSING_DURATION", {
+      jobId: job.jobId,
+      durationMs,
+      eventCount,
+      msPerEvent: eventCount > 0 ? durationMs / eventCount : null,
+    });
     return { status: "completed", result };
   }
 

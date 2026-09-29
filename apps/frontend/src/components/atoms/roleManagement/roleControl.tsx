@@ -85,7 +85,7 @@ function RoleSelectElement({ row }: pageProps) {
           {selectOptions.map((option, idx) => {
             return (
               <SelectItem key={idx} value={option}>
-                {option}
+                {formatRoleLabel(option)}
               </SelectItem>
             );
           })}
@@ -109,7 +109,12 @@ function RoleSelectElement({ row }: pageProps) {
     </div>
   );
 }
-
+export function formatRoleLabel(role: string) {
+  return role
+    .toLowerCase()
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+}
 export default function RoleControl({ row }: pageProps) {
   const pending = isPendingRequest(row);
   if (pending) {

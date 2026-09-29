@@ -104,7 +104,7 @@
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-PDF-01** | Import Timetable from PDF | [PDF Import](#pdf-system) | User |<span class="status-implemented">Implemented</span>|
     | **UC-PDF-02** | Review Imported Timetable Data | [PDF Import](#pdf-system) | User |<span class="status-implemented">Implemented</span>|
-    | **UC-PDF-02** | Verify Imported Data | [PDF Import](#pdf-system) | University Admin |<span class="status-implemented">Implemented</span>|   
+    | **UC-PDF-03** | Verify Imported Data | [PDF Import](#pdf-system) | University Admin |<span class="status-implemented">Implemented</span>|
 
     </div>
     <div class="uc-table" markdown>

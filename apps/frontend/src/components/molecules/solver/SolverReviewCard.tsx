@@ -5,7 +5,11 @@ import CustomiseEventPanel from "@/components/atoms/customise/CustomiseEventPane
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import { X } from "lucide-react";
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { updateEventMut } from "@/components/templates/builder/Queries/eventQueries";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -16,17 +20,22 @@ import {
 
 interface SolverReviewProps {
   modules: ModuleResponseDto[];
-  onUpdateEvents: React.Dispatch<React.SetStateAction<EventResponse[]>>;
 }
 
-export default function SolverReviewCard({
-  modules,
-  onUpdateEvents,
-}: SolverReviewProps) {
+export default function SolverReviewCard({ modules }: SolverReviewProps) {
   const [selectedEvent, setSelectedEvent] = useState<EventResponse | null>(
     null,
   );
   const [tempEvent, setTempEvent] = useState<EventResponse | null>(null);
+
+  const updateEventMutation = useMutation({
+    ...updateEventMut(),
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: ["PDF", "MODULES"],
+      });
+    },
+  });
 
   const handleSelect = (event: EventResponse) => {
     if (selectedEvent?.eventId === event.eventId) {
@@ -69,16 +78,23 @@ export default function SolverReviewCard({
     });
   }
 
-  function handleSave() {
+  async function handleSave() {
     if (!tempEvent) {
       return;
     }
 
-    onUpdateEvents((previousEvents) =>
-      previousEvents.map((event) =>
-        event.eventId === tempEvent.eventId ? tempEvent : event,
-      ),
-    );
+    await updateEventMutation.mutateAsync({
+      path: {
+        id: tempEvent.eventId,
+      },
+      body: {
+        eventName: tempEvent.eventName,
+        activityCode: tempEvent.activityCode,
+        activityType: tempEvent.activityType,
+        isRecurring: tempEvent.isRecurring,
+        eventCriteria: tempEvent.eventCriteria,
+      },
+    });
 
     setSelectedEvent(null);
     setTempEvent(null);
@@ -115,8 +131,19 @@ export default function SolverReviewCard({
                   }
                 }}
               >
-                <AlertDialogContent className="w-full max-w-2xl gap-0 overflow-hidden p-0">
-                  <AlertDialogHeader className="border-b border-[var(--border)] p-6">
+                <AlertDialogContent className="w-full max-w-2xl gap-0 overflow-hidden p-0 bg-(--bg-surface)">
+                  <AlertDialogCancel asChild>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={handleDiscard}
+                      className="absolute right-4 top-4 z-10 border-none bg-transparent"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogCancel>
+
+                  <AlertDialogHeader className="p-4 pr-12">
                     <AlertDialogTitle className="text-xl font-semibold text-[var(--text-primary)]">
                       Review Event
                     </AlertDialogTitle>
@@ -132,23 +159,13 @@ export default function SolverReviewCard({
                     )}
                   </div>
 
-                  <div className="flex justify-end gap-2 border-t border-[var(--border)] p-6">
-                    <AlertDialogCancel asChild>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={handleDiscard}
-                      >
-                        Discard & Close
-                      </Button>
-                    </AlertDialogCancel>
-
+                  <div className="flex justify-center p-4">
                     <Button
                       size="sm"
-                      disabled={!eventChange}
+                      disabled={!eventChange || updateEventMutation.isPending}
                       onClick={handleSave}
                     >
-                      Save & Close
+                      Save
                     </Button>
                   </div>
                 </AlertDialogContent>
