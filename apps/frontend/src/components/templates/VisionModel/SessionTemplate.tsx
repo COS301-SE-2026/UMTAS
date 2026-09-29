@@ -56,7 +56,7 @@ export default function VM_SessionTemplate() {
   const [cameraStarting, setCameraStarting] = useState(false);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
-  const [modelSize, setModelSize] = useState<VisionModelSize>("small");
+  const [modelSize, setModelSize] = useState<VisionModelSize>("nano");
 
   const [detectionSettings, setDetectionSettings] = useState<DetectionSettings>(
     {
