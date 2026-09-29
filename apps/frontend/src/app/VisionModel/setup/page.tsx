@@ -9,6 +9,7 @@ import { Badge } from "@/components/atoms/baseShadcn/badge";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
 import { Progress } from "@/components/atoms/baseShadcn/progress";
+import Popup from "@/components/atoms/utility/floatContainer";
 import { Download, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -61,6 +62,7 @@ export default function VisionModelSetupPage() {
   const [currentModel, setCurrentModel] = useState<string | null>(null);
   const [downloadedMb, setDownloadedMb] = useState(0);
   const [totalMb, setTotalMb] = useState<number | null>(null);
+  const [showGuide, setShowGuide] = useState<boolean>(false);
 
   useEffect(() => {
     async function checkExistingCache() {
@@ -331,7 +333,7 @@ export default function VisionModelSetupPage() {
           )}
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-x-2">
           {status === "ready" ? (
             <Button onClick={() => router.push("/VisionModel")}>
               Continue
@@ -351,8 +353,10 @@ export default function VisionModelSetupPage() {
               )}
             </Button>
           )}
+          <Button>Setup Guide</Button>
         </div>
       </div>
+      {showGuide && <Popup onClose={() => setShowGuide(false)}></Popup>}
     </main>
   );
 }
