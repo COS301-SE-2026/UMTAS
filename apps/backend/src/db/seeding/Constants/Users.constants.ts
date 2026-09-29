@@ -18,3 +18,12 @@ export const UserPasswords: string[] = [
   'SarrieJammerGat#123',
   'PietPierneef#123',
 ];
+
+export const DEFAULT_COS_ADMIN_EMAIL = 'admin301@local.umtas';
+export const DEFAULT_SYSTEM_ADMIN_EMAIL = 'system-admin@local.umtas';
+
+export const getCosAdminEmail = (): string =>
+  process.env.SEED_COS_ADMIN_EMAIL?.toLowerCase() ?? DEFAULT_COS_ADMIN_EMAIL;
+
+export const getSystemAdminEmail = (): string =>
+  process.env.SEED_SYSTEM_ADMIN_EMAIL ?? DEFAULT_SYSTEM_ADMIN_EMAIL;

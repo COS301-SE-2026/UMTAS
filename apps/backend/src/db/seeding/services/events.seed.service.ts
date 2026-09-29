@@ -64,7 +64,7 @@ export class EventsSeedService extends BaseSeedService {
       relationshipsCreated += result.relationshipsCreated;
     }
 
-    await this.seedAttendanceConflictDemo(db, modulesByCode, codes, university);
+    await this.seedAttendanceConflictDemo(db, modulesByCode, university);
 
     this.logResult('Hatfield recurring module events', eventsCreated);
     this.logResult('module event relationships', relationshipsCreated);
@@ -74,7 +74,6 @@ export class EventsSeedService extends BaseSeedService {
   private async seedAttendanceConflictDemo(
     db: AppDatabase,
     modulesByCode: Map<string, { id: string; code: string }>,
-    codes: string[],
     universityId: string,
   ): Promise<void> {
     const lecturerEmail = this.constants.UserEmails[1];
@@ -83,13 +82,11 @@ export class EventsSeedService extends BaseSeedService {
       .from(usersTable)
       .where(eq(usersTable.email, lecturerEmail))
       .limit(1);
-    const demoModules = codes
-      .map((code) => modulesByCode.get(code))
-      .filter(
-        (module): module is { id: string; code: string } =>
-          module !== undefined,
-      )
-      .slice(0, 2);
+    const demoModules = this.constants.ATTENDANCE_DEMO_MODULE_CODES.map(
+      (code) => modulesByCode.get(code),
+    ).filter(
+      (module): module is { id: string; code: string } => module !== undefined,
+    );
 
     if (!lecturer || demoModules.length < 2) {
       this.logger.warn(

@@ -19,3 +19,9 @@ export const ALL_SEED_MODULES: SeedModule[] = [
   ...year2.ALL_SEED_MODULES,
   ...year3.ALL_SEED_MODULES,
 ];
+
+// Modules used by the attendance conflict demo (the first two seeded modules)
+export const ATTENDANCE_DEMO_MODULE_CODES: string[] = ALL_SEED_MODULES.slice(
+  0,
+  2,
+).map((module) => module.Code);

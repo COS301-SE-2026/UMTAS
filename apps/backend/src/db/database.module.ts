@@ -13,6 +13,8 @@ import { BuildingSeedService } from './seeding/services/buildings.seed.service';
 import { EventsSeedService } from './seeding/services/events.seed.service';
 import { SeedQueryService } from './seeding/services/seed-query.service';
 import { VenuesSeedService } from './seeding/services/venues.seed.service';
+import { AdminTeachingSeedService } from './seeding/services/admin-teaching.seed.service';
+import { AttendanceDemoAdminsSeedService } from './seeding/services/attendance-demo-admins.seed.service';
 import { EventVenuesSeedService } from './seeding/services/eventVenue.seed.service';
 
 @Global()
@@ -33,6 +35,8 @@ import { EventVenuesSeedService } from './seeding/services/eventVenue.seed.servi
     BuildingSeedService,
     VenuesSeedService,
     EventVenuesSeedService,
+    AdminTeachingSeedService,
+    AttendanceDemoAdminsSeedService,
   ],
   exports: [DatabaseService, SeedPersistenceService],
 })
