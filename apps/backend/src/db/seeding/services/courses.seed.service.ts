@@ -5,7 +5,12 @@ import { DatabaseService } from '../../database.service';
 import { eq, inArray, and } from 'drizzle-orm';
 
 //Tables
-import { Course, University } from '../../../entities';
+import {
+  Course,
+  CourseEnrollment,
+  University,
+  usersTable,
+} from '../../../entities';
 import { SeedPersistenceService } from '../seed-persistence.service';
 
 @Injectable()
@@ -74,5 +79,31 @@ export class CourseSeedService extends BaseSeedService {
     } else {
       this.logResult('Courses');
     }
+
+    await enrollUsersInCourses(tx, uni.UniversityID);
   } //END_seed
 } //END_CourseSeedService
+
+async function enrollUsersInCourses(
+  tx: DatabaseService['db'],
+  universityId: string,
+): Promise<void> {
+  //Get all users
+  const users = await tx.select().from(usersTable);
+
+  const courses = await tx
+    .select()
+    .from(Course)
+    .where(eq(Course.UniversityID, universityId));
+
+  if (users.length === 0 || courses.length === 0) {
+    return;
+  }
+
+  const enrollments = users.map((user, index) => ({
+    UserID: user.id,
+    CourseID: courses[index % courses.length].CourseID,
+  }));
+
+  await tx.insert(CourseEnrollment).values(enrollments).onConflictDoNothing();
+} //END_enrollUsersInCourses
