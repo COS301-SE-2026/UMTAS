@@ -1,0 +1,13 @@
+Command: bash -c cd apps/backend && npx jest src/Timetable/timetable.service.spec.ts src/auth/permissions.spec.ts src/auth/roles.guard.spec.ts src/Events/event.service.spec.ts
+Exit code: 0
+Environment: macOS-27.0-arm64-arm-64bit
+PASS src/auth/permissions.spec.ts
+PASS src/auth/roles.guard.spec.ts
+PASS src/Timetable/timetable.service.spec.ts
+PASS src/Events/event.service.spec.ts
+
+Test Suites: 4 passed, 4 total
+Tests:       86 passed, 86 total
+Snapshots:   0 total
+Time:        2.198 s
+Ran all test suites matching /src\/Timetable\/timetable.service.spec.ts|src\/auth\/permissions.spec.ts|src\/auth\/roles.guard.spec.ts|src\/Events\/event.service.spec.ts/i.

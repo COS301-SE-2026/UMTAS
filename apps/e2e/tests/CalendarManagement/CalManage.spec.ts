@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 type ResTypes =
   | "SEMESTER_1_START"
@@ -16,7 +16,30 @@ type ResTypes =
 
 test.describe.configure({ mode: "serial" });
 
+// Tests assume 2030 starts with no restrictions. Clear leftovers before and
+// after each test so a failed run can't pollute the next one.
+async function clearRestrictions(page: Page) {
+  await page.goto("/calendar-management");
+  await page.getByTestId("SELECT_NEW_YEAR").click();
+  await page.getByRole("option", { name: "2030" }).click();
+  await expect(page.getByText("2030")).toBeVisible();
+
+  const rows = page.getByTestId("ADDED_CONTAINER");
+  for (let remaining = await rows.count(); remaining > 0; remaining--) {
+    await rows.first().getByTestId("btn-delete-restriction").click();
+    await expect(rows).toHaveCount(remaining - 1);
+  }
+}
+
 test.describe("Calendar", () => {
+  test.beforeEach(async ({ page }) => {
+    await clearRestrictions(page);
+  });
+
+  test.afterEach(async ({ page }) => {
+    await clearRestrictions(page);
+  });
+
   test("Calendar Page Loads", async ({ page }) => {
     await page.goto("/calendar-management");
     await expect(page.getByText("Calendar Management")).toBeVisible();
