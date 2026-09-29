@@ -302,7 +302,7 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
         )}
 
         <div className="flex w-full flex-col gap-3 border-t pt-4">
-          <div className="flex w-full items-center justify-center gap-4">
+          <div className="flex w-full min-w-0 flex-col items-center justify-center gap-4">
             {!selectedInstitute && (
               <Button type="button" variant="outline" disabled>
                 Select an institute to continue

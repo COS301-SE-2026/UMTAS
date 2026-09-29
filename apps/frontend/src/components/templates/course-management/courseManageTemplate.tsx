@@ -66,6 +66,10 @@ const steps = [
     content: "Create a new course for your institute.",
   },
   {
+    target: "#btn-edit-course",
+    content: "Edit course name and degree.",
+  },
+  {
     target: "#btn-view-modules",
     content: "View the modules available for the selected course.",
   },
@@ -238,93 +242,93 @@ export default function CourseManagementTemplate() {
   return (
     <>
       <Tutorial steps={steps} wait={true} />
-
       <div className="flex w-full flex-col items-center gap-6 px-6 pt-6">
-        <div className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
-          <div className="border-b border-[var(--border)] px-5 py-4">
-            <h1 className="text-lg font-semibold text-[var(--text-primary)]">
-              Course Management
-            </h1>
-            <p className="mt-1 text-sm text-[var(--text-secondary)]">
-              Search and filter courses, degrees and modules.
-            </p>
+        <div className="w-full max-w-6xl py-4 border-b border-[var(--border)]">
+          <h1 className="text-lg font-semibold text-[var(--text-primary)]">
+            Course Management
+          </h1>
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">
+            Search and filter courses, degrees and modules.
+          </p>
+        </div>
+        <div className="flex w-full max-w-6xl flex-col items-start gap-4 md:flex-row md:justify-between">
+          <div className="w-full md:max-w-sm flex-1">
+            <Input
+              id="input-search-courses-degrees-modules"
+              placeholder="Search courses, degrees, or module codes/names..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-[var(--background)]"
+            />
           </div>
-          <div className="flex flex-col items-center justify-between gap-4 bg-[var(--bg-surface)] p-5 md:flex-row">
-            <div className="w-full md:max-w-sm flex-1">
-              <Input
-                id="input-search-courses-degrees-modules"
-                placeholder="Search courses, degrees, or module codes/names..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[var(--background)]"
-              />
-            </div>
 
-            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-              <Select value={selectedDegree} onValueChange={setSelectedDegree}>
-                <SelectTrigger
-                  id="select-all-degrees"
-                  className="w-[180px] bg-[var(--background)]"
-                >
-                  <SelectValue placeholder="Filter Degree" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All">All Degrees</SelectItem>
-                  {availableDegrees.map((degree) => (
-                    <SelectItem key={degree} value={degree}>
-                      {degree}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={effectiveModulePrefix}
-                onValueChange={setSelectedModulePrefix}
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <Select value={selectedDegree} onValueChange={setSelectedDegree}>
+              <SelectTrigger
+                id="select-all-degrees"
+                className="w-[180px] bg-[var(--background)]"
               >
-                <SelectTrigger
-                  id="select-all-module"
-                  className="w-[180px] bg-[var(--background)]"
-                >
-                  <SelectValue placeholder="Filter Module Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All">All Module Types</SelectItem>
-                  {availableModulePrefixes.map((prefix) => (
-                    <SelectItem key={prefix} value={prefix}>
-                      {prefix}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {isStudent === false && (
-                <Button
-                  data-testid="show-add-course"
-                  onClick={() => {
-                    if (
-                      // updated to be more agnostic
-                      university?.ApiKey != null ||
-                      university?.ApiKey != undefined
-                    ) {
-                      setExternalCourses(true);
-                    } else {
-                      setShowAddCourse(true);
-                    }
-                  }}
-                >
-                  Add Courses
-                </Button>
-              )}
-              {showAddCourse && isStudent === false && (
-                <AddCoursePopup onClose={() => setShowAddCourse(false)} />
-              )}
-              {showExternalCourses && (
-                <Popup onClose={() => setExternalCourses(false)}>
-                  <ExternalCoursesPopup />
-                </Popup>
-              )}
-            </div>
+                <SelectValue placeholder="Filter Degree" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Degrees</SelectItem>
+                {availableDegrees.map((degree) => (
+                  <SelectItem key={degree} value={degree}>
+                    {degree}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={effectiveModulePrefix}
+              onValueChange={setSelectedModulePrefix}
+            >
+              <SelectTrigger
+                id="select-all-module"
+                className="w-[180px] bg-[var(--background)]"
+              >
+                <SelectValue placeholder="Filter Module Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Module Types</SelectItem>
+                {availableModulePrefixes.map((prefix) => (
+                  <SelectItem key={prefix} value={prefix}>
+                    {prefix}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {isStudent === false && (
+              <Button
+                id="btn-add-course"
+                data-testid="show-add-course"
+                onClick={() => {
+                  if (
+                    // updated to be more agnostic
+                    university?.ApiKey != null ||
+                    university?.ApiKey != undefined
+                  ) {
+                    setExternalCourses(true);
+                  } else {
+                    setShowAddCourse(true);
+                  }
+                }}
+              >
+                Add Courses
+              </Button>
+            )}
+            {showAddCourse && isStudent === false && (
+              <AddCoursePopup onClose={() => setShowAddCourse(false)} />
+            )}
+            {showExternalCourses && (
+              <Popup onClose={() => setExternalCourses(false)}>
+                <ExternalCoursesPopup />
+              </Popup>
+            )}
           </div>
+        </div>
+        <div className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
           <Table>
             <TableHeader>
               <TableRow className="border-b border-[var(--border)]">
@@ -371,6 +375,7 @@ export default function CourseManagementTemplate() {
                           <div className="flex justify-end gap-2">
                             {isStudent == false ? (
                               <Button
+                                id="btn-edit-course"
                                 size="sm"
                                 variant="outline"
                                 onClick={() => setCourseToEdit(course)}

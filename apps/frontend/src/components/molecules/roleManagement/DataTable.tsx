@@ -118,8 +118,8 @@ export function DataTable<TData, TValue>({
   };
 
   return (
-    <div className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
-      <div className="border-b border-[var(--border)] px-5 py-4">
+    <>
+      <div className="w-full max-w-6xl py-4 border-b border-[var(--border)]">
         <h1 className="text-lg font-semibold text-[var(--text-primary)]">
           Role Management
         </h1>
@@ -129,7 +129,7 @@ export function DataTable<TData, TValue>({
         </p>
       </div>
 
-      <div className="flex flex-col items-center justify-between gap-4 bg-[var(--bg-surface)] p-5 md:flex-row">
+      <div className="flex w-full max-w-6xl flex-col items-start gap-4 md:flex-row md:justify-between">
         <div className="w-full flex-1 md:max-w-sm">
           <Input
             id="input-search-name-email-role"
@@ -196,109 +196,110 @@ export function DataTable<TData, TValue>({
           </DropdownMenu>
         </div>
       </div>
-
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow
-              key={headerGroup.id}
-              className="border-b border-[var(--border)]"
-            >
-              {headerGroup.headers.map((header) => {
-                const isActions = header.id.toLowerCase() === "actions";
-
-                return (
-                  <TableHead
-                    key={header.id}
-                    className={`p-4 font-bold text-[var(--text-primary)] ${
-                      isActions ? "text-right" : ""
-                    }`}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
+      <div className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
-                data-testid="row-roles-table"
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                className="brand-table-hover border-b border-[var(--border)]"
+                key={headerGroup.id}
+                className="border-b border-[var(--border)]"
               >
-                {row.getVisibleCells().map((cell) => {
-                  const isActions = cell.column.id.toLowerCase() === "actions";
+                {headerGroup.headers.map((header) => {
+                  const isActions = header.id.toLowerCase() === "actions";
 
                   return (
-                    <TableCell
-                      id="select-the-row-in-table"
-                      key={cell.id}
-                      className={`p-4 text-[var(--text-primary)] ${
+                    <TableHead
+                      key={header.id}
+                      className={`p-4 font-bold text-[var(--text-primary)] ${
                         isActions ? "text-right" : ""
                       }`}
                     >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
                   );
                 })}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="p-8 text-center text-[var(--text-secondary)]"
+            ))}
+          </TableHeader>
+
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  data-testid="row-roles-table"
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="brand-table-hover border-b border-[var(--border)]"
+                >
+                  {row.getVisibleCells().map((cell) => {
+                    const isActions =
+                      cell.column.id.toLowerCase() === "actions";
+
+                    return (
+                      <TableCell
+                        key={cell.id}
+                        className={`p-4 text-[var(--text-primary)] ${
+                          isActions ? "text-right" : ""
+                        }`}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="p-8 text-center text-[var(--text-secondary)]"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+
+        {table.getAllLeafColumns().some((column) => column.id === "select") && (
+          <div className="flex items-center justify-between border-t border-[var(--border)] bg-[var(--bg-surface)] p-4">
+            <div className="text-sm text-muted-foreground">
+              {table.getFilteredSelectedRowModel().rows.length} of{" "}
+              {table.getFilteredRowModel().rows.length} row(s) selected.
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Button
+                id="btn-role-previous"
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
               >
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+                Previous
+              </Button>
 
-      {table.getAllLeafColumns().some((column) => column.id === "select") && (
-        <div className="flex items-center justify-between border-t border-[var(--border)] bg-[var(--bg-surface)] p-4">
-          <div className="text-sm text-muted-foreground">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
+              <Button
+                id="btn-role-next"
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
+            </div>
           </div>
-
-          <div className="flex items-center space-x-2">
-            <Button
-              id="btn-role-previous"
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-
-            <Button
-              id="btn-role-next"
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }

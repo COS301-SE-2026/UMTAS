@@ -4,7 +4,7 @@ import {
   getStudentRoutesQ,
 } from "../../../../utilities/route/studentRoutingQueries";
 import { getRoutingHeatmapQ } from "../../../../utilities/route/routeQueries";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getCongestionLevel } from "../../../../utilities/heatmaps/routeCongestion";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { AlertTriangle } from "lucide-react";
@@ -107,14 +107,26 @@ function StudentRouteLineItem({
   transition,
   routeIndex,
   date,
+  buildingPairKey,
+  onAlternateRouteError,
+  onAlternateRouteSuccess,
+  onRouteClick,
+  onRouteHover,
+  onRouteHoverEnd,
 }: {
   transition: getStudentRouteTransitionType;
   routeIndex?: number;
   date: string;
+  buildingPairKey: string;
+  onAlternateRouteError: () => void;
+  onAlternateRouteSuccess: (buildingPairKey: string) => void;
+  onRouteClick: () => void;
+  onRouteHover: (position: { x: number; y: number }) => void;
+  onRouteHoverEnd: () => void;
 }) {
   const isAlternative = routeIndex !== undefined && routeIndex !== 0;
 
-  const { data: alternativeRouteData } = useQuery({
+  const { data: alternativeRouteData, error: alternateRouteError } = useQuery({
     ...getAlternateRoutesQ({
       originEventId: transition.originEvent.eventId,
       destinationEventId: transition.destinationEvent.eventId,
@@ -123,6 +135,20 @@ function StudentRouteLineItem({
     }),
     enabled: isAlternative,
   });
+
+  //Alternate route found
+  useEffect(() => {
+    if (alternativeRouteData) {
+      onAlternateRouteSuccess(buildingPairKey);
+    }
+  }, [alternativeRouteData]);
+
+  //Alternate route does not exist
+  useEffect(() => {
+    if (alternateRouteError) {
+      onAlternateRouteError();
+    }
+  }, [alternateRouteError, onAlternateRouteError]);
 
   const path =
     isAlternative && alternativeRouteData?.route?.pathCoordinates
@@ -137,6 +163,9 @@ function StudentRouteLineItem({
     <RouteLine
       path={path}
       colour={isAlternative ? "#3B82F6" : transition.route?.displayColour}
+      onClick={onRouteClick}
+      onHover={onRouteHover}
+      onHoverEnd={onRouteHoverEnd}
     />
   );
 }
@@ -145,10 +174,20 @@ export function StudentRouteLines({
   date,
   time,
   selectedIndex,
+  onAlternateRouteError,
+  onAlternateRouteSuccess,
+  onRouteClick,
+  onRouteHover,
+  onRouteHoverEnd,
 }: {
   date: string;
   time?: string;
   selectedIndex: Record<string, number>;
+  onAlternateRouteError: () => void;
+  onAlternateRouteSuccess: (buildingPairKey: string) => void;
+  onRouteClick: (buildingPairKey: string) => void;
+  onRouteHover: (position: { x: number; y: number }) => void;
+  onRouteHoverEnd: () => void;
 }) {
   const { data: studentRoutes } = useQuery(getStudentRoutesQ({ date }));
 
@@ -176,6 +215,12 @@ export function StudentRouteLines({
             transition={transition}
             routeIndex={selectedIndex[buildingPairKey]}
             date={date}
+            buildingPairKey={buildingPairKey}
+            onAlternateRouteError={onAlternateRouteError}
+            onAlternateRouteSuccess={onAlternateRouteSuccess}
+            onRouteClick={() => onRouteClick(buildingPairKey)}
+            onRouteHover={onRouteHover}
+            onRouteHoverEnd={onRouteHoverEnd}
           />
         );
       })}

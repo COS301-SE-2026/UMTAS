@@ -19,7 +19,7 @@ const HEATMAP_COLOUR_RANGE: [number, number, number, number][] = [
 
 //temporary for now until we get the simulation service up
 //remember to tune this before sim service is up vro!
-const HEATMAP_COLOUR_DOMAIN: [number, number] = [0, 15];
+const HEATMAP_COLOUR_DOMAIN: [number, number] = [0, 75];
 
 interface UseHeatmapOverlayOptions {
   buildingPoints: WeightedPoint[];

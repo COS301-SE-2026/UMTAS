@@ -50,7 +50,10 @@ export function AttendanceModuleRow({
         : "UPCOMING";
 
   return (
-    <AccordionItem value={group.key} className="border-[var(--border)]">
+    <AccordionItem
+      value={group.key}
+      className="border-[var(--border)] bg-[var(--bg-surface)]"
+    >
       <AccordionTrigger className="min-h-20 rounded-none px-4 py-3 hover:bg-[var(--bg-surface)]/70 hover:no-underline data-[state=open]:bg-[var(--bg-surface)]/70">
         <span className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 pr-3 md:grid-cols-[minmax(12rem,1.1fr)_minmax(17rem,1.4fr)_auto] md:gap-x-5">
           <span className="min-w-0">
@@ -79,7 +82,7 @@ export function AttendanceModuleRow({
           />
         </span>
       </AccordionTrigger>
-      <AccordionContent className="bg-[var(--bg-surface)]/70 px-4 pb-3">
+      <AccordionContent className="bg-[var(--bg-surface)] px-4 pb-3">
         {group.slots.map((slot) => {
           const slotPreferred = slot.eventID === preferredEventId;
           return (

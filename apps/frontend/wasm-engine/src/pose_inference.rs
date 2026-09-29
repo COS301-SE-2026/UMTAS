@@ -87,8 +87,8 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
     let mut people: Vec<DetectedPersonPose> = Vec::new();
 
     const NUM_FEATURES: usize = 56;
-    const CONFIDENCE_THRESHOLD: f32 = 0.15;
-    const KEYPOINT_CONFIDENCE_THRESHOLD: f32 = 0.1;
+    const CONFIDENCE_THRESHOLD: f32 = 0.05;
+    const KEYPOINT_CONFIDENCE_THRESHOLD: f32 = 0.4;
 
     if slice_data.is_empty() || slice_data.len() % NUM_FEATURES != 0 {
         return Err(format!(

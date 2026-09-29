@@ -18,10 +18,12 @@ export function PreparedTagUrl({
   registration,
   expired,
   onExpire,
+  onCopied,
 }: {
   registration: PreparedNfcRegistration;
   expired: boolean;
   onExpire: () => void;
+  onCopied?: () => void;
 }) {
   const fieldRef = useRef<HTMLTextAreaElement>(null);
   const expirationReported = useRef(false);
@@ -57,6 +59,7 @@ export function PreparedTagUrl({
 
       setCopied(true);
       setCopyFallback(false);
+      onCopied?.();
     } catch {
       fieldRef.current?.focus();
       fieldRef.current?.select();

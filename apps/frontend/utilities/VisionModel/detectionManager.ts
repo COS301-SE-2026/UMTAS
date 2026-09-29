@@ -39,9 +39,6 @@ class DetectionManager {
           this.isProcessing = false;
 
           const durationSeconds = (performance.now() - startTime) / 1000;
-          console.log(
-            `Detection pipeline took: ${durationSeconds.toFixed(3)}s`,
-          );
 
           resolve(message.payload.results);
         }

@@ -16,38 +16,41 @@ import {
 
 interface SolverReviewProps {
   modules: ModuleResponseDto[];
-
   onUpdateEvents: React.Dispatch<React.SetStateAction<EventResponse[]>>;
 }
 
 export default function SolverReviewCard({
   modules,
-
   onUpdateEvents,
 }: SolverReviewProps) {
   const [selectedEvent, setSelectedEvent] = useState<EventResponse | null>(
     null,
   );
-
   const [tempEvent, setTempEvent] = useState<EventResponse | null>(null);
 
   const handleSelect = (event: EventResponse) => {
     if (selectedEvent?.eventId === event.eventId) {
       setSelectedEvent(null);
       setTempEvent(null);
-    } else {
-      setSelectedEvent(event);
-      setTempEvent(event);
+      return;
     }
+
+    setSelectedEvent(event);
+    setTempEvent(event);
   };
 
-  function handleUpdate(id: string, field: string, value: string | boolean) {
+  function handleUpdate(_id: string, field: string, value: string | boolean) {
     setTempEvent((previous) => {
       if (!previous) {
         return previous;
       }
 
-      const rootFields = ["eventName", "eventCode", "isRecurring"];
+      const rootFields = [
+        "eventName",
+        "activityCode",
+        "activityType",
+        "isRecurring",
+      ];
 
       if (rootFields.includes(field)) {
         return {
@@ -71,29 +74,32 @@ export default function SolverReviewCard({
       return;
     }
 
-    onUpdateEvents((previousEvents) => {
-      const updatedEvents = previousEvents.map((event) =>
+    onUpdateEvents((previousEvents) =>
+      previousEvents.map((event) =>
         event.eventId === tempEvent.eventId ? tempEvent : event,
-      );
-
-      return updatedEvents;
-    });
+      ),
+    );
 
     setSelectedEvent(null);
     setTempEvent(null);
   }
 
-  // console.log(modules);
+  function handleDiscard() {
+    setSelectedEvent(null);
+    setTempEvent(null);
+  }
+
   return (
     <>
       {modules.map((module) =>
         module?.Events?.map((event) => {
           const isSelected = selectedEvent?.eventId === event.eventId;
+
           const eventChange =
-            tempEvent && JSON.stringify(tempEvent) !== JSON.stringify(event);
+            !!tempEvent && JSON.stringify(tempEvent) !== JSON.stringify(event);
 
           return (
-            <div key={event.eventId} className="space-y-2 border-b pb-4  ">
+            <div key={event.eventId} className="space-y-2 border-b pb-4">
               <CustomiseEventPanel
                 event={isSelected && tempEvent ? tempEvent : event}
                 modules={modules}
@@ -105,49 +111,44 @@ export default function SolverReviewCard({
                 open={isSelected}
                 onOpenChange={(open) => {
                   if (!open) {
-                    setSelectedEvent(null);
-                    setTempEvent(null);
+                    handleDiscard();
                   }
                 }}
               >
-                <AlertDialogContent className="w-max max-w-[50vw] p-6">
-                  <AlertDialogHeader className="flex flex-row justify-between items-center border-b pb-2">
-                    <AlertDialogTitle className="text-xl font-bold">
-                      Review your Events
+                <AlertDialogContent className="w-full max-w-2xl gap-0 overflow-hidden p-0">
+                  <AlertDialogHeader className="border-b border-[var(--border)] p-6">
+                    <AlertDialogTitle className="text-xl font-semibold text-[var(--text-primary)]">
+                      Review Event
                     </AlertDialogTitle>
-                    <AlertDialogCancel className="mt-0">
-                      Close
-                    </AlertDialogCancel>
                   </AlertDialogHeader>
 
-                  <div className="py-4 overflow-auto max-h-[80vh] ">
-                    <div className="pl-4 space-y-2">
-                      {tempEvent && (
-                        <NoPermissionsEventCard
-                          event={tempEvent}
-                          modules={modules}
-                          onUpdate={handleUpdate}
-                        />
-                      )}
-                    </div>
+                  <div className="max-h-[70vh] overflow-y-auto p-6">
+                    {tempEvent && (
+                      <NoPermissionsEventCard
+                        event={tempEvent}
+                        modules={modules}
+                        onUpdate={handleUpdate}
+                      />
+                    )}
                   </div>
-                  <div className="flex gap-2">
+
+                  <div className="flex justify-end gap-2 border-t border-[var(--border)] p-6">
+                    <AlertDialogCancel asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleDiscard}
+                      >
+                        Discard & Close
+                      </Button>
+                    </AlertDialogCancel>
+
                     <Button
                       size="sm"
                       disabled={!eventChange}
                       onClick={handleSave}
                     >
                       Save & Close
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      disabled={!eventChange}
-                      onClick={() => {
-                        setTempEvent(selectedEvent);
-                      }}
-                    >
-                      Discard & Close
                     </Button>
                   </div>
                 </AlertDialogContent>

@@ -71,11 +71,6 @@ function toRead(str: string) {
 
 const steps = [
   {
-    target: "#calendar-management",
-    content:
-      "Manage your university's academic calendars, public holidays, and calendar restrictions here.",
-  },
-  {
     target: "#select-calendar-year",
     content:
       "Select the academic year you want to manage. A calendar will be created automatically if one does not already exist.",
@@ -151,16 +146,13 @@ export default function CalTemplate() {
 
   return (
     <>
-      {/* <Tutorial steps={steps} wait={true} /> */}
+      <Tutorial steps={steps} wait={true} />
 
       <div className="flex w-full flex-col items-center gap-6 px-6 pt-6 capitalize">
-        <div
-          id="calendar-management"
-          className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm"
-        >
+        <div className="w-full max-w-6xl overflow-auto">
           {/* Header */}
-          <div className="border-b border-[var(--border)] px-5 py-4">
-            <h1 className="text-lg font-semibold text-[var(--text-primary)]">
+          <div className="mx-5 py-4 border-b border-[var(--border)]">
+            <h1 className="text-xl font-semibold text-[var(--text-primary)]">
               Calendar Management
             </h1>
 
@@ -171,7 +163,7 @@ export default function CalTemplate() {
           </div>
 
           {/* Controls */}
-          <div className="mx-5 mt-5 flex flex-col gap-4 rounded-lg border border-[var(--border)] bg-[var(--bg-base)] p-4 md:flex-row md:items-end md:justify-between">
+          <div className="mx-5 mt-5 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="flex flex-wrap items-end gap-4">
               {/* Academic Year */}
               <div className="flex flex-col gap-2">
