@@ -33,8 +33,8 @@ export function proxy(request: NextRequest) {
   const nonce = btoa(crypto.randomUUID());
   const policy = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
-    `style-src 'self' 'nonce-${nonce}'`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'wasm-unsafe-eval`,
+    "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     `connect-src 'self' https: wss:${isDevelopment ? " http://localhost:* ws://localhost:*" : ""}`,
