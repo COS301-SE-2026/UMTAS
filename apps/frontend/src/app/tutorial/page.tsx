@@ -3,20 +3,25 @@ import Tutorial from "@/components/organisms/nav/Tutorial";
 
 import { builderSection } from "../builder/HelpPage";
 import { courseSection } from "../course-management/HelpPage";
-import { dashboardSection } from "../dashboard/HelpPage";
 import { moduleManagementSection } from "../module-management/HelpPage";
 import { roleManagementSection } from "../role-management/HelpPage";
 import { schedulesSection } from "../schedules/HelpPage";
 import { solverSection } from "../solver/HelpPage";
-
+import { vmSection } from "../VisionModel/HelpPage";
+import { mapSection } from "../map/HelpPage";
+import { attendanceSection } from "../attendance/HelpPage";
+import { calendarSection } from "../calendar-management/HelpPage";
 const allTutorialSections = [
-  dashboardSection,
   solverSection,
   builderSection,
   schedulesSection,
   moduleManagementSection,
   roleManagementSection,
   courseSection,
+  calendarSection,
+  vmSection,
+  mapSection,
+  attendanceSection,
 ];
 
 const steps = [
