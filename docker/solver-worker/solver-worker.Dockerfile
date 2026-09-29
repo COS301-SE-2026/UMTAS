@@ -27,6 +27,12 @@ RUN pnpm --filter shared-types build \
     && cp -R apps/solver-worker/dist /deploy/dist
 
 FROM vigilcs/umtas:ortools-base-${ORTOOLS_VERSION} AS solver-build
+
+# Mikallitjie ?????????
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends python3 \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /workspace
 
 COPY apps/preference-solver /workspace/apps/preference-solver
