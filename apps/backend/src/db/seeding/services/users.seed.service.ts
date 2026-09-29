@@ -23,6 +23,8 @@ import { SeedPersistenceService } from '../seed-persistence.service';
 const LECTURER_EMAIL = process.env.LECTURER_EMAIL || undefined;
 const LECTURER_PASSWORD = process.env.LECTURER_PASSWORD || undefined;
 
+const STUDENT_PASSWORD = process.env.NOT_A_PASSWORD;
+
 type UniversityRecord = InferSelectModel<typeof University>;
 
 @Injectable()
@@ -37,21 +39,17 @@ export class UserSeedService extends BaseSeedService {
 
     // Seed the standard users
     const newUsers = await this.seedUsers(tx, {
-      ids: this.constants.UserIDs,
       names: this.constants.UserNames,
       emails: this.constants.UserEmails,
-      passwords: this.constants.UserPasswords,
+      password: STUDENT_PASSWORD,
     });
 
     // Assign the configured university role to each newly-created user
-    for (const [index, user] of newUsers.entries()) {
-      await this.seedUserUniversityRoles(
-        tx,
-        user.id,
-        this.constants.UserUniRoles[index],
-        universities,
-      );
+    for (const user of newUsers) {
+      await this.seedUserUniversityRoles(tx, user.id, 'STUDENT', universities);
     }
+
+    this.logResult('UniversityRoles', newUsers.length * 2);
 
     // Seed the lecturer
     await this.seedLecturer(tx, universities);
@@ -73,7 +71,7 @@ export class UserSeedService extends BaseSeedService {
     const newUsers = await this.seedUsers(tx, {
       names: ['lecturer'],
       emails: [LECTURER_EMAIL],
-      passwords: [LECTURER_PASSWORD],
+      password: LECTURER_PASSWORD,
     });
 
     // Assign role
@@ -88,27 +86,24 @@ export class UserSeedService extends BaseSeedService {
       ids?: string[];
       names: string[];
       emails: string[];
-      passwords: string[];
+      password: string | undefined;
     },
   ): Promise<(typeof usersTable.$inferSelect)[]> {
-    // constants
     const userIDs = options.ids;
     const userNames = options.names;
     const userEmails = options.emails;
-    const userPasswords = options.passwords;
+
+    if (!options.password) {
+      this.logger.warn(
+        'Users could not be seeded due to missing NOT_A_PASSWORD environment variable.',
+      );
+      return [];
+    }
 
     // Ensure names and emails have matching lengths
     if (userNames.length !== userEmails.length) {
       this.logger.warn(
         `Names length [${userNames.length}] does not match emails length [${userEmails.length}].`,
-      );
-      return [];
-    }
-
-    // Ensure emails and passwords have matching lengths
-    if (userEmails.length !== userPasswords.length) {
-      this.logger.warn(
-        `Emails length [${userEmails.length}] does not match passwords length [${userPasswords.length}].`,
       );
       return [];
     }
@@ -120,19 +115,15 @@ export class UserSeedService extends BaseSeedService {
       return [];
     }
 
-    //hash passwords
-    const hashedUserPasswords = await Promise.all(
-      userPasswords.map((password) => hashPassword(password)),
-    );
+    const hashedPassword = await hashPassword(options.password);
 
-    // user objects
     const userObjects = userEmails.map((email, index) => ({
       id: userIDs?.[index],
       name: userNames[index],
       email,
       role: 'user',
       emailVerified: true,
-      password: hashedUserPasswords[index],
+      password: hashedPassword,
     }));
 
     // Get existing users through their emails
@@ -148,13 +139,11 @@ export class UserSeedService extends BaseSeedService {
       (user) => !existingEmails.has(user.email),
     );
 
-    //no new users to seed
     if (missingUsers.length === 0) {
       this.logResult('Users');
       return [];
     }
 
-    // Seed missing users
     const newUsers = await this.persistence.insertUsers(
       tx,
       missingUsers.map((user) => ({
@@ -166,7 +155,6 @@ export class UserSeedService extends BaseSeedService {
       })),
     );
 
-    // Seed credentials in the accounts table
     await this.persistence.insertAccounts(
       tx,
       missingUsers.map((user, index) => ({
@@ -236,11 +224,6 @@ export class UserSeedService extends BaseSeedService {
     }
 
     // Seed missing university roles
-    const newRoles = await this.persistence.insertUniversityRoles(
-      tx,
-      missingRoles,
-    );
-
-    this.logResult('UniversityRoles', newRoles.length);
+    await this.persistence.insertUniversityRoles(tx, missingRoles);
   } //END_seedUserUniversityRoles
 } //END_UserSeedService
