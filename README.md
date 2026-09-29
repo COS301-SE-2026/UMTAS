@@ -10,7 +10,7 @@
 
 <br>
 
-### University Management & Timetabling Automation System
+### University Management & Timetables Analytics System
 
 Team Vigil - UMTAS - A university timetable platform for PDF ingestion, constraint solving and personalised schedules.
 
@@ -107,12 +107,15 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 ### <img src="https://api.iconify.design/mdi/numeric-1-circle.svg?color=%2314532d" width="20" height="20" valign="middle"> Demo 1
 
 <details>
+
 <summary>Show Demo 1 documentation</summary>
 
 <div align="center">
 
 [![capstone-vigil.dns.net.za](https://img.shields.io/badge/capstone--vigil.dns.net.za-Visit_Website-14532d?style=for-the-badge&logo=vercel&logoColor=white)](https://capstone-vigil.dns.net.za/)
+
 [![cos301-se-2026.github.io/UMTAS](https://img.shields.io/badge/cos301--se--2026.github.io%2FUMTAS-Visit_Docs-18181b?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/demo1/)
+
 [![brand.capstone-vigil.dns.net.za](https://img.shields.io/badge/brand.capstone--vigil.dns.net.za-Visit_Brand_Site-14532d?style=for-the-badge&logo=materialdesign&logoColor=white)](https://brand.capstone-vigil.dns.net.za/)
 
 </div>
@@ -120,63 +123,99 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 <br>
 
 <details>
+
 <summary><strong>Requirements & Architecture</strong> &nbsp;-&nbsp;</summary>
+
 <br>
+
 <div align="center">
 
 [![Introduction](https://img.shields.io/badge/Introduction-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Introduction/)
+
 [![Domain Model](https://img.shields.io/badge/Domain_Model-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Domain-Model/)
+
 [![User Stories](https://img.shields.io/badge/User_Stories-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/User-Stories/)
+
 [![Use Cases](https://img.shields.io/badge/Use_Cases-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Use-Cases/)
+
 [![Functional Requirements](https://img.shields.io/badge/Functional_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Functional-Requirements/)
+
 [![Quality Requirements](https://img.shields.io/badge/Quality_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Quality-Requirements/)
+
 [![Architectural Requirements](https://img.shields.io/badge/Architectural_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Architectural-Requirements/)
+
 [![Technology Requirements](https://img.shields.io/badge/Technology_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Technology-Requirements/)
+
 [![Traceability Matrix](https://img.shields.io/badge/Traceability_Matrix-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Traceability-Matrix/)
+
 [![API Service Contracts](https://img.shields.io/badge/API_Service_Contracts-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/API-Service-Contracts/)
 
 </div>
+
 </details>
 
 <details>
+
 <summary><strong>Design Specifications</strong> &nbsp;-&nbsp;</summary>
+
 <br>
+
 <div align="center">
 
 [![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-14532d?style=for-the-badge)](https://brand.capstone-vigil.dns.net.za/)
+
 [![Wireframes](https://img.shields.io/badge/Wireframes-78350f?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/design/Wireframes/)
 
 </div>
+
 </details>
 
 <details>
+
 <summary><strong>Developer Guides</strong> &nbsp;-&nbsp; 10 guides</summary>
+
 <br>
+
 <div align="center">
 
 [![Repo Setup](https://img.shields.io/badge/Repo_Setup-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/Repo-Setup-Guide/)
+
 [![Git Strategy](https://img.shields.io/badge/Git_Strategy-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/git-strategy-guide/)
+
 [![Master Dev Guide](https://img.shields.io/badge/Master_Dev_Guide-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/master-development-guide/)
+
 [![Backend Development](https://img.shields.io/badge/Backend_Development-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/backend-development-guide/)
+
 [![Frontend Development](https://img.shields.io/badge/Frontend_Development-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/frontend-development-guide/)
+
 [![Server Setup](https://img.shields.io/badge/Server_Setup-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/Server-Setup-Guide/)
+
 [![Server Operations](https://img.shields.io/badge/Server_Operations-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/server-guide/)
+
 [![Unit Testing](https://img.shields.io/badge/Unit_Testing-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/unit-testing-guide/)
+
 [![Integration Testing](https://img.shields.io/badge/Integration_Testing-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/integration-testing-guide/)
+
 [![Local CI/CD](https://img.shields.io/badge/Local_CI%2FCD-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/local-cicd-guide/)
 
 </div>
+
 </details>
 
 <details>
+
 <summary><strong>Reference</strong> &nbsp;-&nbsp; </summary>
+
 <br>
+
 <div align="center">
 
 [![API Reference](https://img.shields.io/badge/API_Reference-52525b?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/api/API-Reference/)
+
 [![Team Profiles](https://img.shields.io/badge/Team_Profiles-52525b?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/management/Team-Profiles/)
 
 </div>
+
 </details>
 
 </details>
@@ -188,6 +227,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 <br>
 
 <details>
+
 <summary>Show Demo 2 documentation</summary>
 
 <br>
@@ -203,6 +243,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 <br>
 
 <details>
+
 <summary><strong>SRS - Functional Requirements</strong> &nbsp;-&nbsp; 5 marks</summary>
 
 <br>
@@ -216,6 +257,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </details>
 
 <details>
+
 <summary><strong>SRS - Use Cases and Use Case Diagrams</strong> &nbsp;-&nbsp; 10 marks</summary>
 
 <br>
@@ -229,6 +271,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </details>
 
 <details>
+
 <summary><strong>SRS - Domain Model</strong> &nbsp;-&nbsp; 5 marks</summary>
 
 <br>
@@ -242,6 +285,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </details>
 
 <details>
+
 <summary><strong>SRS - Non-Functional Requirements</strong> &nbsp;-&nbsp; 10 marks</summary>
 
 <br>
@@ -255,6 +299,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </details>
 
 <details>
+
 <summary><strong>SAS - Architectural Requirements</strong> &nbsp;-&nbsp; 20 marks</summary>
 
 <br>
@@ -268,6 +313,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </details>
 
 <details>
+
 <summary><strong>SAS - Architecture Diagram</strong> &nbsp;-&nbsp; 10 marks</summary>
 
 <br>
@@ -281,6 +327,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </details>
 
 <details>
+
 <summary><strong>SAS - Deployment Diagram</strong> &nbsp;-&nbsp; 10 marks</summary>
 
 <br>
@@ -308,6 +355,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </details>
 
 <details>
+
 <summary><strong>Coding Standards Document</strong> &nbsp;-&nbsp; 10 marks</summary>
 
 <br>
@@ -327,6 +375,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </details>
 
 <details>
+
 <summary><strong>Testing Policy Document</strong> &nbsp;-&nbsp; 10 marks</summary>
 
 <br>
@@ -340,6 +389,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </details>
 
 <details>
+
 <summary><strong>User Manual Document</strong> &nbsp;-&nbsp; 5 marks</summary>
 
 <br>
@@ -353,6 +403,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </details>
 
 <details>
+
 <summary><strong>Brand Style Guide</strong> &nbsp;-&nbsp; 5 marks</summary>
 
 <br>
@@ -367,11 +418,153 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 </details>
 
+### <img src="https://api.iconify.design/mdi/numeric-3-circle.svg?color=%231d4ed8" width="20" height="20" valign="middle"> Demo 3
+
+<br>
+
+<details>
+
+<summary>Show Demo 3 documentation</summary>
+
+<br>
+
+<details>
+
+<summary><strong>SRS - Updated Use Case Diagrams</strong> &nbsp;-&nbsp; 5 marks</summary>
+
+<br>
+
+<div align="center">
+
+[![Use Case Diagrams](https://img.shields.io/badge/Use_Case_Diagrams-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo3/srs/USE_CASES/)
+
+</div>
+
+</details>
+
+<details>
+
+<summary><strong>SAS - Updated Deployment Diagram</strong> &nbsp;-&nbsp; 5 marks</summary>
+
+<br>
+
+<div align="center">
+
+[![Deployment Diagram](https://img.shields.io/badge/Deployment_Diagram-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo3/sas/deployment/DeploymentDiagram/)
+
+</div>
+
+</details>
+
+<details>
+
+<summary><strong>SAS - Service Contracts</strong> &nbsp;-&nbsp; 15 marks</summary>
+
+<br>
+
+<div align="center">
+
+[![Service Contracts](https://img.shields.io/badge/Service_Contracts-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo3/sas/architecture/SERVICE_CONTRACTS/)
+
+</div>
+
+</details>
+
+<details>
+
+<summary><strong>SAS - NFR Testing</strong> &nbsp;-&nbsp; 10 marks</summary>
+
+<br>
+
+<div align="center">
+
+[![NFR Testing](https://img.shields.io/badge/NFR_Testing-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo3/srs/NON-FUNCTIONAL_TESTING/)
+
+</div>
+
+</details>
+
+<details>
+
+<summary><strong>SAS - NFR Traceability Matrix</strong> &nbsp;-&nbsp; 15 marks</summary>
+
+<br>
+
+<div align="center">
+
+[![NFR Traceability Matrix](https://img.shields.io/badge/NFR_Traceability_Matrix-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo3/srs/NON-FUNCTIONAL_TESTING/)
+
+</div>
+
+</details>
+
+</details>
+
 ### <img src="https://api.iconify.design/mdi/numeric-4-circle.svg?color=%231e3a8a" width="20" height="20" valign="middle"> Demo 4
 
-The [Demo 4 marking guide](https://cos301-se-2026.github.io/UMTAS/latest/management/Marking-Guide/) links to the documentation and assessment resources.
+<br>
 
-Documents: [SRS](https://cos301-se-2026.github.io/UMTAS/latest/srs/), [SAS](https://cos301-se-2026.github.io/UMTAS/latest/sas/), [Non-Functional Requirements](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_REQUIREMENTS/), [NFR traceability matrix and evidence](https://cos301-se-2026.github.io/UMTAS/latest/evidence/nfr/NON-FUNCTIONAL_TESTING/), [quality requirement mapping](https://cos301-se-2026.github.io/UMTAS/latest/sas/architecture/QUALITY_REQUIREMENT_MAPPING/), [user manual](https://cos301-se-2026.github.io/UMTAS/latest/management/UserManual/) and [team profiles with LinkedIn links](https://cos301-se-2026.github.io/UMTAS/latest/management/Team-Profiles/).
+<details>
+<summary>Show Demo 4 documentation</summary>
+
+<br>
+
+<div align="center">
+
+[![Full Documentation](https://img.shields.io/badge/Full_Documentation-Visit_Docs-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/)
+
+[![Demo 4 Marking Guide](https://img.shields.io/badge/Demo_4_Marking_Guide-View_Guide-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/management/Marking-Guide/)
+
+</div>
+
+<br>
+
+<details>
+<summary><strong>Landing Page + Help Menu</strong> &nbsp;-&nbsp; 10 marks</summary>
+
+<br>
+
+<div align="center">
+
+[![Landing Page](https://img.shields.io/badge/Landing_Page-14532d?style=for-the-badge)](https://capstone-vigil.dns.net.za/)
+
+[![Help Menu Tutorial](https://img.shields.io/badge/Help_Menu_Tutorial-14532d?style=for-the-badge)](https://capstone-vigil.dns.net.za/tutorial)
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>NFR Testing (with evidence)</strong> &nbsp;-&nbsp; 15 marks</summary>
+
+<br>
+
+<div align="center">
+
+[![Non-Functional Requirements](https://img.shields.io/badge/Non--Functional_Requirements-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_REQUIREMENTS/)
+
+[![NFR Testing & Evidence](https://img.shields.io/badge/NFR_Testing_%26_Evidence-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/evidence/nfr/NON-FUNCTIONAL_TESTING/)
+
+[![Quality Requirement Mapping](https://img.shields.io/badge/Quality_Requirement_Mapping-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/architecture/QUALITY_REQUIREMENT_MAPPING/)
+
+</div>
+
+</details>
+
+<details>
+<summary><strong>User Manual</strong> &nbsp;-&nbsp; 5 marks</summary>
+
+<br>
+
+<div align="center">
+
+[![User Manual](https://img.shields.io/badge/User_Manual-52525b?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/management/UserManual/)
+
+</div>
+
+</details>
+
+</details>
 
 <div align="center">
 
