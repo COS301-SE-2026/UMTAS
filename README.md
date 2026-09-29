@@ -10,7 +10,7 @@
 
 <br>
 
-### University Management & Timetabling Automation System
+### University Management & Timetables Analytics System
 
 Team Vigil - UMTAS - A university timetable platform for PDF ingestion, constraint solving and personalised schedules.
 
