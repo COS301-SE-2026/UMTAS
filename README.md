@@ -20,7 +20,7 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 <br>
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=3500&pause=1000&color=3B82F6&center=true&vCenter=true&width=580&lines=Automated+timetabling+powered+by+OR-Tools;PDF+schedule+ingestion;University-agnostic+by+design;20%2C000-user+load+test+pending)](https://cos301-se-2026.github.io/UMTAS/latest/)
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=3500&pause=1000&color=3B82F6&center=true&vCenter=true&width=580&lines=Automated+timetabling+powered+by+OR-Tools;PDF+schedule+ingestion;University-agnostic+by+design;100-concurrent-user+load+test)](https://cos301-se-2026.github.io/UMTAS/latest/)
 
 <br>
 
@@ -75,7 +75,7 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 </div>
 
-UMTAS automates the university timetabling lifecycle - from ingesting PDF schedules and extracting scheduling constraints through to generating timetable options. Support for **20,000 concurrent students** is an acceptance target that still requires a full-scale load test.
+UMTAS automates the university timetabling lifecycle - from ingesting PDF schedules and extracting scheduling constraints through to generating timetable options. The client scale is **20,000 users per day**; the recorded load test exercises **100 concurrent virtual users**. See the [scalability requirement and evidence](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_REQUIREMENTS/#nfr-scale-1-university-scale-scheduling-workload) for the workload rationale and test limits.
 
 The system is **university-agnostic by design**: a Core-and-Adapter architecture cleanly separates the constraint-solving engine from institution-specific data formats. Onboarding a new university requires only a thin adapter - the core solver remains untouched.
 
@@ -367,75 +367,11 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 </details>
 
-### <img src="https://api.iconify.design/mdi/numeric-3-circle.svg?color=%231d4ed8" width="20" height="20" valign="middle"> Demo 3
-
-<br>
-
-<details>
-<summary>Show Demo 3 documentation</summary>
-
-<br>
-
-[![Full Demo 3 Documentation](https://img.shields.io/badge/Full_Demo_3_Documentation-Visit_Archive-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo3/)
-[![Demo 3 Marking Guide](https://img.shields.io/badge/Demo_3_Marking_Guide-View_Archive-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo3/management/Marking-Guide/)
-
-<details>
-<summary><strong>SRS - Updated Use Case Diagrams</strong> &nbsp;-&nbsp; 5 marks</summary>
-<br>
-<div align="center">
-
-[![Use Case Diagrams](https://img.shields.io/badge/Use_Case_Diagrams-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo3/srs/USE_CASES/)
-
-</div>
-</details>
-
-<details>
-<summary><strong>SAS - Updated Deployment Diagram</strong> &nbsp;-&nbsp; 5 marks</summary>
-<br>
-<div align="center">
-
-[![Deployment Diagram](https://img.shields.io/badge/Deployment_Diagram-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo3/sas/deployment/DeploymentDiagram/)
-
-</div>
-</details>
-
-<details>
-<summary><strong>SAS - Service Contracts</strong> &nbsp;-&nbsp; 15 marks</summary>
-<br>
-<div align="center">
-
-[![Service Contracts](https://img.shields.io/badge/Service_Contracts-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo3/sas/architecture/SERVICE_CONTRACTS/)
-
-</div>
-</details>
-
-<details>
-<summary><strong>SAS - NFR Testing</strong> &nbsp;-&nbsp; 10 marks</summary>
-<br>
-<div align="center">
-
-[![NFR Testing](https://img.shields.io/badge/NFR_Testing-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo3/srs/NON-FUNCTIONAL_TESTING/)
-
-</div>
-</details>
-
-<details>
-<summary><strong>SAS - NFR Traceability Matrix</strong> &nbsp;-&nbsp; 15 marks</summary>
-<br>
-<div align="center">
-
-[![NFR Traceability Matrix](https://img.shields.io/badge/NFR_Traceability_Matrix-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo3/srs/NON-FUNCTIONAL_TESTING/)
-
-</div>
-</details>
-
-</details>
-
 ### Demo 4
 
-The three wow factors are assessed in the live demonstration. The [Demo 4 marking guide](https://cos301-se-2026.github.io/UMTAS/latest/management/Marking-Guide/) links to the current documentation and assessment resources.
+At least three wow factors are assessed in the live demonstration. The [Demo 4 marking guide](https://cos301-se-2026.github.io/UMTAS/latest/management/Marking-Guide/) links to the current documentation and assessment resources.
 
-Current documents: [SRS](https://cos301-se-2026.github.io/UMTAS/latest/srs/), [SAS](https://cos301-se-2026.github.io/UMTAS/latest/sas/), [Non-Functional Requirements and evidence](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_REQUIREMENTS/), [user manual](https://cos301-se-2026.github.io/UMTAS/latest/management/UserManual/) and [team profiles with LinkedIn links](https://cos301-se-2026.github.io/UMTAS/latest/management/Team-Profiles/). The [project board](https://github.com/orgs/COS301-SE-2026/projects/31) tracks work, and the [live application](https://capstone-vigil.dns.net.za/) provides the help menu. The Demo 3 archive links above will resolve after the documentation deployment on `main` publishes `/demo3/`.
+Current documents: [SRS](https://cos301-se-2026.github.io/UMTAS/latest/srs/), [SAS](https://cos301-se-2026.github.io/UMTAS/latest/sas/), [Non-Functional Requirements and evidence](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_REQUIREMENTS/), [user manual](https://cos301-se-2026.github.io/UMTAS/latest/management/UserManual/) and [team profiles with LinkedIn links](https://cos301-se-2026.github.io/UMTAS/latest/management/Team-Profiles/). The [project board](https://github.com/orgs/COS301-SE-2026/projects/31) tracks work, and the [live application](https://capstone-vigil.dns.net.za/) provides the help menu.
 
 <div align="center">
 

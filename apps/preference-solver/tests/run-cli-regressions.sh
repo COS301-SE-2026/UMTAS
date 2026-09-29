@@ -113,10 +113,12 @@ assert_json_contains "$tmp_dir/cp-sat.json" '"status": "feasible"'
 assert_json_contains "$tmp_dir/cp-sat.json" '"outcome": "conflict-free"'
 assert_json_contains "$tmp_dir/cp-sat.json" '"solveMode": "optimization"'
 assert_json_contains "$tmp_dir/cp-sat.json" '"CS101-L1-A"'
+python3 tests/validate-hard-constraints.py src/data/API/example.json "$tmp_dir/cp-sat.json"
 
 # Removed since logic is being changed -> tests will change
 ./GA_BIN --input tests/fixtures/preferred-start-time.json --output "$tmp_dir/preferred-start-time.json" --engine cp-sat --solve-mode optimization
 assert_json_contains "$tmp_dir/preferred-start-time.json" '"CS101-L1-B"'
+python3 tests/validate-hard-constraints.py tests/fixtures/preferred-start-time.json "$tmp_dir/preferred-start-time.json"
 
 ./GA_BIN --input tests/fixtures/preferred-start-time.json --output "$tmp_dir/ga-feasibility.json" --engine ga --solve-mode feasibility
 assert_json_contains "$tmp_dir/ga-feasibility.json" '"outcome": "conflict-free"'

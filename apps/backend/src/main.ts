@@ -4,6 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { OpenAPIObject } from '@nestjs/swagger';
 import type { NextFunction, Request, Response } from 'express';
+import helmet from 'helmet';
 import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { PostHog } from 'posthog-node';
@@ -29,6 +30,8 @@ async function bootstrap() {
   });
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.use(helmet.frameguard({ action: 'deny' }));
+  app.use(helmet.noSniff());
   const ph = app.get(PostHog);
   app.useGlobalInterceptors(
     new PostHogInterceptor(ph, { captureExceptions: true }),

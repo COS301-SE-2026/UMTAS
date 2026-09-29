@@ -57,9 +57,10 @@ export default defineConfig({
       dependencies: ["setup"],
     },
     {
-      name: "chromium",
+      name: "edge",
       use: {
         ...devices["Desktop Edge"],
+        channel: "msedge",
         storageState: "playwright/.auth/user.json",
       },
       dependencies: ["setup"],
