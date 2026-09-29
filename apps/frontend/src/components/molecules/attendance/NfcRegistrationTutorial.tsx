@@ -28,7 +28,7 @@ export function NfcRegistrationTutorial({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="h-dvh max-w-none overflow-y-auto rounded-none sm:h-auto sm:max-h-[85vh] sm:max-w-2xl sm:rounded-xl">
+      <DialogContent className="h-dvh max-w-none overflow-y-auto rounded-none sm:h-auto sm:max-h-[85vh] sm:max-w-2xl sm:rounded-xl bg-(--bg-surface)">
         <DialogHeader>
           <DialogTitle>Set up an NFC sticker</DialogTitle>
 
