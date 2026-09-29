@@ -180,7 +180,7 @@ export function AttendanceOverviewPanel() {
   );
 
   return (
-    <div className="p-5">
+    <div className="w-full">
       {error && (
         <Alert variant="destructive" className="mb-5">
           <CircleHelp size={16} aria-hidden="true" />

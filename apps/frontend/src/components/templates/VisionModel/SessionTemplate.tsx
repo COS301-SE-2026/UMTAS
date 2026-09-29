@@ -249,11 +249,8 @@ export default function VM_SessionTemplate() {
           </div>
 
           <div className="space-y-6">
-            <section
-              aria-label="Vision preview"
-              className="w-full overflow-hidden rounded-lg border border-[var(--border)]"
-            >
-              <div className="w-full aspect-video">
+            <section aria-label="Vision preview" className="w-full">
+              <div className="w-full">
                 <CameraCanvas
                   isCameraActive={cameraOn}
                   detectionSettings={detectionSettings}

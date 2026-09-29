@@ -50,25 +50,54 @@ export function drawPoint(ctx: CanvasRenderingContext2D, kp?: Keypoint) {
   }
 }
 
+const MODEL_COORDINATE_SIZE = 640;
+
 function getVideoConstraints(deviceId?: string): MediaStreamConstraints {
   const isMobile = window.innerWidth < 768;
+
   return {
-    video: deviceId
-      ? { deviceId: { exact: deviceId } }
-      : {
-          width: isMobile ? { ideal: 720 } : { ideal: 1280 },
-          height: isMobile ? { ideal: 1280 } : { ideal: 720 },
-          facingMode: isMobile ? "user" : "environment",
-        },
+    video: {
+      ...(deviceId ? { deviceId: { exact: deviceId } } : {}),
+      width: isMobile ? { ideal: 1080 } : { ideal: 1920 },
+      height: isMobile ? { ideal: 1920 } : { ideal: 1080 },
+      ...(!deviceId ? { facingMode: isMobile ? "user" : "environment" } : {}),
+    },
     audio: false,
   };
 }
 
-function getCanvasConstraints() {
-  return {
-    width: 640,
-    height: 640,
-  };
+function drawScaledSegment(
+  ctx: CanvasRenderingContext2D,
+  kp1: Keypoint | undefined,
+  kp2: Keypoint | undefined,
+  scaleX: number,
+  scaleY: number,
+) {
+  if (
+    kp1 &&
+    kp2 &&
+    kp1.score > KEY_SCORE_THRESHOLD &&
+    kp2.score > KEY_SCORE_THRESHOLD
+  ) {
+    ctx.beginPath();
+    ctx.moveTo(kp1.x * scaleX, kp1.y * scaleY);
+    ctx.lineTo(kp2.x * scaleX, kp2.y * scaleY);
+    ctx.stroke();
+  }
+}
+
+function drawScaledPoint(
+  ctx: CanvasRenderingContext2D,
+  kp: Keypoint | undefined,
+  scaleX: number,
+  scaleY: number,
+  visualScale: number,
+) {
+  if (kp && kp.score > KEY_SCORE_THRESHOLD) {
+    ctx.beginPath();
+    ctx.arc(kp.x * scaleX, kp.y * scaleY, 2 * visualScale, 0, 2 * Math.PI);
+    ctx.fill();
+  }
 }
 
 export interface DetectionSettings {
@@ -122,6 +151,7 @@ function CanvasWebcam({
 }: CanvasCamProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const processingCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const [loadedCameraKey, setLoadedCameraKey] = useState<string | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -288,6 +318,18 @@ function CanvasWebcam({
       const video = videoRef.current;
       const img = imageRef.current;
       if (canvas) {
+        const sourceWidth = imageFile ? img?.naturalWidth : video?.videoWidth;
+        const sourceHeight = imageFile
+          ? img?.naturalHeight
+          : video?.videoHeight;
+
+        if (sourceWidth && sourceHeight) {
+          if (canvas.width !== sourceWidth || canvas.height !== sourceHeight) {
+            canvas.width = sourceWidth;
+            canvas.height = sourceHeight;
+          }
+        }
+
         const context = canvas.getContext("2d", { willReadFrequently: true });
         if (context) {
           context.clearRect(0, 0, canvas.width, canvas.height);
@@ -296,6 +338,50 @@ function CanvasWebcam({
           } else if (video) {
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
           }
+
+          const scaleX = canvas.width / MODEL_COORDINATE_SIZE;
+          const scaleY = canvas.height / MODEL_COORDINATE_SIZE;
+          const visualScale = Math.max(1, Math.min(scaleX, scaleY));
+
+          if (!processingCanvasRef.current) {
+            const processingCanvas = document.createElement("canvas");
+            processingCanvas.width = MODEL_COORDINATE_SIZE;
+            processingCanvas.height = MODEL_COORDINATE_SIZE;
+            processingCanvasRef.current = processingCanvas;
+          }
+
+          const processingCanvas = processingCanvasRef.current;
+          const processingContext = processingCanvas.getContext("2d", {
+            willReadFrequently: true,
+          });
+
+          if (processingContext) {
+            processingContext.clearRect(
+              0,
+              0,
+              MODEL_COORDINATE_SIZE,
+              MODEL_COORDINATE_SIZE,
+            );
+
+            if (imageFile && img) {
+              processingContext.drawImage(
+                img,
+                0,
+                0,
+                MODEL_COORDINATE_SIZE,
+                MODEL_COORDINATE_SIZE,
+              );
+            } else if (video) {
+              processingContext.drawImage(
+                video,
+                0,
+                0,
+                MODEL_COORDINATE_SIZE,
+                MODEL_COORDINATE_SIZE,
+              );
+            }
+          }
+
           const detectionIntervalMs =
             detectionSettings.DetectionInterval * 1000;
           const inferenceIntervalMs =
@@ -309,14 +395,18 @@ function CanvasWebcam({
             timestamp - lastRunRef.current >= detectionIntervalMs
           ) {
             lastRunRef.current = timestamp;
-            const imageData = context.getImageData(
+            const imageData = processingContext?.getImageData(
               0,
               0,
-              canvas.width,
-              canvas.height,
+              MODEL_COORDINATE_SIZE,
+              MODEL_COORDINATE_SIZE,
             );
             detectionManager
-              .run(imageData?.data, canvas.width, canvas.height)
+              .run(
+                imageData?.data ?? new Uint8ClampedArray(),
+                MODEL_COORDINATE_SIZE,
+                MODEL_COORDINATE_SIZE,
+              )
               .then((results) => {
                 if (results) {
                   detection_data_manager.run(results).then((people) => {
@@ -336,14 +426,18 @@ function CanvasWebcam({
             if (imageFile) {
               imageProcessedRef.current = true;
             }
-            const imageData = context.getImageData(
+            const imageData = processingContext?.getImageData(
               0,
               0,
-              canvas.width,
-              canvas.height,
+              MODEL_COORDINATE_SIZE,
+              MODEL_COORDINATE_SIZE,
             );
             pose_Manager
-              .run(imageData?.data, canvas.width, canvas.height)
+              .run(
+                imageData?.data ?? new Uint8ClampedArray(),
+                MODEL_COORDINATE_SIZE,
+                MODEL_COORDINATE_SIZE,
+              )
               .then((results) => {
                 if (results) {
                   pose_data_manager.run(results).then((people) => {
@@ -362,12 +456,12 @@ function CanvasWebcam({
           if (detectionSettings.runDetection) {
             for (const person of detectedPeopleRef.current) {
               context.strokeStyle = "#00ff00";
-              context.lineWidth = 1.2;
+              context.lineWidth = Math.max(2, 1.5 * visualScale);
               context.strokeRect(
-                person.top_left_x,
-                person.top_left_y,
-                person.width,
-                person.height,
+                person.top_left_x * scaleX,
+                person.top_left_y * scaleY,
+                person.width * scaleX,
+                person.height * scaleY,
               );
             }
           }
@@ -380,53 +474,107 @@ function CanvasWebcam({
                 continue;
               }
               context.fillStyle = "#00ff00";
-              context.font = "14px sans-serif";
+              context.font = `${Math.min(24, 14 * visualScale)}px sans-serif`;
               context.fillText(
                 `ID ${frameOfPeople.assigned_id.toString()}`,
-                data.person.top_left_x,
-                Math.max(data.person.top_left_y - 5, 15),
+                data.person.top_left_x * scaleX,
+                Math.max(data.person.top_left_y * scaleY - 5, 15),
               );
               context.strokeStyle = "#00ffff";
               context.fillStyle = "#00ffff";
-              context.lineWidth = 2;
+              context.lineWidth = Math.max(2, 2 * visualScale);
               const leftElbow = data.left_arm?.[0];
               const leftWrist = data.left_arm?.[1];
               const rightElbow = data.right_arm?.[0];
               const rightWrist = data.right_arm?.[1];
-              drawSegment(context, data.left_shoulder, data.center_mass);
-              drawSegment(context, data.right_shoulder, data.center_mass);
-              drawSegment(context, data.left_shoulder, leftElbow);
-              drawSegment(context, leftElbow, leftWrist);
-              drawSegment(context, data.right_shoulder, rightElbow);
-              drawSegment(context, rightElbow, rightWrist);
-              drawSegment(context, data.nose, data.center_mass);
-              drawPoint(context, data.nose);
-              drawPoint(context, data.center_mass);
-              drawPoint(context, data.left_shoulder);
-              drawPoint(context, leftElbow);
-              drawPoint(context, leftWrist);
-              drawPoint(context, data.right_shoulder);
-              drawPoint(context, rightElbow);
-              drawPoint(context, rightWrist);
+              drawScaledSegment(
+                context,
+                data.left_shoulder,
+                data.center_mass,
+                scaleX,
+                scaleY,
+              );
+              drawScaledSegment(
+                context,
+                data.right_shoulder,
+                data.center_mass,
+                scaleX,
+                scaleY,
+              );
+              drawScaledSegment(
+                context,
+                data.left_shoulder,
+                leftElbow,
+                scaleX,
+                scaleY,
+              );
+              drawScaledSegment(context, leftElbow, leftWrist, scaleX, scaleY);
+              drawScaledSegment(
+                context,
+                data.right_shoulder,
+                rightElbow,
+                scaleX,
+                scaleY,
+              );
+              drawScaledSegment(
+                context,
+                rightElbow,
+                rightWrist,
+                scaleX,
+                scaleY,
+              );
+              drawScaledSegment(
+                context,
+                data.nose,
+                data.center_mass,
+                scaleX,
+                scaleY,
+              );
+              drawScaledPoint(context, data.nose, scaleX, scaleY, visualScale);
+              drawScaledPoint(
+                context,
+                data.center_mass,
+                scaleX,
+                scaleY,
+                visualScale,
+              );
+              drawScaledPoint(
+                context,
+                data.left_shoulder,
+                scaleX,
+                scaleY,
+                visualScale,
+              );
+              drawScaledPoint(context, leftElbow, scaleX, scaleY, visualScale);
+              drawScaledPoint(context, leftWrist, scaleX, scaleY, visualScale);
+              drawScaledPoint(
+                context,
+                data.right_shoulder,
+                scaleX,
+                scaleY,
+                visualScale,
+              );
+              drawScaledPoint(context, rightElbow, scaleX, scaleY, visualScale);
+              drawScaledPoint(context, rightWrist, scaleX, scaleY, visualScale);
               if (gaze) {
-                const noseX = data.nose.x;
-                const noseY = data.nose.y;
+                const noseX = data.nose.x * scaleX;
+                const noseY = data.nose.y * scaleY;
                 if (gaze.looking_straight) {
-                  const xSize = 5;
+                  const xSize = 5 * visualScale;
                   context.beginPath();
                   context.strokeStyle = "#ff3333";
-                  context.lineWidth = 2;
+                  context.lineWidth = Math.max(2, 2 * visualScale);
                   context.moveTo(noseX - xSize, noseY - xSize);
                   context.lineTo(noseX + xSize, noseY + xSize);
                   context.moveTo(noseX - xSize, noseY + xSize);
                   context.lineTo(noseX + xSize, noseY - xSize);
                   context.stroke();
                 } else if (gaze.looking_left || gaze.looking_right) {
-                  const lineLength = 25;
+                  const lineLength = 25 * visualScale;
                   const directionMultiplier = gaze.looking_left ? -1 : 1;
                   context.beginPath();
                   context.strokeStyle = "#ffcc00";
-                  context.lineWidth = 3;
+                  context.lineWidth = Math.max(3, 3 * visualScale);
                   context.moveTo(noseX, noseY);
                   context.lineTo(
                     noseX + lineLength * directionMultiplier,
@@ -517,18 +665,18 @@ function CanvasWebcam({
   const showCanvas = imageFile !== null || cameraLoaded;
   return (
     <>
-      <div className="grid h-full w-full grid-cols-1 gap-4 lg:grid-cols-4">
-        <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-2 lg:col-span-3">
+      <div className="flex h-full w-full flex-col gap-4">
+        <div className="flex w-full items-center justify-center overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-elevated)] p-2">
           <video ref={videoRef} playsInline muted className="hidden"></video>
           {showCanvas ? (
             <canvas
               ref={canvasRef}
-              width={getCanvasConstraints().width}
-              height={getCanvasConstraints().height}
-              className="w-full h-full max-h-[75vh] object-contain rounded-xl"
+              width={1280}
+              height={720}
+              className="block h-auto w-full rounded-xl"
             ></canvas>
           ) : isCameraActive && cameraError ? (
-            <div className="flex h-[60vh] w-full flex-col items-center justify-center gap-2 px-6 text-center text-[var(--text-secondary)]">
+            <div className="flex min-h-[60vh] w-full flex-col items-center justify-center gap-2 px-6 text-center text-[var(--text-secondary)]">
               <CircleX className="h-6 w-6" aria-hidden="true" />
               <p className="font-medium text-[var(--text-primary)]">
                 Camera unavailable
@@ -536,11 +684,11 @@ function CanvasWebcam({
               <p className="max-w-md text-sm">{cameraError}</p>
             </div>
           ) : isCameraActive ? (
-            <div className="flex h-[60vh] w-full items-center justify-center text-sm text-[var(--text-secondary)]">
+            <div className="flex min-h-[60vh] w-full items-center justify-center text-sm text-[var(--text-secondary)]">
               Starting camera…
             </div>
           ) : (
-            <div className="flex h-[60vh] w-full flex-col items-center justify-center gap-2 px-6 text-center text-[var(--text-secondary)]">
+            <div className="flex min-h-[60vh] w-full flex-col items-center justify-center gap-2 px-6 text-center text-[var(--text-secondary)]">
               <CircleX className="h-6 w-6" aria-hidden="true" />
               <p className="font-medium text-[var(--text-primary)]">
                 No input selected
@@ -551,96 +699,115 @@ function CanvasWebcam({
             </div>
           )}
         </div>
-        <div className="flex w-full flex-col justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-5 shadow-sm lg:col-span-1">
-          <div className="space-y-4">
-            <div className="pb-3 border-b border-[var(--border)]">
-              <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
-                {singleSession ? (
-                  <>Session: {` ${singleSession?.session.SessionName}`} </>
-                ) : (
-                  <>No Active Session</>
-                )}
+
+        <div className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-5 shadow-sm">
+          <div className="flex flex-col gap-4 border-b border-[var(--border)] pb-4 md:flex-row md:items-start md:justify-between">
+            <div>
+              <h2 className="text-[15px] font-medium text-[var(--text-primary)]">
+                {singleSession
+                  ? `Session: ${singleSession.session.SessionName}`
+                  : "No Active Session"}
               </h2>
               {singleSession && (
-                <p className="text-xs text-[var(--text-secondary)] mt-1">
+                <p className="mt-1 text-xs text-[var(--text-secondary)]">
                   Your results will be automatically saved
                 </p>
               )}
             </div>
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-3">
-                Results
-              </h3>
-              <div className="grid grid-cols-2 gap-y-2 text-sm text-[var(--text-secondary)]">
-                <span>Questions asked:</span>
-                <span className="font-medium text-[var(--text-primary)] text-right">
+
+            <div className="flex w-full flex-col gap-2 sm:flex-row md:w-auto">
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto"
+                disabled={pendingPatch}
+                onClick={async () => {
+                  const emptyResults = {
+                    questions_asked: 0,
+                    total_frames: 0,
+                    total_no_attention: 0,
+                    total_paying_attention: 0,
+                    total_restless_frames: 0,
+                    total_stable_frames: 0,
+                  };
+                  try {
+                    if (singleSession && !pendingPatch) {
+                      await updateSession({
+                        body: { Data: emptyResults },
+                        path: { sessionId: singleSession.session.SessionID },
+                      });
+                    }
+                    frameStore.current?.clear();
+                    imageProcessedRef.current = false;
+                    SetSessionRes(emptyResults);
+                    toast.success("Results reset");
+                  } catch (error) {
+                    console.error("Could not reset results:", error);
+                    toast.error("Results could not be reset", {
+                      description: "Please try again.",
+                    });
+                  }
+                }}
+              >
+                Reset Results
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() => setCreateSessionPop(true)}
+              >
+                {singleSession ? "Change Session" : "Select Session"}
+              </Button>
+            </div>
+          </div>
+
+          <div className="pt-4">
+            <h3 className="mb-3 text-xs font-semibold text-[var(--text-secondary)]">
+              Results
+            </h3>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3 lg:grid-cols-5">
+              <div className="min-w-0">
+                <p className="text-xs text-[var(--text-secondary)]">
+                  Questions asked
+                </p>
+                <p className="mt-1 text-base font-semibold text-[var(--text-primary)]">
                   {sessionRes.questions_asked}
-                </span>
-                <span>Paying attention:</span>
-                <span className="font-medium text-[var(--text-primary)] text-right">
+                </p>
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-[var(--text-secondary)]">
+                  Paying attention
+                </p>
+                <p className="mt-1 text-base font-semibold text-[var(--text-primary)]">
                   {sessionRes.total_frames > 0
                     ? `${((sessionRes.total_paying_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
                     : "0.00%"}
-                </span>
-                <span>Not Paying attention:</span>
-                <span className="font-medium text-[var(--text-primary)] text-right">
+                </p>
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-[var(--text-secondary)]">
+                  Not paying attention
+                </p>
+                <p className="mt-1 text-base font-semibold text-[var(--text-primary)]">
                   {sessionRes.total_frames > 0
                     ? `${((sessionRes.total_no_attention / sessionRes.total_frames) * 100).toFixed(2)}%`
                     : "0.00%"}
-                </span>
-                <span>Sitting still:</span>
-                <span className="font-medium text-[var(--text-primary)] text-right">
+                </p>
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-[var(--text-secondary)]">
+                  Sitting still
+                </p>
+                <p className="mt-1 text-base font-semibold text-[var(--text-primary)]">
                   {`${percentageStable.toFixed(2)}%`}
-                </span>
-                <span>Restless:</span>
-                <span className="font-medium text-[var(--text-primary)] text-right">
+                </p>
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-[var(--text-secondary)]">Restless</p>
+                <p className="mt-1 text-base font-semibold text-[var(--text-primary)]">
                   {`${percentageNotStable.toFixed(2)}%`}
-                </span>
+                </p>
               </div>
             </div>
-          </div>
-          <div className="mt-4 flex w-full gap-2 border-t border-[var(--border)] pt-6">
-            <Button
-              variant="outline"
-              className="flex-1"
-              disabled={pendingPatch}
-              onClick={async () => {
-                const emptyResults = {
-                  questions_asked: 0,
-                  total_frames: 0,
-                  total_no_attention: 0,
-                  total_paying_attention: 0,
-                  total_restless_frames: 0,
-                  total_stable_frames: 0,
-                };
-                try {
-                  if (singleSession && !pendingPatch) {
-                    await updateSession({
-                      body: { Data: emptyResults },
-                      path: { sessionId: singleSession.session.SessionID },
-                    });
-                  }
-                  frameStore.current?.clear();
-                  imageProcessedRef.current = false;
-                  SetSessionRes(emptyResults);
-                  toast.success("Results reset");
-                } catch (error) {
-                  console.error("Could not reset results:", error);
-                  toast.error("Results could not be reset", {
-                    description: "Please try again.",
-                  });
-                }
-              }}
-            >
-              Reset Results
-            </Button>
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => setCreateSessionPop(true)}
-            >
-              {singleSession ? "Change Session" : "Select Session"}
-            </Button>
           </div>
         </div>
       </div>
