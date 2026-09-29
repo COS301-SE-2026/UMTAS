@@ -9,6 +9,7 @@ import { useErrorListener } from "@/hooks/errorListener";
 interface WeeklyGridProps {
   events: ScheduleEvent[];
   weekStart: Date;
+  selectedDate?: Date;
 }
 
 const TimeSlots: string[] = [];
@@ -73,7 +74,11 @@ function slotSpan(startTime: string, endTime: string): number {
   return Math.max(1, Math.ceil((endMinutes - startMinutes) / 30));
 }
 
-export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
+export function WeeklyGrid({
+  events,
+  weekStart,
+  selectedDate,
+}: WeeklyGridProps) {
   useErrorListener();
   const weekDates = getWeekDates(weekStart);
 
@@ -168,7 +173,11 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
     return (
       <div
         key={isoDateStr(date)}
-        className="flex-1 border-r border-[var(--border)] min-w-0"
+        className={`${
+          !selectedDate || isoDateStr(date) === isoDateStr(selectedDate)
+            ? "flex"
+            : "hidden"
+        } sm:flex flex-1 flex-col border-r border-[var(--border)] min-w-0`}
       >
         {/* col headers */}
         <div
@@ -225,7 +234,7 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
 
   return (
     <div className="w-full max-h-[65vh] overflow-auto relative rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)] custom-scrollbar">
-      <div className="flex w-full min-w-[600px]">
+      <div className="flex w-full sm:min-w-[600px]">
         {renderTimeColumn()}
         {weekDates.map((date) => renderDayColumn(date))}
       </div>

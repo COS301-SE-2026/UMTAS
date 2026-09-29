@@ -867,9 +867,33 @@ export function ScheduleView({
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
+              <div className="grid grid-cols-7 gap-2 pb-2 sm:hidden">
+                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                  (day, index) => {
+                    const date = new Date(currentWeekStart);
+                    date.setDate(currentWeekStart.getDate() + index);
+
+                    const selected =
+                      date.toDateString() === selectedDate.toDateString();
+
+                    return (
+                      <Button
+                        key={day}
+                        type="button"
+                        variant={selected ? "default" : "outline"}
+                        className="h-8 px-0 text-xs"
+                        onClick={() => setSelectedDate(date)}
+                      >
+                        {day}
+                      </Button>
+                    );
+                  },
+                )}
+              </div>
               <WeeklyGrid
                 events={resolvedEvents}
                 weekStart={currentWeekStart}
+                selectedDate={selectedDate}
               />
             </div>
           )}

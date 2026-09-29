@@ -18,13 +18,14 @@ export default function AttendanceTemplate() {
     return <NotFound />;
   }
   return (
-    <div className="flex w-full flex-col items-center px-6 pt-6">
-      <div className="w-full max-w-6xl overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
-        <AttendancePageHeader
-          className="px-5 py-4"
-          title="Attendance"
-          meta={<AttendanceDateStamp date={new Date()} />}
-        />
+    <div className="flex w-full flex-col items-center gap-6 px-6 pt-6">
+      <AttendancePageHeader
+        className="w-full max-w-6xl py-4"
+        title="Attendance"
+        meta={<AttendanceDateStamp date={new Date()} />}
+      />
+
+      <div className="w-full max-w-6xl">
         <AttendanceOverviewPanel />
       </div>
     </div>

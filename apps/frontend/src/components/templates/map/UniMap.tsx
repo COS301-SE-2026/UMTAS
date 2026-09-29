@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AdvancedMarker, Pin } from "@vis.gl/react-google-maps";
+import { Building2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { MapScreen } from "@/components/organisms/map/MapScreen";
@@ -102,8 +103,8 @@ export function UniMap() {
 
   //heatmap use state stuff
   const [mapMode, setMapMode] = useState<"route" | "heatmap">("route");
-  const [fromHour, setFromHour] = useState(8);
-  const [toHour, setToHour] = useState(15);
+  const [fromHour, setFromHour] = useState(7);
+  const [toHour, setToHour] = useState(18);
   const [metricMode, setMetricMode] = useState<"projected" | "worstCase">(
     "projected",
   );
@@ -495,7 +496,9 @@ export function UniMap() {
                     onClick={() => handleMarkerClick(building)}
                   >
                     <Pin
-                      background={building.displayColour}
+                      background="#000000"
+                      borderColor="#000000"
+                      glyphColor="#ffffff"
                       scale={building.venueCount === 0 ? 0.85 : 1}
                     />
                   </AdvancedMarker>

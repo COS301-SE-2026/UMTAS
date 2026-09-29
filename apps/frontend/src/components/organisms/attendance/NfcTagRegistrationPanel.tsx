@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { CapabilityBadge } from "@/components/molecules/attendance/CapabilityBadge";
 import { NfcRegistrationTutorial } from "@/components/molecules/attendance/NfcRegistrationTutorial";
 import { NfcTagStatusCard } from "@/components/molecules/attendance/NfcTagStatusCard";
-import { NfcTagTestResult } from "@/components/molecules/attendance/NfcTagTestResult";
 import { RegistrationStepper } from "@/components/molecules/attendance/RegistrationStepper";
 import {
   getNfcCapabilities,
@@ -20,8 +19,6 @@ import {
 import { getRegisteredTag } from "@/lib/nfc_attendance/nfc_api";
 import { scanNdefUrl } from "@/lib/nfc_attendance/web_nfc";
 import type {
-  NfcTagTestResult as TagTestResult,
-  NfcTagTestState,
   PreparedNfcRegistration,
   RegisteredNfcTag,
   RegistrationMethod,
@@ -34,6 +31,7 @@ export function NfcTagRegistrationPanel() {
     getNfcCapabilities,
     getServerNfcCapabilities,
   );
+
   const [tag, setTag] = useState<RegisteredNfcTag | null>(null);
   const [stage, setStage] = useState<RegistrationStage>("CHOOSE_METHOD");
   const [method, setMethod] = useState<RegistrationMethod | null>(null);
@@ -46,11 +44,11 @@ export function NfcTagRegistrationPanel() {
   const [registrationError, setRegistrationError] = useState<string | null>(
     null,
   );
-  const [tagTestState, setTagTestState] = useState<NfcTagTestState>("IDLE");
-  const [tagTestResult, setTagTestResult] = useState<TagTestResult | null>(
-    null,
-  );
+
+  const [testingTag, setTestingTag] = useState(false);
+
   const tagTestAbortRef = useRef<AbortController | null>(null);
+  const tagTestToastRef = useRef<string | number | null>(null);
 
   useEffect(() => {
     void getRegisteredTag()
@@ -58,43 +56,80 @@ export function NfcTagRegistrationPanel() {
       .catch(() => {
         toast.error("NFC sticker status could not be loaded");
       });
-    return () => tagTestAbortRef.current?.abort();
-  }, []);
 
-  async function handleTestTag() {
-    tagTestAbortRef.current?.abort();
-    const controller = new AbortController();
-    tagTestAbortRef.current = controller;
-    setTagTestResult(null);
-    setTagTestState("SCANNING");
-    try {
-      const url = await scanNdefUrl({ signal: controller.signal });
-      const result = await testRegisteredTagUrl(url);
-      if (tagTestAbortRef.current !== controller) return;
-      setTagTestResult(result);
-      setTagTestState(result.valid ? "VALID" : "INVALID");
-    } catch (error) {
-      if (tagTestAbortRef.current !== controller) return;
-      if (error instanceof DOMException && error.name === "AbortError") {
-        setTagTestState("IDLE");
-        return;
+    return () => {
+      tagTestAbortRef.current?.abort();
+
+      if (tagTestToastRef.current !== null) {
+        toast.dismiss(tagTestToastRef.current);
       }
-      setTagTestResult({
-        valid: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : "The NFC sticker could not be tested.",
-      });
-      setTagTestState("FAILED");
-    }
-  }
+    };
+  }, []);
 
   function closeTagTest() {
     tagTestAbortRef.current?.abort();
     tagTestAbortRef.current = null;
-    setTagTestResult(null);
-    setTagTestState("IDLE");
+
+    if (tagTestToastRef.current !== null) {
+      toast.dismiss(tagTestToastRef.current);
+      tagTestToastRef.current = null;
+    }
+
+    setTestingTag(false);
+  }
+
+  async function handleTestTag() {
+    closeTagTest();
+
+    const controller = new AbortController();
+    tagTestAbortRef.current = controller;
+
+    setTestingTag(true);
+
+    tagTestToastRef.current = toast.loading("Waiting for sticker", {
+      description: "Hold this phone near the NFC sticker until it is detected.",
+    });
+
+    try {
+      const url = await scanNdefUrl({ signal: controller.signal });
+      const result = await testRegisteredTagUrl(url);
+
+      if (tagTestAbortRef.current !== controller) return;
+
+      if (result.valid) {
+        toast.success("Sticker verified", {
+          id: tagTestToastRef.current ?? undefined,
+          description: result.displayId
+            ? `Sticker ID: ${result.displayId}`
+            : result.message,
+        });
+      } else {
+        toast.error("Sticker could not be verified", {
+          id: tagTestToastRef.current ?? undefined,
+          description: result.message ?? "UMTAS could not verify this sticker.",
+        });
+      }
+    } catch (error) {
+      if (tagTestAbortRef.current !== controller) return;
+
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+
+      toast.error("Sticker could not be verified", {
+        id: tagTestToastRef.current ?? undefined,
+        description:
+          error instanceof Error
+            ? error.message
+            : "The NFC sticker could not be tested.",
+      });
+    } finally {
+      if (tagTestAbortRef.current === controller) {
+        tagTestAbortRef.current = null;
+        tagTestToastRef.current = null;
+        setTestingTag(false);
+      }
+    }
   }
 
   async function handlePrepare() {
@@ -102,6 +137,7 @@ export function NfcTagRegistrationPanel() {
     setManuallyVerified(false);
     setPrepared(null);
     setStage("PREPARING");
+
     try {
       setPrepared(await prepareRegistration());
       setStage("PREPARED");
@@ -116,8 +152,10 @@ export function NfcTagRegistrationPanel() {
       setStage("EXPIRED");
       return;
     }
+
     setRegistrationError(null);
     setStage("WRITING_WEB_NFC");
+
     try {
       await writePreparedTag(prepared);
       setStage("WRITTEN");
@@ -136,9 +174,12 @@ export function NfcTagRegistrationPanel() {
       setStage("EXPIRED");
       return;
     }
+
     if (method === "MANUAL" && !manuallyVerified) return;
+
     setRegistrationError(null);
     setStage("CONFIRMING");
+
     try {
       await confirmRegistration(prepared);
       setTag(await getRegisteredTag());
@@ -163,7 +204,7 @@ export function NfcTagRegistrationPanel() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="w-full space-y-5">
       <div className="flex justify-end">
         <CapabilityBadge capabilities={capabilities} />
       </div>
@@ -181,17 +222,8 @@ export function NfcTagRegistrationPanel() {
           setRegistrationError(null);
         }}
         busy={registrationOpen && stage !== "READY"}
-        testing={tagTestState === "SCANNING"}
+        testing={testingTag}
       />
-
-      {tagTestState !== "IDLE" && (
-        <NfcTagTestResult
-          state={tagTestState}
-          result={tagTestResult}
-          onCancel={closeTagTest}
-          onRetry={() => void handleTestTag()}
-        />
-      )}
 
       {registrationOpen && (
         <RegistrationStepper
@@ -206,7 +238,10 @@ export function NfcTagRegistrationPanel() {
             setMethod(nextMethod);
             setRegistrationError(null);
             setManuallyVerified(false);
-            if (prepared) setStage("PREPARED");
+
+            if (prepared) {
+              setStage("PREPARED");
+            }
           }}
           onPrepare={() => void handlePrepare()}
           onWrite={() => void handleWrite()}
@@ -227,7 +262,10 @@ export function NfcTagRegistrationPanel() {
         preparing={stage === "PREPARING"}
         onOpenChange={setTutorialOpen}
         onPrepare={() => {
-          if (!method) setMethod("MANUAL");
+          if (!method) {
+            setMethod("MANUAL");
+          }
+
           void handlePrepare();
         }}
       />

@@ -427,30 +427,13 @@ export function EventsStep({
         </div>
         <p className="text-base text-[var(--text-secondary)]">No events yet.</p>
         <p className="text-sm text-[var(--text-secondary)]">
-          Add an event below to get started.
+          Add an event above to get started.
         </p>
       </div>
     );
   }
 
-  function renderNoModulesWarning() {
-    return (
-      <Alert className="mb-4 border-[var(--border)] bg-[var(--bg-surface)]">
-        <AlertCircle size={16} strokeWidth={1.5} />
-        <AlertDescription className="text-base text-[var(--text-secondary)]">
-          No modules yet.{" "}
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={onGoToModules}
-            className="h-auto p-0 text-base underline text-[var(--text-primary)] hover:bg-transparent hover:opacity-70 transition-opacity duration-[var(--duration-fast)]"
-          >
-            Go back to Step 1 to create some.
-          </Button>
-        </AlertDescription>
-      </Alert>
-    );
-  }
+  function renderNoModulesWarning() {}
 
   function renderEventRow(event: EventResponse, index: number) {
     const isComplete = isEventComplete(event);
@@ -620,8 +603,6 @@ export function EventsStep({
         </div>
         {renderAddButton()}
       </div>
-
-      {modules.length === 0 && renderNoModulesWarning()}
 
       <div data-testid="builder-event-div" className="flex flex-col gap-3">
         {events.length === 0 && renderEmptyState()}

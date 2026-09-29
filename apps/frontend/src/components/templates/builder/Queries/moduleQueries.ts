@@ -15,22 +15,11 @@ export function getAllModulesQ() {
     queryKey: ["modules"] as const,
 
     queryFn: async () => {
-      console.log("[moduleQueries] FETCHING ALL MODULES");
-
       try {
         const response = await new getAllModulesBuilder().send({});
 
-        console.log("[moduleQueries] RAW MODULE RESPONSE", response);
-
-        console.log("[moduleQueries] MODULE ARRAY", {
-          modules: response.modules,
-          moduleCount: response.modules?.length ?? 0,
-        });
-
         return response.modules;
       } catch (error) {
-        console.error("[moduleQueries] MODULE FETCH FAILED", error);
-
         throw error;
       }
     },

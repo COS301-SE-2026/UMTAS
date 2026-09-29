@@ -30,7 +30,7 @@ export default function VisionModule({
   if (!moduleSelected) {
     return (
       <div className="flex items-center justify-center text-text-secondary">
-        Please Select a Module
+        Please Select a Module with the Filter Above
       </div>
     );
   }

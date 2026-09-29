@@ -339,9 +339,7 @@ export function GenerateStep({
           type="button"
           variant="ghost"
           size="default"
-          onClick={() => {
-            onGenerate("BACK", []);
-          }}
+          onClick={() => router.push("/builder")}
           className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)]"
         >
           <ArrowLeft size={16} strokeWidth={1.5} />
@@ -393,7 +391,7 @@ export function GenerateStep({
             {isGenerating
               ? "Generating..."
               : selectedEventIds.length === 0
-                ? "Select at Least One Event"
+                ? "Select At Least One Event"
                 : isEditMode
                   ? "Edit Timetable"
                   : "Generate Timetable"}
@@ -408,7 +406,7 @@ export function GenerateStep({
             onClick={() => setShowSolver(true)}
             className="w-fit px-4 text-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40 transition-colors duration-[var(--duration-fast)]"
           >
-            Solve timetable
+            Solve Timetable
           </Button>
         </div>
       </div>
