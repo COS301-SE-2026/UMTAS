@@ -391,7 +391,7 @@ export function RegistrationStepper({
         )}
 
         {stage === "READY" && (
-          <Alert variant="success">
+          <Alert variant="success" className="bg-(--bg-surface)">
             <AlertTitle>Sticker registered</AlertTitle>
 
             <AlertDescription>

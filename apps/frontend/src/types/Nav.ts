@@ -118,7 +118,7 @@ export const navigationItems: NavigationItem[] = [
 
   {
     id: "module-management",
-    label: "Module Management",
+    label: "Event/Module Management",
     href: "/module-management",
     section: "actions",
     icon: "BookOpenIcon",

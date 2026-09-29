@@ -22,14 +22,30 @@ function eventCodeCol(): ColumnDef<EventResponse, string> {
   });
 }
 function eventDateCol() {
-  return columnCreator.accessor((row) => row.eventCriteria?.date ?? "", {
-    id: "date",
-    header: "Date",
-    cell: (info) => {
-      const date = info.getValue();
-      return <div>{date}</div>;
+  return columnCreator.accessor(
+    (row) =>
+      row.isRecurring
+        ? (row.eventCriteria?.dayOfWeek ?? "")
+        : (row.eventCriteria?.date ?? ""),
+    {
+      id: "date",
+      header: "Date / Day",
+      cell: (info) => {
+        const value = info.getValue();
+
+        if (!value) {
+          return <div>-</div>;
+        }
+
+        if (info.row.original.isRecurring) {
+          const day = value.charAt(0).toUpperCase() + value.slice(1);
+          return <div>Every {day}</div>;
+        }
+
+        return <div>{value}</div>;
+      },
     },
-  });
+  );
 }
 function eventTimeCol() {
   return columnCreator.accessor(

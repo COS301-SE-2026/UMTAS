@@ -6,7 +6,9 @@ import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
 
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { getSingleApplication } from "@/app/role-management/queries/builder";
-import RoleControl from "@/components/atoms/roleManagement/roleControl";
+import RoleControl, {
+  formatRoleLabel,
+} from "@/components/atoms/roleManagement/roleControl";
 
 export const columns: ColumnDef<getSingleApplication>[] = [
   {
@@ -52,6 +54,11 @@ export const columns: ColumnDef<getSingleApplication>[] = [
   {
     accessorKey: "role",
     header: "Role",
+    cell: ({ row }) => {
+      const role = row.original.role;
+
+      return <div>{role ? formatRoleLabel(role) : "-"}</div>;
+    },
   },
   {
     id: "actions",
