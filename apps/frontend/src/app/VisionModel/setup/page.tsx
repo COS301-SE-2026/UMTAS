@@ -367,7 +367,7 @@ function RequirementRow({
   status: string;
 }) {
   return (
-    <div className="flex min-h-20 w-full items-center justify-between gap-4 rounded-lg border border-[var(--border)] p-4">
+    <div className="flex min-h-20 w-full items-center justify-between gap-4 rounded-lg border border-[var(--border)] bg-(--bg-surface) p-4">
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold text-[var(--text-primary)]">
           {label}
