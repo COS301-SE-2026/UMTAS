@@ -25,7 +25,6 @@ print(f"Loaded {len(PROFILES)} profiles from {PROFILES_PATH}")
 print(f"Found {len(files_pdf)} PDF files in {pdf_dir}")
 max_modules = 10
 max_tt_events = 40
-h_keys = ["module", "activity", "location"]
 PDF_USERS_PER_FILE = int(os.environ.get("PDF_USERS_PER_FILE", "10"))
 PDF_ATTENDANCE_DAYS = int(os.environ.get("PDF_ATTENDANCE_DAYS", "7"))
 pdf_assignment_lock = threading.Lock()
@@ -47,6 +46,16 @@ def is_valid_checker(val) -> bool:
         return True
     except (ValueError, TypeError):
         return False
+
+
+def solver_preferences():
+    """Generate optimization preferences accepted by the shared solver contract."""
+    choices = [
+        {"key": "preferred-start-time", "parameters": {"minutes-After-midnight": 600}},
+        {"key": "small-gaps"},
+        {"key": "day-skip", "parameters": {"day-to-skip": "friday"}},
+    ]
+    return {"heuristics": random.sample(choices, k=random.randint(1, 2))}
 
 
 def next_day_checker(day_of_week):
@@ -496,15 +505,7 @@ class DomainUser(HttpUser):
         }
 
         if solve_mode == "optimization":
-            payload["preferences"] = {
-                "heuristics": [
-                    {
-                        "key": key,
-                        "weight": round(random.uniform(0.1, 1.0), 2),
-                    }
-                    for key in h_keys
-                ]
-            }
+            payload["preferences"] = solver_preferences()
 
         with self.client.post(
             "/api/solver/jobs",

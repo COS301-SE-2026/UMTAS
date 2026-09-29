@@ -123,16 +123,19 @@ python3 tests/validate-hard-constraints.py tests/fixtures/preferred-start-time.j
 ./GA_BIN --input tests/fixtures/preferred-start-time.json --output "$tmp_dir/ga-feasibility.json" --engine ga --solve-mode feasibility
 assert_json_contains "$tmp_dir/ga-feasibility.json" '"outcome": "conflict-free"'
 assert_json_contains "$tmp_dir/ga-feasibility.json" '"solveMode": "feasibility"'
+python3 tests/validate-hard-constraints.py tests/fixtures/preferred-start-time.json "$tmp_dir/ga-feasibility.json"
 
 ./GA_BIN --input tests/fixtures/avoidable-conflict.json --output "$tmp_dir/ga-avoidable-conflict.json" --engine ga --solve-mode feasibility
 assert_json_contains "$tmp_dir/ga-avoidable-conflict.json" '"outcome": "conflict-free"'
 assert_json_contains "$tmp_dir/ga-avoidable-conflict.json" '"conflictCount": 0'
 assert_json_contains "$tmp_dir/ga-avoidable-conflict.json" '"CS101-L1-B"'
 assert_json_not_contains "$tmp_dir/ga-avoidable-conflict.json" '"CS101-L1-A"'
+python3 tests/validate-hard-constraints.py tests/fixtures/avoidable-conflict.json "$tmp_dir/ga-avoidable-conflict.json"
 
  ./GA_BIN --input tests/fixtures/preferred-start-time.json --output "$tmp_dir/ga-optimization.json" --engine ga --solve-mode optimization
  assert_json_contains "$tmp_dir/ga-optimization.json" '"CS101-L1-B"'
  assert_json_contains "$tmp_dir/ga-optimization.json" '"solveMode": "optimization"'
+ python3 tests/validate-hard-constraints.py tests/fixtures/preferred-start-time.json "$tmp_dir/ga-optimization.json"
 
 node - "$tmp_dir/insufficient-alternatives.json" <<'NODE'
 const { spawnSync } = require("node:child_process");
@@ -163,12 +166,14 @@ assert_json_contains "$tmp_dir/insufficient-alternatives.json" '"status": "infea
 assert_json_contains "$tmp_dir/exact-interval-overlap.json" '"CS101-L1-PREFERRED"'
 assert_json_not_contains "$tmp_dir/exact-interval-overlap.json" '"CS101-L1-OTHER"'
 assert_json_contains "$tmp_dir/exact-interval-overlap.json" '"conflictCount": 0'
+python3 tests/validate-hard-constraints.py tests/fixtures/exact-interval-overlap.json "$tmp_dir/exact-interval-overlap.json"
 
 ./GA_BIN --input tests/fixtures/dated-events.json --output "$tmp_dir/dated.json" --engine ga --solve-mode optimization
 assert_json_contains "$tmp_dir/dated.json" '"status": "feasible"'
 assert_json_contains "$tmp_dir/dated.json" '"outcome": "conflict-free"'
 assert_json_contains "$tmp_dir/dated.json" '"conflictCount": 0'
 assert_json_contains "$tmp_dir/dated.json" '"CS101-L1-A"'
+python3 tests/validate-hard-constraints.py tests/fixtures/dated-events.json "$tmp_dir/dated.json"
 
 ./GA_BIN --input tests/fixtures/conflicting-events.json --output "$tmp_dir/conflicting.json" --engine ga --solve-mode optimization
 assert_json_contains "$tmp_dir/conflicting.json" '"status": "feasible"'
@@ -189,6 +194,7 @@ assert_json_contains "$tmp_dir/conflicting-cp-sat.json" '"status": "infeasible"'
 assert_json_contains "$tmp_dir/empty.json" '"status": "feasible"'
 assert_json_contains "$tmp_dir/empty.json" '"selectedEventIds": []'
 assert_json_contains "$tmp_dir/empty.json" '"solveMode": "feasibility"'
+python3 tests/validate-hard-constraints.py tests/fixtures/empty-events.json "$tmp_dir/empty.json"
 
 assert_ga_feasibility_is_bounded
 assert_ga_honors_sigterm
