@@ -36,10 +36,6 @@ plugins:
   - mkdocs-pdf
   - minify:
       minify_html: true
-  - git-revision-date-localized:
-      enable_creation_date: true
-      type: timeago
-      fallback_to_build_date: true
   - include-markdown
 
 markdown_extensions:
@@ -79,6 +75,7 @@ nav:
       - Constraints: sas/architecture/CONSTRAINTS.md
       - Architectural Diagram: sas/architecture/ARCHITECTURAL_DIAGRAM.md
       - Quality Requirement Mapping: sas/architecture/QUALITY_REQUIREMENT_MAPPING.md
+      - REST Endpoint Catalogue: sas/architecture/REST_ENDPOINT_CATALOGUE.md
       - Technology Requirements: sas/architecture/TECHNOLOGY_REQUIREMENTS.md
       - Service Contracts: sas/architecture/SERVICE_CONTRACTS.md
       - Deployment:
@@ -90,6 +87,12 @@ nav:
           - Rollback Strategy: sas/deployment/RollBackStrategy.md
           - Deployment Diagram: sas/deployment/DeploymentDiagram.md
           - CI/CD Pipeline Diagram: sas/deployment/PipelineDiagram.md
+  - Evidence:
+      - NFR Traceability Matrix: evidence/nfr/NON-FUNCTIONAL_TESTING.md
+      - Adapter Case Study: evidence/nfr/API_ADAPTER_CASE_STUDY.md
+      - Accessibility Reports: evidence/nfr/Lighthouse.md
+      - Security Scan: evidence/nfr/Owasp.md
+      - Availability Monitor: evidence/nfr/Availability.md
   - Admin:
       - Marking Guide: management/Marking-Guide.md
       - Team Profiles: management/Team-Profiles.md

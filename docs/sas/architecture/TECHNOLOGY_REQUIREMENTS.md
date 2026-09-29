@@ -28,7 +28,7 @@ university-adapter modifiability.
 
 | Responsibility | Selected Technology | Reason |
 |---|---|---|
-| Authentication | Better Auth with optional Google OAuth | Supports password flows, Google identity-provider sign-in, account linking, and delegated authorization without hand-built authentication. |
+| Authentication | Better Auth with optional Google OAuth | Supports password flows, Google identity-provider sign-in, account linking, and delegated authorisation without hand-built authentication. |
 | Queue and secondary state | Redis | Supports the message queue and authentication secondary storage. |
 | Object storage | MinIO | Provides an S3-compatible interface without cloud lock-in. |
 | Ingress | Traefik | Provides container routing and HTTPS termination. |

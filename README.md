@@ -77,7 +77,7 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 UMTAS automates the university timetabling lifecycle - from ingesting PDF schedules and extracting scheduling constraints through to generating timetable options. The client scale is **20,000 users per day**; the recorded load test exercises **100 concurrent virtual users**. See the [scalability requirement and evidence](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_REQUIREMENTS/#nfr-scale-1-university-scale-scheduling-workload) for the workload rationale and test limits.
 
-The system is **university-agnostic by design**: a Core-and-Adapter architecture cleanly separates the constraint-solving engine from institution-specific data formats. Onboarding a new university requires only a thin adapter - the core solver remains untouched.
+The system is **university-agnostic by design**: a Core-and-Adapter architecture cleanly separates the constraint-solving engine from institution-specific data formats. A new university parser is one file in the adapters package that follows the canonical contract and declares an `ADAPTER_KEY`; the parser registry discovers it without modification. The core solver uses the canonical result.
 
 <br>
 
@@ -367,11 +367,11 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 </details>
 
-### Demo 4
+### <img src="https://api.iconify.design/mdi/numeric-4-circle.svg?color=%231e3a8a" width="20" height="20" valign="middle"> Demo 4
 
-At least three wow factors are assessed in the live demonstration. The [Demo 4 marking guide](https://cos301-se-2026.github.io/UMTAS/latest/management/Marking-Guide/) links to the current documentation and assessment resources.
+The [Demo 4 marking guide](https://cos301-se-2026.github.io/UMTAS/latest/management/Marking-Guide/) links to the documentation and assessment resources.
 
-Current documents: [SRS](https://cos301-se-2026.github.io/UMTAS/latest/srs/), [SAS](https://cos301-se-2026.github.io/UMTAS/latest/sas/), [Non-Functional Requirements and evidence](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_REQUIREMENTS/), [user manual](https://cos301-se-2026.github.io/UMTAS/latest/management/UserManual/) and [team profiles with LinkedIn links](https://cos301-se-2026.github.io/UMTAS/latest/management/Team-Profiles/). The [project board](https://github.com/orgs/COS301-SE-2026/projects/31) tracks work, and the [live application](https://capstone-vigil.dns.net.za/) provides the help menu.
+Documents: [SRS](https://cos301-se-2026.github.io/UMTAS/latest/srs/), [SAS](https://cos301-se-2026.github.io/UMTAS/latest/sas/), [Non-Functional Requirements](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_REQUIREMENTS/), [NFR traceability matrix and evidence](https://cos301-se-2026.github.io/UMTAS/latest/evidence/nfr/NON-FUNCTIONAL_TESTING/), [quality requirement mapping](https://cos301-se-2026.github.io/UMTAS/latest/sas/architecture/QUALITY_REQUIREMENT_MAPPING/), [user manual](https://cos301-se-2026.github.io/UMTAS/latest/management/UserManual/) and [team profiles with LinkedIn links](https://cos301-se-2026.github.io/UMTAS/latest/management/Team-Profiles/).
 
 <div align="center">
 
@@ -514,7 +514,7 @@ UMTAS/
 │   ├── database/             # Shared Drizzle schema & migration tooling
 │   └── shared-types/         # Shared TypeScript types across apps
 ├── infra/
-│   ├── traefik/              # Reverse proxy & TLS termination
+│   ├── traefik/              # Ingress routing & TLS termination
 │   ├── grafana/              # Dashboards & alerting
 │   ├── prometheus/           # Metrics scraping
 │   ├── loki/                 # Log aggregation

@@ -212,7 +212,7 @@ The Traceability Matrices for the functional requirements to use cases can be fo
     - **R5.4** Adapter Bootstrapping
         - **R5.4.1** The system shall automatically scaffold new client adapters using an OpenAPI specification file.
         - **R5.4.2** The system shall auto-generate endpoint configurations, synthetic data schemas, and executable Python simulation scripts mapped to discovered API methods.
-    - **R5.5** Simulated Behaviors (UMTAS Domain)
+    - **R5.5** Simulated Behaviours (UMTAS Domain)
         - **R5.5.1** The system shall simulate mock account creation, secure login, and session token management.
         - **R5.5.2** The system shall simulate uploading timetable PDF files, polling for parser job status, and retrieving results.
         - **R5.5.3** The system shall simulate users browsing enrolled modules, available events, and existing timetables.

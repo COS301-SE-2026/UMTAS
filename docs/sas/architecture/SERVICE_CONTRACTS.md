@@ -1,6 +1,6 @@
 # Service Contracts
 
-The tables and schemas below document the asynchronous parser, solver, and authentication boundaries. For complete static REST coverage, see the [REST endpoint catalogue](REST_ENDPOINT_CATALOGUE.md), generated from the committed OpenAPI source. Interactive Swagger remains available below as a convenience, not as the sole contract source.
+The tables and schemas below document the asynchronous parser, solver, and authentication boundaries. For complete static REST coverage, see the [REST endpoint catalogue](REST_ENDPOINT_CATALOGUE.md), generated from the committed OpenAPI source. Interactive Swagger is available below as a convenience, not as the sole contract source.
 
 <swagger-ui src="https://capstone-vigil.dns.net.za/api/docs-json" />
 
@@ -369,7 +369,7 @@ stateDiagram-v2
 
 - The Core owns the job record, input, result, and terminal state.
 - Workers keep only temporary files. They remove them after acknowledged work
-  and may retain failed files only when diagnostics are explicitly enabled.
+  and may keep failed files only when diagnostics are explicitly enabled.
 - Queue retries do not create another Core job.
 - Completed and failed states are terminal. A conflicting later callback is
   rejected.

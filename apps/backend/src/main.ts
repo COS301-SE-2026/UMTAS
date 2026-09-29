@@ -32,6 +32,16 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.use(helmet.frameguard({ action: 'deny' }));
   app.use(helmet.noSniff());
+  app.use(
+    helmet.contentSecurityPolicy({
+      directives: {
+        defaultSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+        baseUri: ["'none'"],
+        formAction: ["'none'"],
+      },
+    }),
+  );
   const ph = app.get(PostHog);
   app.useGlobalInterceptors(
     new PostHogInterceptor(ph, { captureExceptions: true }),
