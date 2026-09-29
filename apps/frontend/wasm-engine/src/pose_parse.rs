@@ -88,23 +88,46 @@ pub fn attach_id(
 
     // finding matches
     for (new_index, new_person) in new_frame_people.iter().enumerate() {
-        let mut best_iou: f32 = IOU_THRESHOLD;
+        let mut best_score = -1.0;
         let mut best_index_prev_idx: Option<usize> = None;
+
         for (prev_index, prev_person) in prev_frame.people.iter().enumerate() {
             if matched_prev_indices[prev_index] {
                 continue;
             }
 
-            let iou = intersection_over_union(&new_person.person, &prev_person.pose_data.person);
-            if best_iou < iou {
+            let iou =
+                intersection_over_union(&new_person.person, &prev_person.pose_data.person);
+
+            let dx =
+                new_person.person.center_x - prev_person.pose_data.person.center_x;
+            let dy =
+                new_person.person.center_y - prev_person.pose_data.person.center_y;
+            let distance = (dx.powi(2) + dy.powi(2)).sqrt();
+
+            let max_distance = prev_person
+                .pose_data
+                .person
+                .width
+                .max(prev_person.pose_data.person.height)
+                * 0.4;
+
+            let score = if iou >= IOU_THRESHOLD {
+                1.0 + iou
+            } else if distance <= max_distance {
+                1.0 - (distance / max_distance)
+            } else {
+                continue;
+            };
+
+            if score > best_score {
+                best_score = score;
                 best_index_prev_idx = Some(prev_index);
-                best_iou = iou;
             }
         }
 
         if let Some(prev_idx) = best_index_prev_idx {
-            if best_iou >= IOU_THRESHOLD
-                && matched_new_indices[new_index] == false
+            if matched_new_indices[new_index] == false
                 && matched_prev_indices[prev_idx] == false
             {
                 matched_new_indices[new_index] = true;
