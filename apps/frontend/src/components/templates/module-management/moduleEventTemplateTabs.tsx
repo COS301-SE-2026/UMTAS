@@ -9,11 +9,15 @@ import {
 
 import EventManagementTemplate from "./eventManagementTemplate";
 import ModManagementTemplate from "./moduleManagementTemplate";
+import { useSearchParams } from "next/navigation";
 
 export default function ModuleEventTemplateTabs() {
+  const searchParams = useSearchParams();
+  const activeTab =
+    searchParams.get("tab") === "modules" ? "modules" : "events";
   return (
     <div className="w-full pt-2">
-      <Tabs defaultValue="events" className="w-full">
+      <Tabs defaultValue={activeTab} className="w-full">
         <div className="flex w-full justify-center px-6">
           <div className="w-full max-w-6xl">
             <TabsList id="management-tabs" className="flex h-auto gap-2">
