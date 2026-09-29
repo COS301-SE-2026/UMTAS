@@ -389,9 +389,8 @@ function CanvasWebcam({
               });
           }
 
-          const shouldRunInferenceForImage = imageFile
-            ? !inferenceImageProcessedRef.current
-            : true;
+          const shouldRunInferenceForImage = imageFile || isCameraActive;
+
           if (
             inferenceSettings.runInference &&
             shouldRunInferenceForImage &&
@@ -565,6 +564,8 @@ function CanvasWebcam({
       cancelAnimationFrame(animationFrameID);
     };
   }, [
+    isCameraActive,
+    modelSize,
     cameraLoaded,
     imageLoaded,
     imageFile,
@@ -581,14 +582,17 @@ function CanvasWebcam({
   });
   const totalRestlessFramesCount =
     sessionRes.total_restless_frames + sessionRes.total_stable_frames;
+
   const percentageStable =
     totalRestlessFramesCount > 0
       ? (sessionRes.total_stable_frames / totalRestlessFramesCount) * 100
       : 0.0;
+
   const percentageNotStable =
     totalRestlessFramesCount > 0
       ? (sessionRes.total_restless_frames / totalRestlessFramesCount) * 100
       : 0.0;
+
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
     if ((cameraLoaded || imageLoaded) && inferenceSettings.runInference) {
