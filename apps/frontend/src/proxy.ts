@@ -8,6 +8,8 @@ const useSecureCookies =
   (secureCookiesOverride !== "false" &&
     ["production", "staging"].includes(process.env.NODE_ENV ?? ""));
 
+const isDevelopment = process.env.NODE_ENV === "development";
+
 const SESSION_COOKIE_NAME = `${useSecureCookies ? "__Secure-" : ""}${cookiePrefix}.session_token`;
 
 const PUBLIC_PATHS = [
@@ -35,7 +37,7 @@ export function proxy(request: NextRequest) {
     `style-src 'self' 'nonce-${nonce}'`,
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
-    "connect-src 'self' https: wss:",
+    `connect-src 'self' https: wss:${isDevelopment ? " http://localhost:* ws://localhost:*" : ""}`,
     "object-src 'none'",
     "base-uri 'self'",
     "frame-ancestors 'none'",
