@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { CircleX } from "lucide-react";
+import { BookOpen, CircleX } from "lucide-react";
 import { detectionManager } from "../../../../utilities/VisionModel/detectionManager";
 import { detection_data_manager } from "../../../../utilities/VisionModel/detection_data_manager";
 import {
@@ -22,6 +22,7 @@ import {
   patchSessionMut,
 } from "../../../../utilities/VisionModel/backend/persistance";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import VM_GUIDE from "@/app/VisionModel/setup/setupGuide";
 
 const KEY_SCORE_THRESHOLD = 0.15;
 
@@ -168,6 +169,7 @@ function CanvasWebcam({
   const lastInferenceRunRef = useRef<number>(0);
   const frameCounterRef = useRef<number>(0);
   const detectionImageProcessedRef = useRef<boolean>(false);
+  const [showGuide, setShowGuide] = useState<boolean>(false);
   const inferenceImageProcessedRef = useRef<boolean>(false);
   const { data: singleSession } = useQuery(
     getSingleSessionQuery({ sessionId: sessionID ?? "" }),
@@ -694,6 +696,14 @@ function CanvasWebcam({
               <Button
                 variant="outline"
                 className="w-full sm:w-auto"
+                onClick={() => setShowGuide(true)}
+              >
+                <BookOpen />
+                Setup Guide
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto"
                 disabled={pendingPatch}
                 onClick={async () => {
                   const emptyResults = {
@@ -787,6 +797,11 @@ function CanvasWebcam({
           </div>
         </div>
       </div>
+      {showGuide && (
+        <Popup onClose={() => setShowGuide(false)}>
+          <VM_GUIDE></VM_GUIDE>
+        </Popup>
+      )}
       {createSessionPop == true && (
         <Popup
           onClose={() => {

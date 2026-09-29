@@ -15,20 +15,22 @@ WORKDIR /app
 
 COPY apps/frontend/public/models ./apps/frontend/public/models
 
-RUN if [ ! -f apps/frontend/public/models/yolo26n.onnx ] || [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ]; then \
-    python3 -m venv .venv && \
-    .venv/bin/pip install --no-cache-dir ultralytics onnx onnxruntime && \
-    if [ ! -f apps/frontend/public/models/yolo26n.onnx ]; then \
-    .venv/bin/yolo export model=yolo26n.pt format=onnx imgsz=640 && \
-    mkdir -p apps/frontend/public/models && \
-    mv yolo26n.onnx apps/frontend/public/models/yolo26n.onnx; \
-    fi && \
-    if [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ]; then \
-    .venv/bin/yolo export model=yolo26n-pose.pt format=onnx imgsz=640 && \
-    mkdir -p apps/frontend/public/models && \
-    mv yolo26n-pose.onnx apps/frontend/public/models/yolo26n-pose.onnx; \
-    fi && \
-    rm -rf .venv; \
+RUN if [ ! -f apps/frontend/public/models/yolo26n.onnx ] || \
+       [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ] || \
+       [ ! -f apps/frontend/public/models/yolo26s.onnx ] || \
+       [ ! -f apps/frontend/public/models/yolo26s-pose.onnx ] || \
+       [ ! -f apps/frontend/public/models/yolo26m.onnx ] || \
+       [ ! -f apps/frontend/public/models/yolo26m-pose.onnx ]; then \
+        python3 -m venv .venv && \
+        .venv/bin/pip install --no-cache-dir ultralytics onnx onnxruntime && \
+        mkdir -p apps/frontend/public/models && \
+        for model in yolo26n yolo26s yolo26m yolo26n-pose yolo26s-pose yolo26m-pose; do \
+            if [ ! -f apps/frontend/public/models/$model.onnx ]; then \
+                .venv/bin/yolo export model=$model.pt format=onnx imgsz=640 && \
+                mv $model.onnx apps/frontend/public/models/$model.onnx; \
+            fi; \
+        done && \
+        rm -rf .venv; \
     else echo "ONNX models already exist locally, skipping export."; fi
 
 COPY apps/frontend/wasm-engine ./apps/frontend/wasm-engine
