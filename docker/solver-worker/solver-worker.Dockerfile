@@ -35,10 +35,6 @@ ENV LD_LIBRARY_PATH=/opt/ortools/lib
 #Download first
 RUN make lib/openGA.hpp lib/nlohmann/json.hpp 
     
-RUN apt-get update \
-    && apt-get install --yes --no-install-recommends python3 \
-    && rm -rf /var/lib/apt/lists/*
-
 RUN make clean \
     && make --jobs="$(nproc)" \
       ORTOOLS_PREFIX=/opt/ortools \

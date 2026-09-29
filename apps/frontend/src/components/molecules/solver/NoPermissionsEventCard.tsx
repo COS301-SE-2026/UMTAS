@@ -45,7 +45,7 @@ export function NoPermissionsEventCard({
   errors,
 }: EventCardProps) {
   const inputClass =
-    "h-10 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] " +
+    "h-10 bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)] " +
     "placeholder:text-[var(--text-disabled)] focus-visible:ring-2 focus-visible:ring-offset-2 " +
     "focus-visible:ring-[var(--ring)] text-sm";
 
@@ -132,7 +132,7 @@ export function NoPermissionsEventCard({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 bg-(--bg-surface)">
       <div className={cardClass}>
         <div className={cardContentClass}>
           <Label className={titleClass}>General</Label>
