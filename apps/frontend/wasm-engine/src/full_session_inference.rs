@@ -268,8 +268,6 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
                         frame_hand_down: None,
                         gaze_paying_attention_count: 0,
                         gaze_no_attention_count: 0,
-                        last_gaze_paying: is_paying && !person.is_inferred,
-                        last_gaze_no_attention: is_no_attention && !person.is_inferred,
                         assigned_id: person.assigned_id,
                         all_center_mass: [person.pose_data.center_mass].to_vec(),
                         left_shoulder: [person.pose_data.left_shoulder].to_vec(),

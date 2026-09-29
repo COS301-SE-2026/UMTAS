@@ -47,17 +47,17 @@ compile-wasm-dev:
     phase run -- pnpm --filter frontend build:wasm:dev
 
 VisionModel:
-    @if [ ! -f apps/frontend/public/models/yolo26n.onnx ] || [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ]; then \
+    @if [ ! -f apps/frontend/public/models/yolo26s.onnx ] || [ ! -f apps/frontend/public/models/yolo26s-pose.onnx ]; then \
         python3 -m venv .venv; \
         .venv/bin/pip install --no-cache-dir ultralytics onnx onnxruntime; \
         mkdir -p apps/frontend/public/models; \
-        if [ ! -f apps/frontend/public/models/yolo26n.onnx ]; then \
-            .venv/bin/yolo export model=yolo26n.pt format=onnx imgsz=640; \
-            mv yolo26n.onnx apps/frontend/public/models/yolo26n.onnx; \
-    fi; \
-        if [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ]; then \
-            .venv/bin/yolo export model=yolo26n-pose.pt format=onnx imgsz=640; \
-            mv yolo26n-pose.onnx apps/frontend/public/models/yolo26n-pose.onnx; \
+        if [ ! -f apps/frontend/public/models/yolo26s.onnx ]; then \
+            .venv/bin/yolo export model=yolo26s.pt format=onnx imgsz=640; \
+            mv yolo26s.onnx apps/frontend/public/models/yolo26s.onnx; \
+        fi; \
+        if [ ! -f apps/frontend/public/models/yolo26s-pose.onnx ]; then \
+            .venv/bin/yolo export model=yolo26s-pose.pt format=onnx imgsz=640; \
+            mv yolo26s-pose.onnx apps/frontend/public/models/yolo26s-pose.onnx; \
         fi; \
         rm -rf .venv; \
     fi
