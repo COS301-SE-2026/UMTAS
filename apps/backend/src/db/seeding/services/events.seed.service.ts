@@ -849,12 +849,14 @@ export class EventsSeedService extends BaseSeedService {
     let created = 0;
 
     for (let i = 0; i < missingAttendances.length; i += BATCH_SIZE) {
-      const inserted = await this.persistence.insertEventAttendances(
-        db,
-        missingAttendances.slice(i, i + BATCH_SIZE),
-      );
+      if (Math.random() < 0.9) {
+        const inserted = await this.persistence.insertEventAttendances(
+          db,
+          missingAttendances.slice(i, i + BATCH_SIZE),
+        );
 
-      created += inserted.length;
+        created += inserted.length;
+      }
     }
 
     await db
