@@ -69,6 +69,12 @@ pub fn infer_pose_data(
 
     all_people.extend(full_image_people);
     all_people.extend(quadrant_people);
+    all_people.sort_by(|a, b| {
+        b.person
+            .confidence
+            .partial_cmp(&a.person.confidence)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
 
     let res_people = non_maximum_sepression(all_people, 0.30);
 
@@ -87,7 +93,7 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
     let mut people: Vec<DetectedPersonPose> = Vec::new();
 
     const NUM_FEATURES: usize = 56;
-    const CONFIDENCE_THRESHOLD: f32 = 0.05;
+    const CONFIDENCE_THRESHOLD: f32 = 0.15;
     const KEYPOINT_CONFIDENCE_THRESHOLD: f32 = 0.4;
 
     if slice_data.is_empty() || slice_data.len() % NUM_FEATURES != 0 {
@@ -172,6 +178,8 @@ pub fn map_to_global(
     let (offset_x, offset_y) = match quad_idx {
         0 => (0.0, 0.0),
         1 => (640.0, 0.0),
+        2 => (0.0, 640.0),
+        3 => (640.0, 640.0),
         _ => (0.0, 0.0),
     };
 
@@ -187,6 +195,10 @@ pub fn map_to_global(
         transform_keypoint(&mut person.center_mass, offset_x, offset_y);
         transform_keypoint(&mut person.left_shoulder, offset_x, offset_y);
         transform_keypoint(&mut person.right_shoulder, offset_x, offset_y);
+        transform_keypoint(&mut person.left_eye, offset_x, offset_y);
+        transform_keypoint(&mut person.right_eye, offset_x, offset_y);
+        transform_keypoint(&mut person.left_ear, offset_x, offset_y);
+        transform_keypoint(&mut person.right_ear, offset_x, offset_y);
 
         for kp in &mut person.left_arm {
             transform_keypoint(kp, offset_x, offset_y);

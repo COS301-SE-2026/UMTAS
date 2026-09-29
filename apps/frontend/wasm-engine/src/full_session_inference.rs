@@ -251,7 +251,7 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
                     person.assigned_id,
                     SessionPerson {
                         highest_nose: person.pose_data.nose,
-                        count_hand_up: if person.hand_up { 1 } else { 0 },
+                        count_hand_up: 0,
                         first_frame_hand_up: if person.hand_up {
                             Some(frame.frame_number)
                         } else {
