@@ -216,7 +216,7 @@ pub fn is_hands_up(new_person: &DetectedPersonPose) -> bool {
     return right_hand_up || left_hand_up;
 }
 pub fn analyze_gaze(person: &DetectedPersonPose) -> GazeDirection {
-    let confidence_threshold = 0.4;
+    let confidence_threshold = 0.25;
 
     if person.nose.score < confidence_threshold
         || person.left_eye.score < confidence_threshold

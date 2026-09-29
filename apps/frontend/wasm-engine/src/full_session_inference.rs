@@ -150,9 +150,7 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
         let inferred = *inferred_frames_count.get(&id).unwrap_or(&0);
         let real_detections = total - inferred;
 
-        if (inferred as f32 / total as f32) > MAX_INFERRED_RATIO
-            || real_detections < 3
-        {
+        if (inferred as f32 / total as f32) > MAX_INFERRED_RATIO {
             excluded_ids.insert(id);
         }
     }
@@ -189,19 +187,16 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
                     stored_person.highest_nose = person.pose_data.nose;
                 }
 
-                // Accumulate gaze frame counts directly
-                if !person.is_inferred {
-                    if is_paying && stored_person.last_gaze_paying {
-                        stored_person.gaze_paying_attention_count += 1;
-                    }
+                    // Accumulate gaze frame counts directly
+                    if !person.is_inferred {
+                        if is_paying {
+                            stored_person.gaze_paying_attention_count += 1;
+                        }
 
-                    if is_no_attention && stored_person.last_gaze_no_attention {
-                        stored_person.gaze_no_attention_count += 1;
+                        if is_no_attention {
+                            stored_person.gaze_no_attention_count += 1;
+                        }
                     }
-
-                    stored_person.last_gaze_paying = is_paying;
-                    stored_person.last_gaze_no_attention = is_no_attention;
-                }
 
                 // question logic
 
@@ -305,8 +300,6 @@ pub struct SessionPerson {
     frame_hand_down: Option<usize>,
     gaze_paying_attention_count: usize,
     gaze_no_attention_count: usize,
-    last_gaze_paying: bool,
-    last_gaze_no_attention: bool,
     assigned_id: usize,
     highest_nose: Keypoint,
     all_center_mass: Vec<Keypoint>,
