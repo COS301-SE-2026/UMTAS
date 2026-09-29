@@ -10,7 +10,7 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 
 import { Progress } from "@/components/atoms/baseShadcn/progress";
 import Popup from "@/components/atoms/utility/floatContainer";
-import { Download, Loader2 } from "lucide-react";
+import { BookOpen, Download, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -354,7 +354,10 @@ export default function VisionModelSetupPage() {
               )}
             </Button>
           )}
-          <Button onClick={() => setShowGuide(true)}>Setup Guide</Button>
+          <Button onClick={() => setShowGuide(true)}>
+            <BookOpen />
+            Setup Guide
+          </Button>
         </div>
       </div>
       {showGuide && (
