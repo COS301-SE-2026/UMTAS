@@ -15,10 +15,13 @@ export type VisionModelEvent<Tmessage extends MessageType, PayloadType> = {
   payload: PayloadType;
 };
 
+export type VisionModelSize = "nano" | "small" | "medium";
+
 export type PIXEL_PAYLOAD = {
   pixelData: Uint8ClampedArray;
   width: number;
   height: number;
+  modelSize: VisionModelSize;
 };
 
 export type DETECT_MESSAGE = VisionModelEvent<"DETECT", PIXEL_PAYLOAD>;

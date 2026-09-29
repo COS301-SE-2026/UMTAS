@@ -22,8 +22,9 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import type { VisionModelSize } from "../../../../utilities/VisionModel/messageTypes";
 
-const MODEL_READY_KEY = "vision-model-ready";
+const MODEL_READY_KEY = "vision-model-ready-v3";
 const MODEL_SETUP_ROUTE = "/VisionModel/setup";
 
 function getCameraErrorMessage(error: unknown): string {
@@ -55,6 +56,7 @@ export default function VM_SessionTemplate() {
   const [cameraStarting, setCameraStarting] = useState(false);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
+  const [modelSize, setModelSize] = useState<VisionModelSize>("small");
 
   const [detectionSettings, setDetectionSettings] = useState<DetectionSettings>(
     {
@@ -257,13 +259,14 @@ export default function VM_SessionTemplate() {
                   inferenceSettings={inferenceSettings}
                   imageFile={imageUpload}
                   deviceId={selectedDeviceId}
+                  modelSize={modelSize}
                 />
               </div>
             </section>
 
             <section
               aria-label="Vision session settings"
-              className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+              className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5"
             >
               <SettingsCard
                 title="Input"
@@ -428,6 +431,59 @@ export default function VM_SessionTemplate() {
                       using it and try again.
                     </p>
                   </div>
+                </div>
+              </SettingsCard>
+
+              <SettingsCard
+                title="Vision Model"
+                description="Choose the balance between speed and accuracy."
+                status={
+                  modelSize === "nano"
+                    ? "Fast"
+                    : modelSize === "small"
+                      ? "Balanced"
+                      : "Accurate"
+                }
+              >
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="vision-model-select"
+                    className="text-sm font-medium text-[var(--text-primary)]"
+                  >
+                    Model
+                  </Label>
+
+                  <Select
+                    value={modelSize}
+                    onValueChange={(value) => {
+                      setDetectionSettings((settings) => ({
+                        ...settings,
+                        runDetection: false,
+                      }));
+
+                      setInferenceSettings((settings) => ({
+                        ...settings,
+                        runInference: false,
+                      }));
+
+                      setModelSize(value as VisionModelSize);
+                    }}
+                  >
+                    <SelectTrigger id="vision-model-select" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectItem value="nano">Nano - Fast</SelectItem>
+                      <SelectItem value="small">Small - Balanced</SelectItem>
+                      <SelectItem value="medium">Medium - Accurate</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <p className="text-xs text-[var(--text-secondary)]">
+                    Larger models improve accuracy but require more processing
+                    power.
+                  </p>
                 </div>
               </SettingsCard>
 

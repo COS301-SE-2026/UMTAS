@@ -22,17 +22,33 @@ type NavigatorWithGPU = Navigator & {
 
 type SetupStatus = "idle" | "installing" | "ready" | "error";
 
-const MODEL_KEY = "vision-model-ready";
-const CACHE_NAME = "vision-models-v1";
+const MODEL_KEY = "vision-model-ready-v3";
+const CACHE_NAME = "vision-models-v3";
 
 const MODELS = [
   {
-    name: "Person Detection Model",
+    name: "Nano Detection Model",
     url: "/models/yolo26n.onnx",
   },
   {
-    name: "Pose Estimation Model",
+    name: "Nano Pose Model",
     url: "/models/yolo26n-pose.onnx",
+  },
+  {
+    name: "Small Detection Model",
+    url: "/models/yolo26s.onnx",
+  },
+  {
+    name: "Small Pose Model",
+    url: "/models/yolo26s-pose.onnx",
+  },
+  {
+    name: "Medium Detection Model",
+    url: "/models/yolo26m.onnx",
+  },
+  {
+    name: "Medium Pose Model",
+    url: "/models/yolo26m-pose.onnx",
   },
 ];
 
@@ -204,30 +220,26 @@ export default function VisionModelSetupPage() {
     if (status === "error") return "Not ready";
 
     if (status === "installing") {
-      if (requirement === "webgpu") return "Verified";
+      if (requirement === "webgpu") {
+        return "Verified";
+      }
 
-      if (
-        requirement === "detection" &&
-        currentModel === "Person Detection Model"
-      ) {
+      if (requirement === "detection" && currentModel?.includes("Detection")) {
         return "Downloading";
       }
 
-      if (requirement === "pose" && currentModel === "Pose Estimation Model") {
+      if (requirement === "pose" && currentModel?.includes("Pose")) {
         return "Downloading";
       }
 
-      if (
-        requirement === "detection" &&
-        currentModel === "Pose Estimation Model"
-      ) {
-        return "Ready";
-      }
+      return "Preparing";
     }
 
     return "Pending";
   }
-
+  const currentModelNumber = currentModel
+    ? MODELS.findIndex((model) => model.name === currentModel) + 1
+    : 0;
   return (
     <main className="w-full px-8 pt-6">
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
@@ -295,8 +307,7 @@ export default function VisionModelSetupPage() {
                 </span>
 
                 <span>
-                  Model {currentModel === "Pose Estimation Model" ? "2" : "1"}{" "}
-                  of {MODELS.length}
+                  Model {currentModelNumber} of {MODELS.length}
                 </span>
               </div>
             </section>

@@ -9,6 +9,7 @@ import {
   DetectedPerson,
   Keypoint,
   SessionInferenceResult,
+  VisionModelSize,
 } from "../../../../utilities/VisionModel/messageTypes";
 import { pose_Manager } from "../../../../utilities/VisionModel/pose_manager";
 import { pose_data_manager } from "../../../../utilities/VisionModel/pose_data_manager";
@@ -116,6 +117,7 @@ interface CanvasCamProps {
   inferenceSettings: InferenceSettings;
   imageFile: File | null;
   deviceId?: string;
+  modelSize: VisionModelSize;
 }
 
 export default function CameraCanvas({
@@ -124,6 +126,7 @@ export default function CameraCanvas({
   detectionSettings,
   inferenceSettings,
   deviceId,
+  modelSize,
 }: CanvasCamProps) {
   return (
     <div className="flex h-full w-full flex-col">
@@ -135,6 +138,7 @@ export default function CameraCanvas({
             detectionSettings={detectionSettings}
             inferenceSettings={inferenceSettings}
             deviceId={deviceId}
+            modelSize={modelSize}
           />
         </div>
       </div>
@@ -148,6 +152,7 @@ function CanvasWebcam({
   imageFile,
   inferenceSettings,
   deviceId,
+  modelSize,
 }: CanvasCamProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -216,6 +221,7 @@ function CanvasWebcam({
     inferenceSettings.runInference,
     isCameraActive,
     imageFile,
+    modelSize,
   ]);
   useEffect(() => {
     if (!imageFile) {
@@ -371,7 +377,7 @@ function CanvasWebcam({
               canvas.height,
             );
             detectionManager
-              .run(imageData.data, canvas.width, canvas.height)
+              .run(imageData.data, canvas.width, canvas.height, modelSize)
               .then((results) => {
                 if (results) {
                   detection_data_manager.run(results).then((people) => {
@@ -402,7 +408,7 @@ function CanvasWebcam({
               canvas.height,
             );
             pose_Manager
-              .run(imageData.data, canvas.width, canvas.height)
+              .run(imageData.data, canvas.width, canvas.height, modelSize)
               .then((results) => {
                 if (results) {
                   pose_data_manager.run(results).then((people) => {
