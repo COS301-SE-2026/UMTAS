@@ -1,0 +1,2 @@
+Method,Name,Error,Occurrences
+GET,/api/auth/get-session,HTTPError('429 Client Error: Too Many Requests for url: /api/auth/get-session'),45

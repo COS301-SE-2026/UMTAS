@@ -139,6 +139,9 @@ test.describe("Calendar", () => {
       .getByTestId("TEMP_CONTAINER")
       .getByTestId("restriction-dsc-Input")
       .fill("Test Range");
+    await expect(
+      page.getByTestId("TEMP_CONTAINER").getByTestId("restriction-dsc-Input"),
+    ).toHaveValue("Test Range");
 
     await page
       .getByTestId("TEMP_CONTAINER")
@@ -393,6 +396,9 @@ test.describe("Calendar", () => {
       .getByTestId("TEMP_CONTAINER")
       .getByTestId("restriction-dsc-Input")
       .fill("Test Range");
+    await expect(
+      page.getByTestId("TEMP_CONTAINER").getByTestId("restriction-dsc-Input"),
+    ).toHaveValue("Test Range");
 
     await page
       .getByTestId("TEMP_CONTAINER")

@@ -199,6 +199,7 @@ services:
     stop_grace_period: 330s
 
   frontend:
+    image: ${E2E_FRONTEND_IMAGE:-umtas-e2e-frontend}
     build:
       context: ../..
       dockerfile: docker/frontend/frontend.Dockerfile
@@ -206,6 +207,7 @@ services:
         NEXT_PUBLIC_API_URL: /api
         API_URL: http://backend:3000
         COOKIE_SECURE: "false"
+        SKIP_ML_MODELS: "1"
     init: true
     environment:
       API_URL: http://backend:3000
@@ -230,6 +232,7 @@ services:
       retries: 30
 
   test-runner:
+    image: ${E2E_RUNNER_IMAGE:-umtas-e2e-runner}
     build:
       context: ../..
       dockerfile: apps/e2e/Dockerfile

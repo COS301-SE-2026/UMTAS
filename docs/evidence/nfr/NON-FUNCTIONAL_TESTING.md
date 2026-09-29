@@ -23,7 +23,7 @@ The [Locust report](LOCUST_REPORT.html) contains endpoint statistics, percentile
 | NFR-Eff-2 | Job acceptance p95 at most 1 s, with 100% valid submissions accepted | Persist then enqueue before HTTP 202 | Locust, production | [Result](LOCUST_REPORT.html) | Pass |
 | NFR-Rely-1 | Session canary success at least 99% throughout the sustained soak | Dedicated session canary under sustained load | Locust, production | [Result](records/soak-report.html) | Pass |
 | NFR-Rely-2 | 100% sign-in completion and p95 at most 1 s per step | Three step account and session establishment | Locust, production | [Result](LOCUST_REPORT.html) | Pass |
-| NFR-Avail-1 | At least 99.5% public uptime across the 30 day release window | Public health monitoring | UptimeRobot, production | [Result](records/uptime-export.csv) | Pass |
+| NFR-Avail-1 | At least 99.5% public uptime across the 30 day release window | Public health monitoring | UptimeRobot, production | [Status screenshot](records/uptime-status.png) | Pass |
 | NFR-Sec-2 | Zero Medium or High ZAP alerts in baseline and authenticated scans | CSP, clickjacking protection and authenticated scanning | OWASP ZAP, production | [Result](ZAP_REPORT.pdf) | Pass |
 | NFR-Sec-3 | Zero moderate or higher production dependency findings | Dependency audit gate | pnpm audit, release test environment | [Result](records/dependency-audit.txt) | Pass |
 | NFR-Por-1 | Zero failures across Chromium, Firefox and Microsoft Edge | Playwright browser projects | Playwright, release test environment | [Chromium](records/playwright-chromium/index.html), [Firefox](records/playwright-firefox/index.html), [Edge](records/playwright-edge/index.html) | Pass |
@@ -49,7 +49,7 @@ The privacy boundary is evidenced by backend unit tests covering the role permis
 | NFR-Eff-2 | `bash apps/NFR/run_production_load.sh` | [LOCUST_REPORT.html](LOCUST_REPORT.html) |
 | NFR-Rely-1 | `bash apps/NFR/run_soak.sh` | [records/soak-report.html](records/soak-report.html) |
 | NFR-Rely-2 | `bash apps/NFR/run_production_load.sh` | [LOCUST_REPORT.html](LOCUST_REPORT.html) |
-| NFR-Avail-1 | In UptimeRobot, select monitor 803621896, set the 30 day release window in Reports and export the CSV to `docs/evidence/nfr/records/uptime-export.csv`. The status and metrics screenshots are [records/uptime-monitor.jpg](records/uptime-monitor.jpg) and [records/uptime-metrics.jpg](records/uptime-metrics.jpg). | [records/uptime-export.csv](records/uptime-export.csv) |
+| NFR-Avail-1 | In UptimeRobot, select monitor 803621896 and capture the 30 day release-window summary. The status, monitor and metrics screenshots are [records/uptime-status.png](records/uptime-status.png), [records/uptime-monitor.jpg](records/uptime-monitor.jpg) and [records/uptime-metrics.jpg](records/uptime-metrics.jpg). | [records/uptime-status.png](records/uptime-status.png) |
 | NFR-Sec-2 | `ZAP_CONTEXT_FILE=/absolute/path/context.context ZAP_USER=student bash apps/NFR/run_zap.sh` | [ZAP_REPORT.pdf](ZAP_REPORT.pdf) |
 | NFR-Sec-3 | `python3 apps/NFR/record_command.py docs/evidence/nfr/records/dependency-audit.txt -- pnpm audit --audit-level=moderate --prod` | [records/dependency-audit.txt](records/dependency-audit.txt) |
 | NFR-Por-1 | `bash apps/NFR/run_browser_reports.sh` | [Chromium](records/playwright-chromium/index.html), [Firefox](records/playwright-firefox/index.html), [Edge](records/playwright-edge/index.html) |
