@@ -8,7 +8,7 @@ import { moduleManagementSection } from "../module-management/HelpPage";
 import { roleManagementSection } from "../role-management/HelpPage";
 import { schedulesSection } from "../schedules/HelpPage";
 import { solverSection } from "../solver/HelpPage";
-
+import { vmSection } from "../VisionModel/HelpPage";
 const allTutorialSections = [
   dashboardSection,
   solverSection,
@@ -17,6 +17,7 @@ const allTutorialSections = [
   moduleManagementSection,
   roleManagementSection,
   courseSection,
+  vmSection,
 ];
 
 const steps = [
