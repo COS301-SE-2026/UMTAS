@@ -1,5 +1,4 @@
 "use client";
-
 import { Badge } from "@/components/atoms/baseShadcn/badge";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Input } from "@/components/atoms/baseShadcn/input";
@@ -23,6 +22,36 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { VisionModelSize } from "../../../../utilities/VisionModel/messageTypes";
+import Tutorial from "@/components/organisms/nav/Tutorial";
+
+const steps = [
+  {
+    target: "#btn-analyse-video",
+    content: "Analyse a video file using the vision model.",
+  },
+  {
+    target: "#btn-upload-image",
+    content: "Upload an image to use as the analysis input.",
+  },
+  {
+    target: "#switch-live-camera",
+    content: "Turn on the camera to use a live video input.",
+  },
+  {
+    target: "#vision-model-select",
+    content:
+      "Choose the vision model based on the speed and accuracy you need.",
+  },
+  {
+    target: "#switch-people-detection",
+    content: "Enable people detection to find and track people in the input.",
+  },
+  {
+    target: "#switch-lecture-analysis",
+    content:
+      "Enable lecture analysis to analyse attention, movement and participation.",
+  },
+];
 
 const MODEL_READY_KEY = "vision-model-ready-v3";
 const MODEL_SETUP_ROUTE = "/VisionModel/setup";
@@ -249,6 +278,7 @@ export default function VM_SessionTemplate() {
 
   return (
     <>
+      <Tutorial steps={steps} wait={true} />
       <main className="w-full px-8 pt-6">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
           <div className="w-full border-b border-[var(--border)] pb-4">
@@ -292,6 +322,7 @@ export default function VM_SessionTemplate() {
               >
                 <div className="mt-auto flex flex-col gap-2">
                   <Button
+                    id="btn-analyse-video"
                     type="button"
                     variant="outline"
                     className="w-full"
@@ -313,6 +344,7 @@ export default function VM_SessionTemplate() {
                   </Button>
 
                   <Button
+                    id="btn-upload-image"
                     type="button"
                     variant="outline"
                     className="w-full"
@@ -399,6 +431,7 @@ export default function VM_SessionTemplate() {
                         />
                       )}
                       <Switch
+                        id="switch-live-camera"
                         checked={cameraOn}
                         disabled={cameraStarting}
                         aria-label="Toggle camera"
@@ -536,6 +569,7 @@ export default function VM_SessionTemplate() {
                 <div className="space-y-4">
                   <SettingRow label="Detection">
                     <Switch
+                      id="switch-people-detection"
                       checked={detectionSettings.runDetection}
                       disabled={!hasInput || !modelEnabled}
                       aria-label="Toggle people detection"
@@ -586,6 +620,7 @@ export default function VM_SessionTemplate() {
                 <div className="space-y-4">
                   <SettingRow label="Analysis">
                     <Switch
+                      id="switch-lecture-analysis"
                       checked={inferenceSettings.runInference}
                       disabled={!hasInput || !modelEnabled}
                       aria-label="Toggle lecture analysis"
