@@ -331,7 +331,7 @@ export default function VisionModelSetupPage() {
           )}
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-center">
           {status === "ready" ? (
             <Button onClick={() => router.push("/VisionModel")}>
               Continue
