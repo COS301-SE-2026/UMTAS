@@ -1,0 +1,120 @@
+SOLVER_PROCESSING_DURATION {
+  jobId: 'timing-solver-1',
+  durationMs: 1.037916999999993,
+  eventCount: 1,
+  msPerEvent: 1.037916999999993
+}
+PDF_PARSER_PROCESSING_DURATION {
+  jobId: 'timing-parser-1',
+  durationMs: 0.011000000000024102,
+  inputBytes: 1024,
+  msPerKb: 0.011000000000024102
+}
+SOLVER_PROCESSING_DURATION {
+  jobId: 'timing-solver-2',
+  durationMs: 0.10108400000001438,
+  eventCount: 1,
+  msPerEvent: 0.10108400000001438
+}
+PDF_PARSER_PROCESSING_DURATION {
+  jobId: 'timing-parser-2',
+  durationMs: 0.0026659999999765205,
+  inputBytes: 1024,
+  msPerKb: 0.0026659999999765205
+}
+SOLVER_PROCESSING_DURATION {
+  jobId: 'timing-solver-3',
+  durationMs: 0.03249999999997044,
+  eventCount: 1,
+  msPerEvent: 0.03249999999997044
+}
+PDF_PARSER_PROCESSING_DURATION {
+  jobId: 'timing-parser-3',
+  durationMs: 0.0016249999999899956,
+  inputBytes: 1024,
+  msPerKb: 0.0016249999999899956
+}
+SOLVER_PROCESSING_DURATION {
+  jobId: 'timing-solver-4',
+  durationMs: 0.019917000000020835,
+  eventCount: 1,
+  msPerEvent: 0.019917000000020835
+}
+PDF_PARSER_PROCESSING_DURATION {
+  jobId: 'timing-parser-4',
+  durationMs: 0.0014590000000112013,
+  inputBytes: 1024,
+  msPerKb: 0.0014590000000112013
+}
+SOLVER_PROCESSING_DURATION {
+  jobId: 'timing-solver-5',
+  durationMs: 0.016124999999988177,
+  eventCount: 1,
+  msPerEvent: 0.016124999999988177
+}
+PDF_PARSER_PROCESSING_DURATION {
+  jobId: 'timing-parser-5',
+  durationMs: 0.0013749999999959073,
+  inputBytes: 1024,
+  msPerKb: 0.0013749999999959073
+}
+SOLVER_PROCESSING_DURATION {
+  jobId: 'timing-solver-6',
+  durationMs: 0.015249999999980446,
+  eventCount: 1,
+  msPerEvent: 0.015249999999980446
+}
+PDF_PARSER_PROCESSING_DURATION {
+  jobId: 'timing-parser-6',
+  durationMs: 0.026624999999967258,
+  inputBytes: 1024,
+  msPerKb: 0.026624999999967258
+}
+SOLVER_PROCESSING_DURATION {
+  jobId: 'timing-solver-7',
+  durationMs: 0.06920800000000327,
+  eventCount: 1,
+  msPerEvent: 0.06920800000000327
+}
+PDF_PARSER_PROCESSING_DURATION {
+  jobId: 'timing-parser-7',
+  durationMs: 0.002208999999993466,
+  inputBytes: 1024,
+  msPerKb: 0.002208999999993466
+}
+SOLVER_PROCESSING_DURATION {
+  jobId: 'timing-solver-8',
+  durationMs: 0.04941700000000537,
+  eventCount: 1,
+  msPerEvent: 0.04941700000000537
+}
+PDF_PARSER_PROCESSING_DURATION {
+  jobId: 'timing-parser-8',
+  durationMs: 0.00637499999999136,
+  inputBytes: 1024,
+  msPerKb: 0.00637499999999136
+}
+SOLVER_PROCESSING_DURATION {
+  jobId: 'timing-solver-9',
+  durationMs: 0.07145799999995006,
+  eventCount: 1,
+  msPerEvent: 0.07145799999995006
+}
+PDF_PARSER_PROCESSING_DURATION {
+  jobId: 'timing-parser-9',
+  durationMs: 0.024416999999971267,
+  inputBytes: 1024,
+  msPerKb: 0.024416999999971267
+}
+SOLVER_PROCESSING_DURATION {
+  jobId: 'timing-solver-10',
+  durationMs: 0.025291999999978998,
+  eventCount: 1,
+  msPerEvent: 0.025291999999978998
+}
+PDF_PARSER_PROCESSING_DURATION {
+  jobId: 'timing-parser-10',
+  durationMs: 0.002667000000030839,
+  inputBytes: 1024,
+  msPerKb: 0.002667000000030839
+}

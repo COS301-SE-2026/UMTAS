@@ -4,7 +4,7 @@
 
 The [NFR testing matrix](../evidence/nfr/NON-FUNCTIONAL_TESTING.md) links each release measure to its repeatable command and evidence. Each requirement states its own test environment.
 
-The evidence set comprises the [Locust report](../evidence/nfr/LOCUST_REPORT.html), [soak report](../evidence/nfr/records/soak-report.html), [worker timings](../evidence/nfr/records/worker-timings.txt), [privacy boundary unit tests](../evidence/nfr/records/privacy-boundary-unit-tests.txt), [ZAP report](../evidence/nfr/ZAP_REPORT.pdf), [Lighthouse reports](../evidence/nfr/Lighthouse.md), [browser reports](../evidence/nfr/records/playwright-chromium/index.html), [availability export](../evidence/nfr/records/uptime-export.csv), [parser suite](../evidence/nfr/records/parser-suite.txt), [solver regression](../evidence/nfr/records/solver-regression.txt), [dependency audit](../evidence/nfr/records/dependency-audit.txt) and [adapter case study](../evidence/nfr/API_ADAPTER_CASE_STUDY.md).
+The evidence set comprises the [Locust report](../evidence/nfr/LOCUST_REPORT.html), [soak report](../evidence/nfr/records/soak-report.html), [worker timings](../evidence/nfr/records/worker-timings.txt), [privacy boundary unit tests](../evidence/nfr/records/privacy-boundary-unit-tests.txt), [ZAP report](../evidence/nfr/ZAP_REPORT.pdf), [Lighthouse reports](../evidence/nfr/Lighthouse.md), [Chromium](../evidence/nfr/records/playwright-chromium/index.html), [Firefox](../evidence/nfr/records/playwright-firefox/index.html) and [Edge](../evidence/nfr/records/playwright-edge/index.html) browser reports, [availability screenshot](../evidence/nfr/records/uptime-status.png), [parser suite](../evidence/nfr/records/parser-suite.txt), [solver regression](../evidence/nfr/records/solver-regression.txt), [dependency audit](../evidence/nfr/records/dependency-audit.txt) and [adapter case study](../evidence/nfr/API_ADAPTER_CASE_STUDY.md).
 
 ## Utility Tree
 
@@ -213,7 +213,7 @@ The shared [Locust report](../evidence/nfr/LOCUST_REPORT.html) records the produ
 | **Response** | Remain reachable and healthy, with any outage detected and the service restarted automatically or promptly |
 | **Response measure** | Measured uptime over a stated 30-day monitoring window that includes the assessed Demo 4 release is **at least 99.5%**. The report must identify its start and end dates and the monitored endpoint. |
 
-**Acceptance evidence:** The requirement is met; see the [result](../evidence/nfr/records/uptime-export.csv).
+**Acceptance evidence:** The requirement is met; see the [status screenshot](../evidence/nfr/records/uptime-status.png).
 
 ## NFR-Maint-1 - University Adapter Modifiability
 
@@ -222,11 +222,11 @@ The shared [Locust report](../evidence/nfr/LOCUST_REPORT.html) records the produ
 | **Part** | **UMTAS scenario** |
 |---|---|
 | **Source of stimulus** | A developer adding support for another university |
-| **Stimulus** | Add a new concrete adapter that transforms the new university's timetable format into the canonical UMTAS representation |
-| **Environment** | Normal development and continuous-integration workflow using representative fixtures from the new university |
+| **Stimulus** | Change or extend university-specific timetable parsing for a university format |
+| **Environment** | Normal development and continuous-integration workflow using representative university fixtures |
 | **Artifact** | University adapter layer (`apps/pdf_parser/parser/adapters/`) and parser registry (`apps/pdf_parser/parser/registry.py`) |
-| **Response** | Add the university-specific behaviour within the Adapter layer, registering it by key |
-| **Response measure** | Adding a university requires one adapter module in the adapter layer and one entry in the parser registry. The adapter contract, command line interface and canonical models are unchanged. |
+| **Response** | University-specific behaviour is implemented within the adapter layer and resolved by key |
+| **Response measure** | University-specific parsing is confined to adapter modules that implement one adapter contract and are selected through the parser registry. The canonical models and command line interface contain no university-specific logic. |
 
 **Acceptance evidence:** The requirement is met; see the [result](../evidence/nfr/API_ADAPTER_CASE_STUDY.md).
 

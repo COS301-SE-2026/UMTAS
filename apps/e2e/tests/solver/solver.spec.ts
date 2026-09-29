@@ -8,22 +8,16 @@ test("Solver Page Loads", async ({ page }) => {
 });
 
 test("Solver uploads", async ({ page }) => {
+  test.setTimeout(60_000);
   await page.goto("/solver");
   const filePath = path.join(__dirname, "LECTURES_S1.pdf");
 
   const fileInput = page.getByTestId("input-file-pdf");
   await fileInput.setInputFiles(filePath);
 
-  await page.waitForTimeout(5_000);
-
   const uploadBtn = page.getByTestId("btn-upload-confirm");
-  const enabled = await uploadBtn.isEnabled();
-
-  if (enabled) {
-    await uploadBtn.click();
-  } else {
-    console.log("Upload button disabled, skipping click");
-  }
+  await expect(uploadBtn).toBeEnabled({ timeout: 30_000 });
+  await uploadBtn.click();
 
   console.log("Post upload step");
   await expect(page.getByTestId("confirm-solver-events")).toBeVisible();
@@ -33,7 +27,7 @@ test("Solver uploads", async ({ page }) => {
 
   await page.getByTestId("btn-upload-and-create-timetable").click();
 
-  await expect(page).toHaveURL("/schedules");
+  await expect(page).toHaveURL("/schedules", { timeout: 30_000 });
   await page.getByTestId("schedules-Delete-Btn").click();
   await page.getByTestId("Schedules-ConfirmDelete-Btn").click();
 });

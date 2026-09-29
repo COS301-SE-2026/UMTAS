@@ -1,231 +1,127 @@
-# University API Adapter - Architectural Case Study
+# University Adapter Case Study
 
 ## 1. Overview
 
-This case study examines how UMTAS handles integration with external university APIs, with specific attention to **modifiability**.
-
-University APIs vary across endpoints, authentication, response structures, naming, pagination, and error handling. Allowing these differences to propagate into the core application would increase coupling and make future changes costly.
+This case study examines how UMTAS isolates university-specific timetable formats behind a common adapter contract, with specific attention to **modifiability**. University timetables differ in layout, column order, naming and date formats. Allowing those differences into the core application would increase coupling and make change costly.
 
 ---
 
 ## 2. Context
 
-### 2.1 UMTAS and External University APIs
+UMTAS imports timetable PDFs from universities and converts them into canonical import candidates: modules, events and warnings. The canonical models are defined once in `apps/pdf_parser/parser/models.py`. The University of Pretoria (UP) is the implemented university.
 
-UMTAS needs course, module, and event data from external university systems. These APIs rarely match UMTAS internal representations. For example, an external API might return:
-
-```
-course_id
-name
-```
-
-while UMTAS expects:
-
-```
-CourseID
-CourseName
-```
-
-### 2.2 The Core Problem
-
-> How can UMTAS integrate external university APIs without leaking university-specific details into the core application?
+> How does UMTAS support university-specific formats without leaking them into the canonical models, the command line interface or the queue contracts?
 
 ---
 
 ## 3. Solution Approach
 
-### 3.1 Architecture Overview
+### 3.1 Architecture
 
-UMTAS uses a University Adapter layer to isolate API communication and data transformation. The architecture includes:
-
-- an abstract `University_Adapter` defining the expected interface;
-- concrete adapters for each university's specific implementation;
-- an `AdapterRegistry` to select the correct adapter at runtime;
-- UMTAS services that depend only on the abstraction.
-
-The existing Maryland implementation is `ML_Adapter`.
+| Element | Location | Responsibility |
+|---|---|---|
+| Adapter contract | `apps/pdf_parser/parser/base_parser.py` | The abstract `BasePDFParser` declares `parse(file_path)` and result validation. |
+| Concrete adapters | `apps/pdf_parser/parser/adapters/` | University-specific detection, table extraction and normalisation. `UPPDFParser` is the UP adapter. |
+| Registry | `apps/pdf_parser/parser/registry.py` | `PARSER_REGISTRY` maps an adapter key to a parser class. `get_parser` resolves the key. |
+| Canonical models | `apps/pdf_parser/parser/models.py` | Shared candidate types and `validate_parser_result`, which every adapter output passes through. |
+| Command line interface | `apps/pdf_parser/parser_cli.py` | Resolves the adapter by key and emits canonical JSON or a structured error. |
 
 ### 3.2 Adapter Contract
 
-The abstract adapter defines what UMTAS requires from any university integration:
+```python
+class BasePDFParser(ABC):
+    @abstractmethod
+    def parse(self, file_path: str) -> ParserOutput: ...
 
-```typescript
-abstract authenticate(): Promise<void>;
-
-abstract getCourses(
-    page: number,
-    limit: number
-): Promise<CreateCourseDto[]>;
-
-abstract getModules(
-    course: CourseDto
-): Promise<CreateModuleDto[]>;
-
-abstract getEvents(
-    module: ModulesDto
-): Promise<CreateEventDtoV2[]>;
+    def validate_result(self, result: ParserOutput) -> ParserOutput: ...
 ```
 
-This contract separates UMTAS's internal DTOs from external API representations.
+Every adapter returns the same canonical output and is validated by the same function.
 
 ### 3.3 Adapter Responsibilities
 
-Concrete adapters handle all university-specific logic: endpoint URLs, authentication, request formatting, response parsing, and error translation. This knowledge stays inside the adapter boundary.
+Concrete adapters own all university-specific behaviour: schedule type detection, column layouts, cell cleaning, and translation of malformed input into structured `ParserError` codes. The UP adapter is split into `up_parser.py`, `up_lectures.py`, `up_tests.py`, `up_exams.py` and `up_values.py`. The canonical models, registry and command line interface contain no UP-specific logic.
 
 ---
 
 ## 4. Quality Attribute Focus
 
-**Modifiability** is the primary concern-specifically, whether adding a new university requires changes outside the adapter layer.
-
-University APIs are volatile dependencies. Different universities may use different:
-- data structures and field names;
-- endpoint designs;
-- authentication schemes;
-- pagination methods;
-- date/time formats.
-
-These vary independently of UMTAS core logic.
+**Modifiability** is the primary concern: university-specific change must stay inside the adapter layer. Timetable formats vary independently of the core, so they are treated as volatile.
 
 ---
 
 ## 5. Non-Functional Requirement
 
-### 5.1 NFR-Mod-1
+### 5.1 NFR-Maint-1
 
-> Adding support for a new university API shall not require modification of existing production components outside the University API Adapter layer.
-
-This allows changes within the adapter boundary-creating a new adapter and registering it-but prohibits changes propagating elsewhere.
+> University-specific parsing behaviour is confined to adapter modules that implement a single adapter contract and are selected through a registry. The canonical models and the command line interface contain no university-specific logic.
 
 ### 5.2 Measure and Target
 
-**Measure:** Count of existing production components outside the adapter layer that must be modified when adding a new university.
+**Measure:** Count of university-specific rules located outside `apps/pdf_parser/parser/adapters/`.
 
-**Target:** 0 components outside the adapter layer.
+**Target:** 0. The only shared points are the `BasePDFParser` contract and the `PARSER_REGISTRY` mapping.
 
 ---
 
 ## 6. Tactics
 
-### 6.1 Isolate Volatile Behaviour
-
-University-specific integration code is contained within concrete adapters. Changes to an external API affect only its corresponding adapter.
-
-![Adapter Layer Architecture](Api_Adapter.png)
-
-### 6.2 Depend on Abstractions
-
-UMTAS core code references `University_Adapter` rather than concrete implementations. This decouples the core from external systems.
+- **Isolate volatile behaviour.** Format knowledge lives in `apps/pdf_parser/parser/adapters/`.
+- **Depend on abstractions.** The command line interface depends on `BasePDFParser` and `get_parser`, never on a concrete adapter.
+- **Validate at the boundary.** `validate_parser_result` applies one canonical schema to every adapter.
+- **Fail with structured errors.** An unregistered key produces the `UNKNOWN_ADAPTER` error rather than a crash.
 
 ---
 
 ## 7. Trade-offs
 
-### 7.1 Benefits
+**Benefits**
 
-- University-specific logic is contained;
-- External API changes have limited impact;
-- Authentication varies per adapter;
-- Data mapping stays out of business services;
-- New universities can be added against a stable contract;
-- Core application loosely couples to external systems.
+- University formats are contained in one directory.
+- The canonical output is uniform for every consumer.
+- The registry gives a single, testable lookup point.
 
-### 7.2 Costs
+**Costs**
 
-The architecture adds complexity:
-
-- additional classes and an extra layer
-- ongoing contract maintenance
-- registry/factory logic
-- more implementation effort per university
-
-This trades simplicity for modifiability.
+- An abstract layer and a registry add indirection.
+- The contract must remain general enough for every university without accumulating provider-specific features.
 
 ---
 
 ## 8. Change Boundary
 
-When adding a new university, the expected changes are contained:
-
-| Component | Expected Change | Required? |
+| Component | University-specific logic | Location |
 |---|---|---|
-| New concrete adapter | Add | Yes |
-| AdapterRegistry | Modify | Yes |
-| University_Adapter | Modify | Ideally no |
-| CourseService | Modify | No |
-| ModuleService | Modify | No |
-| EventService | Modify | No |
-| Database layer | Modify | No |
-| Controllers | Modify | No |
-
-The registry is part of the adapter layer, so modifying it does not violate NFR-Mod-1.
+| Concrete adapter | Yes | `apps/pdf_parser/parser/adapters/` |
+| Registry | Key to class mapping only | `apps/pdf_parser/parser/registry.py` |
+| Adapter contract | No | `apps/pdf_parser/parser/base_parser.py` |
+| Canonical models | No | `apps/pdf_parser/parser/models.py` |
+| Command line interface | No | `apps/pdf_parser/parser_cli.py` |
 
 ---
 
 ## 9. Verification
 
-### 9.1 Approach
+The parser suite (`apps/pdf_parser/parser/tests`) verifies the boundary:
 
-Verification involves adding a second university API with different characteristics:
+- `test_registry.py` verifies that `get_parser("up")` returns the UP adapter and that an unknown key raises `UNKNOWN_ADAPTER`.
+- `test_cli_contract.py` verifies that the command line interface emits canonical output for lecture, test and exam timetables and a structured error for an unknown adapter.
+- The UP ground truth, schema and error handling tests verify that adapter output meets the canonical contract.
 
-1. Record baseline codebase state.
-2. Implement a new concrete adapter.
-3. Register it with `AdapterRegistry`.
-4. Connect to the target API.
-5. Verify all contract operations work.
-6. Review the change set.
-7. Count modified components outside the adapter layer.
-
-### 9.2 Pass Condition
-
-The NFR passes when:
-
-```
-Number of existing non-adapter components modified = 0
-```
-
-Expected outcome:
-
-```
-Changed:    AdapterRegistry (1 line)
-Added:      New_Adapter
-Unchanged:  CourseService, ModuleService, EventService, Controllers, Database layer
-```
-
-The proposed new adapter would contain university-specific requests, authentication, mapping and
-error handling without changing existing services. A controlled implementation and diff are still
-needed to measure the result.
+The command and its recorded output are listed in the [evidence register](NON-FUNCTIONAL_TESTING.md). The requirement passes when the parser suite passes and no university-specific rule exists outside the adapter directory.
 
 ---
 
 ## 10. Findings
 
-The adapter architecture is designed to control the impact of external system changes.
-University-specific behaviour sits behind a stable internal contract, so core UMTAS components
-should remain unaware of individual API details. This case study has not yet measured a second
-university implementation.
+University-specific behaviour sits behind a stable contract, and the canonical models, registry and command line interface remain free of university-specific rules. The architecture supports the modifiability requirement.
 
-The architecture supports the modifiability NFR. However, new integrations still require new code-the benefit is confinement of that code to the adapter layer rather than spread across the application.
-
-A key consideration is the abstraction contract: it must remain general enough to accommodate multiple universities without accumulating provider-specific features.
+A new university requires new adapter code. The benefit is confinement of that code to the adapter layer instead of its spread across the application.
 
 ---
 
 ## 11. Conclusion
 
-This case study demonstrates how the University API Adapter addresses external API variability through a common abstraction and concrete implementations.
+The adapter contract, registry and canonical models isolate university-specific parsing from the rest of the system. NFR-Maint-1 is met by this structure and verified by the parser suite.
 
-The NFR requires zero modifications to existing non-adapter components when adding a new university. The architecture aims to achieve this through:
-
-- isolating volatile behaviour inside adapters;
-- depending on abstractions rather than concretions;
-- establishing an explicit boundary contract.
-
-The Adapter pattern provides the mechanism, supported by dependency inversion and registry-based selection.
-
-The trade-off, additional abstraction and indirection in exchange for reduced change propagation,
-is appropriate given that external university APIs are a known source of architectural volatility.
-
-The design traces clearly from a quality attribute through NFR, tactics, patterns, implementation, and measurable verification.
-
----
+The trade-off, additional abstraction in exchange for reduced change propagation, is appropriate because university timetable formats are a known source of volatility.
