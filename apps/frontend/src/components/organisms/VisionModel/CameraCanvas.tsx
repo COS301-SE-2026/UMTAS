@@ -151,7 +151,6 @@ function CanvasWebcam({
 }: CanvasCamProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const processingCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const [loadedCameraKey, setLoadedCameraKey] = useState<string | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -160,9 +159,11 @@ function CanvasWebcam({
   const [sessionID, setSessionID] = useState<string | null>(null);
   const detectedPeopleRef = useRef<DetectedPerson[]>([]);
   const frameStore = useRef<SessionStorePose | null>(null);
-  const lastRunRef = useRef<number>(0);
+  const lastDetectionRunRef = useRef<number>(0);
+  const lastInferenceRunRef = useRef<number>(0);
   const frameCounterRef = useRef<number>(0);
-  const imageProcessedRef = useRef<boolean>(false);
+  const detectionImageProcessedRef = useRef<boolean>(false);
+  const inferenceImageProcessedRef = useRef<boolean>(false);
   const { data: singleSession } = useQuery(
     getSingleSessionQuery({ sessionId: sessionID ?? "" }),
   );
@@ -193,6 +194,7 @@ function CanvasWebcam({
   useEffect(() => {
     const isSourceActive = isCameraActive || imageFile !== null;
     if (detectionSettings.runDetection && isSourceActive) {
+      detectionImageProcessedRef.current = false;
       detectionManager.start();
       detection_data_manager.start();
     } else {
@@ -202,7 +204,7 @@ function CanvasWebcam({
     }
     if (inferenceSettings.runInference && isSourceActive) {
       frameStore.current = new SessionStorePose();
-      imageProcessedRef.current = false;
+      inferenceImageProcessedRef.current = false;
       pose_Manager.start();
       pose_data_manager.start();
     } else {
@@ -221,12 +223,15 @@ function CanvasWebcam({
       // eslint-disable-next-line
       setImageLoaded(false);
       detectedPeopleRef.current = [];
-      imageProcessedRef.current = false;
+      detectionImageProcessedRef.current = false;
+      inferenceImageProcessedRef.current = false;
       return;
     }
     detectedPeopleRef.current = [];
-    lastRunRef.current = 0;
-    imageProcessedRef.current = false;
+    lastDetectionRunRef.current = 0;
+    lastInferenceRunRef.current = 0;
+    detectionImageProcessedRef.current = false;
+    inferenceImageProcessedRef.current = false;
     const img = new Image();
     const objectUrl = URL.createObjectURL(imageFile);
     img.src = objectUrl;
@@ -343,70 +348,30 @@ function CanvasWebcam({
           const scaleY = canvas.height / MODEL_COORDINATE_SIZE;
           const visualScale = Math.max(1, Math.min(scaleX, scaleY));
 
-          if (!processingCanvasRef.current) {
-            const processingCanvas = document.createElement("canvas");
-            processingCanvas.width = MODEL_COORDINATE_SIZE;
-            processingCanvas.height = MODEL_COORDINATE_SIZE;
-            processingCanvasRef.current = processingCanvas;
-          }
-
-          const processingCanvas = processingCanvasRef.current;
-          const processingContext = processingCanvas.getContext("2d", {
-            willReadFrequently: true,
-          });
-
-          if (processingContext) {
-            processingContext.clearRect(
-              0,
-              0,
-              MODEL_COORDINATE_SIZE,
-              MODEL_COORDINATE_SIZE,
-            );
-
-            if (imageFile && img) {
-              processingContext.drawImage(
-                img,
-                0,
-                0,
-                MODEL_COORDINATE_SIZE,
-                MODEL_COORDINATE_SIZE,
-              );
-            } else if (video) {
-              processingContext.drawImage(
-                video,
-                0,
-                0,
-                MODEL_COORDINATE_SIZE,
-                MODEL_COORDINATE_SIZE,
-              );
-            }
-          }
-
           const detectionIntervalMs =
             detectionSettings.DetectionInterval * 1000;
           const inferenceIntervalMs =
             inferenceSettings.InferenceInterval * 1000;
-          const shouldRunForImage = imageFile
-            ? !imageProcessedRef.current
+          const shouldRunDetectionForImage = imageFile
+            ? !detectionImageProcessedRef.current
             : true;
           if (
             detectionSettings.runDetection &&
-            shouldRunForImage &&
-            timestamp - lastRunRef.current >= detectionIntervalMs
+            shouldRunDetectionForImage &&
+            timestamp - lastDetectionRunRef.current >= detectionIntervalMs
           ) {
-            lastRunRef.current = timestamp;
-            const imageData = processingContext?.getImageData(
+            lastDetectionRunRef.current = timestamp;
+            if (imageFile) {
+              detectionImageProcessedRef.current = true;
+            }
+            const imageData = context.getImageData(
               0,
               0,
-              MODEL_COORDINATE_SIZE,
-              MODEL_COORDINATE_SIZE,
+              canvas.width,
+              canvas.height,
             );
             detectionManager
-              .run(
-                imageData?.data ?? new Uint8ClampedArray(),
-                MODEL_COORDINATE_SIZE,
-                MODEL_COORDINATE_SIZE,
-              )
+              .run(imageData.data, canvas.width, canvas.height)
               .then((results) => {
                 if (results) {
                   detection_data_manager.run(results).then((people) => {
@@ -417,27 +382,27 @@ function CanvasWebcam({
                 }
               });
           }
+
+          const shouldRunInferenceForImage = imageFile
+            ? !inferenceImageProcessedRef.current
+            : true;
           if (
             inferenceSettings.runInference &&
-            shouldRunForImage &&
-            timestamp - lastRunRef.current >= inferenceIntervalMs
+            shouldRunInferenceForImage &&
+            timestamp - lastInferenceRunRef.current >= inferenceIntervalMs
           ) {
-            lastRunRef.current = timestamp;
+            lastInferenceRunRef.current = timestamp;
             if (imageFile) {
-              imageProcessedRef.current = true;
+              inferenceImageProcessedRef.current = true;
             }
-            const imageData = processingContext?.getImageData(
+            const imageData = context.getImageData(
               0,
               0,
-              MODEL_COORDINATE_SIZE,
-              MODEL_COORDINATE_SIZE,
+              canvas.width,
+              canvas.height,
             );
             pose_Manager
-              .run(
-                imageData?.data ?? new Uint8ClampedArray(),
-                MODEL_COORDINATE_SIZE,
-                MODEL_COORDINATE_SIZE,
-              )
+              .run(imageData.data, canvas.width, canvas.height)
               .then((results) => {
                 if (results) {
                   pose_data_manager.run(results).then((people) => {
@@ -737,7 +702,8 @@ function CanvasWebcam({
                       });
                     }
                     frameStore.current?.clear();
-                    imageProcessedRef.current = false;
+                    detectionImageProcessedRef.current = false;
+                    inferenceImageProcessedRef.current = false;
                     SetSessionRes(emptyResults);
                     toast.success("Results reset");
                   } catch (error) {
