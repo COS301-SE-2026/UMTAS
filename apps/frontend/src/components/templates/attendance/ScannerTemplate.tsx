@@ -12,6 +12,18 @@ import {
   UniversityStateLoading,
   useUniversityState,
 } from "@/hooks/useUniversityState";
+import Tutorial from "@/components/organisms/nav/Tutorial";
+
+const steps = [
+  {
+    target: "#attendance-scanner-header",
+    content: "Use the scanner to record student attendance.",
+  },
+  {
+    target: "#btn-start-scanner",
+    content: "Start scanning barcodes.",
+  },
+];
 
 export default function ScannerTemplate() {
   const { university, isLoading } = useUniversityState();
@@ -30,7 +42,12 @@ export default function ScannerTemplate() {
     if (!hasRole) return <NoRoleSelected />;
 
     return (
-      <div className="flex w-full flex-col items-center gap-6 px-6 pt-6">
+      <div
+        id="attendance-scanner-header"
+        className="flex w-full flex-col items-center gap-6 px-6 pt-6"
+      >
+        <Tutorial steps={steps} wait={true} />
+
         <AttendancePageHeader
           className="w-full max-w-6xl py-4"
           title="Attendance Scanner"
@@ -44,7 +61,7 @@ export default function ScannerTemplate() {
           }
         />
 
-        <div className="w-full max-w-6xl">
+        <div id="attendance-scanner" className="w-full max-w-6xl">
           <AttendanceScanner />
         </div>
       </div>

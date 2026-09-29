@@ -463,6 +463,7 @@ export default function AttendanceScanner() {
         )}
 
         <Button
+          id="btn-start-scanner"
           type="button"
           disabled={!selectedEventID || expectedStudents.length === 0}
           onClick={startSession}
