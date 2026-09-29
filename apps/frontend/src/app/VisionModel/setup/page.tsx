@@ -367,9 +367,9 @@ function RequirementRow({
   status: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-lg border border-[var(--border)] p-4">
-      <div className="min-w-0">
-        <p className="text-sm font-medium text-[var(--text-primary)]">
+    <div className="flex min-h-20 w-full items-center justify-between gap-4 rounded-lg border border-[var(--border)] p-4">
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold text-[var(--text-primary)]">
           {label}
         </p>
 
@@ -380,7 +380,7 @@ function RequirementRow({
 
       <Badge
         variant="outline"
-        className="shrink-0 text-[var(--text-secondary)]"
+        className="whitespace-nowrap text-[var(--text-secondary)]"
       >
         {status}
       </Badge>

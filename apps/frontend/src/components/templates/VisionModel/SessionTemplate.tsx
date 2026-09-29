@@ -74,6 +74,7 @@ export default function VM_SessionTemplate() {
 
   const [imageUpload, setImageUpload] = useState<File | null>(null);
   const [showVideoPopUp, setShowVideoPopUp] = useState(false);
+  const [modelEnabled, setModelEnabled] = useState(true);
 
   const uploadImageRef = useRef<HTMLInputElement>(null);
 
@@ -192,6 +193,11 @@ export default function VM_SessionTemplate() {
   }
 
   function handleDetectionToggle(checked: boolean) {
+    if (checked && !modelEnabled) {
+      toast.error("Enable the vision model first");
+      return;
+    }
+
     if (checked && !hasInput) {
       toast.error("Choose an input first", {
         description: "Turn on the camera or upload an image before detection.",
@@ -213,6 +219,11 @@ export default function VM_SessionTemplate() {
   }
 
   function handleInferenceToggle(checked: boolean) {
+    if (checked && !modelEnabled) {
+      toast.error("Enable the vision model first");
+      return;
+    }
+
     if (checked && !hasInput) {
       toast.error("Choose an input first", {
         description:
@@ -279,7 +290,7 @@ export default function VM_SessionTemplate() {
                       : "No input"
                 }
               >
-                <div className="flex flex-col gap-2">
+                <div className="mt-auto flex flex-col gap-2">
                   <Button
                     type="button"
                     variant="outline"
@@ -445,45 +456,75 @@ export default function VM_SessionTemplate() {
                       : "Accurate"
                 }
               >
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="vision-model-select"
-                    className="text-sm font-medium text-[var(--text-primary)]"
-                  >
-                    Model
-                  </Label>
+                <div className="space-y-4">
+                  <SettingRow label="Model selection">
+                    <Switch
+                      checked={modelEnabled}
+                      aria-label="Toggle vision model"
+                      onCheckedChange={(checked) => {
+                        setModelEnabled(checked);
 
-                  <Select
-                    value={modelSize}
-                    onValueChange={(value) => {
-                      setDetectionSettings((settings) => ({
-                        ...settings,
-                        runDetection: false,
-                      }));
+                        if (!checked) {
+                          setDetectionSettings((settings) => ({
+                            ...settings,
+                            runDetection: false,
+                          }));
 
-                      setInferenceSettings((settings) => ({
-                        ...settings,
-                        runInference: false,
-                      }));
+                          setInferenceSettings((settings) => ({
+                            ...settings,
+                            runInference: false,
+                          }));
+                        }
+                      }}
+                    />
+                  </SettingRow>
 
-                      setModelSize(value as VisionModelSize);
-                    }}
-                  >
-                    <SelectTrigger id="vision-model-select" className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="vision-model-select"
+                      className="text-sm font-medium text-[var(--text-primary)]"
+                    >
+                      Model
+                    </Label>
 
-                    <SelectContent>
-                      <SelectItem value="nano">Nano - Fast</SelectItem>
-                      <SelectItem value="small">Small - Balanced</SelectItem>
-                      <SelectItem value="medium">Medium - Accurate</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <Select
+                      disabled={!modelEnabled}
+                      value={modelSize}
+                      onValueChange={(value) => {
+                        setDetectionSettings((settings) => ({
+                          ...settings,
+                          runDetection: false,
+                        }));
 
-                  <p className="text-xs text-[var(--text-secondary)]">
-                    Larger models improve accuracy but require more processing
-                    power.
-                  </p>
+                        setInferenceSettings((settings) => ({
+                          ...settings,
+                          runInference: false,
+                        }));
+
+                        setModelSize(value as VisionModelSize);
+                      }}
+                    >
+                      <SelectTrigger
+                        id="vision-model-select"
+                        className="w-full"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        <SelectItem value="nano">Nano - Fast</SelectItem>
+                        <SelectItem value="small">Small - Balanced</SelectItem>
+                        <SelectItem value="medium">
+                          Medium - Accurate
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <p className="text-xs text-[var(--text-secondary)]">
+                      Larger models improve accuracy but require more processing
+                      power.
+                    </p>
+                  </div>
                 </div>
               </SettingsCard>
 
@@ -496,7 +537,7 @@ export default function VM_SessionTemplate() {
                   <SettingRow label="Detection">
                     <Switch
                       checked={detectionSettings.runDetection}
-                      disabled={!hasInput}
+                      disabled={!hasInput || !modelEnabled}
                       aria-label="Toggle people detection"
                       onCheckedChange={handleDetectionToggle}
                     />
@@ -513,7 +554,7 @@ export default function VM_SessionTemplate() {
                     <Input
                       id="detection-interval"
                       value={detectionSettings.DetectionInterval}
-                      disabled={!hasInput}
+                      disabled={!hasInput || !modelEnabled}
                       onChange={(event) => {
                         const value = Math.max(0.2, Number(event.target.value));
                         setDetectionSettings((settings) => ({
@@ -546,7 +587,7 @@ export default function VM_SessionTemplate() {
                   <SettingRow label="Analysis">
                     <Switch
                       checked={inferenceSettings.runInference}
-                      disabled={!hasInput}
+                      disabled={!hasInput || !modelEnabled}
                       aria-label="Toggle lecture analysis"
                       onCheckedChange={handleInferenceToggle}
                     />
@@ -563,7 +604,7 @@ export default function VM_SessionTemplate() {
                     <Input
                       id="inference-interval"
                       value={inferenceSettings.InferenceInterval}
-                      disabled={!hasInput}
+                      disabled={!hasInput || !modelEnabled}
                       onChange={(event) => {
                         const value = Math.max(0.2, Number(event.target.value));
                         setInferenceSettings((settings) => ({
@@ -593,7 +634,7 @@ export default function VM_SessionTemplate() {
 
       {showVideoPopUp && (
         <Popup onClose={() => setShowVideoPopUp(false)}>
-          <VideoUploadComp />
+          <VideoUploadComp modelSize={modelSize} />
         </Popup>
       )}
     </>
@@ -612,29 +653,29 @@ function SettingsCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-full flex-col rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
-      <div className="mb-4">
-        <div className="flex items-start justify-between gap-3">
-          <h2 className="text-[15px] font-medium leading-[1.4] text-[var(--text-primary)]">
+    <div className="flex h-full min-w-0 flex-col rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+      <div className="mb-4 min-w-0">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+          <h2 className="min-w-0 text-[15px] font-semibold text-[var(--text-primary)]">
             {title}
           </h2>
 
           {status && (
             <Badge
               variant="outline"
-              className="shrink-0 text-[var(--text-secondary)]"
+              className="whitespace-nowrap text-[var(--text-secondary)]"
             >
               {status}
             </Badge>
           )}
         </div>
 
-        <p className="mt-1 text-xs leading-[1.5] text-[var(--text-secondary)]">
+        <p className="mt-1 text-xs text-[var(--text-secondary)]">
           {description}
         </p>
       </div>
 
-      <div className="mt-auto">{children}</div>
+      <div className="flex min-w-0 flex-1 flex-col">{children}</div>
     </div>
   );
 }
