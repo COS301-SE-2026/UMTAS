@@ -86,7 +86,7 @@ export default function VisionStatsPageTemplate() {
         <div className="flex flex-col gap-4 pb-4 border-b border-[var(--border)] sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="text-xl font-bold tracking-tight text-[var(--text-primary)] pb-2">
-              Vision Stats Dashboard
+              Lecture Watch Statistics Dashboard
             </h1>
             <p className="text-sm text-[var(--text-secondary)]">
               View various statistics and metrics related to the Vision Model.

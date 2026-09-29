@@ -199,7 +199,7 @@ export const navigationItems: NavigationItem[] = [
   },
   {
     id: "VisionStats",
-    label: "Vision Stats",
+    label: "Lecture Watch Statistics",
     href: "/vision-stats",
     section: "admin",
     icon: "ChartBarIcon",
