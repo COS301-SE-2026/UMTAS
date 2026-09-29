@@ -1,9 +1,9 @@
 "use client";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AdvancedMarker, Pin } from "@vis.gl/react-google-maps";
 import { Building2, ChevronDown, GitFork, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MapScreen } from "@/components/organisms/map/MapScreen";
 import { useShapeCreator } from "@/hooks/useShapeCreator";
 import { Badge } from "@/components/atoms/baseShadcn/badge";
@@ -60,6 +60,7 @@ import {
 } from "@/components/organisms/map/StudentRoutes";
 import { AdminRouteDiversion } from "@/components/organisms/map/AdminRouteDiversion";
 import { NoAlternateRouteMessage } from "@/components/molecules/map/NoAlternateRouteMessage";
+import { getStudentRoutesQ } from "../../../../utilities/route/routeQueries";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -226,6 +227,11 @@ export function UniMap() {
     enabled: !isLoading && university != null && mapMode === "heatmap",
   });
 
+  const { isLoading: isRoutesLoading } = useQuery({
+    ...getStudentRoutesQ({ date: selectedDate }),
+    enabled: !isLoading && university != null && mapMode === "route",
+  });
+
   const buildingHeatmapPoints: WeightedPoint[] = useMemo(() => {
     if (mapMode !== "heatmap") {
       return [];
@@ -339,7 +345,9 @@ export function UniMap() {
     setIsBuildingSheetOpen(true);
   }
 
-  if (isLoading) return <UniversityStateLoading />;
+  if (isLoading || (isRoutesLoading && mapMode === "route")) {
+    return <UniversityStateLoading />;
+  }
 
   if (!isAssignedRole) {
     return <NoRoleSelected />;
