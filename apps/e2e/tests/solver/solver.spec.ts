@@ -19,20 +19,30 @@ test("Solver uploads", async ({ page }) => {
   const uploadBtn = page.getByTestId("btn-upload-confirm");
   const confirmEvents = page.getByTestId("confirm-solver-events");
 
-  await fileInput.setInputFiles(filePath);
-
-  // Lookup either completes from cache or enables a fresh upload after it settles.
-  await expect(
-    confirmEvents.or(uploadBtn.and(page.locator(":enabled"))),
-  ).toBeVisible();
-  if (!(await confirmEvents.isVisible())) {
-    const uploadResponse = page.waitForResponse(
+  // File selection enables Upload before lookup finishes. A cache hit then
+  // disables it while the review step loads, so branch on the lookup result.
+  const [lookupResponse] = await Promise.all([
+    page.waitForResponse(
       (response) =>
         response.request().method() === "POST" &&
-        response.url().includes("/pdf-parser/jobs/upload"),
-    );
-    await uploadBtn.click();
-    expect((await uploadResponse).ok()).toBeTruthy();
+        response.url().includes("/pdf-parser/jobs/lookup"),
+    ),
+    fileInput.setInputFiles(filePath),
+  ]);
+  expect(lookupResponse.ok()).toBeTruthy();
+  const lookup = await lookupResponse.json();
+
+  if (lookup.status !== "completed" || !lookup.moduleGroupingId) {
+    await expect(uploadBtn).toBeEnabled();
+    const [uploadResponse] = await Promise.all([
+      page.waitForResponse(
+        (response) =>
+          response.request().method() === "POST" &&
+          response.url().includes("/pdf-parser/jobs/upload"),
+      ),
+      uploadBtn.click(),
+    ]);
+    expect(uploadResponse.ok()).toBeTruthy();
   }
 
   await expect(confirmEvents).toBeVisible({
