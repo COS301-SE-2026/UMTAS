@@ -7,13 +7,11 @@ import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
-import CustomiseShellPopup from "@/components/organisms/customise/CustomiseShellPopup";
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
 import Popup from "@/components/atoms/utility/floatContainer";
 import SolverPreferences from "../solver/SolverPreferences";
-import { UserDetails } from "@/lib/userclass/userClass";
 
 let eventAdded = false;
 
@@ -89,7 +87,6 @@ export function GenerateStep({
   });
 
   const events = modules.flatMap((module) => module?.Events ?? []);
-  const isAdmin = UserDetails.getUniDetails()?.role === "UNIVERSITY_ADMIN";
 
   const filteredEvents = events.filter((event) => {
     if (!searchQuery.trim()) {
@@ -248,7 +245,7 @@ export function GenerateStep({
       <Tutorial steps={steps} wait={true} />
 
       <div className="flex flex-col gap-4">
-        <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_40px] md:items-end">
+        <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
           <div className="flex w-full flex-col gap-2">
             <Label
               htmlFor="timetable-name"
@@ -281,14 +278,6 @@ export function GenerateStep({
               className="h-10 w-full bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)]"
             />
           </div>
-
-          {isAdmin && (
-            <div className="flex w-full justify-end md:w-10 md:justify-self-end">
-              <div className="h-10 w-10 [&_button]:h-10 [&_button]:w-10 [&_button]:p-0 [&_svg]:h-4 [&_svg]:w-4">
-                <CustomiseShellPopup />
-              </div>
-            </div>
-          )}
         </div>
 
         <div
@@ -314,7 +303,7 @@ export function GenerateStep({
             : selectedEventIds.length === 0
               ? "Select At Least One Event"
               : isEditMode
-                ? "Edit Timetable"
+                ? "Save Timetable"
                 : "Generate Timetable"}
         </Button>
 
