@@ -1,7 +1,7 @@
 "use client";
 
-import React, { Suspense, useState, useCallback } from "react";
-import { Separator } from "@/components/atoms/baseShadcn/separator";
+import React, { Suspense, useCallback, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ScheduleHeader } from "@/components/molecules/viewTimetable/ScheduleHeader";
 import { ScheduleView } from "@/components/organisms/viewTimetable/ScheduleView";
 import Tutorial from "@/components/organisms/nav/Tutorial";
@@ -20,37 +20,40 @@ const steps = [
 ];
 
 export default function SchedulesPage() {
+  const router = useRouter();
   const [eventCount, setEventCount] = useState(0);
   const [moduleCount, setModuleCount] = useState(0);
+  const [isGenerateMode, setIsGenerateMode] = useState(false);
+  const exportRef = useRef<() => void>(() => {});
 
-  const exportRef = React.useRef<(() => void) | null>(null);
-
-  const handleExportReady = useCallback((fn: () => void) => {
-    exportRef.current = fn;
+  const handleExportReady = useCallback((exportFn: () => void) => {
+    exportRef.current = exportFn;
   }, []);
 
-  function handleExport() {
-    exportRef.current?.();
-  }
+  const handleExport = useCallback(() => {
+    exportRef.current();
+  }, []);
 
   return (
     <>
       <Tutorial steps={steps} wait={true} />
 
-      <div className="bg-[var(--bg-base)] flex flex-col min-h-[calc(100vh-56px)]">
-        <div id="schedule-header">
+      <div className="w-full min-h-screen bg-[var(--bg-base)]">
+        <div id="schedule-header" className="pt-6">
           <ScheduleHeader
             eventCount={eventCount}
             moduleCount={moduleCount}
             onExport={handleExport}
+            isGenerateMode={isGenerateMode}
+            onBack={() => router.push("/builder")}
           />
         </div>
 
         <div className="px-8 py-6">
-          <div id="schedule-view" className="mx-auto max-w-6xl">
+          <div id="schedule-view" className="mx-auto w-full max-w-6xl">
             <Suspense
               fallback={
-                <div className="py-12 text-sm text-[var(--text-secondary)]">
+                <div className="text-sm text-[var(--text-secondary)]">
                   Loading schedule...
                 </div>
               }
@@ -59,6 +62,7 @@ export default function SchedulesPage() {
                 onEventCountChange={setEventCount}
                 onModuleCountChange={setModuleCount}
                 onExportReady={handleExportReady}
+                onGenerateModeChange={setIsGenerateMode}
               />
             </Suspense>
           </div>
