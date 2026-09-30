@@ -1,7 +1,6 @@
 "use client";
 
 import React, { Suspense, useCallback, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { ScheduleHeader } from "@/components/molecules/viewTimetable/ScheduleHeader";
 import { ScheduleView } from "@/components/organisms/viewTimetable/ScheduleView";
 import Tutorial from "@/components/organisms/nav/Tutorial";
@@ -20,18 +19,26 @@ const steps = [
 ];
 
 export default function SchedulesPage() {
-  const router = useRouter();
   const [eventCount, setEventCount] = useState(0);
   const [moduleCount, setModuleCount] = useState(0);
   const [isGenerateMode, setIsGenerateMode] = useState(false);
   const exportRef = useRef<() => void>(() => {});
+  const generateBackRef = useRef<() => void>(() => {});
 
   const handleExportReady = useCallback((exportFn: () => void) => {
     exportRef.current = exportFn;
   }, []);
 
+  const handleGenerateBackReady = useCallback((backFn: () => void) => {
+    generateBackRef.current = backFn;
+  }, []);
+
   const handleExport = useCallback(() => {
     exportRef.current();
+  }, []);
+
+  const handleBack = useCallback(() => {
+    generateBackRef.current();
   }, []);
 
   return (
@@ -45,7 +52,7 @@ export default function SchedulesPage() {
             moduleCount={moduleCount}
             onExport={handleExport}
             isGenerateMode={isGenerateMode}
-            onBack={() => router.push("/builder")}
+            onBack={handleBack}
           />
         </div>
 
@@ -63,6 +70,7 @@ export default function SchedulesPage() {
                 onModuleCountChange={setModuleCount}
                 onExportReady={handleExportReady}
                 onGenerateModeChange={setIsGenerateMode}
+                onGenerateBackReady={handleGenerateBackReady}
               />
             </Suspense>
           </div>

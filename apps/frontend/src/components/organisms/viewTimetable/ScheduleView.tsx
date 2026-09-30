@@ -119,6 +119,7 @@ interface ScheduleViewProps {
   onModuleCountChange: (count: number) => void;
   onExportReady: (exportFn: () => void) => void;
   onGenerateModeChange: (isGenerateMode: boolean) => void;
+  onGenerateBackReady: (backFn: () => void) => void;
 }
 
 export function ScheduleView({
@@ -126,6 +127,7 @@ export function ScheduleView({
   onModuleCountChange,
   onExportReady,
   onGenerateModeChange,
+  onGenerateBackReady,
 }: ScheduleViewProps) {
   const router = useRouter();
   const [selectedTimetableId, setSelectedTimetableId] = useState<string>("");
@@ -135,9 +137,31 @@ export function ScheduleView({
   const [viewMode, setViewMode] = useState<"Generate" | "Timetable">(
     "Timetable",
   );
+  const [generateOrigin, setGenerateOrigin] = useState<"external" | "schedule">(
+    "schedule",
+  );
+
   useEffect(() => {
     onGenerateModeChange(viewMode === "Generate");
   }, [viewMode, onGenerateModeChange]);
+
+  const handleGenerateBack = useCallback(() => {
+    if (generateOrigin === "schedule") {
+      setViewMode("Timetable");
+      return;
+    }
+
+    if (window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.push("/builder");
+  }, [generateOrigin, router]);
+
+  useEffect(() => {
+    onGenerateBackReady(handleGenerateBack);
+  }, [handleGenerateBack, onGenerateBackReady]);
   const [timetableName, setTimetableName] = useState("My New Schedule");
   const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
   const [OGeventId, setOGeventId] = useState<string[]>([]);
@@ -199,6 +223,7 @@ export function ScheduleView({
     if (actionChecker === "new") {
       const startGeneration = window.setTimeout(() => {
         setSelectedTimetableId("");
+        setGenerateOrigin("external");
         setViewMode("Generate");
         router.replace("/schedules");
       }, 0);
@@ -488,6 +513,7 @@ export function ScheduleView({
     setOGeventId([]);
     setSelectedEventIds([]);
     setIsGenerating(false);
+    setGenerateOrigin("schedule");
     setViewMode("Generate");
   }
   async function handleGenerate(name: string, selectedEventIds: string[]) {
