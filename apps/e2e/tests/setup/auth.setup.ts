@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 const authFile = "playwright/.auth/user.json";
-test.describe.configure({ mode: "serial" });
+test.use({ storageState: { cookies: [], origins: [] } });
 test("authenticate Admin", async ({ page }) => {
   await page.goto("/login");
   await page
@@ -11,8 +11,19 @@ test("authenticate Admin", async ({ page }) => {
     .getByLabel("Password", { exact: true })
     .fill(process.env.SEED_SYSTEM_ADMIN_PASSWORD ?? "Admin@UMTAS2024!");
 
+  const signInResponse = page.waitForResponse(
+    (response) =>
+      response.request().method() === "POST" &&
+      response.url().includes("/auth/sign-in/email"),
+  );
   await page.getByRole("button", { name: "Log in", exact: true }).click();
-  await page.waitForURL("**/dashboard");
+  expect((await signInResponse).ok()).toBeTruthy();
+  await expect(page).toHaveURL(/\/dashboard(?:\?.*)?$/);
+  const session = await page.request.get("/api/auth/get-session");
+  expect(session.ok()).toBeTruthy();
+  expect((await session.json()).user?.email).toBe(
+    process.env.SEED_SYSTEM_ADMIN_EMAIL ?? "system-admin@local.umtas",
+  );
   await page.getByTestId("click-avatar").click();
   const instituteDiv = page.getByTestId("dashboard-popup-div");
   await expect(instituteDiv).toBeVisible();

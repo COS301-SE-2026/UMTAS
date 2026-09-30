@@ -21,30 +21,19 @@ test("Solver uploads", async ({ page }) => {
 
   await fileInput.setInputFiles(filePath);
 
-  await expect
-    .poll(
-      async () => {
-        if (await confirmEvents.isVisible()) {
-          return "complete";
-        }
-
-        if (await uploadBtn.isEnabled()) {
-          return "upload";
-        }
-
-        return "waiting";
-      },
-      {
-        timeout: 30_000,
-      },
-    )
-    .not.toBe("waiting");
-
-  if (await uploadBtn.isEnabled()) {
+  // Lookup either completes from cache or enables a fresh upload after it settles.
+  await expect(
+    confirmEvents.or(uploadBtn.and(page.locator(":enabled"))),
+  ).toBeVisible();
+  if (!(await confirmEvents.isVisible())) {
+    const uploadResponse = page.waitForResponse(
+      (response) =>
+        response.request().method() === "POST" &&
+        response.url().includes("/pdf-parser/jobs/upload"),
+    );
     await uploadBtn.click();
+    expect((await uploadResponse).ok()).toBeTruthy();
   }
-
-  console.log("Post upload step");
 
   await expect(confirmEvents).toBeVisible({
     timeout: 60_000,

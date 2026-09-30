@@ -155,7 +155,7 @@ test('[flow:venue] manages venues and building assignments', async () => {
             const [persisted] = await context.runtime.database
               .select()
               .from(Venue)
-              .where(eq(Venue.VenueID, venue.VenueID as string))
+              .where(eq(Venue.VenueID, venue.VenueID))
               .limit(1);
 
             assert.ok(persisted, 'venue must be persisted');
@@ -163,8 +163,8 @@ test('[flow:venue] manages venues and building assignments', async () => {
             assert.equal(persisted.Capacity, payload.Capacity);
 
             return {
-              venueId: venue.VenueID as string,
-              venueName: venue.VenueName as string,
+              venueId: venue.VenueID,
+              venueName: venue.VenueName,
             };
           },
         },
@@ -206,7 +206,7 @@ test('[flow:venue] manages venues and building assignments', async () => {
 
             return {
               venueId: venue.VenueID as string,
-              venueName: venue.VenueName as string,
+              venueName: venue.VenueName,
             };
           },
         },

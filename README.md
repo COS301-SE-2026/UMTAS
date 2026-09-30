@@ -75,24 +75,19 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 </div>
 
-UMTAS automates the university timetabling lifecycle - from ingesting PDF schedules and extracting scheduling constraints through to generating timetable options. The client scale is **20,000 users per day**; the recorded load test exercises **100 concurrent virtual users**. See the [scalability requirement and evidence](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_REQUIREMENTS/#nfr-scale-1-university-scale-scheduling-workload) for the workload rationale and test limits.
+UMTAS turns a university's existing timetable into a clash-free personal timetable in your calendar, then helps on campus with attendance, walking routes and lecture insights.
 
-The system is **university-agnostic by design**: a Core-and-Adapter architecture cleanly separates the constraint-solving engine from institution-specific data formats. A new university parser is one file in the adapters package that follows the canonical contract and declares an `ADAPTER_KEY`; the parser registry discovers it without modification. The core solver uses the canonical result.
+<div align="center">
 
-<br>
+**Ingest** (PDF or university API) → **Solve** (clash-free, OR-Tools) → **Export** (.ics / Google Calendar) → **On campus** (attendance, routes, Lecture Watch) → **Insights** (stats, heat maps)
 
-<table width="100%">
-  <tr>
-    <td width="50%" valign="top">
-      <h4><img src="https://api.iconify.design/mdi/file-pdf-box.svg?color=%233B82F6" width="18" height="18" valign="middle"> The Problem</h4>
-      <p>Traditional timetabling is a multi-week manual process. Administrators juggle hundreds of constraints - venue capacities, lecturer availability, student group conflicts - in spreadsheets. A single room change cascades into hours of rescheduling.</p>
-    </td>
-    <td width="50%" valign="top">
-      <h4><img src="https://api.iconify.design/mdi/lightbulb-outline.svg?color=%233B82F6" width="18" height="18" valign="middle"> The Solution</h4>
-      <p>UMTAS ingests the university's existing PDF calendar, parses all constraints automatically, and invokes a CP-SAT constraint-programming solver to generate an optimal schedule in seconds - not weeks.</p>
-    </td>
-  </tr>
-</table>
+</div>
+
+- **Zero manual entry:** upload the PDF the university already publishes, and UMTAS extracts, solves and exports everything.
+- **University-agnostic:** each institution plugs in through a small adapter. UP works through its PDFs and the University of Maryland through its API.
+- **For every role:** students, lecturers, university admins and system admins. Guests get a one-click demo account.
+- **Privacy-friendly:** attendance, heat maps and Lecture Watch use aggregate numbers, not personal footage or class lists.
+- **Built-in help:** interactive Joyride tours on most pages (Help section of the top nav bar), a user manual and an FAQ.
 
 ---
 
@@ -174,7 +169,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 <br>
 
 <details>
-<summary><strong>Landing Page + Help Menu</strong> &nbsp;-&nbsp; 10 marks</summary>
+<summary><strong>Landing Page + Help Menu (Joyride tours)</strong> &nbsp;-&nbsp; 10 marks</summary>
 
 <br>
 
@@ -182,9 +177,9 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 [![Landing Page](https://img.shields.io/badge/Landing_Page-14532d?style=for-the-badge)](https://capstone-vigil.dns.net.za/)
 
-[![Help Menu Tutorial](https://img.shields.io/badge/Help_Menu_Tutorial-14532d?style=for-the-badge)](https://capstone-vigil.dns.net.za/tutorial)
-
 </div>
+
+> **Where is the Help Menu?** Log in and open the **Help** section of the top navigation bar. **Run Tutorial for this Page** starts an interactive guided tour ([Joyride](https://react-joyride.com/)) of the page you are on, and **How to use the Help Menu** walks through the Command-K palette. The tours are separate from the [User Manual](https://cos301-se-2026.github.io/UMTAS/latest/management/UserManual/) below.
 
 </details>
 
