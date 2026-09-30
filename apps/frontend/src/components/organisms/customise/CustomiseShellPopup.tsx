@@ -10,16 +10,22 @@ import {
 } from "@/components/atoms/baseShadcn/dialog";
 
 import { useQuery } from "@tanstack/react-query";
-import { getAllModulesQ } from "@/components/templates/builder/Queries/moduleQueries";
-import { getAllEventsQ } from "@/components/templates/builder/Queries/eventQueries";
 import { SquarePen } from "lucide-react";
+import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
 
 export default function CustomiseShellPopup() {
-  const { data: modules, isLoading: modulesLoading } =
-    useQuery(getAllModulesQ());
-  const { data: events, isLoading: eventsLoading } = useQuery(getAllEventsQ());
+  const { data: modules = [], isLoading } = useQuery({
+    queryKey: ["ModulesV2"],
+    queryFn: async () => {
+      const result = await fetchAllModulesv2({
+        userEnrollment: true,
+      });
 
-  const isLoading = modulesLoading || eventsLoading;
+      return result.modules;
+    },
+  });
+
+  const events = modules.flatMap((module) => module.Events ?? []);
 
   return (
     <div className="">

@@ -32,7 +32,6 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 import { resolveScheduleEvents } from "@/lib/scheduleUtils";
-
 import {
   downloadICS,
   generateAcademicCalendarICS,
@@ -80,6 +79,7 @@ import { GoogleIcon } from "@/components/atoms/auth/GoogleIcon";
 import { errorName } from "../../../../utilities/errorCries";
 
 const CALENDAR_TIMEZONE = "Africa/Johannesburg";
+
 const GOOGLE_CALENDAR_EXPORT_TIMEOUT_MS = 60_000;
 
 const emptySteps = [
@@ -118,15 +118,18 @@ interface ScheduleViewProps {
   onEventCountChange: (count: number) => void;
   onModuleCountChange: (count: number) => void;
   onExportReady: (exportFn: () => void) => void;
+  onGenerateModeChange: (isGenerateMode: boolean) => void;
+  onGenerateBackReady: (backFn: () => void) => void;
 }
 
 export function ScheduleView({
   onEventCountChange,
   onModuleCountChange,
   onExportReady,
+  onGenerateModeChange,
+  onGenerateBackReady,
 }: ScheduleViewProps) {
   const router = useRouter();
-
   const [selectedTimetableId, setSelectedTimetableId] = useState<string>("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -134,22 +137,43 @@ export function ScheduleView({
   const [viewMode, setViewMode] = useState<"Generate" | "Timetable">(
     "Timetable",
   );
+  const [generateOrigin, setGenerateOrigin] = useState<"external" | "schedule">(
+    "schedule",
+  );
 
+  useEffect(() => {
+    onGenerateModeChange(viewMode === "Generate");
+  }, [viewMode, onGenerateModeChange]);
+
+  const handleGenerateBack = useCallback(() => {
+    if (generateOrigin === "schedule") {
+      setViewMode("Timetable");
+      return;
+    }
+
+    if (window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.push("/builder");
+  }, [generateOrigin, router]);
+
+  useEffect(() => {
+    onGenerateBackReady(handleGenerateBack);
+  }, [handleGenerateBack, onGenerateBackReady]);
   const [timetableName, setTimetableName] = useState("My New Schedule");
   const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
   const [OGeventId, setOGeventId] = useState<string[]>([]);
   const searchParams = useSearchParams();
   const actionChecker = searchParams.get("action");
-
   const { mutateAsync: addTimetable } = useMutation(addTimetableMut());
   const { mutateAsync: updateTimetable } = useMutation(updateTimetableMut());
-
   const [exportingTo, setExportingTo] = useState<"ics" | "google" | null>(null);
   const exportInProgress = useRef(false);
   const handledConsentReturn = useRef(false);
   const [isGoogleDialogOpen, setIsGoogleDialogOpen] = useState(false);
   const [googleDialogTimetableId, setGoogleDialogTimetableId] = useState("");
-
   const showNotice = useCallback((message: string) => {
     window.dispatchEvent(
       new CustomEvent(errorName, {
@@ -159,7 +183,6 @@ export function ScheduleView({
       }),
     );
   }, []);
-
   const { data: allModules = [], isLoading: isLoadingModules } = useQuery({
     queryKey: ["Modules", "Courses"],
     queryFn: async () => {
@@ -169,10 +192,8 @@ export function ScheduleView({
       return result.modules;
     },
   });
-
   const { data: timetables = [], isLoading: isLoadingTimetables } =
     useQuery(getAllTimetablesQ());
-
   const {
     data: hasGoogleCalendarAccess,
     isLoading: isLoadingGoogleCalendarAccess,
@@ -182,11 +203,8 @@ export function ScheduleView({
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
-
   const { mutate: deleteTimetable } = useMutation(removeTimetableMut());
-
   const isLoading = isLoadingModules || isLoadingTimetables;
-
   useEffect(() => {
     if (
       timetables.length > 0 &&
@@ -201,57 +219,46 @@ export function ScheduleView({
       return () => window.clearTimeout(selectTimetable);
     }
   }, [timetables, selectedTimetableId, viewMode]);
-
   useEffect(() => {
     if (actionChecker === "new") {
       const startGeneration = window.setTimeout(() => {
         setSelectedTimetableId("");
+        setGenerateOrigin("external");
         setViewMode("Generate");
         router.replace("/schedules");
       }, 0);
       return () => window.clearTimeout(startGeneration);
     }
   }, [actionChecker, router]);
-
   const { events, modules } = useMemo(() => {
     if (!selectedTimetableId) {
       return { events: [], modules: [] };
     }
-
     const selectedTT = timetables.find(
       (tt) => tt.timetable.timetableID === selectedTimetableId,
     );
-
     if (selectedTT) {
       const activeEvents = selectedTT.events;
-
       const activeModuleIds = activeEvents
         .map((e) => e.eventCriteria?.moduleId)
         .filter(Boolean);
-
       const activeModules = allModules.filter((m) =>
         activeModuleIds.includes(m.moduleID),
       );
-
       return { events: activeEvents, modules: activeModules };
     }
-
     return { events: [], modules: [] };
   }, [selectedTimetableId, timetables, allModules]);
-
   const resolvedEvents = useMemo(
     () => resolveScheduleEvents(events, modules),
     [events, modules],
   );
-
   useEffect(() => {
     onModuleCountChange(modules.length);
     onEventCountChange(events.length);
   }, [modules.length, events.length, onModuleCountChange, onEventCountChange]);
-
   const exportToICS = useCallback(async () => {
     if (!selectedTimetableId || exportInProgress.current) return;
-
     exportInProgress.current = true;
     setExportingTo("ics");
     try {
@@ -269,11 +276,9 @@ export function ScheduleView({
       setExportingTo(null);
     }
   }, [selectedTimetableId, showNotice]);
-
   const exportToGoogleCalendar = useCallback(
     async (timetableId = selectedTimetableId) => {
       if (!timetableId || exportInProgress.current) return;
-
       exportInProgress.current = true;
       setExportingTo("google");
       try {
@@ -284,14 +289,12 @@ export function ScheduleView({
           () => exportController.abort(),
           GOOGLE_CALENDAR_EXPORT_TIMEOUT_MS,
         );
-
         try {
           const result = await syncToGoogleCalendar(payload, {
             accessToken: token.accessToken,
             timezone: CALENDAR_TIMEZONE,
             signal: exportController.signal,
           });
-
           if (result.failed.length > 0) {
             showNotice(
               `UMTAS Calendar exported with ${result.failed.length} failed event${result.failed.length === 1 ? "" : "s"}.`,
@@ -323,7 +326,6 @@ export function ScheduleView({
           }
           return;
         }
-
         showNotice("Could not export this timetable to Google Calendar.");
       } finally {
         exportInProgress.current = false;
@@ -332,15 +334,12 @@ export function ScheduleView({
     },
     [selectedTimetableId, showNotice],
   );
-
   const handleGoogleCalendarExport = useCallback(() => {
     setGoogleDialogTimetableId(selectedTimetableId);
     setIsGoogleDialogOpen(true);
   }, [selectedTimetableId]);
-
   const connectGoogleCalendar = useCallback(async () => {
     if (!googleDialogTimetableId || exportInProgress.current) return;
-
     exportInProgress.current = true;
     setExportingTo("google");
     const returnUrl = new URL(window.location.href);
@@ -348,7 +347,6 @@ export function ScheduleView({
       "calendarExportTimetable",
       googleDialogTimetableId,
     );
-
     try {
       await startCalendarConsent(
         `${returnUrl.pathname}${returnUrl.search}${returnUrl.hash}`,
@@ -359,7 +357,6 @@ export function ScheduleView({
       setExportingTo(null);
     }
   }, [googleDialogTimetableId, showNotice]);
-
   const confirmGoogleCalendarExport = useCallback(
     async (timetableId: string) => {
       await exportToGoogleCalendar(timetableId);
@@ -367,25 +364,21 @@ export function ScheduleView({
     },
     [exportToGoogleCalendar],
   );
-
   useEffect(() => {
     onExportReady(() => {
       void exportToICS();
     });
   }, [exportToICS, onExportReady]);
-
   useEffect(() => {
     const consentStatus = searchParams.get("calendarConsent");
     if (!consentStatus || handledConsentReturn.current) return;
     handledConsentReturn.current = true;
-
     const timetableId =
       searchParams.get("calendarExportTimetable") ?? selectedTimetableId;
     const cleanedParams = new URLSearchParams(searchParams.toString());
     cleanedParams.delete("calendarConsent");
     cleanedParams.delete("calendarExportTimetable");
     const cleanedUrl = `${window.location.pathname}${cleanedParams.size ? `?${cleanedParams}` : ""}`;
-
     if (consentStatus === "granted") {
       const resumeExport = window.setTimeout(() => {
         void exportToGoogleCalendar(timetableId).finally(() => {
@@ -407,7 +400,6 @@ export function ScheduleView({
     selectedTimetableId,
     showNotice,
   ]);
-
   const currentWeekStart = useMemo(() => {
     const date = new Date(selectedDate);
     const day = date.getDay();
@@ -416,7 +408,6 @@ export function ScheduleView({
     date.setHours(0, 0, 0, 0);
     return date;
   }, [selectedDate]);
-
   function handlePrevWeek() {
     setSelectedDate((prev) => {
       const date = new Date(prev);
@@ -424,7 +415,6 @@ export function ScheduleView({
       return date;
     });
   }
-
   function handleNextWeek() {
     setSelectedDate((prev) => {
       const date = new Date(prev);
@@ -432,7 +422,6 @@ export function ScheduleView({
       return date;
     });
   }
-
   function renderLoadingSkeleton() {
     return (
       <div className="flex flex-col gap-3">
@@ -448,7 +437,6 @@ export function ScheduleView({
       </div>
     );
   }
-
   if (isLoading) {
     return renderLoadingSkeleton();
   }
@@ -459,11 +447,9 @@ export function ScheduleView({
         className="flex flex-col items-center gap-4 py-20 text-center"
       >
         <Tutorial steps={emptySteps} wait={true} />
-
         <p className="text-base text-[var(--text-secondary)]">
           No timetables found.
         </p>
-
         <div className="flex items-center justify-center gap-3">
           <button
             id="ref-go-to-builder"
@@ -472,9 +458,7 @@ export function ScheduleView({
           >
             Go to generator
           </button>
-
           <span className="text-sm text-[var(--text-secondary)]">or</span>
-
           <Link
             id="ref-go-to-solver"
             href="/solver"
@@ -486,84 +470,67 @@ export function ScheduleView({
       </div>
     );
   }
-
   function deleteDialog() {
     if (!selectedTimetableId) {
       return;
     }
-
     setIsDeleteDialogOpen(true);
   }
-
   async function deleteTimetableByID() {
     setIsDeleteDialogOpen(false);
-
     if (!selectedTimetableId) return;
-
     deleteTimetable(selectedTimetableId, {
       onSuccess: () => {
         setSelectedTimetableId("");
         setSelectedDate(new Date());
       },
-
       onError: (error) => {
         console.error("error while deleting timetable", error);
       },
     });
   }
-
   async function editTimetable() {
     if (!selectedTimetableId) return;
-
     try {
       const queryClient = getQueryClient();
       const timetableRes = await queryClient.fetchQuery(
         getTimetableByIdQ(selectedTimetableId),
       );
-
       setTimetableName(
         timetableRes.timetable.timetableName || "Updated Schedule",
       );
-
       setOGeventId((timetableRes.eventIds || []).map(String));
       setSelectedEventIds((timetableRes.eventIds || []).map(String));
-
       setIsGenerating(false);
-
       setViewMode("Generate");
     } catch (error) {
       console.error("edit timetable error", error);
     }
   }
-
   function createTimetable() {
     setSelectedTimetableId("");
     setTimetableName("My New Schedule");
     setOGeventId([]);
     setSelectedEventIds([]);
     setIsGenerating(false);
+    setGenerateOrigin("schedule");
     setViewMode("Generate");
   }
-
   async function handleGenerate(name: string, selectedEventIds: string[]) {
     if (name == "BACK" && selectedEventIds.length == 0) {
       setViewMode("Timetable");
       return;
     }
-
     setIsGenerating(true);
     try {
       const finalEvents = selectedEventIds.map((id) => id);
-
       if (selectedTimetableId != "") {
         const noNumIds = OGeventId.filter(
           (id) => !selectedEventIds.includes(id),
         );
-
         const numbersOnlyAddIds = selectedEventIds.filter(
           (id) => !OGeventId.includes(id),
         );
-
         await updateTimetable({
           path: { id: selectedTimetableId },
           body: {
@@ -580,20 +547,16 @@ export function ScheduleView({
           },
         });
       }
-
       const queryClient = getQueryClient();
-
       await queryClient.invalidateQueries({
         queryKey: getAllTimetablesQ().queryKey,
       });
-
       setViewMode("Timetable");
     } catch (error) {
       console.error("Failed to generate timetable:", error);
       setIsGenerating(false);
     }
   }
-
   function renderView() {
     if (viewMode === "Generate") {
       return (
@@ -609,11 +572,9 @@ export function ScheduleView({
         />
       );
     }
-
     return (
       <>
         <Tutorial steps={steps} wait={true} />
-
         <div
           data-testid="schedules-Calendar-Div"
           className="flex flex-col gap-3"
@@ -723,7 +684,6 @@ export function ScheduleView({
                       Create Timetable
                       <CalendarPlus />
                     </DropdownMenuItem>
-
                     <DropdownMenuItem
                       aria-label="Edit Timetable"
                       id="edit-item"
@@ -733,7 +693,6 @@ export function ScheduleView({
                       Edit Timetable
                       <SquarePen />
                     </DropdownMenuItem>
-
                     <DropdownMenuItem
                       aria-label="Delete Timetable"
                       id="delete-item"
@@ -749,7 +708,6 @@ export function ScheduleView({
               </div>
             </div>
           </div>
-
           {!currentWeekStart || events.length === 0 ? (
             <EmptySchedule />
           ) : (
@@ -796,7 +754,6 @@ export function ScheduleView({
                           <span className="hidden sm:inline">
                             Save to Google Calendar
                           </span>
-
                           <span className="sm:hidden">Google Calendar</span>
                         </>
                       )}
@@ -815,7 +772,6 @@ export function ScheduleView({
                   >
                     <CalendarPlus />
                   </Button>
-
                   <Button
                     aria-label="Edit Timetable"
                     id="btn-edit"
@@ -827,7 +783,6 @@ export function ScheduleView({
                   >
                     <SquarePen />
                   </Button>
-
                   <Button
                     aria-label="Delete Timetable"
                     id="btn-delete"
@@ -872,10 +827,8 @@ export function ScheduleView({
                   (day, index) => {
                     const date = new Date(currentWeekStart);
                     date.setDate(currentWeekStart.getDate() + index);
-
                     const selected =
                       date.toDateString() === selectedDate.toDateString();
-
                     return (
                       <Button
                         key={day}
@@ -901,14 +854,12 @@ export function ScheduleView({
       </>
     );
   }
-
   const googleSchedules: GoogleScheduleOption[] = timetables.map((tt) => ({
     id: String(tt.timetable.timetableID),
     name:
       tt.timetable.timetableName ||
       `Timetable ${String(tt.timetable.timetableID)}`,
   }));
-
   return (
     <>
       {renderView()}
