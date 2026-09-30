@@ -10,8 +10,6 @@ import {
 } from "@/components/atoms/baseShadcn/dialog";
 
 import { useQuery } from "@tanstack/react-query";
-import { getAllModulesQ } from "@/components/templates/builder/Queries/moduleQueries";
-import { getAllEventsQ } from "@/components/templates/builder/Queries/eventQueries";
 import { SquarePen } from "lucide-react";
 import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
 

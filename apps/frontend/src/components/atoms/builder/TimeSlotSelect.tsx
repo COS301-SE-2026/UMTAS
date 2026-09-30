@@ -31,10 +31,19 @@ interface TimeSlotSelectProps {
 export const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 export const TIMES: string[] = [];
+
 for (let h = 7; h <= 20; h++) {
-  TIMES.push(`${String(h).padStart(2, "0")}:00`);
-  if (h < 20) TIMES.push(`${String(h).padStart(2, "0")}:30`);
-}
+  if (h === 7) {
+    TIMES.push("07:30");
+  } else {
+    TIMES.push(`${String(h).padStart(2, "0")}:30`);
+  }
+
+  const endHour = h + 1;
+  if (endHour <= 20) {
+    TIMES.push(`${String(endHour).padStart(2, "0")}:20`);
+  }
+} //END_h
 
 const triggerClass =
   "h-8 text-xs bg-[var(--bg-elevated)] border-[var(--border)] text-[var(--text-primary)] focus:ring-1 focus:ring-[var(--text-primary)]";
