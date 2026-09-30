@@ -332,9 +332,9 @@ export function GenerateStep({
   const router = useRouter();
   const steps = [...baseSteps, ...extendedSteps];
   return (
-    <div>
+    <div className="w-full">
       <Tutorial steps={steps} wait={true} />
-      <div className="mx-auto w-full max-w-2xl px-4 py-4">
+      <div className="flex w-full justify-end py-4">
         <Button
           type="button"
           variant="ghost"
@@ -342,13 +342,13 @@ export function GenerateStep({
           onClick={() => router.push("/builder")}
           className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)]"
         >
-          <ArrowLeft size={16} strokeWidth={1.5} />
+          <ArrowLeft size={16} strokeWidth={2} />
           Back
         </Button>
       </div>
       <div
         data-testid="create-Schedule-Div"
-        className="mx-auto w-full max-w-2xl px-4 py-4 border rounded-xl border-[var(--border)] bg-[var(--bg-surface)]"
+        className="w-full px-4 py-4 border rounded-xl border-[var(--border)] bg-[var(--bg-surface)]"
       >
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-[var(--text-primary)]">
