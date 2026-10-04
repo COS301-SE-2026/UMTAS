@@ -1,0 +1,14 @@
+infra/traefik/traefik.yml
+  h_2d4b3dca70a3d8 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "db37045f1a98ca471b3e25bc14c8ee0fbf6438a7",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
