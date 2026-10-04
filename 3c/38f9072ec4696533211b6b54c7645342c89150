@@ -1,0 +1,28 @@
+apps/frontend/src/app/VisionModel/setup/page.tsx
+  h_2d4b3dca70a3d8 25-26,30,34,37-52,223-225,227,231,235,240-242,310
+apps/frontend/src/components/organisms/VisionModel/CameraCanvas.tsx
+  h_2d4b3dca70a3d8 12,120,129,141,155,224,380,411
+apps/frontend/src/components/templates/VisionModel/SessionTemplate.tsx
+  h_2d4b3dca70a3d8 25,27,59,262,269,437-489
+apps/frontend/utilities/VisionModel/detectionManager.ts
+  h_2d4b3dca70a3d8 5,27,56
+apps/frontend/utilities/VisionModel/messageTypes.ts
+  h_2d4b3dca70a3d8 18-19,24
+apps/frontend/utilities/VisionModel/modelWorker.ts
+  h_2d4b3dca70a3d8 12,18-29,34-35,84
+apps/frontend/utilities/VisionModel/pose_manager.ts
+  h_2d4b3dca70a3d8 1-6,27,56
+apps/frontend/utilities/VisionModel/pose_worker.ts
+  h_2d4b3dca70a3d8 8,14-25,30-31,80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "3c38f9072ec4696533211b6b54c7645342c89150",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
