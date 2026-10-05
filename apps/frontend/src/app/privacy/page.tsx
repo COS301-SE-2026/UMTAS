@@ -10,15 +10,6 @@ import {
 } from "@/components/atoms/baseShadcn/table";
 import { LimitedUseNotice } from "@/components/molecules/legal/LimitedUseNotice";
 import { LegalPageTemplate } from "@/components/templates/legal/LegalPageTemplate";
-import {
-  CONTACT_EMAIL,
-  GOOGLE_PERMISSIONS_URL,
-  INFORMATION_OFFICER,
-  RETENTION_ANALYTICS,
-  RETENTION_BACKUPS,
-  RETENTION_INACTIVE_ACCOUNTS,
-  RETENTION_LOGS_AND_METRICS,
-} from "@/lib/legal/legalConfig";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -42,9 +33,8 @@ export default function PrivacyPage() {
         </p>
         <p>
           For questions about this policy, contact us at{" "}
-          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Our
-          Information Officer under the Protection of Personal Information Act 4
-          of 2013 (POPIA) is {INFORMATION_OFFICER}.
+          <a href="mailto:vigil.cs2025@gmail.com">vigil.cs2025@gmail.com</a>.
+          Please use this address for Information Officer enquiries.
         </p>
       </section>
 
@@ -331,10 +321,22 @@ export default function PrivacyPage() {
             Google tokens: kept until you remove Google Calendar access or
             delete your account.
           </li>
-          <li>Logs and metrics: {RETENTION_LOGS_AND_METRICS}.</li>
-          <li>Analytics: {RETENTION_ANALYTICS}.</li>
-          <li>Backups: {RETENTION_BACKUPS}.</li>
-          <li>Inactive accounts: {RETENTION_INACTIVE_ACCOUNTS}.</li>
+          <li>
+            Logs and metrics: a fixed retention period has not been published;
+            contact us for details.
+          </li>
+          <li>
+            Analytics: a fixed retention period has not been published; contact
+            us for details.
+          </li>
+          <li>
+            Backups: a fixed retention period has not been published; contact us
+            for details.
+          </li>
+          <li>
+            Inactive accounts: a fixed retention period has not been published;
+            contact us for details.
+          </li>
         </ul>
       </section>
 
@@ -356,7 +358,7 @@ export default function PrivacyPage() {
         </ul>
         <p>
           To make a request, email us at{" "}
-          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+          <a href="mailto:vigil.cs2025@gmail.com">vigil.cs2025@gmail.com</a>.
         </p>
       </section>
 
@@ -367,12 +369,14 @@ export default function PrivacyPage() {
           your account, from <Link href="/account">Account settings</Link>.
           Removing access asks Google to revoke the tokens we hold. Deleting
           your account removes your personal records from UMTAS, including your
-          uploaded PDFs, and also revokes Google access.
+          uploaded PDFs. File cleanup is retried if storage is unavailable. We
+          also attempt to revoke Google access; if Google is unavailable, you
+          can remove access through Google Account permissions below.
         </p>
         <p>
           You can also review and remove UMTAS&apos;s access at any time in your{" "}
           <a
-            href={GOOGLE_PERMISSIONS_URL}
+            href="https://myaccount.google.com/permissions"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -416,8 +420,8 @@ export default function PrivacyPage() {
         <h2>12. Contact</h2>
         <p>
           Questions about this policy or your information? Email{" "}
-          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>, addressed to
-          Team Vigil of the University of Pretoria.
+          <a href="mailto:vigil.cs2025@gmail.com">vigil.cs2025@gmail.com</a>,
+          addressed to Team Vigil of the University of Pretoria.
         </p>
       </section>
     </LegalPageTemplate>

@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     default: "UMTAS",
     template: "%s | UMTAS",
   },
-  description: "University Module Timetable Assistance System",
+  description: "University Modular Timetable & Analytics System",
 };
 
 export default async function RootLayout({
