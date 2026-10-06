@@ -1,0 +1,22 @@
+docs/sas/deployment/DeploymentDiagram.md
+  h_2d4b3dca70a3d8 9,17,25
+docs/sas/deployment/EnvironmentParity.md
+  h_2d4b3dca70a3d8 21
+docs/sas/deployment/LiveAccessibleSystem.md
+  h_2d4b3dca70a3d8 30
+docs/sas/deployment/PipelineDiagram.md
+  h_2d4b3dca70a3d8 5
+docs/srs/DOMAIN_MODEL.md
+  h_2d4b3dca70a3d8 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "12f232b4bbd951d8f297f7935c6e1f52e7b785a8",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
