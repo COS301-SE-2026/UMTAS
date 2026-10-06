@@ -1,0 +1,14 @@
+apps/frontend/src/components/molecules/customise/EditModuleCard.tsx
+  h_2d4b3dca70a3d8 113-120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "8acef9fcdeab905e05719583d80e776d2a908844",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
