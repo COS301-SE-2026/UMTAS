@@ -1,0 +1,20 @@
+apps/frontend/src/app/schedules/page.tsx
+  h_2d4b3dca70a3d8 3-4,23,26-27,29-30,33-35,41-42,47-48,53,56,65
+apps/frontend/src/components/molecules/viewTimetable/ScheduleHeader.tsx
+  h_2d4b3dca70a3d8 4,11-12,19-20,23-26,40,42,49,52-54,56-57,59-71
+apps/frontend/src/components/organisms/builder/GenerateStep.tsx
+  h_2d4b3dca70a3d8 56-58,65,78-79,91-124,138-144,146-147,149-221,225-239,244,246-248,250-267,269-283,286-290,294-298,302-319,322-323,326-329,331
+apps/frontend/src/components/organisms/viewTimetable/ScheduleView.tsx
+  h_2d4b3dca70a3d8 82,121,128,138-140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f76efd36df0aca93623e1c00d91fa179e724d20c",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
