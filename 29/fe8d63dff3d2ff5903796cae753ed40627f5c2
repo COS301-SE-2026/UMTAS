@@ -1,0 +1,14 @@
+apps/frontend/src/app/dashboard/page.tsx
+  h_2d4b3dca70a3d8 174,394
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "29fe8d63dff3d2ff5903796cae753ed40627f5c2",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
