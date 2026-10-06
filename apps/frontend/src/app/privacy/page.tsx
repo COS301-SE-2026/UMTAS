@@ -314,8 +314,9 @@ export default function PrivacyPage() {
             kept until you delete your account.
           </li>
           <li>
-            Uploaded PDFs and the records of their processing: kept until you
-            delete your account.
+            University module PDFs and shared module groupings: kept after
+            account deletion so we can recompute module groupings. Processing
+            records linked to your account are deleted with your account.
           </li>
           <li>
             Google tokens: kept until you remove Google Calendar access or
@@ -368,10 +369,11 @@ export default function PrivacyPage() {
           You can remove UMTAS&apos;s access to your Google Calendar, or delete
           your account, from <Link href="/account">Account settings</Link>.
           Removing access asks Google to revoke the tokens we hold. Deleting
-          your account removes your personal records from UMTAS, including your
-          uploaded PDFs. File cleanup is retried if storage is unavailable. We
-          also attempt to revoke Google access; if Google is unavailable, you
-          can remove access through Google Account permissions below.
+          your account removes your personal records from UMTAS. University
+          module PDFs and shared module groupings are retained so we can
+          recompute module groupings. We also attempt to revoke Google access;
+          if Google is unavailable, you can remove access through Google Account
+          permissions below.
         </p>
         <p>
           You can also review and remove UMTAS&apos;s access at any time in your{" "}
