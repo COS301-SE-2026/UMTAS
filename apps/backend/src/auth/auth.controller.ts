@@ -668,6 +668,36 @@ export class AuthController {
     return this.handleRequest(req, res);
   }
 
+  @ApiTags('Auth Google')
+  @Post('google/revoke-calendar-access')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiCookieAuth('umtas-session')
+  @ApiOperation({
+    summary: "Remove UMTAS access to the current user's Google Calendar",
+    description:
+      'Revokes the stored Google tokens at Google, clears them from UMTAS and resets the stored scopes to sign-in only. The Google account link is kept so the user can still sign in with Google.',
+    operationId: 'revokeGoogleCalendarAccess',
+  })
+  @ApiResponse({
+    status: 204,
+    description: 'Google access was revoked and the stored tokens cleared',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized',
+    type: AuthErrorDto,
+  })
+  @ApiResponse({
+    status: 502,
+    description: 'Google could not be reached or did not confirm the removal',
+    type: AuthErrorDto,
+  })
+  async revokeGoogleCalendarAccess(
+    @CurrentSession() session: SessionData,
+  ): Promise<void> {
+    await this.authService.revokeGoogleCalendarAccess(session.user.id);
+  }
+
   // ─── Admin ────────────────────────────────────────────────────────────────────
 
   @ApiTags('Auth Admin')

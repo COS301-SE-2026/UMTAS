@@ -10,6 +10,7 @@ import { isAppRole, UniRole } from './roles';
 import { getRedisClient } from '../redis/redis';
 import { ac, sysAdmin, user } from './permissions';
 import { SessionData } from './session.decorator';
+import { createBeforeDeleteUserHook } from './delete-user.hook';
 
 export type AppDatabase =
   NodePgDatabase<typeof appSchema> | PgliteDatabase<typeof appSchema>;
@@ -117,7 +118,7 @@ export function mapGoogleProfileToUser(profile: GoogleProfile): {
   return result;
 }
 
-function logAuditEvent(
+export function logAuditEvent(
   logger: LoggerService,
   event: Record<string, unknown>,
 ): void {
@@ -169,6 +170,7 @@ interface CreateAuthInput {
     name: string;
   }) => Promise<void>;
   redisUrl?: string;
+  prepareUserDeletion?: (user: { id: string; email: string }) => Promise<void>;
 }
 
 export function createAuth(input: CreateAuthInput) {
@@ -188,6 +190,7 @@ export function createAuth(input: CreateAuthInput) {
     sendResetPasswordEmail,
     sendVerificationEmail,
     redisUrl,
+    prepareUserDeletion,
   } = input;
 
   const redisClient = redisUrl ? getRedisClient() : null;
@@ -218,6 +221,23 @@ export function createAuth(input: CreateAuthInput) {
     secret,
     baseURL,
     trustedOrigins,
+    user: {
+      deleteUser: {
+        enabled: true,
+        afterDelete: async (user) => {
+          logAuditEvent(logger, {
+            action: 'user.delete',
+            targetUserId: user.id,
+          });
+        },
+        beforeDelete: createBeforeDeleteUserHook({
+          logger,
+          systemAdminUserIds,
+          prepareUserDeletion: prepareUserDeletion ?? (() => Promise.resolve()),
+          audit: logAuditEvent,
+        }),
+      },
+    },
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: true,
@@ -338,7 +358,7 @@ export function createAuth(input: CreateAuthInput) {
     session: {
       expiresIn: 60 * 60 * 24 * 7, // 7 days (reduced from 30 for classroom security)
       updateAge: 60 * 60 * 24, // Update session after 1 day of inactivity
-      freshAge: 60 * 10, // Require fresh auth for sensitive operations (10 minutes)
+      freshAge: 60 * 10,
       cookieCache: {
         enabled: true,
         maxAge: 60 * 5,
