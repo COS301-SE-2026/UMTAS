@@ -1,0 +1,18 @@
+apps/frontend/src/components/organisms/VisionModel/CameraCanvas.tsx
+  h_2d4b3dca70a3d8 53-54,57,59-64,69-100,154,321-332,341-384,398,401-402,405-409,429,432-433,436-440,459,461-464,477,480-481,485,490-558,560-561,563,566,573,577,668-669,674-676,679,687,691,702-709,712,717-772,774-780,784-790,794-800,802-806,808
+apps/frontend/src/components/organisms/attendance/AttendanceOverviewPanel.tsx
+  h_2d4b3dca70a3d8 183
+apps/frontend/src/components/templates/VisionModel/SessionTemplate.tsx
+  h_2d4b3dca70a3d8 252-253
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0c03e461116d016eb2da772b08363f2a6f7e9abe",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
