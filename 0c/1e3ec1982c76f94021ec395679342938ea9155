@@ -1,0 +1,152 @@
+.gitignore
+  h_2d4b3dca70a3d8 171
+apps/NFR/run_production_load.sh
+  h_2d4b3dca70a3d8 10
+apps/NFR/run_soak.sh
+  h_2d4b3dca70a3d8 10
+apps/e2e/Dockerfile
+  h_2d4b3dca70a3d8 10-11
+apps/e2e/e2e.compose.yml
+  h_2d4b3dca70a3d8 202,210,235
+apps/e2e/tests/CalendarManagement/CalManage.spec.ts
+  h_2d4b3dca70a3d8 142-144,399-401
+apps/e2e/tests/solver/solver.spec.ts
+  h_2d4b3dca70a3d8 11,19-20,30
+docker-bake.hcl
+  h_2d4b3dca70a3d8 37-93
+docker/frontend/frontend.Dockerfile
+  h_2d4b3dca70a3d8 18-36
+docs/evidence/nfr/API_ADAPTER_CASE_STUDY.md
+  h_2d4b3dca70a3d8 1,5,11,13,19,21-27,31-34,36,39,43,49,55,57,61,63,69-72,78,80-82,84,86-87,93,95-99,105,107-109,111,117,119,125,127
+docs/evidence/nfr/Availability.md
+  h_2d4b3dca70a3d8 3
+docs/evidence/nfr/NON-FUNCTIONAL_TESTING.md
+  h_2d4b3dca70a3d8 26-27,31,52
+docs/evidence/nfr/Owasp.md
+  h_2d4b3dca70a3d8 3
+docs/evidence/nfr/records/playwright-chromium/data/f17825b705d6fc50a3063a23f48c2813b2101cf6.md
+  h_2d4b3dca70a3d8 1-171
+docs/evidence/nfr/records/playwright-chromium/data/ff1f2410ee588ca1b25448396ef9e3a3f8746aa0.md
+  h_2d4b3dca70a3d8 1-271
+docs/evidence/nfr/records/playwright-chromium/index.html
+  h_2d4b3dca70a3d8 1-90
+docs/evidence/nfr/records/playwright-chromium/trace/assets/codeMirrorModule-Ds_H_9Yq.js
+  h_2d4b3dca70a3d8 1-17783
+docs/evidence/nfr/records/playwright-chromium/trace/assets/defaultSettingsView-D31xz8zv.js
+  h_2d4b3dca70a3d8 1-37048
+docs/evidence/nfr/records/playwright-chromium/trace/assets/urlMatch-BYQrIQwR.js
+  h_2d4b3dca70a3d8 1-38
+docs/evidence/nfr/records/playwright-chromium/trace/codeMirrorModule.DYBRYzYX.css
+  h_2d4b3dca70a3d8 1-423
+docs/evidence/nfr/records/playwright-chromium/trace/defaultSettingsView.BDKsFU3c.css
+  h_2d4b3dca70a3d8 1-4581
+docs/evidence/nfr/records/playwright-chromium/trace/index.BCnMPevh.js
+  h_2d4b3dca70a3d8 1-351
+docs/evidence/nfr/records/playwright-chromium/trace/index.CzXZzn5A.css
+  h_2d4b3dca70a3d8 1-134
+docs/evidence/nfr/records/playwright-chromium/trace/index.html
+  h_2d4b3dca70a3d8 1-44
+docs/evidence/nfr/records/playwright-chromium/trace/manifest.webmanifest
+  h_2d4b3dca70a3d8 1-16
+docs/evidence/nfr/records/playwright-chromium/trace/playwright-logo.svg
+  h_2d4b3dca70a3d8 1-9
+docs/evidence/nfr/records/playwright-chromium/trace/snapshot.html
+  h_2d4b3dca70a3d8 1-10
+docs/evidence/nfr/records/playwright-chromium/trace/snapshot.v8KI4P3m.js
+  h_2d4b3dca70a3d8 1-18
+docs/evidence/nfr/records/playwright-chromium/trace/sw.bundle.js
+  h_2d4b3dca70a3d8 1-5498
+docs/evidence/nfr/records/playwright-chromium/trace/uiMode.Btcz36p_.css
+  h_2d4b3dca70a3d8 1-1458
+docs/evidence/nfr/records/playwright-chromium/trace/uiMode.C2Efnu2P.js
+  h_2d4b3dca70a3d8 1-2228
+docs/evidence/nfr/records/playwright-chromium/trace/uiMode.html
+  h_2d4b3dca70a3d8 1-18
+docs/evidence/nfr/records/playwright-chromium/trace/xtermModule.DYP7pi_n.css
+  h_2d4b3dca70a3d8 1-198
+docs/evidence/nfr/records/playwright-edge/index.html
+  h_2d4b3dca70a3d8 1-90
+docs/evidence/nfr/records/playwright-firefox/data/1244ed8c5a4ddd2b64b099bc444c71847807a3c5.md
+  h_2d4b3dca70a3d8 1-236
+docs/evidence/nfr/records/playwright-firefox/data/668bc13009c6b1c1de782cdbaf72ec781bd968a6.md
+  h_2d4b3dca70a3d8 1-236
+docs/evidence/nfr/records/playwright-firefox/data/f17825b705d6fc50a3063a23f48c2813b2101cf6.md
+  h_2d4b3dca70a3d8 1-171
+docs/evidence/nfr/records/playwright-firefox/data/ff1f2410ee588ca1b25448396ef9e3a3f8746aa0.md
+  h_2d4b3dca70a3d8 1-271
+docs/evidence/nfr/records/playwright-firefox/index.html
+  h_2d4b3dca70a3d8 1-90
+docs/evidence/nfr/records/playwright-firefox/trace/assets/codeMirrorModule-Ds_H_9Yq.js
+  h_2d4b3dca70a3d8 1-17783
+docs/evidence/nfr/records/playwright-firefox/trace/assets/defaultSettingsView-D31xz8zv.js
+  h_2d4b3dca70a3d8 1-37048
+docs/evidence/nfr/records/playwright-firefox/trace/assets/urlMatch-BYQrIQwR.js
+  h_2d4b3dca70a3d8 1-38
+docs/evidence/nfr/records/playwright-firefox/trace/codeMirrorModule.DYBRYzYX.css
+  h_2d4b3dca70a3d8 1-423
+docs/evidence/nfr/records/playwright-firefox/trace/defaultSettingsView.BDKsFU3c.css
+  h_2d4b3dca70a3d8 1-4581
+docs/evidence/nfr/records/playwright-firefox/trace/index.BCnMPevh.js
+  h_2d4b3dca70a3d8 1-351
+docs/evidence/nfr/records/playwright-firefox/trace/index.CzXZzn5A.css
+  h_2d4b3dca70a3d8 1-134
+docs/evidence/nfr/records/playwright-firefox/trace/index.html
+  h_2d4b3dca70a3d8 1-44
+docs/evidence/nfr/records/playwright-firefox/trace/manifest.webmanifest
+  h_2d4b3dca70a3d8 1-16
+docs/evidence/nfr/records/playwright-firefox/trace/playwright-logo.svg
+  h_2d4b3dca70a3d8 1-9
+docs/evidence/nfr/records/playwright-firefox/trace/snapshot.html
+  h_2d4b3dca70a3d8 1-10
+docs/evidence/nfr/records/playwright-firefox/trace/snapshot.v8KI4P3m.js
+  h_2d4b3dca70a3d8 1-18
+docs/evidence/nfr/records/playwright-firefox/trace/sw.bundle.js
+  h_2d4b3dca70a3d8 1-5498
+docs/evidence/nfr/records/playwright-firefox/trace/uiMode.Btcz36p_.css
+  h_2d4b3dca70a3d8 1-1458
+docs/evidence/nfr/records/playwright-firefox/trace/uiMode.C2Efnu2P.js
+  h_2d4b3dca70a3d8 1-2228
+docs/evidence/nfr/records/playwright-firefox/trace/uiMode.html
+  h_2d4b3dca70a3d8 1-18
+docs/evidence/nfr/records/playwright-firefox/trace/xtermModule.DYP7pi_n.css
+  h_2d4b3dca70a3d8 1-198
+docs/evidence/nfr/records/soak-partial-2026-09-29-2014/soak-report.html
+  h_2d4b3dca70a3d8 1-248
+docs/evidence/nfr/records/soak-partial-2026-09-29-2014/soak-stats_exceptions.csv
+  h_2d4b3dca70a3d8 1
+docs/evidence/nfr/records/soak-partial-2026-09-29-2014/soak-stats_failures.csv
+  h_2d4b3dca70a3d8 1-2
+docs/evidence/nfr/records/soak-partial-2026-09-29-2014/soak-stats_stats.csv
+  h_2d4b3dca70a3d8 1-28
+docs/evidence/nfr/records/soak-partial-2026-09-29-2014/soak-stats_stats_history.csv
+  h_2d4b3dca70a3d8 1-28340
+docs/evidence/nfr/records/soak-report.html
+  h_2d4b3dca70a3d8 1-248
+docs/evidence/nfr/records/soak-stats_exceptions.csv
+  h_2d4b3dca70a3d8 1
+docs/evidence/nfr/records/soak-stats_failures.csv
+  h_2d4b3dca70a3d8 1-2
+docs/evidence/nfr/records/soak-stats_stats.csv
+  h_2d4b3dca70a3d8 1-28
+docs/evidence/nfr/records/soak-stats_stats_history.csv
+  h_2d4b3dca70a3d8 1-28340
+docs/evidence/nfr/records/worker-timings.txt
+  h_2d4b3dca70a3d8 1-120
+docs/index.md
+  h_2d4b3dca70a3d8 29
+docs/sas/architecture/QUALITY_REQUIREMENT_MAPPING.md
+  h_2d4b3dca70a3d8 18,23
+docs/srs/NON-FUNCTIONAL_REQUIREMENTS.md
+  h_2d4b3dca70a3d8 7,216,225-226,228-229
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0c1e3ec1982c76f94021ec395679342938ea9155",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
