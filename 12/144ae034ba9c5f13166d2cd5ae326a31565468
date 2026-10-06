@@ -1,0 +1,14 @@
+apps/frontend/src/components/templates/VisionModel/SessionTemplate.tsx
+  h_2d4b3dca70a3d8 388,666
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "12144ae034ba9c5f13166d2cd5ae326a31565468",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
