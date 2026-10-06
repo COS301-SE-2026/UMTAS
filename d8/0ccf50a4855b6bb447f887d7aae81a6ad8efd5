@@ -1,0 +1,14 @@
+apps/e2e/tests/solver/solver.spec.ts
+  h_2d4b3dca70a3d8 3,12-13,15,19-21,24-45,48-53,59-62,67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d80ccf50a4855b6bb447f887d7aae81a6ad8efd5",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
