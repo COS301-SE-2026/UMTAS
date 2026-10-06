@@ -1,0 +1,16 @@
+apps/frontend/src/components/organisms/module-management/editModuleEvent.tsx
+  h_2d4b3dca70a3d8 288,290-292,297-299
+apps/frontend/src/components/templates/calendar-management/caltemplate.tsx
+  h_2d4b3dca70a3d8 149
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9bb78742f29a6396229badc79837f140fb62c182",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
