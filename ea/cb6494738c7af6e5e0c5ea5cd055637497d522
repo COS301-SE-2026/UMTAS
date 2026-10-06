@@ -1,0 +1,16 @@
+apps/frontend/src/app/schedules/page.tsx
+  h_2d4b3dca70a3d8 26,32-35,40-43,55,73
+apps/frontend/src/components/organisms/viewTimetable/ScheduleView.tsx
+  h_2d4b3dca70a3d8 122,130,140-143,147-164,226,516
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "eacb6494738c7af6e5e0c5ea5cd055637497d522",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
