@@ -1,0 +1,16 @@
+apps/frontend/src/components/organisms/builder/GenerateStep.tsx
+  h_2d4b3dca70a3d8 248,306
+apps/frontend/src/components/organisms/solver/SolverPreferences.tsx
+  h_2d4b3dca70a3d8 336
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "84770f02f93b47238e79e392df3c3b29d3e62789",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
