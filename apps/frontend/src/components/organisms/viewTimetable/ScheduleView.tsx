@@ -78,6 +78,9 @@ import {
 import { GoogleIcon } from "@/components/atoms/auth/GoogleIcon";
 import { errorName } from "../../../../utilities/errorCries";
 
+const PARTIAL_CONSENT_MESSAGE =
+  "UMTAS needs all three Google Calendar permissions to export your timetable. Choose Export again and keep every box ticked, or use the ICS download instead.";
+
 const CALENDAR_TIMEZONE = "Africa/Johannesburg";
 
 const GOOGLE_CALENDAR_EXPORT_TIMEOUT_MS = 60_000;
@@ -172,6 +175,13 @@ export function ScheduleView({
   const [exportingTo, setExportingTo] = useState<"ics" | "google" | null>(null);
   const exportInProgress = useRef(false);
   const handledConsentReturn = useRef(false);
+  const mounted = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
   const [isGoogleDialogOpen, setIsGoogleDialogOpen] = useState(false);
   const [googleDialogTimetableId, setGoogleDialogTimetableId] = useState("");
   const showNotice = useCallback((message: string) => {
@@ -277,7 +287,10 @@ export function ScheduleView({
     }
   }, [selectedTimetableId, showNotice]);
   const exportToGoogleCalendar = useCallback(
-    async (timetableId = selectedTimetableId) => {
+    async (
+      timetableId = selectedTimetableId,
+      { canRestartConsent = true }: { canRestartConsent?: boolean } = {},
+    ) => {
       if (!timetableId || exportInProgress.current) return;
       exportInProgress.current = true;
       setExportingTo("google");
@@ -315,6 +328,10 @@ export function ScheduleView({
           return;
         }
         if (error instanceof ConsentRequiredError) {
+          if (!canRestartConsent) {
+            showNotice(PARTIAL_CONSENT_MESSAGE);
+            return;
+          }
           const returnUrl = new URL(window.location.href);
           returnUrl.searchParams.set("calendarExportTimetable", timetableId);
           try {
@@ -379,20 +396,28 @@ export function ScheduleView({
     cleanedParams.delete("calendarConsent");
     cleanedParams.delete("calendarExportTimetable");
     const cleanedUrl = `${window.location.pathname}${cleanedParams.size ? `?${cleanedParams}` : ""}`;
-    if (consentStatus === "granted") {
-      const resumeExport = window.setTimeout(() => {
-        void exportToGoogleCalendar(timetableId).finally(() => {
-          router.replace(cleanedUrl);
-        });
-      }, 0);
-      return () => window.clearTimeout(resumeExport);
-    } else {
-      const showDeniedNotice = window.setTimeout(() => {
-        showNotice("Google Calendar access was not granted.");
-        router.replace(cleanedUrl);
-      }, 0);
-      return () => window.clearTimeout(showDeniedNotice);
+    async function finishConsent() {
+      let hasPermissions = false;
+      if (consentStatus === "granted") {
+        try {
+          hasPermissions = await hasGoogleCalendarPermissions();
+        } catch {
+          hasPermissions = false;
+        }
+      }
+      if (!mounted.current) return;
+      if (hasPermissions) {
+        await exportToGoogleCalendar(timetableId, { canRestartConsent: false });
+      } else {
+        showNotice(
+          consentStatus === "granted"
+            ? PARTIAL_CONSENT_MESSAGE
+            : "Google Calendar access was not granted.",
+        );
+      }
+      if (mounted.current) router.replace(cleanedUrl);
     }
+    void finishConsent();
   }, [
     exportToGoogleCalendar,
     router,

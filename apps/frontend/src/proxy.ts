@@ -27,6 +27,14 @@ const PUBLIC_PATHS = [
   "/dashboard",
 ];
 
+const PUBLIC_EXACT_PATHS = ["/privacy", "/terms"];
+
+function isPublicExactPath(pathname: string): boolean {
+  return PUBLIC_EXACT_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`),
+  );
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -63,6 +71,7 @@ export function proxy(request: NextRequest) {
 
   const isPublicPath =
     pathname === "/attendance/check-in" ||
+    isPublicExactPath(pathname) ||
     PUBLIC_PATHS.some((path) => pathname.startsWith(path));
 
   const isAuthApiPath = pathname.startsWith("/api/auth");
