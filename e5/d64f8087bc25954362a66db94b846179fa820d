@@ -1,0 +1,18 @@
+apps/frontend/src/components/organisms/module-management/editModuleEvent.tsx
+  h_2d4b3dca70a3d8 239-243
+apps/frontend/src/components/organisms/viewTimetable/ScheduleView.tsx
+  h_2d4b3dca70a3d8 870-892,896
+apps/frontend/src/components/organisms/viewTimetable/WeeklyGrid.tsx
+  h_2d4b3dca70a3d8 12,77-81,176-180,237
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e5d64f8087bc25954362a66db94b846179fa820d",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
