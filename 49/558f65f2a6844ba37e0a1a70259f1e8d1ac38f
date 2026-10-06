@@ -1,0 +1,18 @@
+apps/frontend/wasm-engine/src/full_session_inference.rs
+  h_2d4b3dca70a3d8 153,190-194,196-198
+apps/frontend/wasm-engine/src/pose_inference.rs
+  h_2d4b3dca70a3d8 96
+apps/frontend/wasm-engine/src/pose_parse.rs
+  h_2d4b3dca70a3d8 219
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "49558f65f2a6844ba37e0a1a70259f1e8d1ac38f",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
