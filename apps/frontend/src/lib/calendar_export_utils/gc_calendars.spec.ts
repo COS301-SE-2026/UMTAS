@@ -72,9 +72,14 @@ describe("Google calendars", () => {
 
   it("threads cancellation through calendar discovery", async () => {
     const controller = new AbortController();
+    let requestStarted!: () => void;
+    const started = new Promise<void>((resolve) => {
+      requestStarted = resolve;
+    });
     fetchMock.mockImplementation(
       (_url: string, init: RequestInit) =>
         new Promise((_resolve, reject) => {
+          requestStarted();
           if (init.signal?.aborted) {
             reject(new DOMException("aborted", "AbortError"));
             return;
@@ -88,6 +93,7 @@ describe("Google calendars", () => {
     const discovery = ensureUmtasCalendar("token", {
       signal: controller.signal,
     });
+    await started;
     controller.abort();
 
     await expect(discovery).rejects.toMatchObject({ name: "AbortError" });

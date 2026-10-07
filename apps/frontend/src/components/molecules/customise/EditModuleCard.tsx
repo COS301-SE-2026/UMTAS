@@ -110,12 +110,14 @@ export function EditModuleCard({
           <Label className="text-sm font-medium text-[var(--text-secondary)]">
             Colour
           </Label>
-          <ColourPicker
-            value={module.styling?.colour || ""}
-            onChange={(colour) => {
-              onUpdate(module.moduleID, "styling", colour);
-            }}
-          />
+          <div className="pl-1.5">
+            <ColourPicker
+              value={module.styling?.colour || ""}
+              onChange={(colour) => {
+                onUpdate(module.moduleID, "styling", colour);
+              }}
+            />
+          </div>
           {errors?.styling && (
             <p className="text-sm text-[var(--error-text)]">{errors.styling}</p>
           )}

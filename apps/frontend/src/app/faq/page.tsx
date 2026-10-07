@@ -153,6 +153,12 @@ const johanHierisDieData: helpCentreData = {
           answer:
             "Yes. Supported timetables can be exported to Google Calendar or downloaded as a calendar file.",
         },
+        {
+          id: "faq_export_3",
+          question: "How do I remove UMTAS's access to my Google Calendar?",
+          answer:
+            "Open Account settings and choose Remove Google Calendar access. You can also remove UMTAS in your Google Account permissions. The Privacy Policy explains what UMTAS can access and why.",
+        },
       ],
     },
     {
@@ -224,6 +230,12 @@ const johanHierisDieData: helpCentreData = {
           question: "How do I change my university or role?",
           answer:
             "Use Choose Institute to select your university and apply for the role you need. Some roles require approval.",
+        },
+        {
+          id: "faq_general_3",
+          question: "How do I delete my account?",
+          answer:
+            "Open Account settings and choose Delete account. You will be asked to confirm your email address, and you may need to sign in again first. The Privacy Policy explains what is deleted.",
         },
       ],
     },

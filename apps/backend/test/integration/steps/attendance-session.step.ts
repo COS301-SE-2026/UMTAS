@@ -220,6 +220,8 @@ export function attendanceSessionLifecycleStep<TPlan>(
       await db.insert(Event).values({
         eventID: overlappingEventId,
         eventName: 'Overlapping attendance event',
+        validated: true,
+        isRecurring: false,
         eventCriteria: {
           eventSource: EventSource.UNIVERSITY,
           moduleId,
@@ -370,6 +372,13 @@ export function attendanceSessionLifecycleStep<TPlan>(
 
       assert.ok(Array.isArray(operatorSlots.body.slotList));
       assert.equal(operatorSlots.body.requiresSelection, true);
+      const availableSlots = (
+        operatorSlots.body.slotList as Record<string, unknown>[]
+      ).filter((slot) => slot.state === 'AVAILABLE');
+      assert.deepEqual(
+        new Set(availableSlots.map((slot) => slot.eventID)),
+        new Set([eventId, overlappingEventId]),
+      );
       assert.equal(operatorSlots.body.currentSlot, null);
       const selectedPreference = await operatorActor.request.put(
         '/attendance/operator/preferred-event',

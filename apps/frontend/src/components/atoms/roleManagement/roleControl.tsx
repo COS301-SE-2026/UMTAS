@@ -16,9 +16,11 @@ import {
   SelectValue,
 } from "../baseShadcn/select";
 import { useState } from "react";
+import { toast } from "sonner";
 
 function isPendingRequest(row: getSingleApplication) {
   const userRole = row.role;
+
   return (
     userRole === "LECTURER_PENDING" || userRole === "UNIVERSITY_ADMIN_PENDING"
   );
@@ -29,30 +31,53 @@ interface pageProps {
 }
 
 function PendingElement({ row }: pageProps) {
-  // returns 2 buttons confirm / deny ==> runs the tanstack query
   const approveMut = useMutation(ApproveMutator());
+
   return (
-    <div className="flex justify-center ">
+    <div className="flex justify-center">
       <Button
         className="ml-5"
+        disabled={approveMut.isPending}
         onClick={() =>
-          approveMut.mutate({
-            UniversityID: row.UniversityID,
-            userId: row.UserID,
-            isApproved: true,
-          })
+          approveMut.mutate(
+            {
+              UniversityID: row.UniversityID,
+              userId: row.UserID,
+              isApproved: true,
+            },
+            {
+              onSuccess: () => {
+                toast.success("Role application approved successfully");
+              },
+              onError: () => {
+                toast.error("Failed to approve role application");
+              },
+            },
+          )
         }
       >
         Approve
       </Button>
+
       <Button
         className="ml-5"
+        disabled={approveMut.isPending}
         onClick={() =>
-          approveMut.mutate({
-            UniversityID: row.UniversityID,
-            userId: row.UserID,
-            isApproved: false,
-          })
+          approveMut.mutate(
+            {
+              UniversityID: row.UniversityID,
+              userId: row.UserID,
+              isApproved: false,
+            },
+            {
+              onSuccess: () => {
+                toast.success("Role application denied successfully");
+              },
+              onError: () => {
+                toast.error("Failed to deny role application");
+              },
+            },
+          )
         }
       >
         Deny
@@ -60,14 +85,14 @@ function PendingElement({ row }: pageProps) {
     </div>
   );
 }
+
 function RoleSelectElement({ row }: pageProps) {
-  // returns a select with all the types of roles to set a user to.
-  // Will make use of an updated endpoint
   const selectOptions = arrRolesValid;
   const [selectRole, updateRole] = useState<rolesTypeType>(row.role);
   const approveMut = useMutation(ApproveMutator());
+
   return (
-    <div className=" flex justify-center ">
+    <div className="flex justify-center">
       <Select
         defaultValue={row.role || "UNSET"}
         onValueChange={(newRole) => {
@@ -78,30 +103,40 @@ function RoleSelectElement({ row }: pageProps) {
           data-testid="select-user-role"
           id="select-role-for-the-user"
         >
-          <SelectValue placeholder="Select a Role"></SelectValue>
+          <SelectValue placeholder="Select a Role" />
         </SelectTrigger>
 
         <SelectContent>
-          {selectOptions.map((option, idx) => {
-            return (
-              <SelectItem key={idx} value={option}>
-                {formatRoleLabel(option)}
-              </SelectItem>
-            );
-          })}
+          {selectOptions.map((option, idx) => (
+            <SelectItem key={idx} value={option}>
+              {formatRoleLabel(option)}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
+
       <Button
         data-testid="update-role-btn"
         id="update-role-of-user"
         className="ml-5"
+        disabled={approveMut.isPending}
         onClick={() =>
-          approveMut.mutate({
-            UniversityID: row.UniversityID,
-            userId: row.UserID,
-            isApproved: true,
-            provdedRole: selectRole,
-          })
+          approveMut.mutate(
+            {
+              UniversityID: row.UniversityID,
+              userId: row.UserID,
+              isApproved: true,
+              provdedRole: selectRole,
+            },
+            {
+              onSuccess: () => {
+                toast.success("User role updated successfully");
+              },
+              onError: () => {
+                toast.error("Failed to update user role");
+              },
+            },
+          )
         }
       >
         Update
@@ -109,17 +144,20 @@ function RoleSelectElement({ row }: pageProps) {
     </div>
   );
 }
+
 export function formatRoleLabel(role: string) {
   return role
     .toLowerCase()
     .replaceAll("_", " ")
     .replace(/\b\w/g, (character) => character.toUpperCase());
 }
+
 export default function RoleControl({ row }: pageProps) {
   const pending = isPendingRequest(row);
+
   if (pending) {
     return <PendingElement row={row} />;
-  } else {
-    return <RoleSelectElement row={row} />;
   }
+
+  return <RoleSelectElement row={row} />;
 }

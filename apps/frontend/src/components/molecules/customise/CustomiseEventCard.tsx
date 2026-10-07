@@ -37,8 +37,12 @@ export interface EventErrors {
   venue?: string;
 }
 
+interface EventWithModule extends EventResponse {
+  module?: ModuleResponseDto;
+}
+
 interface EventCardProps {
-  event: EventResponse;
+  event: EventWithModule;
   modules: ModuleResponseDto[];
   buildings: BuildingType[];
   onUpdate: (
@@ -84,7 +88,9 @@ export function CustomiseEventCard({
   function renderModuleField() {
     return (
       <Select
-        value={String(event.eventCriteria?.moduleId || "")}
+        value={String(
+          event.eventCriteria?.moduleId || event.module?.moduleID || "",
+        )}
         onValueChange={(v) => onUpdate(event.eventId, "moduleId", v)}
         disabled={!canEdit}
       >

@@ -1,4 +1,5 @@
 import {
+  BadGatewayException,
   BadRequestException,
   Injectable,
   Logger,
@@ -6,13 +7,14 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { and, count, eq, gte, ilike, like, ne, sql } from 'drizzle-orm';
+import { decryptOAuthToken } from 'better-auth/oauth2';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { MailerService } from '../mail/mailer.service';
 import * as appSchema from '../entities';
 import { createRedisClient } from '../redis/redis';
 import type { AppDatabase, AuthInstance } from './auth';
 import { DatabaseService } from '../db/database.service';
-import { createAuth } from './auth';
+import { createAuth, logAuditEvent } from './auth';
 
 import { UniRole } from './roles';
 import { SessionData } from './session.decorator';
@@ -37,6 +39,9 @@ interface ProvisioningOptions {
   role: appSchema.RoleTypeType;
   universityName?: string;
 }
+
+const GOOGLE_REVOKE_URL = 'https://oauth2.googleapis.com/revoke';
+const GOOGLE_SIGN_IN_SCOPE = 'openid,email,profile';
 
 const MAX_GUESTS_PER_DAY = 200;
 const GUEST_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -133,6 +138,7 @@ export class AuthService implements OnModuleInit {
       useSecureCookies,
       redisUrl,
       logger: this.logger,
+      prepareUserDeletion: (user) => this.prepareUserDeletion(user),
       sendResetPasswordEmail: async ({ email, url, name }) => {
         await this.mailerService.sendResetPasswordEmail({
           email,
@@ -436,5 +442,106 @@ export class AuthService implements OnModuleInit {
       success: true,
       message: `Deleted ${deletedUsers.length} users.`,
     };
+  }
+  async revokeGoogleCalendarAccess(userId: string): Promise<void> {
+    const [account] = await this.databaseService.db
+      .select({
+        id: appSchema.accountsTable.id,
+        refreshToken: appSchema.accountsTable.refreshToken,
+        accessToken: appSchema.accountsTable.accessToken,
+      })
+      .from(appSchema.accountsTable)
+      .where(
+        and(
+          eq(appSchema.accountsTable.userId, userId),
+          eq(appSchema.accountsTable.providerId, 'google'),
+        ),
+      )
+      .limit(1);
+
+    if (!account) return;
+
+    const storedToken = account.refreshToken || account.accessToken;
+    if (storedToken) {
+      const token = await decryptOAuthToken(
+        storedToken,
+
+        (await this.getAuth().$context) as unknown as Parameters<
+          typeof decryptOAuthToken
+        >[1],
+      );
+      await this.revokeGoogleToken(token);
+    }
+
+    await this.databaseService.db
+      .update(appSchema.accountsTable)
+      .set({
+        accessToken: null,
+        refreshToken: null,
+        accessTokenExpiresAt: null,
+        refreshTokenExpiresAt: null,
+        scope: GOOGLE_SIGN_IN_SCOPE,
+        updatedAt: new Date(),
+      })
+      .where(eq(appSchema.accountsTable.id, account.id));
+
+    logAuditEvent(this.logger, {
+      action: 'account.google.revoke',
+      targetUserId: userId,
+    });
+  }
+
+  async prepareUserDeletion(user: {
+    id: string;
+    email: string;
+  }): Promise<void> {
+    try {
+      await this.revokeGoogleCalendarAccess(user.id);
+    } catch (error) {
+      this.logger.warn(
+        `Could not revoke Google access while deleting user[${user.id}]`,
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+  }
+
+  private async revokeGoogleToken(token: string): Promise<void> {
+    let response: Response;
+    try {
+      response = await fetch(GOOGLE_REVOKE_URL, {
+        method: 'POST',
+        signal: AbortSignal.timeout(5000),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ token }).toString(),
+      });
+    } catch (error) {
+      this.logger.warn(
+        'Google token revocation request failed',
+        error instanceof Error ? error.message : String(error),
+      );
+      throw new BadGatewayException(
+        'We could not reach Google to remove access. Try again, or remove UMTAS at https://myaccount.google.com/permissions.',
+      );
+    }
+
+    if (response.ok) return;
+
+    if (response.status === 400 && (await isInvalidTokenResponse(response))) {
+      return;
+    }
+
+    this.logger.warn(`Google token revocation returned ${response.status}`);
+    throw new BadGatewayException(
+      'Google did not confirm the removal of access. Try again, or remove UMTAS at https://myaccount.google.com/permissions.',
+    );
+  }
+}
+
+async function isInvalidTokenResponse(response: Response): Promise<boolean> {
+  try {
+    const payload = (await response.json()) as { error?: unknown };
+    return payload.error === 'invalid_token';
+  } catch {
+    return false;
   }
 }

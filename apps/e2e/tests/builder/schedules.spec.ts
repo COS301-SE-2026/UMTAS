@@ -44,9 +44,9 @@ test("Add Event", async ({ page }) => {
   await event.getByTestId("event-Code-Input").fill("AA");
   await event.getByTestId("event-Date-Input").fill("2026-12-30");
   await event.getByTestId("event-TimeStart-Select").click();
-  await page.getByRole("option", { name: "07:00" }).click();
-  await event.getByTestId("event-TimeEnd-Select").click();
   await page.getByRole("option", { name: "07:30" }).click();
+  await event.getByTestId("event-TimeEnd-Select").click();
+  await page.getByRole("option", { name: "08:20" }).click();
   await event.getByTestId("event-Type-Select").click();
   await page.getByRole("option").first().click();
   await event.getByTestId("event-Module-Select").click();
@@ -62,8 +62,8 @@ test("Add Event", async ({ page }) => {
   await expect(event.getByTestId("event-Code-Input")).toHaveValue("AA");
   await expect(event.getByTestId("event-Date-Input")).toHaveValue("2026-12-30");
 
-  await expect(event.getByTestId("event-TimeStart-Select")).toHaveText("07:00");
-  await expect(event.getByTestId("event-TimeEnd-Select")).toHaveText("07:30");
+  await expect(event.getByTestId("event-TimeStart-Select")).toHaveText("07:30");
+  await expect(event.getByTestId("event-TimeEnd-Select")).toHaveText("08:20");
 
   await expect(event.getByTestId("event-Type-Select")).toHaveText("Lecture");
 });
@@ -80,7 +80,7 @@ test("Update event", async ({ page }) => {
   await event.getByTestId("event-Code-Input").fill("AA");
   await event.getByTestId("event-Date-Input").fill("2026-12-30");
   await event.getByTestId("event-TimeStart-Select").click();
-  await page.getByRole("option", { name: "07:00" }).click();
+  await page.getByRole("option", { name: "07:30" }).click();
   await event.getByTestId("event-TimeEnd-Select").click();
   await page.getByRole("option", { name: "10:30" }).click();
   await event.getByTestId("event-Type-Select").click();
@@ -98,7 +98,7 @@ test("Update event", async ({ page }) => {
   await expect(event.getByTestId("event-Code-Input")).toHaveValue("AA");
   await expect(event.getByTestId("event-Date-Input")).toHaveValue("2026-12-30");
 
-  await expect(event.getByTestId("event-TimeStart-Select")).toHaveText("07:00");
+  await expect(event.getByTestId("event-TimeStart-Select")).toHaveText("07:30");
   await expect(event.getByTestId("event-TimeEnd-Select")).toHaveText("10:30");
 
   await expect(event.getByTestId("event-Type-Select")).toHaveText("Test");
@@ -109,13 +109,9 @@ test("Create schedule", async ({ page }) => {
   await page.getByTestId("builder-Next-Step").click();
   await page.getByTestId("builder-Next-Step").click(); // now on schedules edit page
 
-  const createScheduleContainer = page.getByTestId("create-Schedule-Div");
-  const TimetableNameInput = createScheduleContainer.getByTestId(
-    "schedule-Timetable-Input",
-  );
+  const TimetableNameInput = page.getByTestId("schedule-Timetable-Input");
   await TimetableNameInput.fill("TestName");
 
-  await page.waitForTimeout(1_000);
   const EventCheckBox = page
     .getByTestId("outer-schedule-div")
     .filter({ has: page.locator("p", { hasText: "AA" }) })
@@ -125,9 +121,7 @@ test("Create schedule", async ({ page }) => {
 
   await EventCheckBox.check();
 
-  const createScheduleBtn = createScheduleContainer.getByTestId(
-    "schedules-Create-Btn",
-  );
+  const createScheduleBtn = page.getByTestId("schedules-Create-Btn");
   await createScheduleBtn.click();
 
   await expect(page.getByTestId("schedules-Calendar-Div")).toBeVisible();

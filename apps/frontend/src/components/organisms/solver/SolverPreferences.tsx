@@ -333,7 +333,7 @@ export default function SolverPreferences({
             onClick={handleCreateTimetable}
             className="h-8 w-fit"
           >
-            Upload and Create Timetable
+            Solve Timetable With Preferences
           </Button>
         </div>
       </div>

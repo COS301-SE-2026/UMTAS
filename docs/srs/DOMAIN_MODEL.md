@@ -3,7 +3,7 @@
 ## Diagram 
 
 <figure markdown="span">
-  <img src="../diagrams/domain/Domain.svg" alt="Domain Diagram" width="800">
+  <img src="../../diagrams/domain/Domain.svg" alt="Domain Diagram" width="800">
 </figure>
 
 

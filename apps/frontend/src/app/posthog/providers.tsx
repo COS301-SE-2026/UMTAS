@@ -18,7 +18,8 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       tracing_headers: headers,
       capture_performance: true,
       capture_exceptions: true,
-      enable_recording_console_log: true,
+      enable_recording_console_log: false,
+      session_recording: { maskAllInputs: true },
     });
   }, []);
 
