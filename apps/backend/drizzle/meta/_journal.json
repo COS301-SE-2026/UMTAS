@@ -78,6 +78,13 @@
       "when": 1790432674271,
       "tag": "0010_VISION_TABLE",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791223200000,
+      "tag": "0011_account_deletion_cleanup",
+      "breakpoints": true
     }
   ]
 }
