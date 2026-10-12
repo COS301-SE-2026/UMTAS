@@ -14,7 +14,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions: {}
 
@@ -22,8 +22,6 @@ jobs:
   ci:
     name: Lint, Build & Test
     runs-on: ubuntu-latest
-    # environment:
-    #   name: ${{ startsWith(github.ref, 'refs/tags/v') && 'production' || 'staging' }}
     permissions:
       contents: read
       checks: write
@@ -56,6 +54,15 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Validate observability configuration and alert transitions
+        run: |
+          docker run --rm -v "$PWD/infra/prometheus:/etc/prometheus:ro" --entrypoint /bin/promtool prom/prometheus:v3.4.0 check config /etc/prometheus/prometheus.yml
+          docker run --rm -v "$PWD/infra/prometheus:/etc/prometheus:ro" --entrypoint /bin/promtool prom/prometheus:v3.4.0 test rules /etc/prometheus/alerts.test.yml
+          docker run --rm -v "$PWD/infra/alertmanager:/etc/alertmanager:ro" --entrypoint /bin/amtool prom/alertmanager:v0.28.1 check-config /etc/alertmanager/alertmanager.yml
+
+      - name: Verify deployment and rollback contracts
+        run: python3 infra/scripts/test_devops.py
 
       - name: Run Linter
         run: pnpm run lint
@@ -115,15 +122,6 @@ jobs:
           disable_search: true
           flags: unit
 
-      #When Integration tests actually contribut to coverage
-      # - name: Upload integration coverage to Codecov
-      #   uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
-      #   with:
-      #     token: ${{ secrets.CODECOV_TOKEN }}
-      #     files: apps/backend/coverage/integration/lcov.info
-      #     disable_search: true
-      #     flags: integration
-
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3
@@ -167,7 +165,10 @@ jobs:
         with:
           context: .
           file: docker/backend/backend.Dockerfile
+          build-args: APP_COMMIT=${{ github.sha }}
           push: true
+          sbom: true
+          provenance: mode=min
           tags: |
             vigilcs/umtas:backend-staging-${{ steps.tag.outputs.latest }}
             vigilcs/umtas:backend-staging-${{ steps.tag.outputs.sha }}
@@ -180,6 +181,8 @@ jobs:
           context: .
           file: docker/frontend/frontend.Dockerfile
           push: true
+          sbom: true
+          provenance: mode=min
           build-args: |
             NEXT_PUBLIC_POSTHOG_PT=${{ secrets.NEXT_PUBLIC_POSTHOG_PT }}
             NEXT_PUBLIC_POSTHOG_API_HOST=${{ secrets.NEXT_PUBLIC_POSTHOG_API_HOST}}
@@ -200,6 +203,8 @@ jobs:
           context: .
           file: docker/solver-worker/solver-worker.Dockerfile
           push: true
+          sbom: true
+          provenance: mode=min
           tags: |
             vigilcs/umtas:solver-worker-staging-${{ steps.tag.outputs.latest }}
             vigilcs/umtas:solver-worker-staging-${{ steps.tag.outputs.sha }}
@@ -212,6 +217,8 @@ jobs:
           context: .
           file: docker/pdf-parser-worker/pdf-parser-worker.Dockerfile
           push: true
+          sbom: true
+          provenance: mode=min
           tags: |
             vigilcs/umtas:pdf-parser-worker-staging-${{ steps.tag.outputs.latest }}
             vigilcs/umtas:pdf-parser-worker-staging-${{ steps.tag.outputs.sha }}
@@ -221,10 +228,13 @@ jobs:
   deploy-staging:
     runs-on: ubuntu-latest
     name: Deploy to Staging
-    needs: docker-staging
+    concurrency:
+      group: staging-deploy
+      cancel-in-progress: false
+    needs: [docker-staging, image-scan]
     if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     environment:
-      name: production
+      name: staging
     permissions: {}
     steps:
       - name: Execute deployment on server
@@ -235,14 +245,15 @@ jobs:
           username: ${{ secrets.PROD_SSH_USER }}
           key: ${{ secrets.PROD_SSH_KEY }}
           script: |
+            set -eu
             cd /opt/UMTAS
-                docker compose -p umtas-staging -f docker-compose.staging.yml stop
-                docker compose -p umtas-staging -f docker-compose.staging.yml rm -f umtas-staging-postgres-1
-                docker volume rm umtas-staging_postgres_data || true
-                docker compose -p umtas-staging -f docker-compose.staging.yml up -d --pull always umtas-staging-postgres-1
-                phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml run --rm backend node dist/db/migrate.js
-                docker compose -p umtas-staging -f docker-compose.staging.yml up -d --pull always
-                just staging-up
+            export IMAGE_TAG=${{ github.sha }}
+            IMAGE_TAG=$(printf '%s' "$IMAGE_TAG" | cut -c1-7)
+            export IMAGE_TAG
+            phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml pull
+            phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml run --rm backend node dist/db/migrate.js
+            phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml up -d --wait --wait-timeout 180
+            python3 infra/scripts/verify-deployment.py https://staging.capstone-vigil.dns.net.za "staging-$IMAGE_TAG"
 
   docker-release:
     name: Build & Push Release Images
@@ -280,7 +291,10 @@ jobs:
         with:
           context: .
           file: docker/backend/backend.Dockerfile
+          build-args: APP_COMMIT=${{ github.sha }}
           push: true
+          sbom: true
+          provenance: mode=min
           tags: |
             vigilcs/umtas:backend-${{ steps.tag.outputs.release }}
             vigilcs/umtas:backend-${{ steps.tag.outputs.sha }}
@@ -293,10 +307,12 @@ jobs:
           context: .
           file: docker/frontend/frontend.Dockerfile
           push: true
+          sbom: true
+          provenance: mode=min
           build-args: |
             NEXT_PUBLIC_POSTHOG_PT=${{ secrets.NEXT_PUBLIC_POSTHOG_PT }}
             NEXT_PUBLIC_POSTHOG_API_HOST=${{ secrets.NEXT_PUBLIC_POSTHOG_API_HOST}}
-            NEXT_PUBLIC_APP_ENV=staging
+            NEXT_PUBLIC_APP_ENV=production
             NEXT_PUBLIC_API_URL=https://capstone-vigil.dns.net.za/api
             NEXT_PUBLIC_MAP_KEY=${{ secrets.NEXT_PUBLIC_MAP_KEY }}
             NEXT_PUBLIC_MAP_ID=${{ secrets.NEXT_PUBLIC_MAP_ID }}
@@ -313,6 +329,8 @@ jobs:
           context: .
           file: docker/solver-worker/solver-worker.Dockerfile
           push: true
+          sbom: true
+          provenance: mode=min
           tags: |
             vigilcs/umtas:solver-worker-${{ steps.tag.outputs.release }}
             vigilcs/umtas:solver-worker-${{ steps.tag.outputs.sha }}
@@ -325,15 +343,55 @@ jobs:
           context: .
           file: docker/pdf-parser-worker/pdf-parser-worker.Dockerfile
           push: true
+          sbom: true
+          provenance: mode=min
           tags: |
             vigilcs/umtas:pdf-parser-worker-${{ steps.tag.outputs.release }}
             vigilcs/umtas:pdf-parser-worker-${{ steps.tag.outputs.sha }}
           cache-from: type=gha,scope=pdf-parser-release
           cache-to: type=gha,mode=max,scope=pdf-parser-release
 
+  image-scan:
+    name: Scan application images
+    runs-on: ubuntu-latest
+    needs: [docker-staging, docker-release]
+    if: ${{ always() && (needs.docker-staging.result == 'success' || needs.docker-release.result == 'success') }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [backend, frontend, solver-worker, pdf-parser-worker]
+    steps:
+      - name: Scan for vulnerabilities
+        env:
+          SERVICE: ${{ matrix.service }}
+          REF_NAME: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+        run: |
+          if [ "$REF_TYPE" = tag ]; then
+            tag="$REF_NAME"
+          else
+            tag="staging-${GITHUB_SHA::7}"
+          fi
+          mkdir -p reports
+          docker run --rm -v "$PWD/reports:/reports" aquasec/trivy:0.75.0 image \
+            --scanners vuln --severity HIGH,CRITICAL --format json \
+            --output "/reports/$SERVICE.json" "vigilcs/umtas:$SERVICE-$tag"
+          docker run --rm -v "$PWD/reports:/reports" aquasec/trivy:0.75.0 image \
+            --scanners vuln --severity CRITICAL --exit-code 1 \
+            "vigilcs/umtas:$SERVICE-$tag"
+      - name: Keep vulnerability report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: vulnerabilities-${{ matrix.service }}
+          path: reports/
+          retention-days: 30
+
   notify-ci-failure:
     name: Notify CI/CD Failure
-    needs: [ci, docker-staging, docker-release]
+    needs: [ci, docker-staging, docker-release, image-scan, deploy-staging]
     if: failure()
     uses: ./.github/workflows/discord-notify.yml
     with:
