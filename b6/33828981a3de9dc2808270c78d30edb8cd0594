@@ -1,0 +1,32 @@
+apps/backend/src/app.controller.ts
+  h_2d4b3dca70a3d8 9-18
+apps/backend/src/health/health.controller.spec.ts
+  h_2d4b3dca70a3d8 1-33
+apps/backend/src/health/health.controller.ts
+  h_2d4b3dca70a3d8 1,15-28
+apps/backend/src/health/health.service.ts
+  h_2d4b3dca70a3d8 16,26,38,45-46,50,52,63-79
+apps/backend/src/jobs/jobs.module.ts
+  h_2d4b3dca70a3d8 8,62-67
+apps/backend/src/jobs/queue-metrics.service.spec.ts
+  h_2d4b3dca70a3d8 1-27
+apps/backend/src/jobs/queue-metrics.service.ts
+  h_2d4b3dca70a3d8 1-91
+apps/backend/src/main.ts
+  h_2d4b3dca70a3d8 12,15,55-60,69-79,104-115,119
+apps/backend/src/posthog/posthog.module.ts
+  h_2d4b3dca70a3d8 10-11
+docker/backend/backend.Dockerfile
+  h_2d4b3dca70a3d8 33-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b633828981a3de9dc2808270c78d30edb8cd0594",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
