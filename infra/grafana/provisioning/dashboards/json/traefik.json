@@ -27,7 +27,15 @@
   "gnetId": 17346,
   "graphTooltip": 0,
   "id": null,
-  "links": [],
+  "links": [
+    {
+      "type": "dashboards",
+      "title": "UMTAS views",
+      "tags": ["umtas"],
+      "asDropdown": true,
+      "keepTime": true
+    }
+  ],
   "liveNow": false,
   "panels": [
     {
@@ -1342,7 +1350,7 @@
   "refresh": false,
   "schemaVersion": 37,
   "style": "dark",
-  "tags": [],
+  "tags": ["umtas"],
   "templating": {
     "list": [
       {

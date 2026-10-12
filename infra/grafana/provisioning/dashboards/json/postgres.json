@@ -18,7 +18,15 @@
   "graphTooltip": 0,
   "id": null,
   "iteration": 1534108418743,
-  "links": [],
+  "links": [
+    {
+      "type": "dashboards",
+      "title": "UMTAS views",
+      "tags": ["umtas"],
+      "asDropdown": true,
+      "keepTime": true
+    }
+  ],
   "panels": [
     {
       "aliasColors": {},
@@ -1130,7 +1138,7 @@
   "refresh": false,
   "schemaVersion": 16,
   "style": "dark",
-  "tags": ["postgres"],
+  "tags": ["umtas", "postgres"],
   "templating": {
     "list": [
       {

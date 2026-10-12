@@ -15,7 +15,15 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "links": [],
+  "links": [
+    {
+      "type": "dashboards",
+      "title": "UMTAS views",
+      "tags": ["umtas"],
+      "asDropdown": true,
+      "keepTime": true
+    }
+  ],
   "liveNow": false,
   "panels": [
     {
@@ -127,7 +135,7 @@
   "refresh": "30s",
   "schemaVersion": 36,
   "style": "dark",
-  "tags": ["logs", "loki"],
+  "tags": ["logs", "loki", "umtas"],
   "templating": {
     "list": [
       {
