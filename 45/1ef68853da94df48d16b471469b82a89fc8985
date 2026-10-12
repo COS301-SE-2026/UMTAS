@@ -1,0 +1,40 @@
+apps/frontend/src/app/posthog/providers.tsx
+  h_2d4b3dca70a3d8 8-11,13-18,22-33
+docker-compose.prod.yml
+  h_2d4b3dca70a3d8 171-174,306-329,446
+infra/alertmanager/alertmanager.yml
+  h_2d4b3dca70a3d8 1-8
+infra/alertmanager/docker-entrypoint.sh
+  h_2d4b3dca70a3d8 1-15
+infra/blackbox/blackbox.yml
+  h_2d4b3dca70a3d8 1-8
+infra/grafana/provisioning/dashboards/json/application.json
+  h_2d4b3dca70a3d8 2-12,14,17-19,22-24,27-28,30-37,46,50-67,71-74,79,85,89-106,110-113,116-131,134-136,138-141,144-145,147-154,161-175,178-180,182-184,188-191,200-214,217-219,221-223,227-230,233-248,251-253,256-258,264-271,274,277,280-281,284-285,287,295,298-299,303-304,307-308,310,312-318,320-324,327,330,335-338,341
+infra/grafana/provisioning/dashboards/json/containers.json
+  h_2d4b3dca70a3d8 2-12,14,18-28,32-35,40-55,59-66,68,78-79,81-95,99-102,117-118,120-134,138-141,146,156-157,159,162-173,177-180,195-196,198-201,203-207,210-224
+infra/grafana/provisioning/dashboards/json/home.json
+  h_2d4b3dca70a3d8 2-12,14,17-19,22-24,30-37,40,43,46-47,50-51,53,78-81,84-92,97-104,107,110,113-114,117-118,120,145-148,151-153,156-158,164-171,174-187,189,194,198-199,202,206-220,222-223,225-243,246-249,251-268,272-273,275,278-293,296-304,309-316,319,321,323-337,339-340,342,344-346,350-358,360-387,389-392,395-410,413-415,418-420,426-433,436,440-454,456-457,459,461-463,467-470,473-488,491-499,504-511,514,518-532,535-537,539-541,545-548,551-566,569-571,574-576,579-580,582-594,597-619,623-626,629-644,647-670
+infra/grafana/provisioning/dashboards/json/loki.json
+  h_2d4b3dca70a3d8 18-26,138
+infra/grafana/provisioning/dashboards/json/postgres.json
+  h_2d4b3dca70a3d8 21-29,1141
+infra/grafana/provisioning/dashboards/json/traefik.json
+  h_2d4b3dca70a3d8 30-38,1353
+infra/prometheus/alerts.test.yml
+  h_2d4b3dca70a3d8 1-60
+infra/prometheus/alerts.yml
+  h_2d4b3dca70a3d8 1-128
+infra/prometheus/prometheus.yml
+  h_2d4b3dca70a3d8 9-15,62-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "451ef68853da94df48d16b471469b82a89fc8985",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
