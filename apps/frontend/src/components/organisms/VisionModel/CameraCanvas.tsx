@@ -799,7 +799,7 @@ function CanvasWebcam({
       </div>
       {showGuide && (
         <Popup onClose={() => setShowGuide(false)}>
-          <VM_GUIDE></VM_GUIDE>
+          <VM_GUIDE open={showGuide} onOpenChange={setShowGuide} />
         </Popup>
       )}
       {createSessionPop == true && (

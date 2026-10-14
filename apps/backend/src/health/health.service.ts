@@ -13,7 +13,7 @@ export class HealthService {
     private readonly mailerService: MailerService,
   ) {}
 
-  async check(): Promise<{
+  async check(includeMailer = true): Promise<{
     status: string;
     services: Record<string, string>;
   }> {
@@ -23,7 +23,7 @@ export class HealthService {
 
     // 1. Database check (Essential)
     try {
-      await this.databaseService.db.execute(sql`SELECT 1`);
+      await this.withTimeout(this.databaseService.db.execute(sql`SELECT 1`));
       services.database = 'ok';
     } catch (error) {
       this.logger.error('Database health check failed', error);
@@ -35,19 +35,21 @@ export class HealthService {
     const redis = getRedisClient();
     if (redis) {
       try {
-        await redis.ping();
+        await this.withTimeout(redis.ping());
         services.redis = 'ok';
       } catch (error) {
         this.logger.error('Redis health check failed', error);
         services.redis = 'error';
         if (status === 'ok') status = 'degraded';
       }
+    } else {
+      services.redis = 'unavailable';
     }
 
     // 3. Mailer check (Secondary, production only)
-    if (process.env.NODE_ENV === 'production') {
+    if (includeMailer && process.env.NODE_ENV === 'production') {
       try {
-        await this.mailerService.verify();
+        await this.withTimeout(this.mailerService.verify());
         services.mailer = 'ok';
       } catch (error) {
         this.logger.error('Mailer health check failed', error);
@@ -57,5 +59,22 @@ export class HealthService {
     }
 
     return { status, services };
+  }
+
+  private async withTimeout<T>(operation: PromiseLike<T>): Promise<T> {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      return await Promise.race([
+        operation,
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(
+            () => reject(new Error('Dependency health timeout')),
+            3000,
+          );
+        }),
+      ]);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
   }
 }

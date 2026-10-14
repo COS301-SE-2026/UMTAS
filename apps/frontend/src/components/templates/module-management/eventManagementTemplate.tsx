@@ -13,11 +13,11 @@ import {
   useUniversityState,
 } from "@/hooks/useUniversityState";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
-import { getAllEventsQ } from "../builder/Queries/eventQueries";
-import { getAllModulesQ } from "../builder/Queries/moduleQueries";
 import { EventsTable } from "@/components/organisms/module-management/eventsTable";
 import { eventCols } from "@/components/organisms/module-management/eventsColumns";
 import CustomiseEventPopup from "@/components/organisms/customise/customiseEventPopup";
+import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
+
 const steps = [
   {
     target: "#input-search-event-code",
@@ -35,42 +35,53 @@ export default function EventManagementTemplate() {
     null,
   );
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedType, setSelectedType] = useState("All");
-
-  const { data: eventData, isLoading: isEventsLoading } = useQuery({
-    ...getAllEventsQ(),
-    enabled: !isUniversityLoading && university != null,
-  });
 
   const { data: moduleData, isLoading: isModulesLoading } = useQuery({
-    ...getAllModulesQ(),
+    queryKey: ["ModulesV2", university?.UniversityID],
+    queryFn: async () => {
+      const result = await fetchAllModulesv2({
+        universityId: university!.UniversityID,
+        userEnrollment: false,
+      });
+
+      return result.modules;
+    },
     enabled: !isUniversityLoading && university != null,
   });
+
+  const eventData = useMemo(() => {
+    return (
+      moduleData?.flatMap((module) =>
+        (module.Events ?? []).map((event) => ({
+          ...event,
+          module,
+        })),
+      ) ?? []
+    );
+  }, [moduleData]);
 
   const filteredEvents = useMemo(() => {
     return (
       eventData?.filter((event) => {
-        const typeMatch =
-          selectedType === "All" ||
-          event.eventName?.toUpperCase().startsWith(selectedType);
-
         const searchLowercase = searchQuery.toLowerCase();
+
         const matchesSearch =
           searchQuery === "" ||
           event.eventName?.toLowerCase().includes(searchLowercase) ||
-          event.activityCode?.toLowerCase().includes(searchLowercase);
+          event.activityCode?.toLowerCase().includes(searchLowercase) ||
+          event.module?.moduleCode?.toLowerCase().includes(searchLowercase);
 
-        return typeMatch && matchesSearch;
+        return matchesSearch;
       }) ?? []
     );
-  }, [eventData, selectedType, searchQuery]);
+  }, [eventData, searchQuery]);
 
   const ViableRole =
     university?.role === "UNIVERSITY_ADMIN" ||
     university?.role === "LECTURER" ||
     university?.role === "STUDENT";
 
-  if (isUniversityLoading || isEventsLoading || isModulesLoading)
+  if (isUniversityLoading || isModulesLoading)
     return <UniversityStateLoading />;
 
   const hasRole = university?.role != null;

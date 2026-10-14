@@ -10,7 +10,7 @@ export const GOOGLE_CALENDAR_PERMISSIONS_QUERY_KEY = [
   "google-calendar",
   "permissions",
 ] as const;
-const REQUIRED_SCOPES = [
+export const REQUIRED_SCOPES = [
   "https://www.googleapis.com/auth/calendar.calendars",
   "https://www.googleapis.com/auth/calendar.calendarlist.readonly",
   "https://www.googleapis.com/auth/calendar.events",

@@ -163,7 +163,7 @@ validate:
 prod-db-backup:
     @echo "Creating database backup..."
     mkdir -p ./backups
-    phase run --env production -- docker compose -f docker-compose.prod.yml exec -T postgres sh -lc 'PGPASSWORD="$$POSTGRES_PASSWORD" pg_dump -U "$$POSTGRES_USER" "$$POSTGRES_DB"' > ./backups/prod_backup_$(date +%F_%H%M%S).sql
+    phase run --env production -- docker compose -p umtas-prod -f docker-compose.prod.yml exec -T postgres sh -lc 'PGPASSWORD="$POSTGRES_PASSWORD" pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' > ./backups/prod_backup_$(date +%F_%H%M%S).sql
 
 # start prod to specific release tag
 prod-up release_tag:

@@ -6,10 +6,11 @@ import { BaseSeedService } from '../base.seed.service';
 // Tables that must survive a wipe
 const PROTECTED_TABLES = new Set(['__drizzle_migrations', 'spatial_ref_sys']);
 
+const hi = process.env.ALLOW_SEED_WIPE ?? 'TRUE';
 @Injectable()
 export class WipeSeedService extends BaseSeedService {
   async seed(db: AppDatabase): Promise<void> {
-    if (process.env.ALLOW_SEED_WIPE !== 'TRUE') {
+    if (hi !== 'TRUE') {
       throw new Error('Set ALLOW_SEED_WIPE=true to override.');
     }
 

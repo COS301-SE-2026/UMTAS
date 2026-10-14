@@ -1,21 +1,29 @@
 "use client";
 
 import React from "react";
-import { Download } from "lucide-react";
+import { ArrowLeft, Download } from "lucide-react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
 interface ScheduleHeaderProps {
   eventCount: number;
   moduleCount: number;
   onExport: () => void;
+  isGenerateMode?: boolean;
+  onBack?: () => void;
 }
 
 export function ScheduleHeader({
   eventCount,
   moduleCount,
   onExport,
+  isGenerateMode = false,
+  onBack,
 }: ScheduleHeaderProps) {
   function buildSubtitle() {
+    if (isGenerateMode) {
+      return "Check your events before generating your schedule.";
+    }
+
     if (eventCount === 0) {
       return "No events generated yet.";
     }
@@ -29,26 +37,38 @@ export function ScheduleHeader({
   return (
     <div className="px-8">
       <div className="mx-auto max-w-6xl flex items-start justify-between gap-4 border-b border-[var(--border)] bg-[var(--bg-base)] pb-4">
-        <div className="flex flex-col gap-1 ">
+        <div className="flex flex-col gap-1">
           <h1 className="text-lg font-semibold text-[var(--text-primary)]">
-            Your Schedule
+            {isGenerateMode ? "Review and generate" : "Your Schedule"}
           </h1>
           <p className="text-sm text-[var(--text-secondary)]">
             {buildSubtitle()}
           </p>
         </div>
 
-        {eventCount > 0 && (
+        {isGenerateMode ? (
           <Button
-            hidden
             type="button"
-            onClick={onExport}
-            variant="outline"
-            className="flex items-center gap-2 border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors duration-[var(--duration-fast)]"
+            variant="ghost"
+            onClick={onBack}
+            className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
           >
-            <Download size={16} strokeWidth={1.5} />
-            Export .ics
+            <ArrowLeft size={16} strokeWidth={2} />
+            Back
           </Button>
+        ) : (
+          eventCount > 0 && (
+            <Button
+              hidden
+              type="button"
+              onClick={onExport}
+              variant="outline"
+              className="flex items-center gap-2 border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors duration-[var(--duration-fast)]"
+            >
+              <Download size={16} strokeWidth={2} />
+              Export .ics
+            </Button>
+          )
         )}
       </div>
     </div>

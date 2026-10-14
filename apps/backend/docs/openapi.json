@@ -882,6 +882,60 @@
         "description": "Link a Google account to the current user. This Auth operation is part of the versioned UMTAS HTTP contract."
       }
     },
+    "/api/auth/google/revoke-calendar-access": {
+      "post": {
+        "description": "Revokes the stored Google tokens at Google, clears them from UMTAS and resets the stored scopes to sign-in only. The Google account link is kept so the user can still sign in with Google.",
+        "operationId": "revokeGoogleCalendarAccess",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Google access was revoked and the stored tokens cleared"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthErrorDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "description": "Google could not be reached or did not confirm the removal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthErrorDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Remove UMTAS access to the current user's Google Calendar",
+        "tags": [
+          "Auth",
+          "Auth Google"
+        ]
+      }
+    },
     "/api/auth/admin/create-user": {
       "post": {
         "operationId": "adminCreateUser",
@@ -16779,6 +16833,17 @@
       "contract": "OpenAPI Auth Google paths; scopes: openid, email, profile",
       "security": "OAuth state cookie, HTTPS redirect, and encrypted stored tokens",
       "failure": "Provider and callback errors return through the authentication flow"
+    },
+    {
+      "id": "backend-google-token-revocation",
+      "purpose": "Remove UMTAS access to a user's Google Calendar, and revoke Google tokens when an account is deleted.",
+      "transport": "http",
+      "producer": "nestjs-backend",
+      "consumer": "google",
+      "data": "Form-encoded refresh token sent to https://oauth2.googleapis.com/revoke",
+      "contract": "OpenAPI POST /api/auth/google/revoke-calendar-access; Better Auth deleteUser",
+      "security": "Session cookie required; token read through the Better Auth server API and never returned to the browser",
+      "failure": "Google 200 or 400 invalid_token clears stored tokens; any other result returns 502 and keeps them. Account deletion logs the failure and continues"
     }
   ]
 }

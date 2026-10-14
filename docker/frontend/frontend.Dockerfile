@@ -1,4 +1,5 @@
 FROM rust:slim AS rust-builder
+
 RUN apt-get update && apt-get install -y \
     curl \
     python3 \
@@ -11,51 +12,74 @@ RUN apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
 WORKDIR /app
 
 COPY apps/frontend/public/models ./apps/frontend/public/models
 
-# Set to any value to use empty placeholder models (e.g. e2e builds, which never load them).
+# Set to any value to use empty placeholder models
+# e.g. E2E builds that never load the actual models.
 ARG SKIP_ML_MODELS=""
+
 RUN if [ -n "$SKIP_ML_MODELS" ]; then \
-    mkdir -p apps/frontend/public/models && \
-    touch apps/frontend/public/models/yolo26n.onnx apps/frontend/public/models/yolo26n-pose.onnx; \
-    elif [ ! -f apps/frontend/public/models/yolo26n.onnx ] || [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ]; then \
-    python3 -m venv .venv && \
-    .venv/bin/pip install --no-cache-dir ultralytics onnx onnxruntime && \
-    if [ ! -f apps/frontend/public/models/yolo26n.onnx ]; then \
-    .venv/bin/yolo export model=yolo26n.pt format=onnx imgsz=640 && \
-    mkdir -p apps/frontend/public/models && \
-    mv yolo26n.onnx apps/frontend/public/models/yolo26n.onnx; \
-    fi && \
-    if [ ! -f apps/frontend/public/models/yolo26n-pose.onnx ]; then \
-    .venv/bin/yolo export model=yolo26n-pose.pt format=onnx imgsz=640 && \
-    mkdir -p apps/frontend/public/models && \
-    mv yolo26n-pose.onnx apps/frontend/public/models/yolo26n-pose.onnx; \
-    fi && \
-    rm -rf .venv; \
-    else echo "ONNX models already exist locally, skipping export."; fi
+      mkdir -p apps/frontend/public/models && \
+      touch \
+        apps/frontend/public/models/yolo26n.onnx \
+        apps/frontend/public/models/yolo26n-pose.onnx \
+        apps/frontend/public/models/yolo26s.onnx \
+        apps/frontend/public/models/yolo26s-pose.onnx \
+        apps/frontend/public/models/yolo26m.onnx \
+        apps/frontend/public/models/yolo26m-pose.onnx; \
+    else \
+      python3 -m venv .venv && \
+      .venv/bin/pip install --no-cache-dir ultralytics onnx onnxruntime && \
+      mkdir -p apps/frontend/public/models && \
+      for model in yolo26n yolo26s yolo26m; do \
+        if [ ! -f apps/frontend/public/models/$model.onnx ]; then \
+          .venv/bin/yolo export model=$model.pt format=onnx imgsz=640 && \
+          mv $model.onnx apps/frontend/public/models/$model.onnx; \
+        fi; \
+      done && \
+      for model in yolo26n-pose yolo26s-pose yolo26m-pose; do \
+        if [ ! -f apps/frontend/public/models/$model.onnx ]; then \
+          .venv/bin/yolo export model=$model.pt format=onnx imgsz=640 && \
+          mv $model.onnx apps/frontend/public/models/$model.onnx; \
+        fi; \
+      done && \
+      rm -rf .venv; \
+    fi
 
 COPY apps/frontend/wasm-engine ./apps/frontend/wasm-engine
+
 WORKDIR /app/apps/frontend/wasm-engine
 
 RUN rustup target add wasm32-unknown-unknown
+
 RUN if [ ! -d "pkg" ]; then \
-    wasm-pack build --target web --release; \
-    else echo "WASM pkg already exists, skipping build."; fi
+      wasm-pack build --target web --release; \
+    else \
+      echo "WASM pkg already exists, skipping build."; \
+    fi
 
 FROM node:22-alpine AS base
+
 WORKDIR /app
+
 RUN corepack enable
 
 FROM base AS deps
+
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY packages/shared-types/package.json ./packages/shared-types/
 COPY apps/frontend/package.json ./apps/frontend/
+
 RUN pnpm install --frozen-lockfile --filter frontend... \
-    --network-concurrency=8 --fetch-retries=5 --fetch-timeout=60000
+    --network-concurrency=8 \
+    --fetch-retries=5 \
+    --fetch-timeout=60000
 
 FROM deps AS build
+
 ARG NEXT_PUBLIC_API_URL
 ARG API_URL
 ARG COOKIE_SECURE
@@ -77,9 +101,13 @@ ENV NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV}
 COPY packages/shared-types/ ./packages/shared-types/
 COPY apps/frontend/ ./apps/frontend/
 
-COPY --from=rust-builder /app/apps/frontend/wasm-engine/pkg ./apps/frontend/wasm-engine/pkg
-COPY --from=rust-builder /app/apps/frontend/public/models/yolo26n.onnx ./apps/frontend/public/models/yolo26n.onnx
-COPY --from=rust-builder /app/apps/frontend/public/models/yolo26n-pose.onnx ./apps/frontend/public/models/yolo26n-pose.onnx
+COPY --from=rust-builder \
+    /app/apps/frontend/wasm-engine/pkg \
+    ./apps/frontend/wasm-engine/pkg
+
+COPY --from=rust-builder \
+    /app/apps/frontend/public/models \
+    ./apps/frontend/public/models
 
 RUN mkdir -p apps/frontend/public/wasm && \
     cp node_modules/onnxruntime-web/dist/ort-wasm*.wasm apps/frontend/public/wasm/ 2>/dev/null || \
@@ -91,15 +119,22 @@ RUN pnpm --filter=shared-types build
 RUN pnpm --filter=frontend build
 
 FROM node:22-alpine AS runtime
+
 WORKDIR /app
+
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+
 COPY --from=build /app/apps/frontend/.next/standalone ./
 COPY --from=build /app/apps/frontend/.next/static ./apps/frontend/.next/static
 COPY --from=build /app/apps/frontend/public ./apps/frontend/public
+
 EXPOSE 3000
+
 USER node
+
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD ["node", "-e", "require('http').get('http://127.0.0.1:'+process.env.PORT+'/login',r=>process.exit(r.statusCode<400?0:1)).on('error',()=>process.exit(1))"]
+
 CMD ["node", "apps/frontend/server.js"]

@@ -9,9 +9,10 @@ import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { PostHog } from 'posthog-node';
 import { PostHogInterceptor } from 'posthog-node/nestjs';
-import { collectDefaultMetrics, register } from 'prom-client';
+import { collectDefaultMetrics, Histogram, Gauge, register } from 'prom-client';
 import { takeCoverage } from 'node:v8';
 
+import { QueueMetricsService } from './jobs/queue-metrics.service';
 import { AppModule } from './app.module';
 import { StandardErrorFilter } from './common/standard-error.filter';
 import { completeOpenApiContract } from './swagger-contract';
@@ -51,6 +52,12 @@ async function bootstrap() {
   app.setGlobalPrefix('api', {
     exclude: ['metrics'],
   });
+  const requestDuration = new Histogram({
+    name: 'umtas_http_request_duration_seconds',
+    help: 'Backend request duration by matched route (no user IDs or query strings)',
+    labelNames: ['method', 'route', 'status_code'],
+    buckets: [0.05, 0.1, 0.3, 0.5, 1, 2, 5, 10],
+  });
   app.use((req: Request, res: Response, next: NextFunction) => {
     const start = Date.now();
     const { method, originalUrl } = req;
@@ -59,6 +66,17 @@ async function bootstrap() {
 
     res.on('finish', () => {
       const duration = Date.now() - start;
+      if (req.path !== '/metrics') {
+        requestDuration.observe(
+          {
+            method,
+            route:
+              (req.route as { path?: string } | undefined)?.path ?? 'unmatched',
+            status_code: String(res.statusCode),
+          },
+          duration / 1000,
+        );
+      }
       console.log(
         `[REQ END] ${method} ${originalUrl} ${res.statusCode} - ${duration}ms`,
       );
@@ -82,11 +100,23 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
   });
-  register.clear();
   collectDefaultMetrics();
+  new Gauge({
+    name: 'umtas_build_info',
+    help: 'Running backend release metadata',
+    labelNames: ['version', 'commit', 'environment'],
+  }).set(
+    {
+      version: process.env.APP_VERSION ?? 'development',
+      commit: process.env.APP_COMMIT ?? 'unknown',
+      environment: process.env.APP_ENV ?? 'development',
+    },
+    1,
+  );
   app.getHttpAdapter().get('/metrics', async (_req: Request, res: Response) => {
     try {
       res.setHeader('Content-Type', register.contentType);
+      await app.get(QueueMetricsService).collect();
       const metrics = await register.metrics();
       res.status(200).send(metrics);
     } catch (err) {

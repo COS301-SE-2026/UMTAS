@@ -360,11 +360,7 @@ export default function VisionModelSetupPage() {
           </Button>
         </div>
       </div>
-      {showGuide && (
-        <Popup onClose={() => setShowGuide(false)}>
-          <VM_GUIDE></VM_GUIDE>
-        </Popup>
-      )}
+      {showGuide && <VM_GUIDE open={showGuide} onOpenChange={setShowGuide} />}
     </main>
   );
 }

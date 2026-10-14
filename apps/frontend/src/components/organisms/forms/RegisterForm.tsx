@@ -19,6 +19,7 @@ import { PasswordInput } from "@/components/atoms/auth/PasswordInput";
 import { FormField } from "@/components/molecules/OAuth/FormField";
 import { GoogleSignInButton } from "@/components/molecules/OAuth/GoogleSignInButton";
 import { AuthDivider } from "@/components/molecules/OAuth/AuthDivider";
+import { LegalAcknowledgement } from "@/components/molecules/OAuth/LegalAcknowledgement";
 import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { PasswordStrengthBadge } from "@/components/molecules/OAuth/PasswordStrengthBadge";
 import { signUp, signIn } from "@/../utilities/auth-client";
@@ -313,6 +314,7 @@ export function RegisterForm() {
               disabled={anyLoading}
             />
           </div>
+          <LegalAcknowledgement />
 
           <p className="text-[12px] text-[var(--text-secondary)] text-center">
             Already have an account?{" "}

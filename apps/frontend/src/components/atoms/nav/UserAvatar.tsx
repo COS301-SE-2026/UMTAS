@@ -1,11 +1,8 @@
+import * as React from "react";
 import { cn } from "@/../utilities/utils";
-import { useState } from "react";
-import Popup from "../utility/floatContainer";
-import { ChooseInstituteTemplate } from "@/components/templates/choose-institute/chooseInstituteTemplate";
 
-interface UserAvatarProps {
+interface UserAvatarProps extends Omit<React.ComponentProps<"button">, "name"> {
   name?: string | null;
-  className?: string;
 }
 
 function getInitials(name: string): string {
@@ -17,43 +14,28 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-export function UserAvatar({ name, className }: UserAvatarProps) {
-  const [selectAvatar, setSelectAvatar] = useState(false);
-
+export function UserAvatar({ name, className, ...props }: UserAvatarProps) {
   const initials = name ? getInitials(name) : "U";
 
   return (
-    <span
+    <button
+      type="button"
       data-testid="click-avatar"
-      aria-label={name ? `${name}'s avatar` : "User avatar"}
+      aria-label={name ? `Account menu for ${name}` : "Account menu"}
       className={cn(
         "inline-flex items-center justify-center",
         "h-8 w-8 rounded-full",
-        "bg-[--bg-elevated] border border-[--border]",
-        "text-[--text-primary] text-xs font-semibold",
-        "select-none shrink-0",
-        "cursor-pointer",
+        "bg-[var(--bg-elevated)] border border-[var(--border)]",
+        "text-[var(--text-primary)] text-xs font-semibold",
+        "select-none shrink-0 cursor-pointer",
+        "transition-colors duration-[var(--duration-fast)] ease-[var(--easing-default)]",
+        "hover:bg-[var(--bg-surface)]",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]",
         className,
       )}
-      onClick={() => {
-        setSelectAvatar(true);
-      }}
+      {...props}
     >
-      {selectAvatar && (
-        <Popup>
-          <div
-            className="w-fit text-center"
-            data-testid="dashboard-popup-div"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <ChooseInstituteTemplate onClose={() => setSelectAvatar(false)} />
-          </div>
-        </Popup>
-      )}
-
       {initials}
-    </span>
+    </button>
   );
 }

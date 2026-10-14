@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { UmtasLogo } from "@/components/atoms/auth/UmtasLogo";
 import { NavLinks } from "@/components/molecules/nav/NavLinks";
 import { NavUser } from "@/components/molecules/nav/NavUser";
+import { useSession } from "@/../utilities/auth-client";
 import { UserDetails } from "@/lib/userclass/userClass";
 import Tutorial from "@/components/organisms/nav/Tutorial";
 
@@ -11,12 +12,9 @@ interface TopNavBarProps {
   userName?: string | null;
 }
 
-/**
- * Layout:
- *   [Logo]   [Nav links]   ...spasie...   [ThemeToggle] [Avatar] [Sign out]
- */
 export function TopNavBar({ userName }: TopNavBarProps) {
   const [needsInstitute, setNeedsInstitute] = useState(false);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const UniDetails = UserDetails.getUniDetails();
@@ -39,7 +37,9 @@ export function TopNavBar({ userName }: TopNavBarProps) {
       className="sticky top-0 z-40 w-full bg-[var(--bg-surface)] border-b border-[var(--border)]"
       role="banner"
     >
-      {needsInstitute && <Tutorial steps={steps} wait={false} />}
+      {needsInstitute && session?.user && (
+        <Tutorial steps={steps} wait={false} />
+      )}
       <div className="mx-auto flex h-14 items-center gap-4 px-4 md:px-6">
         <div className="shrink-0">
           <UmtasLogo />

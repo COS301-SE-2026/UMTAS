@@ -12,6 +12,10 @@ on:
         required: true
         type: string
 
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -21,6 +25,14 @@ jobs:
     outputs:
       status: ${{ job.status }}
     steps:
+      - name: Validate release inputs
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          PREVIOUS_TAG: ${{ inputs.old_tag }}
+        run: |
+          for tag in "$RELEASE_TAG" "$PREVIOUS_TAG"; do
+            [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][a-zA-Z0-9.-]+)?$ ]] || exit 2
+          done
       - name: Execute Deployment via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -29,10 +41,9 @@ jobs:
           username: ${{ secrets.PROD_SSH_USER }}
           key: ${{ secrets.PROD_SSH_KEY }}
           script: |
+            set -eu
             cd /opt/UMTAS
-            docker compose -f docker-compose.prod.yml pull
-            just prod-down ${{ inputs.old_tag }}
-            just prod-up ${{ inputs.release_tag }}
+            phase run --env production -- bash infra/scripts/deploy-production.sh '${{ inputs.release_tag }}' '${{ inputs.old_tag }}'
 
   notify-deploy:
     needs: deploy

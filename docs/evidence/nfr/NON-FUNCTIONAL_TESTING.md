@@ -23,7 +23,7 @@ The [Locust report](LOCUST_REPORT.html) contains endpoint statistics, percentile
 | NFR-Eff-2 | Job acceptance p95 at most 1 s, with 100% valid submissions accepted | Persist then enqueue before HTTP 202 | Locust, production | [Result](LOCUST_REPORT.html) | Pass |
 | NFR-Rely-1 | Session canary success at least 99% throughout the sustained soak | Dedicated session canary under sustained load | Locust, production | [Result](records/soak-report.html) | Pass |
 | NFR-Rely-2 | 100% sign-in completion and p95 at most 1 s per step | Three step account and session establishment | Locust, production | [Result](LOCUST_REPORT.html) | Pass |
-| NFR-Avail-1 | At least 99.5% public uptime across the 30 day release window | Public health monitoring | UptimeRobot, production | [Status screenshot](records/uptime-status.png) | Pass |
+| NFR-Avail-1 | At least 99.5% public uptime across the 30 day release window | Public health monitoring | UptimeRobot, production | [Status Page](https://stats.uptimerobot.com/EfNarUH73Q/803621896) | Pass |
 | NFR-Sec-2 | Zero High ZAP alerts in baseline and authenticated scans | CSP, clickjacking protection and authenticated scanning | OWASP ZAP, production | [Result](ZAP_REPORT.pdf) | Pass |
 | NFR-Sec-3 | Zero moderate or higher production dependency findings | Dependency audit gate | pnpm audit, release test environment | [Result](records/dependency-audit.txt) | Pass |
 | NFR-Por-1 | Zero failures across Chromium, Firefox and Microsoft Edge | Playwright browser projects | Playwright, release test environment | [Chromium](records/playwright-chromium/index.html), [Firefox](records/playwright-firefox/index.html), [Edge](records/playwright-edge/index.html) | Pass |

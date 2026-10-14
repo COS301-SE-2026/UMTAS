@@ -5,6 +5,7 @@ import {
   PDF_PARSE_QUEUE_TOKEN,
   TIMETABLE_SOLVE_QUEUE_TOKEN,
 } from './queue.constants';
+import { QueueMetricsService } from './queue-metrics.service';
 import { QueueProducerService } from './queue-producer.service';
 import { WorkerCallbackAuthGuard } from './worker-callback-auth.guard';
 
@@ -58,8 +59,12 @@ const removeOnFail = { age: 604_800, count: 5_000 };
       },
     ),
   ],
-  providers: [QueueProducerService, WorkerCallbackAuthGuard],
-  exports: [QueueProducerService, WorkerCallbackAuthGuard],
+  providers: [
+    QueueMetricsService,
+    QueueProducerService,
+    WorkerCallbackAuthGuard,
+  ],
+  exports: [QueueMetricsService, QueueProducerService, WorkerCallbackAuthGuard],
 })
 export class JobsModule {}
 

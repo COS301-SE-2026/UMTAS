@@ -150,7 +150,7 @@ export function pdfSolverFinalAssertionsStep<TPlan>(
       assert.equal(groupLinks[0].GroupID, imported.job.moduleGroupingId);
       assert.equal(groupLinks[0].ModuleID, imported.module.moduleID);
       assert.deepEqual(
-        sorted(universityEvents.map((row) => row.eventID!)),
+        sorted(universityEvents.map((row) => row.eventID)),
         eventIds,
       );
       assert.deepEqual(sorted(eventVenues.map((row) => row.EventID)), eventIds);

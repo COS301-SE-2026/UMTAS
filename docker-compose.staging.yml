@@ -169,6 +169,10 @@ services:
       minio-init:
         condition: service_completed_successfully
     environment:
+      - APP_VERSION=staging-${IMAGE_TAG}
+      - APP_ENV=staging
+      - POSTHOG_K=${POSTHOG_K:-}
+      - POSTHOG_H=${POSTHOG_H:-https://eu.i.posthog.com}
       - PORT=${BACKEND_PORT}
       - NODE_ENV=staging
       - NODE_OPTIONS=--dns-result-order=ipv4first --network-family-autoselection-attempt-timeout=2000

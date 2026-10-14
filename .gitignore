@@ -169,3 +169,6 @@ apps/frontend/public/wasm/
 apps/frontend/wasm-engine/target/
 apps/backend/docs/openapi.json
 .buildx-cache/
+
+# Local database backups contain application data.
+/backups/

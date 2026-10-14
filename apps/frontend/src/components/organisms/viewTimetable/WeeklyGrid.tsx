@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { EventBlock } from "@/components/molecules/viewTimetable/EventBlock";
 import { isoDateStr } from "@/lib/scheduleUtils";
 import type { ScheduleEvent } from "@/types/schedule";
@@ -13,13 +13,13 @@ interface WeeklyGridProps {
 }
 
 const TimeSlots: string[] = [];
-for (let h = 7; h <= 20; h++) {
+for (let h = 0; h < 24; h++) {
   const hStr = String(h).padStart(2, "0");
   TimeSlots.push(hStr + ":00");
-  if (h < 20) {
-    TimeSlots.push(hStr + ":30");
-  }
-}
+  TimeSlots.push(hStr + ":30");
+} //END_h
+
+TimeSlots.push("24:00");
 
 const SlotHeight = 40;
 const TotalHeight = TimeSlots.length * SlotHeight;
@@ -63,7 +63,8 @@ function timeToSlotIndex(time: string): number {
   const parts = time.split(":");
   const hours = parseInt(parts[0]);
   const minutes = parseInt(parts[1]);
-  return Math.floor(((hours - 7) * 60 + minutes) / 30);
+
+  return Math.floor((hours * 60 + minutes) / 30);
 }
 
 function slotSpan(startTime: string, endTime: string): number {
@@ -81,6 +82,8 @@ export function WeeklyGrid({
 }: WeeklyGridProps) {
   useErrorListener();
   const weekDates = getWeekDates(weekStart);
+
+  const gridRef = useRef<HTMLDivElement>(null);
 
   function getEventsForDay(date: Date): ScheduleEvent[] {
     const dateStr = isoDateStr(date);
@@ -117,6 +120,37 @@ export function WeeklyGrid({
 
     return result;
   }
+
+  useEffect(() => {
+    if (!gridRef.current || events.length === 0) return;
+
+    const earliestEvent = events.reduce(
+      (earliest, event) => {
+        if (!event.startTime) return earliest;
+
+        if (!earliest || event.startTime < earliest.startTime) {
+          return event;
+        }
+
+        return earliest;
+      },
+      null as ScheduleEvent | null,
+    );
+
+    if (!earliestEvent) return;
+
+    const [hours, minutes] = earliestEvent.startTime.split(":").map(Number);
+
+    const eventPosition =
+      HeaderHeight + ((hours * 60 + minutes) / 30) * SlotHeight;
+
+    const scrollOffset = Math.max(0, eventPosition - 50);
+
+    gridRef.current.scrollTo({
+      top: scrollOffset,
+      behavior: "smooth",
+    });
+  }, [events, selectedDate]);
 
   function renderTimeColumn() {
     return (
@@ -233,7 +267,10 @@ export function WeeklyGrid({
   }
 
   return (
-    <div className="w-full max-h-[65vh] overflow-auto relative rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)] custom-scrollbar">
+    <div
+      ref={gridRef}
+      className="w-full max-h-[65vh] overflow-auto relative rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)] custom-scrollbar"
+    >
       <div className="flex w-full sm:min-w-[600px]">
         {renderTimeColumn()}
         {weekDates.map((date) => renderDayColumn(date))}
