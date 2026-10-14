@@ -1,0 +1,14 @@
+apps/frontend/src/components/templates/attendance/AttendanceTemplate.tsx
+  h_2d4b3dca70a3d8 21-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "8770ba10b3b5dd21f97ac8e223abcf15b154c3c9",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

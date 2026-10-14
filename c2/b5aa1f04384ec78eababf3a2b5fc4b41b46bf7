@@ -1,0 +1,16 @@
+apps/backend/src/pdf-parser/event-importer.service.spec.ts
+  h_2d4b3dca70a3d8 7,10-14,100,143,169,204,207-211,213-219,221-223,225,228,230-232,234-237,244,250-252,254-256,258-263
+apps/backend/src/pdf-parser/event-importer.service.ts
+  h_2d4b3dca70a3d8 2,8,49,70-81,124-183,209,212,227,229,259
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c2b5aa1f04384ec78eababf3a2b5fc4b41b46bf7",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+.github/workflows/ci.yml
+  h_2d4b3dca70a3d8 17,58-66,168,170-171,184-185,206-207,220-221,231-234,237,248,250-256,294,296-297,310-311,315,332-333,346-347,354-391,394
+.github/workflows/deploy-prod.yml
+  h_2d4b3dca70a3d8 15-18,28-35,44,46
+.gitignore
+  h_2d4b3dca70a3d8 172-174
+docker-compose.staging.yml
+  h_2d4b3dca70a3d8 172-175
+infra/scripts/backup-restore.sh
+  h_2d4b3dca70a3d8 1-41
+infra/scripts/deploy-production.sh
+  h_2d4b3dca70a3d8 1-33
+infra/scripts/test_devops.py
+  h_2d4b3dca70a3d8 1-74
+infra/scripts/verify-deployment.py
+  h_2d4b3dca70a3d8 1-35
+justfile
+  h_2d4b3dca70a3d8 166
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "933dd8018313e4ab92f871bede80c01787682545",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

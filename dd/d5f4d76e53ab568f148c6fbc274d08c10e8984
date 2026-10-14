@@ -1,0 +1,14 @@
+docker/frontend/frontend.Dockerfile
+  h_2d4b3dca70a3d8 2,15,20-21,23,25-50,53,57,59-62,65,67,71,75,77-79,82,104-110,122,124,128,132,134,136,139-140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ddd5f4d76e53ab568f148c6fbc274d08c10e8984",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

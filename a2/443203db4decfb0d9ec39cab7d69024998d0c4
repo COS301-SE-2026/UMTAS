@@ -1,0 +1,14 @@
+apps/frontend/src/components/organisms/VisionModel/createSession.tsx
+  h_2d4b3dca70a3d8 19,81-83,134-136,159-165,181-182,185-186,195,198-199,205,210,213,220,224,233,236,241-247,274-280,285-297,314-320,323,329,334,337-338,345,358,389,433,449,453,462,478-480,485-487,500-503,505-510
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a2443203db4decfb0d9ec39cab7d69024998d0c4",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

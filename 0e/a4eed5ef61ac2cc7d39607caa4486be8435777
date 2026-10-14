@@ -1,0 +1,14 @@
+docs/management/UserManual.md
+  h_2d4b3dca70a3d8 5-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0ea4eed5ef61ac2cc7d39607caa4486be8435777",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

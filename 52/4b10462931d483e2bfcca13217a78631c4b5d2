@@ -1,0 +1,14 @@
+apps/frontend/src/components/organisms/VisionModel/CameraCanvas.tsx
+  h_2d4b3dca70a3d8 3,56,62,125-126,142-164,217-223,229-232,238,240-241,244-247,251-276,279-289,293,296-303,305-306,308,526-528,530,536,538,543-554,573,587-598,600-607,638,645,656,664,667-670,675-697,700,702,705-706,708
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "524b10462931d483e2bfcca13217a78631c4b5d2",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+apps/frontend/src/app/VisionModel/setup/page.tsx
+  h_2d4b3dca70a3d8 370-372,383
+apps/frontend/src/components/organisms/VisionModel/videoUpload.tsx
+  h_2d4b3dca70a3d8 25,27-31,161
+apps/frontend/src/components/templates/VisionModel/SessionTemplate.tsx
+  h_2d4b3dca70a3d8 77,196-200,222-226,293,459-480,482-488,490-497,499-527,540,557,590,607,637,656-659,666,673,678
+justfile
+  h_2d4b3dca70a3d8 50-55,59-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "57baf688aac1fdef79f506208b62e6ca71049241",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

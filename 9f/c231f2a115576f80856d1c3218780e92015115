@@ -1,0 +1,14 @@
+apps/frontend/src/proxy.ts
+  h_2d4b3dca70a3d8 34,37-38,46,50,61,65,70,74,81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9fc231f2a115576f80856d1c3218780e92015115",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

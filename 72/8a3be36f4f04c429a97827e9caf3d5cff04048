@@ -1,0 +1,18 @@
+apps/frontend/src/app/VisionModel/setup/page.tsx
+  h_2d4b3dca70a3d8 10,232-250,252-255,258-262,264-321
+apps/frontend/src/components/templates/VisionModel/SessionTemplate.tsx
+  h_2d4b3dca70a3d8 239-254,256-262,265,267-269,271-291,294,296-298,300-306,308-312,314-322,324-326,328-329,331-332,335-338,340-356,359,361-364,368-372,374-537
+apps/frontend/src/components/templates/attendance/ScannerTemplate.tsx
+  h_2d4b3dca70a3d8 33-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "728a3be36f4f04c429a97827e9caf3d5cff04048",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+apps/frontend/src/components/organisms/VisionModel/videoUpload.tsx
+  h_2d4b3dca70a3d8 24,52,64-65,76-79,82,84-100,102-103,105-108,110,112-115,117-119,121-123,129-132,135,152,157,162,165,176-177,181,246,274-301,304-313,316,318-319,329-330,356-364,372-374,376-390,425-428,432-433,487,501,545,555,562,573,588-595,597-600,610-614
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "8517ce3b28fd1f9f8e3c8620eb1ef1ce27bf07d0",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

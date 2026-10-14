@@ -1,0 +1,16 @@
+docker-compose.prod.yml
+  h_2d4b3dca70a3d8 84
+docker-compose.staging.yml
+  h_2d4b3dca70a3d8 85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "855688b17c13888491d92d1974599299f2cedf9a",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

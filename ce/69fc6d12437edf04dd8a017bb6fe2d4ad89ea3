@@ -1,0 +1,26 @@
+apps/frontend/src/app/VisionModel/setup/page.tsx
+  h_2d4b3dca70a3d8 11,231-240,242-275,278-281,283-287,289-320,340-341
+apps/frontend/src/components/molecules/attendance/AttendanceModuleRow.tsx
+  h_2d4b3dca70a3d8 53-56,85
+apps/frontend/src/components/organisms/VisionModel/CameraCanvas.tsx
+  h_2d4b3dca70a3d8 2,66,100-102,520-521,554
+apps/frontend/src/components/templates/VisionModel/SessionTemplate.tsx
+  h_2d4b3dca70a3d8 239-279,281-364,366-371,373,375-378,380-403,405-406,408-457,459-464,467,469-476,478-484,486-504,506-507,510-512,514,517,520-525,528-531,533-536
+apps/frontend/src/components/templates/attendance/AttendanceTemplate.tsx
+  h_2d4b3dca70a3d8 21-28
+apps/frontend/src/components/templates/attendance/NfcRegistrationTemplate.tsx
+  h_2d4b3dca70a3d8 38-53
+apps/frontend/src/components/templates/attendance/ScannerTemplate.tsx
+  h_2d4b3dca70a3d8 34-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ce69fc6d12437edf04dd8a017bb6fe2d4ad89ea3",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

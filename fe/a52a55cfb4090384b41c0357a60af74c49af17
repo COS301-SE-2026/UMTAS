@@ -1,0 +1,14 @@
+justfile
+  h_2d4b3dca70a3d8 50,54-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "fea52a55cfb4090384b41c0357a60af74c49af17",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

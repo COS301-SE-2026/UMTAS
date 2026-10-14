@@ -1,0 +1,18 @@
+apps/frontend/src/components/molecules/attendance/AttendanceConflictSelector.tsx
+  h_2d4b3dca70a3d8 4-8,28-36,39-53,55-68
+apps/frontend/src/components/molecules/attendance/AttendanceMethodCard.tsx
+  h_2d4b3dca70a3d8 21,25,27,30,32,37,40
+apps/frontend/src/components/molecules/attendance/CheckInResultCard.tsx
+  h_2d4b3dca70a3d8 3-8,23-30,32-33,35-36,39-44,47-60,63-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b2c633ce93ddb320553c195a1a1608f8338178f6",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

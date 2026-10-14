@@ -1,0 +1,18 @@
+apps/frontend/src/components/organisms/attendance/AttendanceCounter.tsx
+  h_2d4b3dca70a3d8 19
+apps/frontend/src/components/organisms/attendance/AttendanceScanner.tsx
+  h_2d4b3dca70a3d8 284
+apps/frontend/src/components/organisms/attendance/NfcTagRegistrationPanel.tsx
+  h_2d4b3dca70a3d8 34,47-49,51,59-66,69,71-83,86-92,96,98-111,114,118-121,126-131,140,155,158,177,179,182,207,225,241-244,265-268
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0f1409a6f4a020d2a91f26be48278c3d26606f2d",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

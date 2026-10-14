@@ -1,0 +1,18 @@
+apps/frontend/src/components/templates/stats/statsPageTemplate.tsx
+  h_2d4b3dca70a3d8 73
+apps/frontend/src/components/templates/stats/visionStatsTemplate.tsx
+  h_2d4b3dca70a3d8 89
+apps/frontend/src/types/Nav.ts
+  h_2d4b3dca70a3d8 202
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "76ad47156be1e91641f2853048ac712347dfc6f7",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+docker/solver-worker/solver-worker.Dockerfile
+  h_2d4b3dca70a3d8 9,11,14,16,21,24,26,30,37,39-43,47,49,51-54,73,75,80,99,111,113
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4efde57e82dc41a4695a3b31d6cd79a1193e92b9",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

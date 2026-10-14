@@ -1,0 +1,14 @@
+apps/frontend/src/components/organisms/module-management/editModuleEvent.tsx
+  h_2d4b3dca70a3d8 251
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b575b831a2140613c72c9d68e3fb462c9985f5ed",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

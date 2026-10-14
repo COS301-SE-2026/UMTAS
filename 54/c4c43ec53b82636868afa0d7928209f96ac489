@@ -1,0 +1,20 @@
+apps/frontend/src/components/molecules/attendance/NfcRegistrationTutorial.tsx
+  h_2d4b3dca70a3d8 33-34,36-37,41-61,63-65,67,69-70,73-102,113-140
+apps/frontend/src/components/molecules/attendance/NfcTagStatusCard.tsx
+  h_2d4b3dca70a3d8 2-3,5-11,30-42,45-47,50-66,69-70,73,77-78,88-89,95-117
+apps/frontend/src/components/molecules/attendance/NfcTagTestResult.tsx
+  h_2d4b3dca70a3d8 1,28-30,32-33,43,46-49,51-52,54-58,60-61,65
+apps/frontend/src/components/templates/attendance/NfcRegistrationTemplate.tsx
+  h_2d4b3dca70a3d8 17-28,31-35,37,42,46-47,52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "54c4c43ec53b82636868afa0d7928209f96ac489",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

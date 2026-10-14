@@ -1,0 +1,14 @@
+apps/frontend/src/components/organisms/builder/GenerateStep.tsx
+  h_2d4b3dca70a3d8 396,411
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c94b63478eebd4e003de5cb8a4e4177fd3035944",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

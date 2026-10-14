@@ -1,0 +1,14 @@
+apps/frontend/src/components/atoms/roleManagement/roleControl.tsx
+  h_2d4b3dca70a3d8 19,23,35,37,40,42-56,61,64,66-80,88,93,95,106,110-114,117,122,124-139,147,154,157,161-162
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e5701be6c94cc529ae5353f6742f6d2aafe3a84d",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
