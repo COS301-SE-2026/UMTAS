@@ -1,0 +1,11 @@
+# Accepted risks for CI image scans. Every entry needs a reason and an expiry;
+# re-check upstream status before extending.
+
+# zlib1g (Debian 12): flaw is in minizip's zipOpenNewFileInZip4_6, which the
+# zlib1g package does not ship. Debian: will_not_fix.
+CVE-2023-45853 exp:2027-01-14
+
+# libsqlite3-0 (Debian 12): pulled in by python3's stdlib in pdf-parser-worker.
+# Exploiting it needs attacker-controlled SQL; the worker never uses sqlite3.
+# No Debian 12 fix yet; removed for good by moving to a trixie base.
+CVE-2025-7458 exp:2027-01-14
