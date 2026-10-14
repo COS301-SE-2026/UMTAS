@@ -395,7 +395,7 @@ services:
       - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.52.1
+    image: ghcr.io/google/cadvisor:v0.60.6
     restart: unless-stopped
     networks:
       - observability-internal
@@ -410,7 +410,7 @@ services:
     command:
       - "--docker_only=true"
       - "--store_container_labels=true"
-      - "--disable_metrics=advtcp,app,cpu,cpuLoad,diskIO,hugetlb,memory,network,oom_event,percpu,perf_event,process,referenced_memory,resctrl,sched,tcp,udp"
+      - "--disable_metrics=advtcp,app,cpuLoad,diskIO,hugetlb,oom_event,percpu,perf_event,process,referenced_memory,resctrl,sched,tcp,udp"
 
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:v0.17.1
