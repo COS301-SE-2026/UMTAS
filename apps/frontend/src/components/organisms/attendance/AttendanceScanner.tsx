@@ -2,6 +2,7 @@
 
 import AttendanceCounter from "./AttendanceCounter";
 import { LastScannedStudent } from "./LastScannedStudent";
+import { ScannedStudentsList } from "./ScannedStudentsList";
 
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -366,6 +367,8 @@ export default function AttendanceScanner() {
           </p>
         </div>
 
+        <ScannedStudentsList studentNumbers={[...attendedStudents]} />
+
         <Button type="button" onClick={resetSession}>
           New Session
         </Button>
@@ -521,6 +524,8 @@ export default function AttendanceScanner() {
       </div>
 
       <LastScannedStudent studentNumber={lastScan} />
+
+      <ScannedStudentsList studentNumbers={[...attendedStudents]} />
 
       <Button type="button" onClick={endSession} className="w-full">
         End Attendance Session
