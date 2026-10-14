@@ -1,0 +1,23 @@
+pnpm-workspace.yaml
+  s_d93e7814f5e217::t_dc002075324f10 86
+apps/backend/package.json
+  s_d93e7814f5e217::t_dc002075324f10 54
+apps/frontend/package.json
+  s_d93e7814f5e217::t_dc002075324f10 39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e9dd7a490c4ef2df4ee3e7ca4b20d1d430d08fa5",
+  "prompts": {},
+  "sessions": {
+    "s_d93e7814f5e217": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9bc14b47-2bbc-40e3-82f0-608584b1e11d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
