@@ -46,7 +46,9 @@ LABEL org.opencontainers.image.title="UMTAS PDF parser worker" \
       org.opencontainers.image.base.name="docker.io/library/node:22-bookworm-slim" \
       io.umtas.base-image.update-policy="Track patched Node 22 bookworm-slim releases"
 
+# upgrade pulls Debian security fixes newer than the base image tag.
 RUN apt-get update \
+    && apt-get upgrade --yes \
     && apt-get install --yes --no-install-recommends dumb-init python3 \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /app/python /tmp/umtas-worker \

@@ -129,6 +129,70 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: "**/junit.xml"
 
+  pr-image-scan:
+    name: Scan PR images
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: backend
+            dockerfile: docker/backend/backend.Dockerfile
+            cache: backend-staging
+          - service: frontend
+            dockerfile: docker/frontend/frontend.Dockerfile
+            cache: frontend-staging
+          - service: solver-worker
+            dockerfile: docker/solver-worker/solver-worker.Dockerfile
+            cache: solver-worker-staging
+          - service: pdf-parser-worker
+            dockerfile: docker/pdf-parser-worker/pdf-parser-worker.Dockerfile
+            cache: pdf-parser-staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+
+      - name: Build image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          load: true
+          push: false
+          build-args: SKIP_ML_MODELS=1
+          tags: umtas-pr-scan:${{ matrix.service }}
+          cache-from: type=gha,scope=${{ matrix.cache }}
+
+      - name: Scan for vulnerabilities
+        env:
+          SERVICE: ${{ matrix.service }}
+        run: |
+          mkdir -p reports
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$PWD/reports:/reports" -v "$PWD/.trivyignore:/.trivyignore:ro" \
+            aquasec/trivy:0.75.0 image --ignorefile /.trivyignore \
+            --scanners vuln --severity HIGH,CRITICAL --format json \
+            --output "/reports/$SERVICE.json" "umtas-pr-scan:$SERVICE"
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$PWD/.trivyignore:/.trivyignore:ro" \
+            aquasec/trivy:0.75.0 image --ignorefile /.trivyignore \
+            --scanners vuln --severity CRITICAL --exit-code 1 \
+            "umtas-pr-scan:$SERVICE"
+
+      - name: Keep vulnerability report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pr-vulnerabilities-${{ matrix.service }}
+          path: reports/
+          retention-days: 14
+
   docker-staging:
     name: Build & Push Staging Images
     runs-on: ubuntu-latest
@@ -363,6 +427,11 @@ jobs:
       matrix:
         service: [backend, frontend, solver-worker, pdf-parser-worker]
     steps:
+      - name: Checkout trivyignore
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          sparse-checkout: .trivyignore
+          sparse-checkout-cone-mode: false
       - name: Scan for vulnerabilities
         env:
           SERVICE: ${{ matrix.service }}
@@ -375,10 +444,12 @@ jobs:
             tag="staging-${GITHUB_SHA::7}"
           fi
           mkdir -p reports
-          docker run --rm -v "$PWD/reports:/reports" aquasec/trivy:0.75.0 image \
+          docker run --rm -v "$PWD/reports:/reports" -v "$PWD/.trivyignore:/.trivyignore:ro" \
+            aquasec/trivy:0.75.0 image --ignorefile /.trivyignore \
             --scanners vuln --severity HIGH,CRITICAL --format json \
             --output "/reports/$SERVICE.json" "vigilcs/umtas:$SERVICE-$tag"
-          docker run --rm -v "$PWD/reports:/reports" aquasec/trivy:0.75.0 image \
+          docker run --rm -v "$PWD/.trivyignore:/.trivyignore:ro" \
+            aquasec/trivy:0.75.0 image --ignorefile /.trivyignore \
             --scanners vuln --severity CRITICAL --exit-code 1 \
             "vigilcs/umtas:$SERVICE-$tag"
       - name: Keep vulnerability report
