@@ -1,0 +1,32 @@
+docker/solver-worker/solver-worker.Dockerfile
+  s_2907e5cab8a0d3::t_9a8d54544af3c3 113-114
+  s_2907e5cab8a0d3::t_65380ff383eee2 92-93,95-96
+.trivyignore
+  s_2907e5cab8a0d3::t_9184d0cf226260 1-11
+pnpm-workspace.yaml
+  s_2907e5cab8a0d3::t_3fbac2109fc112 29
+docker/pdf-parser-worker/pdf-parser-worker.Dockerfile
+  s_2907e5cab8a0d3::t_65380ff383eee2 49,51
+.github/workflows/ci.yml
+  s_2907e5cab8a0d3::t_a88aef588b0393 132-195
+  s_2907e5cab8a0d3::t_f113528a899789 447-448,451-452
+  s_2907e5cab8a0d3::t_0edda7fb962932 430-434
+pnpm-lock.yaml
+  s_2907e5cab8a0d3::t_ce4bd9172064b3 19,16680,21202
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "70d0543e2e333b411d853c35a588a6f109b444e9",
+  "prompts": {},
+  "sessions": {
+    "s_2907e5cab8a0d3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "77b8891b-c55d-42c8-b9a9-53d81c61ad69",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
