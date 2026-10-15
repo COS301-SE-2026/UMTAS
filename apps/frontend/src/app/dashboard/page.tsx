@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Activity,
@@ -9,6 +9,7 @@ import {
   BookOpen,
   Building2,
   CalendarDays,
+  CheckCircle2,
   ExternalLink,
   MapPin,
   ScanLine,
@@ -17,8 +18,9 @@ import {
 import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
 import { Badge } from "@/components/atoms/baseShadcn/badge";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import { Separator } from "@/components/atoms/baseShadcn/separator";
 import { PageSkeleton } from "@/components/atoms/nav/PageSkeleton";
+import { Alert, AlertDescription } from "@/components/atoms/baseShadcn/alert";
+import { GoogleAccessExplainer } from "@/components/organisms/landing/GoogleAccessExplainer";
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { useSession } from "@/lib/auth-client";
 
@@ -138,6 +140,7 @@ function TypewriterLine() {
 function DashboardContent() {
   const router = useRouter();
   const { isPending } = useSession();
+  const isAccountDeleted = useSearchParams().get("accountDeleted") === "1";
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -166,6 +169,17 @@ function DashboardContent() {
 
   return (
     <main className="bg-[var(--bg-base)] text-[var(--text-primary)] -mt-6 min-h-[60vh] w-full flex flex-col">
+      {isAccountDeleted && (
+        <div className="max-w-6xl w-full mx-auto px-6 pt-6 lg:px-8">
+          <Alert className="border-[var(--success-text)] bg-[var(--success-bg)] text-[var(--success-text)]">
+            <CheckCircle2 size={16} aria-hidden="true" />
+            <AlertDescription className="text-[var(--success-text)]">
+              Your account was deleted.
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+
       <section className="bg-[var(--bg-elevated)] border-[var(--border)] border-b w-full">
         <div className="max-w-6xl w-full mx-auto px-6 py-12 grid items-center gap-8 lg:grid-cols-2 lg:px-8 lg:py-16 lg:gap-12">
           <div className="flex flex-col items-start gap-6">
@@ -430,6 +444,12 @@ function DashboardContent() {
         </div>
       </section>
 
+      <section className="w-full py-12">
+        <div className="max-w-6xl w-full mx-auto px-6 lg:px-8">
+          <GoogleAccessExplainer />
+        </div>
+      </section>
+
       <section className="w-full py-8">
         <div className="max-w-6xl w-full mx-auto px-6 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between lg:px-8">
           <div className="text-[var(--text-secondary)] flex flex-col gap-2">
@@ -470,26 +490,6 @@ function DashboardContent() {
           </div>
         </div>
       </section>
-
-      <footer className="border-[var(--border)] border-t w-full">
-        <div className="max-w-6xl w-full mx-auto px-6 py-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between lg:px-8">
-          <div className="flex flex-col gap-2">
-            <p className="text-base font-semibold">UMTAS</p>
-            <p className="text-[var(--text-secondary)] text-xs">
-              University Modular Timetable &amp; Analytics System
-            </p>
-          </div>
-
-          <div className="text-[var(--text-disabled)] flex items-center gap-4 text-xs">
-            <p>Team Vigil</p>
-            <Separator
-              orientation="vertical"
-              className="bg-[var(--border)] h-4"
-            />
-            <p>Built for Tyto Insights</p>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }

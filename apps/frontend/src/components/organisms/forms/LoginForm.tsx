@@ -18,6 +18,7 @@ import { PasswordInput } from "@/components/atoms/auth/PasswordInput";
 import { FormField } from "@/components/molecules/OAuth/FormField";
 import { GoogleSignInButton } from "@/components/molecules/OAuth/GoogleSignInButton";
 import { AuthDivider } from "@/components/molecules/OAuth/AuthDivider";
+import { LegalAcknowledgement } from "@/components/molecules/OAuth/LegalAcknowledgement";
 import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { signIn } from "@/../utilities/auth-client";
 import { getallUnisBuilder } from "@/app/choose-institute/queries/builders";
@@ -278,6 +279,7 @@ export function LoginForm() {
               disabled={anyLoading}
             />
           </div>
+          <LegalAcknowledgement />
 
           <button
             type="button"

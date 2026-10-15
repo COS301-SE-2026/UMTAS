@@ -1,0 +1,60 @@
+rule_files:
+  - /etc/prometheus/alerts.yml
+evaluation_interval: 15s
+tests:
+  - name: BackendMetricsUnavailable
+    interval: 1s
+    input_series:
+      - series: up{job="backend"}
+        values: 0x150 1x150
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: BackendMetricsUnavailable
+        exp_alerts:
+          - exp_labels:
+              job: backend
+              severity: critical
+            exp_annotations:
+              summary: Backend cannot be scraped. Check backend process, port and network.
+              runbook: docs/developer-guides/incident-response.md
+      - eval_time: 3m
+        alertname: BackendMetricsUnavailable
+        exp_alerts: []
+  - name: RedisQueueMetricsUnavailable
+    interval: 1s
+    input_series:
+      - series: umtas_queue_scrape_success{queue="pdf-parse"}
+        values: 0x150 1x150
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: RedisQueueMetricsUnavailable
+        exp_alerts:
+          - exp_labels:
+              queue: pdf-parse
+              severity: critical
+            exp_annotations:
+              summary:
+                Queue snapshot failed. Check Redis connectivity before restarting
+                workers.
+              runbook: docs/developer-guides/incident-response.md
+      - eval_time: 3m
+        alertname: RedisQueueMetricsUnavailable
+        exp_alerts: []
+  - name: WorkerUnavailable
+    interval: 1s
+    input_series:
+      - series: umtas_queue_workers{queue="timetable-solve"}
+        values: 0x210 1x150
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: WorkerUnavailable
+        exp_alerts:
+          - exp_labels:
+              queue: timetable-solve
+              severity: critical
+            exp_annotations:
+              summary: No registered worker. Inspect solver/parser logs and Redis connection.
+              runbook: docs/developer-guides/incident-response.md
+      - eval_time: 4m
+        alertname: WorkerUnavailable
+        exp_alerts: []

@@ -30,6 +30,9 @@ RUN pnpm --filter=backend deploy --prod --legacy /deploy \
 
 FROM node:22-alpine AS runtime
 WORKDIR /app
+ARG APP_COMMIT=unknown
+ENV APP_COMMIT=${APP_COMMIT}
+LABEL org.opencontainers.image.revision=${APP_COMMIT}
 ENV NODE_ENV=production
 ENV PORT=8000
 COPY --from=build /deploy .

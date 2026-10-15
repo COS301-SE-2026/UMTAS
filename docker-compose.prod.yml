@@ -168,6 +168,10 @@ services:
         condition: service_completed_successfully
     environment:
       - PORT=${BACKEND_PORT}
+      - APP_VERSION=${IMAGE_TAG}
+      - APP_ENV=production
+      - POSTHOG_K=${POSTHOG_K:-}
+      - POSTHOG_H=${POSTHOG_H:-https://eu.i.posthog.com}
       - NODE_ENV=production
       - NODE_OPTIONS=--dns-result-order=ipv4first --network-family-autoselection-attempt-timeout=2000
       - DATABASE_URL=${DATABASE_URL}
@@ -299,6 +303,30 @@ services:
       - "traefik.http.routers.grafana-prod.tls.certresolver=myresolver"
       - "traefik.http.services.grafana-prod.loadbalancer.server.port=3000"
 
+  alertmanager:
+    image: prom/alertmanager:v0.28.1
+    restart: unless-stopped
+    networks:
+      - observability-internal
+      - gateway
+    environment:
+      ALERT_DISCORD_WEBHOOK_URL: ${ALERT_DISCORD_WEBHOOK_URL:-}
+    volumes:
+      - ./infra/alertmanager:/etc/alertmanager:ro
+      - alertmanager_data:/alertmanager
+    entrypoint: ["/bin/sh", "/etc/alertmanager/docker-entrypoint.sh"]
+
+  blackbox-exporter:
+    image: prom/blackbox-exporter:v0.26.0
+    restart: unless-stopped
+    networks:
+      - observability-internal
+      - data-internal
+      - gateway
+    volumes:
+      - ./infra/blackbox/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+    command: ["--config.file=/etc/blackbox_exporter/config.yml"]
+
   prometheus:
     image: prom/prometheus:v3.4.0
     restart: unless-stopped
@@ -415,4 +443,5 @@ volumes:
   minio_data:
   grafana_data:
   prometheus_data:
+  alertmanager_data:
   loki_data:

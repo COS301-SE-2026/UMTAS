@@ -159,3 +159,7 @@ jest.mock('shared-types', () => ({
 }));
 
 export {};
+
+jest.mock('better-auth/oauth2', () => ({
+  decryptOAuthToken: jest.fn((token: string) => token),
+}));

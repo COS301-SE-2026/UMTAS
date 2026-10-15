@@ -6,7 +6,13 @@ global:
     environment: production
     project: umtas
 
-rule_files: []
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
 
 scrape_configs:
   - job_name: prometheus
@@ -25,14 +31,6 @@ scrape_configs:
         labels:
           service: backend
           language: nestjs
-    metrics_path: /metrics
-
-  - job_name: solver
-    static_configs:
-      - targets: ["solver-worker:8000"]
-        labels:
-          service: solver
-          language: python
     metrics_path: /metrics
 
   - job_name: node
@@ -61,3 +59,25 @@ scrape_configs:
       - targets: ["health-exporter:9066"]
         labels:
           service: health-exporter
+
+  - job_name: public-health
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets: ["https://capstone-vigil.dns.net.za/"]
+        labels:
+          service: frontend
+      - targets: ["https://capstone-vigil.dns.net.za/api/health/ready"]
+        labels:
+          service: backend-readiness
+      - targets: ["http://minio-prod:9000/health"]
+        labels:
+          service: storage
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115

@@ -2590,6 +2590,27 @@ export interface paths {
     patch: operations["updateVisionSession"];
     trace?: never;
   };
+
+  "/api/auth/google/revoke-calendar-access": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Remove UMTAS access to the current user's Google Calendar
+     * @description Revokes the stored Google tokens at Google, clears them from UMTAS and resets the stored scopes to sign-in only. The Google account link is kept so the user can still sign in with Google. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["revokeGoogleCalendarAccess"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -12487,6 +12508,47 @@ export interface operations {
         content?: never;
       };
       500: components["responses"]["InternalError"];
+    };
+  };
+
+  revokeGoogleCalendarAccess: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Google access was revoked and the stored tokens cleared */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      400: components["responses"]["BadRequestError"];
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AuthErrorDto"];
+        };
+      };
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+      /** @description Google could not be reached or did not confirm the removal */
+      502: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AuthErrorDto"];
+        };
+      };
     };
   };
 }

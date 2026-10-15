@@ -1,4 +1,5 @@
 import { TopNavBar } from "@/components/organisms/nav/TopNavBar";
+import { SiteFooter } from "@/components/organisms/nav/SiteFooter";
 import { PageWrapper } from "@/components/templates/app/PageWrapper";
 
 interface AppShellTemplateProps {
@@ -22,6 +23,7 @@ export function AppShellTemplate({
     <div className="min-h-dvh bg-[-var(-bg-base)] flex flex-col">
       <TopNavBar userName={userName} />
       <PageWrapper>{children}</PageWrapper>
+      <SiteFooter />
     </div>
   );
 }

@@ -25,6 +25,7 @@ test("authenticate Admin", async ({ page }) => {
     process.env.SEED_SYSTEM_ADMIN_EMAIL ?? "system-admin@local.umtas",
   );
   await page.getByTestId("click-avatar").click();
+  await page.getByRole("menuitem", { name: /University/ }).click();
   const instituteDiv = page.getByTestId("dashboard-popup-div");
   await expect(instituteDiv).toBeVisible();
   await instituteDiv.getByTestId("institute-select-Uni").click();

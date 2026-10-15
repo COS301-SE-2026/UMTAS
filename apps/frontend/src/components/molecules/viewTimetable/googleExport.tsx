@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { GoogleIcon } from "@/components/atoms/auth/GoogleIcon";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Alert, AlertDescription } from "@/components/atoms/baseShadcn/alert";
@@ -54,7 +55,7 @@ export default function GoogleExportDialog({
     schedules[0];
 
   return (
-    <DialogContent className="bg-[var(--bg-surface)]">
+    <DialogContent className="ph-no-capture bg-[var(--bg-surface)]">
       <DialogHeader>
         <DialogTitle>Export to Google Calendar</DialogTitle>
         <DialogDescription>
@@ -73,6 +74,20 @@ export default function GoogleExportDialog({
           <p className="max-w-sm text-sm">
             Connect your Google Account to Add this Timetable to Your Google
             Calendar.
+          </p>
+
+          <p className="max-w-sm text-xs leading-[1.5] text-[var(--text-secondary)]">
+            Google will ask you to allow UMTAS to see your list of calendars,
+            create a calendar and add events. UMTAS only writes to a calendar
+            named “UMTAS”. Keep every box ticked on Google&apos;s screen so the
+            export can work. You can read more in our{" "}
+            <Link
+              href="/privacy#google-user-data"
+              className="rounded-sm underline underline-offset-2 hover:text-[var(--text-primary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+            >
+              Privacy Policy
+            </Link>
+            .
           </p>
 
           <Button
@@ -135,7 +150,7 @@ export function GoogleList({
   onScheduleChange,
 }: GoogleListProps) {
   return (
-    <div className="grid w-full grid-cols-1 items-center justify-center gap-y-2">
+    <div className="ph-no-capture grid w-full grid-cols-1 items-center justify-center gap-y-2">
       <Label
         htmlFor="google-export-schedule"
         className="text-[var(--text-secondary)]"

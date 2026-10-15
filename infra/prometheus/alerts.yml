@@ -1,0 +1,128 @@
+groups:
+  - name: umtas-operations
+    rules:
+      - alert: PublicServiceUnavailable
+        expr: probe_success{job="public-health"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary:
+            Public frontend, dependency readiness or storage probe failed. Check
+            routing and dependencies.
+          runbook: docs/developer-guides/incident-response.md
+      - alert: BackendMetricsUnavailable
+        expr: up{job="backend"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Backend cannot be scraped. Check backend process, port and network.
+          runbook: docs/developer-guides/incident-response.md
+      - alert: PostgresUnavailable
+        expr: pg_up{job="postgres"} == 0 or up{job="postgres"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary:
+            PostgreSQL or its exporter is unavailable. Check pg_isready, storage
+            and credentials.
+          runbook: docs/developer-guides/incident-response.md
+      - alert: RedisQueueMetricsUnavailable
+        expr: umtas_queue_scrape_success == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary:
+            Queue snapshot failed. Check Redis connectivity before restarting
+            workers.
+          runbook: docs/developer-guides/incident-response.md
+      - alert: WorkerUnavailable
+        expr: umtas_queue_workers == 0
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: No registered worker. Inspect solver/parser logs and Redis connection.
+          runbook: docs/developer-guides/incident-response.md
+      - alert: QueueBacklog
+        expr: sum by (queue) (umtas_queue_jobs{state=~"waiting|delayed"}) > 20
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary:
+            More than 20 pending jobs for ten minutes. Check worker capacity and
+            failed callbacks.
+          runbook: docs/developer-guides/incident-response.md
+      - alert: RetainedFailedJobs
+        expr: umtas_queue_jobs{state="failed"} > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary:
+            Retained failed jobs exist. Diagnose before retrying; counts expire
+            with retention.
+          runbook: docs/developer-guides/incident-response.md
+      - alert: HighApplicationErrors
+        expr:
+          (sum(rate(traefik_service_requests_total{service=~"(backend|frontend)-prod@docker",code=~"5.."}[5m]))
+          /
+          clamp_min(sum(rate(traefik_service_requests_total{service=~"(backend|frontend)-prod@docker"}[5m])),
+          0.001) > 0.01) and
+          (sum(rate(traefik_service_requests_total{service=~"(backend|frontend)-prod@docker"}[5m]))
+          > 0.1)
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary:
+            5xx exceeds 1% under meaningful traffic. Correlate logs with the last
+            release.
+          runbook: docs/developer-guides/incident-response.md
+      - alert: HighApplicationLatency
+        expr: histogram_quantile(0.95, sum by (le,service)
+          (rate(traefik_service_request_duration_seconds_bucket{service=~"(backend|frontend)-prod@docker"}[5m])))
+          > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary:
+            p95 exceeds one second for ten minutes. Check database, queues and
+            external APIs.
+          runbook: docs/developer-guides/incident-response.md
+      - alert: LowRootDisk
+        expr:
+          node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|overlay"} /
+          node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|overlay"} <
+          0.15
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary:
+            Root disk below 15% free. Inspect logs/images/backups; do not delete
+            active volumes.
+          runbook: docs/developer-guides/incident-response.md
+      - alert: ContainerRestarting
+        expr: increase(docker_container_restart_count[15m]) >= 3
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary:
+            Container restarted at least three times in 15 minutes. Check logs and
+            OOM events.
+          runbook: docs/developer-guides/incident-response.md
+      - alert: MonitoringTargetUnavailable
+        expr: up{job!="backend",job!="postgres",job!="public-health"} == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Monitoring target unavailable; dashboards may be missing data.
+          runbook: docs/developer-guides/incident-response.md

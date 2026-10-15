@@ -89,8 +89,11 @@ LABEL org.opencontainers.image.title="UMTAS solver worker" \
       io.umtas.ortools.version="${ORTOOLS_VERSION}" \
       io.umtas.base-image.update-policy="Track patched Node 22 bookworm-slim releases"
 
+# Runtime only needs certs and an init; build tooling stays in solver-build.
+# upgrade pulls Debian security fixes newer than the base image tag.
 RUN apt-get update \
-    && apt-get install --yes --no-install-recommends build-essential ca-certificates curl dumb-init pkg-config unzip \
+    && apt-get upgrade --yes \
+    && apt-get install --yes --no-install-recommends ca-certificates dumb-init \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /app/bin /app/lib /tmp/umtas-worker \
     && chown -R node:node /app /tmp/umtas-worker
@@ -106,6 +109,8 @@ COPY --from=node-build --chown=node:node /deploy/ /app/
 COPY --from=solver-build --chown=node:node /out/bin/solver-cli /app/bin/solver-cli
 COPY --from=solver-build /out/lib/ /app/lib/
 COPY --from=solver-build --chown=node:node /out/image-smoke-ok /app/.image-smoke-ok
+
+RUN if ldd /app/bin/solver-cli | grep -F "not found"; then exit 1; fi
 
 USER node
 
