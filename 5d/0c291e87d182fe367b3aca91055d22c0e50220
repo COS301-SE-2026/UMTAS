@@ -1,0 +1,37 @@
+infra/prometheus/alerts.yml
+  s_9a2ab1c51b7f58::t_8cb1ba31590050 60-62,66
+apps/frontend/src/components/molecules/attendance/BarcodeCamera.tsx
+  s_5714e6b3c2bbf0::t_ce7c428ccecb92 5,8-17
+  s_5714e6b3c2bbf0::t_54a5cca84f627f 7,39-47,82,183-190,221-225,260,299-311
+  s_5714e6b3c2bbf0::t_23f08b4b6da5f6 6
+apps/frontend/src/app/account/page.tsx
+  s_9a2ab1c51b7f58::t_8cb1ba31590050 11,15
+apps/frontend/package.json
+  s_5714e6b3c2bbf0::t_881eef2d9888f3 55
+apps/frontend/src/components/organisms/attendance/AttendanceScanner.tsx
+  s_5714e6b3c2bbf0::t_cd4f248221801f 31,38-43,107,118,140,149,162,231-239,250,259-264,266,268-269,298-302,309,368,390,548
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5d0c291e87d182fe367b3aca91055d22c0e50220",
+  "prompts": {},
+  "sessions": {
+    "s_5714e6b3c2bbf0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9b825410-bc21-4649-9831-59f2fdf15382",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    },
+    "s_9a2ab1c51b7f58": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b7488fa2-1bb2-420b-93b9-4da227408c0b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
