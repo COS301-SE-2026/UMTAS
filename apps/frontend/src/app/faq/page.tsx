@@ -354,7 +354,7 @@ const HelpCentrePage = () => {
   return (
     <>
       <Tutorial steps={steps} wait={true} />
-      <main className="max-w-[1280px] mx-auto py-12 px-6 md:px-8">
+      <main className="mx-auto w-full max-w-4xl py-12 px-6 md:px-8">
         <div className="mb-12 space-y-4">
           <h1 className="text-[32px] font-semibold leading-[1.2] text-primary tracking-normal">
             Help Centre
@@ -365,7 +365,7 @@ const HelpCentrePage = () => {
           </p>
         </div>
 
-        <div id="faq-categories" className="space-y-12 max-w-4xl">
+        <div id="faq-categories" className="space-y-12">
           {johanHierisDieData.categories.map((category) => (
             <FaqCategorySection key={category.id} category={category} />
           ))}
