@@ -28,9 +28,16 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 export default function AttendanceScanner() {
   const pendingScans = useRef(new Set<string>());
   const recordedScans = useRef(new Set<string>());
+  const statusTimeout = useRef<number | undefined>(undefined);
   const [expectedStudents, setExpectedStudents] = useState<string[]>([]);
 
   const [attendedStudents, setAttendedStudents] = useState<Set<string>>(
+    new Set(),
+  );
+
+  // Every valid student number scanned this session, including students who
+  // are not on the uploaded list.
+  const [scannedStudents, setScannedStudents] = useState<Set<string>>(
     new Set(),
   );
 
@@ -97,6 +104,7 @@ export default function AttendanceScanner() {
         const state = JSON.parse(saved) as {
           expected: string[];
           scanned: string[];
+          allScanned?: string[];
           fileName: string;
           active: boolean;
         };
@@ -107,6 +115,7 @@ export default function AttendanceScanner() {
           setExpectedStudents(state.expected);
           recordedScans.current = new Set(state.scanned ?? []);
           setAttendedStudents(new Set(recordedScans.current));
+          setScannedStudents(new Set(state.allScanned ?? state.scanned ?? []));
           setFileName(state.fileName);
           setSessionStarted(state.active);
         });
@@ -128,6 +137,7 @@ export default function AttendanceScanner() {
       JSON.stringify({
         expected: expectedStudents,
         scanned: [...attendedStudents],
+        allScanned: [...scannedStudents],
         fileName,
         active: sessionStarted,
       }),
@@ -136,6 +146,7 @@ export default function AttendanceScanner() {
     selectedEventID,
     expectedStudents,
     attendedStudents,
+    scannedStudents,
     fileName,
     sessionStarted,
   ]);
@@ -148,6 +159,7 @@ export default function AttendanceScanner() {
     setExpectedStudents([]);
     recordedScans.current = new Set();
     setAttendedStudents(new Set());
+    setScannedStudents(new Set());
     setFileName(null);
     setLastScan(null);
   };
@@ -216,6 +228,15 @@ export default function AttendanceScanner() {
     });
   };
 
+  const showStatus = (nextStatus: "SUCCESS" | "ERROR") => {
+    setStatus(nextStatus);
+
+    window.clearTimeout(statusTimeout.current);
+    statusTimeout.current = window.setTimeout(() => {
+      setStatus("READY");
+    }, 1500);
+  };
+
   const handleScan = async (studentNumber: string) => {
     if (!sessionStarted || sessionEnded || !selectedEventID) {
       return;
@@ -226,29 +247,27 @@ export default function AttendanceScanner() {
     setLastScan(cleanedStudentNumber);
 
     if (!/^\d{8}$/.test(cleanedStudentNumber)) {
-      setStatus("ERROR");
+      showStatus("ERROR");
 
       toast.error("Invalid student number", {
         description: "Student numbers must contain exactly 8 digits.",
       });
 
-      window.setTimeout(() => {
-        setStatus("READY");
-      }, 1500);
-
       return;
     }
 
+    setScannedStudents((current) =>
+      current.has(cleanedStudentNumber)
+        ? current
+        : new Set(current).add(cleanedStudentNumber),
+    );
+
     if (!expectedStudents.includes(cleanedStudentNumber)) {
-      setStatus("ERROR");
+      showStatus("ERROR");
 
-      toast.error("Student not found", {
-        description: `${cleanedStudentNumber} is not in the uploaded student list.`,
+      toast.warning("Student not on class list", {
+        description: `${cleanedStudentNumber} was added to the scanned list but not to attendance.`,
       });
-
-      window.setTimeout(() => {
-        setStatus("READY");
-      }, 1500);
 
       return;
     }
@@ -276,14 +295,18 @@ export default function AttendanceScanner() {
         eventID: selectedEventID,
       });
 
-      setStatus("SUCCESS");
+      showStatus("SUCCESS");
+
+      toast.success("Attendance recorded", {
+        description: cleanedStudentNumber,
+      });
 
       void refetch();
     } catch {
       recordedScans.current.delete(cleanedStudentNumber);
       setAttendedStudents(new Set(recordedScans.current));
 
-      setStatus("ERROR");
+      showStatus("ERROR");
 
       toast.error("Attendance could not be recorded", {
         description: "Please try scanning the student again.",
@@ -291,10 +314,6 @@ export default function AttendanceScanner() {
     } finally {
       pendingScans.current.delete(cleanedStudentNumber);
     }
-
-    window.setTimeout(() => {
-      setStatus("READY");
-    }, 1500);
   };
 
   const startSession = () => {
@@ -346,6 +365,7 @@ export default function AttendanceScanner() {
     setExpectedStudents([]);
     recordedScans.current = new Set();
     setAttendedStudents(new Set());
+    setScannedStudents(new Set());
 
     setFileName(null);
     setLastScan(null);
@@ -367,7 +387,7 @@ export default function AttendanceScanner() {
           </p>
         </div>
 
-        <ScannedStudentsList studentNumbers={[...attendedStudents]} />
+        <ScannedStudentsList studentNumbers={[...scannedStudents]} />
 
         <Button type="button" onClick={resetSession}>
           New Session
@@ -525,7 +545,7 @@ export default function AttendanceScanner() {
 
       <LastScannedStudent studentNumber={lastScan} />
 
-      <ScannedStudentsList studentNumbers={[...attendedStudents]} />
+      <ScannedStudentsList studentNumbers={[...scannedStudents]} />
 
       <Button type="button" onClick={endSession} className="w-full">
         End Attendance Session
