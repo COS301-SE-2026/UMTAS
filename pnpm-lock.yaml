@@ -463,7 +463,7 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
       zxing-wasm:
-        specifier: ^3.1.4
+        specifier: 3.1.4
         version: 3.1.4(@types/emscripten@1.41.6)
     devDependencies:
       "@eslint/js":

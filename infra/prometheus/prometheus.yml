@@ -21,13 +21,12 @@ scrape_configs:
 
   - job_name: traefik
     static_configs:
+      # No static `service` label: it would clobber Traefik's own service label.
       - targets: ["traefik:8082"]
-        labels:
-          service: traefik
 
   - job_name: backend
     static_configs:
-      - targets: ["backend:8000"]
+      - targets: ["backend-prod:8000"]
         labels:
           service: backend
           language: nestjs

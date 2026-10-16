@@ -2,7 +2,19 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { readBarcodes } from "zxing-wasm/reader";
+import { prepareZXingModule, readBarcodes } from "zxing-wasm/reader";
+
+import { Button } from "@/components/atoms/baseShadcn/button";
+
+// Serve the decoder from our own app instead of the jsDelivr CDN so scanning
+// works without outside internet. public/zxing/zxing_reader.wasm must match the
+// pinned zxing-wasm version in package.json.
+prepareZXingModule({
+  overrides: {
+    locateFile: (path: string, prefix: string) =>
+      path.endsWith(".wasm") ? `/zxing/${path}` : prefix + path,
+  },
+});
 
 interface BarcodeCameraProps {
   onScan: (value: string) => void;
@@ -24,6 +36,15 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
 
   const [cameraState, setCameraState] = useState<CameraState>("starting");
   const [scanFlash, setScanFlash] = useState(false);
+  const [restartKey, setRestartKey] = useState(0);
+
+  // Keep the latest onScan in a ref so a new callback from the parent does not
+  // tear down and restart the camera stream.
+  const onScanRef = useRef(onScan);
+
+  useEffect(() => {
+    onScanRef.current = onScan;
+  }, [onScan]);
 
   const lastScanRef = useRef<{
     value: string;
@@ -58,7 +79,7 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
         setScanFlash(false);
       }, 300);
 
-      onScan(value);
+      onScanRef.current(value);
     }
 
     async function scanWithWasm() {
@@ -159,6 +180,14 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
 
         const track = stream.getVideoTracks()[0];
 
+        // The OS or another app can take the camera away, which leaves a blank
+        // video. Show the error state so the user can restart it.
+        track.addEventListener("ended", () => {
+          if (!cancelled) {
+            setCameraState("error");
+          }
+        });
+
         const capabilities = track.getCapabilities() as CameraCapabilities;
 
         if (capabilities.zoom) {
@@ -189,6 +218,11 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
           void scanWithWasm();
         }, 200);
       } catch (error) {
+        // play() rejects with AbortError when the stream is torn down mid-start.
+        if (cancelled) {
+          return;
+        }
+
         if (error instanceof DOMException) {
           if (error.name === "NotFoundError") {
             setCameraState("not-found");
@@ -223,7 +257,7 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
         videoRef.current.srcObject = null;
       }
     };
-  }, [onScan]);
+  }, [restartKey]);
 
   if (cameraState === "not-found") {
     return (
@@ -262,6 +296,19 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
           <p className="mt-1 text-sm text-muted-foreground">
             Please try again.
           </p>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-3"
+            onClick={() => {
+              setCameraState("starting");
+              setRestartKey((key) => key + 1);
+            }}
+          >
+            Restart camera
+          </Button>
         </div>
       </div>
     );

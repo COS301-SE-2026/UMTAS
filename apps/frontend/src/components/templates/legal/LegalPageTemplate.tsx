@@ -5,7 +5,7 @@ interface LegalPageTemplateProps {
 }
 
 const CONTENT_CLASSES = [
-  "max-w-3xl space-y-10 text-[14px] leading-[1.6] text-[var(--text-primary)]",
+  "space-y-10 text-[14px] leading-[1.6] text-[var(--text-primary)]",
   "[&_section]:scroll-mt-24 [&_section>*+*]:mt-4",
   "[&_h2]:text-[18px] [&_h2]:font-semibold [&_h2]:leading-[1.4]",
   "[&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6",
@@ -19,8 +19,8 @@ export function LegalPageTemplate({
   children,
 }: LegalPageTemplateProps) {
   return (
-    <div className="max-w-[1280px] mx-auto py-12 px-6 md:px-8">
-      <header className="mb-12 max-w-3xl space-y-4">
+    <div className="mx-auto w-full max-w-3xl py-12 px-6 md:px-8">
+      <header className="mb-12 space-y-4">
         <h1 className="text-[32px] font-semibold leading-[1.2] text-[var(--text-primary)]">
           {title}
         </h1>

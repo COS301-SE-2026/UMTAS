@@ -57,15 +57,13 @@ groups:
             More than 20 pending jobs for ten minutes. Check worker capacity and
             failed callbacks.
           runbook: docs/developer-guides/incident-response.md
-      - alert: RetainedFailedJobs
-        expr: umtas_queue_jobs{state="failed"} > 0
-        for: 5m
+      - alert: NewFailedJobs
+        # The gauge counts failures retained for 7 days, so alert on growth only.
+        expr: delta(umtas_queue_jobs{state="failed"}[15m]) > 0
         labels:
           severity: warning
         annotations:
-          summary:
-            Retained failed jobs exist. Diagnose before retrying; counts expire
-            with retention.
+          summary: New failed jobs in the last 15 minutes. Diagnose before retrying.
           runbook: docs/developer-guides/incident-response.md
       - alert: HighApplicationErrors
         expr:
