@@ -54,7 +54,28 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 <br>
 
-[Demo](#demo) · [Overview](#project-overview) · [Features](#features) · [Documentation](#documentation) · [Architecture](#system-architecture) · [Tech Stack](#technology-stack) · [Branching](#branching-strategy) · [Team](#team) · [Partners](#partners)
+[Project Day](#project-day-2026) · [Demo](#demo) · [Overview](#project-overview) · [Features](#features) · [Documentation](#documentation) · [Architecture](#system-architecture) · [Tech Stack](#technology-stack) · [Branching](#branching-strategy) · [Team](#team) · [Partners](#partners)
+
+</div>
+
+---
+
+<div align="center">
+
+## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/calendar-star.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/calendar-star.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> Project Day 2026
+
+**Come see UMTAS live** · Friday, 30 October 2026 · 09:00–13:00 · Rautenbach Hall, UP Hatfield Campus
+
+</div>
+
+<p align="center">
+  <a href="docs/assets/readmeImg/project-day/UMTAS-Project-Day-2026.pdf"><img src="docs/assets/readmeImg/project-day/slide-01.png" width="48%" alt="Building a university timetable takes seconds"></a>
+  <a href="docs/assets/readmeImg/project-day/UMTAS-Project-Day-2026.pdf"><img src="docs/assets/readmeImg/project-day/slide-09.png" width="48%" alt="Come see UMTAS live: RSVP, try it now, star the repo"></a>
+</p>
+
+<div align="center">
+
+<sub>📄 [View the full Project Day slide deck (PDF)](docs/assets/readmeImg/project-day/UMTAS-Project-Day-2026.pdf)</sub>
 
 </div>
 
@@ -104,6 +125,11 @@ UMTAS turns a university's existing timetable into a clash-free personal timetab
 - **Privacy-friendly:** attendance, heat maps and Lecture Watch use aggregate numbers, not personal footage or class lists.
 - **Built-in help:** interactive Joyride tours on most pages (Help section of the top nav bar), a user manual and an FAQ.
 
+<p align="center">
+  <a href="docs/assets/readmeImg/project-day/UMTAS-Project-Day-2026.pdf"><img src="docs/assets/readmeImg/project-day/slide-02.png" width="48%" alt="One platform for campus life"></a>
+  <a href="docs/assets/readmeImg/project-day/UMTAS-Project-Day-2026.pdf"><img src="docs/assets/readmeImg/project-day/slide-07.png" width="48%" alt="Built like production software: 1,100+ tests, 17/17 quality requirements, 99.97% uptime"></a>
+</p>
+
 ---
 
 <div align="center">
@@ -111,6 +137,16 @@ UMTAS turns a university's existing timetable into a clash-free personal timetab
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/star-outline.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/star-outline.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> Features
 
 </div>
+
+<p align="center">
+  <a href="docs/assets/readmeImg/project-day/UMTAS-Project-Day-2026.pdf"><img src="docs/assets/readmeImg/project-day/slide-03.png" width="48%" alt="Timetables, solved"></a>
+  <a href="docs/assets/readmeImg/project-day/UMTAS-Project-Day-2026.pdf"><img src="docs/assets/readmeImg/project-day/slide-04.png" width="48%" alt="Find your way. Skip the crowds."></a>
+</p>
+
+<p align="center">
+  <a href="docs/assets/readmeImg/project-day/UMTAS-Project-Day-2026.pdf"><img src="docs/assets/readmeImg/project-day/slide-05.png" width="48%" alt="Roll call in seconds"></a>
+  <a href="docs/assets/readmeImg/project-day/UMTAS-Project-Day-2026.pdf"><img src="docs/assets/readmeImg/project-day/slide-06.png" width="48%" alt="Read the room: Lecture Watch"></a>
+</p>
 
 <details>
 <summary><strong>Expand features</strong></summary>
