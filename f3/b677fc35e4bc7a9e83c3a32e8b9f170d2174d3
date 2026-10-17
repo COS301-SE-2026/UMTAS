@@ -1,0 +1,25 @@
+README.md
+  s_e2dc0c07a71644::t_a509743eb062bd 73,75,77-78,80,84
+  s_e2dc0c07a71644::t_86a3408d2b2cf8 57,723-733,735-749,753
+  s_e2dc0c07a71644::t_ab18f2f39cb933 734
+  s_e2dc0c07a71644::t_c76d857a65b540 85
+  s_e2dc0c07a71644::t_6ed560d3309999 750-752
+  s_e2dc0c07a71644::t_4e4dfc4b2f26d0 754
+  s_e2dc0c07a71644::t_75246df993dc4c 65,71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f3b677fc35e4bc7a9e83c3a32e8b9f170d2174d3",
+  "prompts": {},
+  "sessions": {
+    "s_e2dc0c07a71644": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7c8bf65-03bd-43d1-81da-0845735d8ab2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
