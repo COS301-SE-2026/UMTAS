@@ -1,0 +1,21 @@
+README.md
+  s_e2dc0c07a71644::t_78ede1f59a77db 72-73,129-130,142-143,147-148
+  s_e2dc0c07a71644::t_3d322676032bad 57-71,74-78,128,131-132,141,144-146,149
+  s_e2dc0c07a71644::t_51110532b0f69d 150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "679f9e5256d0d24a16b198689434fe566c03e464",
+  "prompts": {},
+  "sessions": {
+    "s_e2dc0c07a71644": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7c8bf65-03bd-43d1-81da-0845735d8ab2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
