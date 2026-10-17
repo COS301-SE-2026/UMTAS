@@ -20,6 +20,10 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 <br>
 
+![Umtas Trailer](docs/assets/readmeImg/Trailer.mp4)
+
+<br>
+
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=3500&pause=1000&color=3B82F6&center=true&vCenter=true&width=580&lines=Automated+timetabling+powered+by+OR-Tools;PDF+schedule+ingestion;University-agnostic+by+design;100-concurrent-user+load+test)](https://cos301-se-2026.github.io/UMTAS/latest/)
 
 <br>
