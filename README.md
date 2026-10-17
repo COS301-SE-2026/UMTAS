@@ -2,12 +2,16 @@
 
 <br>
 
-<img src="docs/assets/images/VigilLogoOwl-animated.svg" width="300" alt="Team Vigil">
+<p align="center">
+  <img src="docs/assets/images/VigilLogoOwl-animated.svg" width="300" alt="Team Vigil">
+</p>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/images/umtas-wordmark.svg">
-  <img src="docs/assets/images/umtas-wordmark-light.svg" width="500" alt="UMTAS">
-</picture>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/images/umtas-wordmark.svg">
+    <img src="docs/assets/images/umtas-wordmark-light.svg" width="500" alt="UMTAS">
+  </picture>
+</p>
 
 ### University Management & Timetables Analytics System
 
