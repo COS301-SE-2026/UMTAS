@@ -20,7 +20,7 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 <br>
 
-<video src="docs/assets/readmeImg/Umtas.mp4" autoplay loop muted playsinline width="100%"></video>
+![Umtas](docs/assets/readmeImg/Umtas.gif)
 
 <br>
 
