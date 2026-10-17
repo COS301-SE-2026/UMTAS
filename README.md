@@ -514,11 +514,12 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <details>
         <summary>Quote</summary>
         <br>
-        <i>"Id kiss you if I was Italian and didn't have a girlfriend"</i>
+        <i>"I'd kiss you if I were Italian and didn't have a girlfriend."</i>
       </details>
       <br>
       <a href="https://www.linkedin.com/in/wilmar-smit-3b11842a3/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/wilmar-smit"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+      <a href="mailto:wilmarsmit2004@gmail.com"><img src="https://img.shields.io/badge/Email-wilmarsmit2004%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email wilmarsmit2004@gmail.com"></a>
       <br><br>
     </td>
   </tr>
@@ -536,11 +537,12 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <details>
         <summary>Quote</summary>
         <br>
-        <i>"Oh no it broke." Everyone asking what thinking of the production server "The chair "</i>
+        <i>"Oh no, it broke."<br>When asked about the production server: "The chair."</i>
       </details>
       <br>
       <a href="https://www.linkedin.com/in/michael-tomlinson-089511274/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/michaeltomlinsontuks"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+      <a href="mailto:michael@tomlinson.co.za"><img src="https://img.shields.io/badge/Email-michael%40tomlinson.co.za-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email michael@tomlinson.co.za"></a>
       <br><br>
     </td>
   </tr>
@@ -558,11 +560,12 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <details>
         <summary>Quote</summary>
         <br>
-        <i>"He's lactating honey "</i>
+        <i>"He's lactating honey."</i>
       </details>
       <br>
       <a href="https://www.linkedin.com/in/johan-coetzer-01bb26401"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/jcoet-gh"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+      <a href="mailto:johancoet9@gmail.com"><img src="https://img.shields.io/badge/Email-johancoet9%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email johancoet9@gmail.com"></a>
       <br><br>
     </td>
   </tr>
@@ -580,11 +583,12 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <details>
         <summary>Quote</summary>
         <br>
-        <i>"I just deleted dev, no biggie"</i>
+        <i>"I just deleted dev. No biggie."</i>
       </details>
       <br>
       <a href="https://www.linkedin.com/in/marcel-stoltz-88bb25238/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/marcelstoltz00"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+      <a href="mailto:marcelstoltz00@gmail.com"><img src="https://img.shields.io/badge/Email-marcelstoltz00%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email marcelstoltz00@gmail.com"></a>
       <br><br>
     </td>
   </tr>
@@ -602,11 +606,12 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <details>
         <summary>Quote</summary>
         <br>
-        <i>"Why do we even need a firewall, computers don't have fire"</i>
+        <i>"Why do we even need a firewall? Computers don't have fire."</i>
       </details>
       <br>
       <a href="https://www.linkedin.com/in/aidan-dawson-3514692ba"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/sdcreek240"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+      <a href="mailto:aidandwsn@gmail.com"><img src="https://img.shields.io/badge/Email-aidandwsn%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email aidandwsn@gmail.com"></a>
       <br><br>
     </td>
   </tr>
