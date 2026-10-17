@@ -20,6 +20,15 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 <br>
 
+
+
+https://github.com/user-attachments/assets/aa66c09f-6299-445e-954f-a26540610dae
+
+<br>
+
+
+
+
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=3500&pause=1000&color=3B82F6&center=true&vCenter=true&width=580&lines=Automated+timetabling+powered+by+OR-Tools;PDF+schedule+ingestion;University-agnostic+by+design;100-concurrent-user+load+test)](https://cos301-se-2026.github.io/UMTAS/latest/)
 
 <br>
@@ -258,6 +267,23 @@ UMTAS turns a university's existing timetable into a clash-free personal timetab
 
 </details>
 
+
+## <img width="24" height="24" valign="middle" alt="image" src="https://github.com/user-attachments/assets/3cf8a75d-4e61-44f6-9ddd-1d74505d41e2" /> Lecture Watch
+<img width="1677" height="1011" alt="VisionModel" src="https://github.com/user-attachments/assets/d6e00a8e-8488-4374-a9a4-54a26d5035f5" />
+
+
+
+## <img width="24" height="24" valign="middle" alt="image" src="https://github.com/user-attachments/assets/747665d0-d89f-45c6-a5ff-fd45b8c0fa62" /> Campus Wide Routing
+<img width="1677" height="1011" alt="routing" src="https://github.com/user-attachments/assets/3257f11c-b0a3-4547-b0a7-90ee86e442c9" />
+
+
+
+## <img width="24" height="24" valign="middle" alt="image" src="https://github.com/user-attachments/assets/0e5aa247-8562-4fa0-bca3-a03d1dca34b7" /> Physical Attendance Tracking
+<img width="1677" height="1011" alt="Attendance" src="https://github.com/user-attachments/assets/21e81c86-2f71-4c64-b4c3-17234c0c0f65" />
+
+
+<br>
+
 ---
 
 <div align="center">
@@ -494,6 +520,11 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
         <br>
         Third-year CS student and primary coordinator between frontend and backend workstreams. Ensures architectural alignment across the full stack and manages the integration of diverse components into a cohesive system. Professional experience at Tyto Insights informs his approach to building scalable, production-ready systems.
       </details>
+      <details>
+        <summary>Quote</summary>
+        <br>
+        <i>"Id kiss you if I was Italian and didn't have a girlfriend"</i>
+      </details>
       <br>
       <a href="https://www.linkedin.com/in/wilmar-smit-3b11842a3/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/wilmar-smit"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
@@ -510,6 +541,11 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
         <summary>About</summary>
         <br>
         Third-year CS student and Software Developer Intern at Tyto Insights, with prior experience migrating legacy systems at DCS Engineering. Serves as System Architect, responsible for the Core-and-Adapter pattern that keeps UMTAS university-agnostic. His Tuks PDF Calendar project provides the foundational domain expertise for the platform's PDF parsing challenges.
+      </details>
+      <details>
+        <summary>Quote</summary>
+        <br>
+        <i>"Oh no it broke." Everyone asking what thinking of the production server "The chair "</i>
       </details>
       <br>
       <a href="https://www.linkedin.com/in/michael-tomlinson-089511274/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
@@ -528,6 +564,11 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
         <br>
         Third-year CS student and Software Developer Intern at Tyto Insights (Skunkworks). As Frontend Lead, manages the Next.js ecosystem with a focus on responsive component architecture and intuitive UX. Bridges complex system logic with the interface to ensure that the heavy data requirements of UMTAS are delivered through a high-performance, accessible dashboard.
       </details>
+      <details>
+        <summary>Quote</summary>
+        <br>
+        <i>"He's lactating honey "</i>
+      </details>
       <br>
       <a href="https://www.linkedin.com/in/johan-coetzer-01bb26401"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/jcoet-gh"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
@@ -545,6 +586,11 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
         <br>
         Third-year CS student and Software Developer Intern at Tyto Insights (Skunkworks). Leads the DevOps and infrastructure workstream, specialising in Docker environments and automated deployment pipelines. Ensures the NestJS backend and PostgreSQL services are optimised for high-performance delivery.
       </details>
+      <details>
+        <summary>Quote</summary>
+        <br>
+        <i>"I just deleted dev, no biggie"</i>
+      </details>
       <br>
       <a href="https://www.linkedin.com/in/marcel-stoltz-88bb25238/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/marcelstoltz00"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
@@ -561,6 +607,11 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
         <summary>About</summary>
         <br>
         Third-year CS student focused on backend development and contract-driven integration. Responsible for core backend functionality, strict adherence to API contracts across all system components, data integrity and PDF extraction accuracy, and automated testing to maintain reliable interactions between the frontend, backend, and external adapters.
+      </details>
+      <details>
+        <summary>Quote</summary>
+        <br>
+        <i>"Why do we even need a firewall, computers don't have fire"</i>
       </details>
       <br>
       <a href="https://www.linkedin.com/in/aidan-dawson-3514692ba"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
