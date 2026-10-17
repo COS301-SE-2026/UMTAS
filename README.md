@@ -70,18 +70,19 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 ### UMTAS Trailer
 
-<a href="TRAILER_YOUTUBE_URL"><img src="docs/assets/readmeImg/trailer-thumbnail.png" width="720" alt="Watch the UMTAS trailer on YouTube"></a>
+<a href="https://youtu.be/PSdCXqWfkxA"><img src="docs/assets/readmeImg/trailer-thumbnail.png" width="720" alt="Watch the UMTAS trailer on YouTube"></a>
 
 <sub>▶ Click to watch the trailer on YouTube, <b>with sound</b> (recommended)</sub>
 
-<details>
-<summary>Or play the silent preview here</summary>
+<br><br>
 
-<br>
+<sub>Or play the silent preview here:</sub>
+
+</div>
 
 https://github.com/user-attachments/assets/aa66c09f-6299-445e-954f-a26540610dae
 
-</details>
+<div align="center">
 
 <br>
 
