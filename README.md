@@ -4,32 +4,20 @@
 
 <img src="docs/assets/images/VigilLogoOwl-animated.svg" width="300" alt="Team Vigil">
 
-<br>
-
-<img src="docs/assets/images/umtas-wordmark.svg" width="500" alt="UMTAS">
-
-<br>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/images/umtas-wordmark.svg">
+  <img src="docs/assets/images/umtas-wordmark-light.svg" width="500" alt="UMTAS">
+</picture>
 
 ### University Management & Timetables Analytics System
 
 Team Vigil - UMTAS - A university timetable platform for PDF ingestion, constraint solving and personalised schedules.
 
+<a href="https://cos301-se-2026.github.io/UMTAS/latest/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=3500&pause=1000&color=FFFFFF&center=true&vCenter=true&width=580&lines=Automated+timetabling+powered+by+OR-Tools;PDF+schedule+ingestion;University-agnostic+by+design;100-concurrent-user+load+test"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=3500&pause=1000&color=18181B&center=true&vCenter=true&width=580&lines=Automated+timetabling+powered+by+OR-Tools;PDF+schedule+ingestion;University-agnostic+by+design;100-concurrent-user+load+test" alt="Typing SVG"></picture></a>
+
 **A Strategic Partnership between [Tyto Insights](https://tyto.africa/), [DNS Business](https://dns.africa/c/), and Team Vigil**
 
 _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan Dawson_
-
-<br>
-
-
-
-https://github.com/user-attachments/assets/aa66c09f-6299-445e-954f-a26540610dae
-
-<br>
-
-
-
-
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=3500&pause=1000&color=3B82F6&center=true&vCenter=true&width=580&lines=Automated+timetabling+powered+by+OR-Tools;PDF+schedule+ingestion;University-agnostic+by+design;100-concurrent-user+load+test)](https://cos301-se-2026.github.io/UMTAS/latest/)
 
 <br>
 
@@ -52,20 +40,6 @@ https://github.com/user-attachments/assets/aa66c09f-6299-445e-954f-a26540610dae
 [![Node](https://img.shields.io/badge/Node-%3E%3D20-16a34a?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/vigilcs/umtas?style=for-the-badge&logo=docker&logoColor=white&label=Docker+Pulls&color=0db7ed)](https://hub.docker.com/u/vigilcs)
 
-<br>
-
-<img src="docs/assets/images/sponsors-marquee.svg" width="900" alt="Tyto Insights · DNS Business · University of Pretoria">
-
-<br>
-
-<!-- Partners & Affiliation -->
-
-[![Tyto Insights](https://img.shields.io/badge/Tyto_Insights-tyto.africa-0f172a?style=for-the-badge)](https://tyto.africa/)
-[![DNS Business](https://img.shields.io/badge/DNS_Business-dns.africa-003366?style=for-the-badge)](https://dns.africa/c/)
-[![University of Pretoria](https://img.shields.io/badge/University_of_Pretoria-COS_301-003B5C?style=for-the-badge)](https://www.up.ac.za/)
-
-<br>
-
 <!-- Documentation Links -->
 
 [![Full Documentation](https://img.shields.io/badge/Full_Documentation-Visit_Site-14532d?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/latest/)
@@ -74,13 +48,41 @@ https://github.com/user-attachments/assets/aa66c09f-6299-445e-954f-a26540610dae
 [![Issue Tracker](https://img.shields.io/badge/Issue_Tracker-GitHub_Issues-14532d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/COS301-SE-2026/UMTAS/issues)
 [![capstone-vigil.dns.net.za](https://img.shields.io/badge/capstone--vigil.dns.net.za-Visit_Website-14532d?style=for-the-badge&logo=vercel&logoColor=white)](https://capstone-vigil.dns.net.za/)
 
+<br>
+
+[Demo](#demo) · [Overview](#project-overview) · [Features](#features) · [Documentation](#documentation) · [Architecture](#system-architecture) · [Tech Stack](#technology-stack) · [Branching](#branching-strategy) · [Team](#team) · [Partners](#partners)
+
 </div>
 
 ---
 
 <div align="center">
 
-## <img src="https://api.iconify.design/mdi/information-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> Project Overview
+## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/play-circle-outline.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/play-circle-outline.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> Demo
+
+</div>
+
+<div align="center">
+
+### UMTAS Trailer
+
+https://github.com/user-attachments/assets/aa66c09f-6299-445e-954f-a26540610dae
+
+<br>
+
+### Full Demo
+
+<a href="https://youtu.be/TF5v5m4Hppk"><img src="docs/assets/readmeImg/demo-thumbnail.png" width="720" alt="Watch the UMTAS demo on YouTube"></a>
+
+<sub>▶ Click to watch the full demo on YouTube</sub>
+
+</div>
+
+---
+
+<div align="center">
+
+## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/information-outline.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/information-outline.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> Project Overview
 
 </div>
 
@@ -102,17 +104,75 @@ UMTAS turns a university's existing timetable into a clash-free personal timetab
 
 <div align="center">
 
-## <img src="https://api.iconify.design/mdi/bookshelf.svg?color=%233B82F6" width="24" height="24" valign="middle"> Documentation
+## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/star-outline.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/star-outline.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> Features
 
 </div>
 
+<details>
+<summary><strong>Expand features</strong></summary>
 <br>
 
-### <img src="https://api.iconify.design/mdi/numeric-1-circle.svg?color=%231d4ed8" width="20" height="20" valign="middle"> Demo 1
+<table width="100%">
+  <tr>
+    <td width="33%" valign="top" align="center">
+      <h3>PDF Ingestion</h3>
+      <p>PyMuPDF-powered extraction parses structured and semi-structured university PDF calendars into machine-readable constraint sets - zero manual data entry.</p>
+    </td>
+    <td width="33%" valign="top" align="center">
+      <h3>Constraint Solving</h3>
+      <p>Google OR-Tools CP-SAT solver handles hard constraints (no double-booking, room capacity) and soft constraints (lecturer preferences, day-spread) with optimal solutions.</p>
+    </td>
+    <td width="33%" valign="top" align="center">
+      <h3>Conflict Detection</h3>
+      <p>BullMQ-backed job queue processes re-solve requests asynchronously. Administrators receive conflict alerts and revised schedules without blocking the UI.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top" align="center">
+      <h3>University-Agnostic</h3>
+      <p>A Core-and-Adapter architecture decouples the solver from any single institution's data format. New universities onboard by implementing a thin adapter - the core is never touched.</p>
+    </td>
+    <td width="33%" valign="top" align="center">
+      <h3>Observability</h3>
+      <p>Prometheus metrics, Grafana dashboards, and Loki log aggregation are provisioned out-of-the-box. PostHog captures product analytics for continuous UX improvement.</p>
+    </td>
+    <td width="33%" valign="top" align="center">
+      <h3>Secure by Default</h3>
+      <p>OAuth 2.0 authentication, role-based access control, Redis-backed session management, and RustFS (S3-compatible) for isolated document storage. All traffic routed through Traefik with TLS termination.</p>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+### <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/cctv.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/cctv.svg?color=%2318181B" width="20" height="20" valign="middle"></picture> Lecture Watch
+
+<img width="1677" height="1011" alt="VisionModel" src="https://github.com/user-attachments/assets/d6e00a8e-8488-4374-a9a4-54a26d5035f5" />
+
+### <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/map-marker-path.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/map-marker-path.svg?color=%2318181B" width="20" height="20" valign="middle"></picture> Campus Wide Routing
+
+<img width="1677" height="1011" alt="routing" src="https://github.com/user-attachments/assets/3257f11c-b0a3-4547-b0a7-90ee86e442c9" />
+
+### <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/account-check-outline.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/account-check-outline.svg?color=%2318181B" width="20" height="20" valign="middle"></picture> Physical Attendance Tracking
+
+<img width="1677" height="1011" alt="Attendance" src="https://github.com/user-attachments/assets/21e81c86-2f71-4c64-b4c3-17234c0c0f65" />
+
+</details>
+
+---
+
+<div align="center">
+
+## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/bookshelf.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/bookshelf.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> Documentation
+
+</div>
+
+### <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/numeric-1-circle.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/numeric-1-circle.svg?color=%2318181B" width="20" height="20" valign="middle"></picture> Demo 1
 
 <details>
-
 <summary>Show Demo 1 documentation</summary>
+
+<br>
 
 <div align="center">
 
@@ -122,12 +182,9 @@ UMTAS turns a university's existing timetable into a clash-free personal timetab
 
 </details>
 
-### <img src="https://api.iconify.design/mdi/numeric-2-circle.svg?color=%231d4ed8" width="20" height="20" valign="middle"> Demo 2
-
-<br>
+### <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/numeric-2-circle.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/numeric-2-circle.svg?color=%2318181B" width="20" height="20" valign="middle"></picture> Demo 2
 
 <details>
-
 <summary>Show Demo 2 documentation</summary>
 
 <br>
@@ -140,12 +197,9 @@ UMTAS turns a university's existing timetable into a clash-free personal timetab
 
 </details>
 
-### <img src="https://api.iconify.design/mdi/numeric-3-circle.svg?color=%231d4ed8" width="20" height="20" valign="middle"> Demo 3
-
-<br>
+### <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/numeric-3-circle.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/numeric-3-circle.svg?color=%2318181B" width="20" height="20" valign="middle"></picture> Demo 3
 
 <details>
-
 <summary>Show Demo 3 documentation</summary>
 
 <br>
@@ -158,9 +212,7 @@ UMTAS turns a university's existing timetable into a clash-free personal timetab
 
 </details>
 
-### <img src="https://api.iconify.design/mdi/numeric-4-circle.svg?color=%231d4ed8" width="20" height="20" valign="middle"> Demo 4
-
-<br>
+### <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/numeric-4-circle.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/numeric-4-circle.svg?color=%2318181B" width="20" height="20" valign="middle"></picture> Demo 4
 
 <details>
 <summary>Show Demo 4 documentation</summary>
@@ -174,8 +226,6 @@ UMTAS turns a university's existing timetable into a clash-free personal timetab
 [![Demo 4 Marking Guide](https://img.shields.io/badge/Demo_4_Marking_Guide-View_Guide-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/management/Marking-Guide/)
 
 </div>
-
-<br>
 
 <details>
 <summary><strong>Landing Page + Help Menu (Joyride tours)</strong> &nbsp;-&nbsp; 10 marks</summary>
@@ -224,71 +274,48 @@ UMTAS turns a university's existing timetable into a clash-free personal timetab
 
 </details>
 
+---
+
 <div align="center">
 
-## <img src="https://api.iconify.design/mdi/star-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> Features
+## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/sitemap-outline.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/sitemap-outline.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> System Architecture
+
+</div>
+
+<details open>
+<summary><strong>System architecture diagram</strong></summary>
+<br>
+
+<div align="center">
+<img src="docs/diagrams/architecture/Architecture.svg" alt="UMTAS System Architecture" width="900">
+</div>
+
+The system follows a **Service-Oriented Architecture**. The Next.js frontend communicates exclusively with the NestJS API Core, which enforces authentication and RBAC before dispatching long-running work (PDF parsing, constraint solving) to stateless workers via a BullMQ job queue. The OR-Tools solver worker (C++ CP-SAT) and PDF parser run as independently scalable services. All traffic is routed through Traefik with TLS termination.
+
+</details>
+
+<!-- <div align="center">
+
+## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/infinity.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/infinity.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> CI/CD Pipeline
 
 </div>
 
 <details>
-<summary><strong>Expand features</strong></summary>
+<summary><strong>CI/CD diagram</strong></summary>
 <br>
 
-<table width="100%">
-  <tr>
-    <td width="33%" valign="top" align="center">
-      <h3><img src="https://api.iconify.design/mdi/file-document-outline.svg?color=%233B82F6" width="20" height="20" valign="middle"> PDF Ingestion</h3>
-      <p>PyMuPDF-powered extraction parses structured and semi-structured university PDF calendars into machine-readable constraint sets - zero manual data entry.</p>
-    </td>
-    <td width="33%" valign="top" align="center">
-      <h3><img src="https://api.iconify.design/mdi/calculator-variant-outline.svg?color=%233B82F6" width="20" height="20" valign="middle"> Constraint Solving</h3>
-      <p>Google OR-Tools CP-SAT solver handles hard constraints (no double-booking, room capacity) and soft constraints (lecturer preferences, day-spread) with optimal solutions.</p>
-    </td>
-    <td width="33%" valign="top" align="center">
-      <h3><img src="https://api.iconify.design/mdi/alert-circle-outline.svg?color=%233B82F6" width="20" height="20" valign="middle"> Conflict Detection</h3>
-      <p>BullMQ-backed job queue processes re-solve requests asynchronously. Administrators receive conflict alerts and revised schedules without blocking the UI.</p>
-    </td>
-  </tr>
-  <tr>
-    <td width="33%" valign="top" align="center">
-      <h3><img src="https://api.iconify.design/mdi/domain.svg?color=%233B82F6" width="20" height="20" valign="middle"> University-Agnostic</h3>
-      <p>A Core-and-Adapter architecture decouples the solver from any single institution's data format. New universities onboard by implementing a thin adapter - the core is never touched.</p>
-    </td>
-    <td width="33%" valign="top" align="center">
-      <h3><img src="https://api.iconify.design/mdi/chart-bar.svg?color=%233B82F6" width="20" height="20" valign="middle"> Observability</h3>
-      <p>Prometheus metrics, Grafana dashboards, and Loki log aggregation are provisioned out-of-the-box. PostHog captures product analytics for continuous UX improvement.</p>
-    </td>
-    <td width="33%" valign="top" align="center">
-      <h3><img src="https://api.iconify.design/mdi/shield-lock-outline.svg?color=%233B82F6" width="20" height="20" valign="middle"> Secure by Default</h3>
-      <p>OAuth 2.0 authentication, role-based access control, Redis-backed session management, and RustFS (S3-compatible) for isolated document storage. All traffic routed through Traefik with TLS termination.</p>
-    </td>
-  </tr>
-</table>
+<div align="center">
+<img src="docs/diagrams/architecture/DeploymentDiagram.svg" alt="UMTAS CI/CD Pipeline" width="900">
+</div>
 
 </details>
-
-
-## <img width="24" height="24" valign="middle" alt="image" src="https://github.com/user-attachments/assets/3cf8a75d-4e61-44f6-9ddd-1d74505d41e2" /> Lecture Watch
-<img width="1677" height="1011" alt="VisionModel" src="https://github.com/user-attachments/assets/d6e00a8e-8488-4374-a9a4-54a26d5035f5" />
-
-
-
-## <img width="24" height="24" valign="middle" alt="image" src="https://github.com/user-attachments/assets/747665d0-d89f-45c6-a5ff-fd45b8c0fa62" /> Campus Wide Routing
-<img width="1677" height="1011" alt="routing" src="https://github.com/user-attachments/assets/3257f11c-b0a3-4547-b0a7-90ee86e442c9" />
-
-
-
-## <img width="24" height="24" valign="middle" alt="image" src="https://github.com/user-attachments/assets/0e5aa247-8562-4fa0-bca3-a03d1dca34b7" /> Physical Attendance Tracking
-<img width="1677" height="1011" alt="Attendance" src="https://github.com/user-attachments/assets/21e81c86-2f71-4c64-b4c3-17234c0c0f65" />
-
-
-<br>
+-->
 
 ---
 
 <div align="center">
 
-## <img src="https://api.iconify.design/mdi/layers-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> Technology Stack
+## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/layers-outline.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/layers-outline.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> Technology Stack
 
 </div>
 
@@ -368,7 +395,7 @@ UMTAS turns a university's existing timetable into a clash-free personal timetab
 
 <div align="center">
 
-## <img src="https://api.iconify.design/mdi/file-tree-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> Repository Structure
+## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/file-tree-outline.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/file-tree-outline.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> Repository Structure
 
 </div>
 
@@ -419,44 +446,7 @@ UMTAS/
 
 <div align="center">
 
-## <img src="https://api.iconify.design/mdi/sitemap-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> System Architecture
-
-</div>
-
-<details open>
-<summary><strong>System architecture diagram</strong></summary>
-<br>
-
-<div align="center">
-<img src="docs/diagrams/architecture/Architecture.svg" alt="UMTAS System Architecture" width="900">
-</div>
-
-The system follows a **Service-Oriented Architecture**. The Next.js frontend communicates exclusively with the NestJS API Core, which enforces authentication and RBAC before dispatching long-running work (PDF parsing, constraint solving) to stateless workers via a BullMQ job queue. The OR-Tools solver worker (C++ CP-SAT) and PDF parser run as independently scalable services. All traffic is routed through Traefik with TLS termination.
-
-</details>
-
----
-
-<!-- <div align="center">
-
-## <img src="https://api.iconify.design/mdi/infinity.svg?color=%233B82F6" width="24" height="24" valign="middle"> CI/CD Pipeline
-
-</div>
-
-<details>
-<summary><strong>CI/CD diagram</strong></summary>
-<br>
-
-<div align="center">
-<img src="docs/diagrams/architecture/DeploymentDiagram.svg" alt="UMTAS CI/CD Pipeline" width="900">
-</div>
-
-</details>
--->
-
-<div align="center">
-
-## <img src="https://api.iconify.design/mdi/source-branch.svg?color=%233B82F6" width="24" height="24" valign="middle"> Branching Strategy
+## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/source-branch.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/source-branch.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> Branching Strategy
 
 </div>
 
@@ -473,6 +463,7 @@ All development follows a **TDD Git Flow**. Feature work is done in short-lived 
 </div>
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'git0': '#3f3f46', 'git1': '#71717a', 'git2': '#a1a1aa', 'git3': '#52525b', 'git4': '#27272a', 'gitBranchLabel0': '#ffffff', 'gitBranchLabel1': '#ffffff', 'gitBranchLabel2': '#18181b', 'gitBranchLabel3': '#ffffff', 'gitBranchLabel4': '#ffffff', 'commitLabelColor': '#18181b', 'commitLabelBackground': '#e4e4e7', 'tagLabelColor': '#18181b', 'tagLabelBackground': '#e4e4e7', 'tagLabelBorder': '#71717a'}}}%%
 gitGraph LR:
    commit id: "v0.1.0"
    branch dev
@@ -499,7 +490,7 @@ gitGraph LR:
 
 <div align="center">
 
-## <img src="https://api.iconify.design/mdi/account-group-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> Team
+## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/account-group-outline.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/account-group-outline.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> Team
 
 </div>
 
@@ -523,11 +514,12 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <details>
         <summary>Quote</summary>
         <br>
-        <i>"Id kiss you if I was Italian and didn't have a girlfriend"</i>
+        <i>"I'd kiss you if I were Italian and didn't have a girlfriend."</i>
       </details>
       <br>
       <a href="https://www.linkedin.com/in/wilmar-smit-3b11842a3/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/wilmar-smit"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+      <a href="mailto:wilmarsmit2004@gmail.com"><img src="https://img.shields.io/badge/Email-wilmarsmit2004%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email wilmarsmit2004@gmail.com"></a>
       <br><br>
     </td>
   </tr>
@@ -545,11 +537,12 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <details>
         <summary>Quote</summary>
         <br>
-        <i>"Oh no it broke." Everyone asking what thinking of the production server "The chair "</i>
+        <i>"Oh no, it broke."<br>When asked about the production server: "The chair."</i>
       </details>
       <br>
       <a href="https://www.linkedin.com/in/michael-tomlinson-089511274/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/michaeltomlinsontuks"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+      <a href="mailto:michael@tomlinson.co.za"><img src="https://img.shields.io/badge/Email-michael%40tomlinson.co.za-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email michael@tomlinson.co.za"></a>
       <br><br>
     </td>
   </tr>
@@ -567,11 +560,12 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <details>
         <summary>Quote</summary>
         <br>
-        <i>"He's lactating honey "</i>
+        <i>"He's lactating honey."</i>
       </details>
       <br>
       <a href="https://www.linkedin.com/in/johan-coetzer-01bb26401"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/jcoet-gh"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+      <a href="mailto:johancoet9@gmail.com"><img src="https://img.shields.io/badge/Email-johancoet9%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email johancoet9@gmail.com"></a>
       <br><br>
     </td>
   </tr>
@@ -580,7 +574,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <img src="docs/assets/images/team/framed/Marcel_Stoltz_PFP_circle.svg" width="120" alt="Marcel Stoltz">
     </td>
     <td align="left" valign="top">
-      <strong>Marcel Stoltz</strong> &nbsp;-&nbsp; DevOps Lead &amp; Backend Specialist<br><br>
+      <strong>Marcel Stoltz</strong> &nbsp;-&nbsp; DevOps Lead &amp; Full-Stack Developer<br><br>
       <details>
         <summary>About</summary>
         <br>
@@ -589,11 +583,12 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <details>
         <summary>Quote</summary>
         <br>
-        <i>"I just deleted dev, no biggie"</i>
+        <i>"I just deleted dev. No biggie."</i>
       </details>
       <br>
       <a href="https://www.linkedin.com/in/marcel-stoltz-88bb25238/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/marcelstoltz00"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+      <a href="mailto:marcelstoltz00@gmail.com"><img src="https://img.shields.io/badge/Email-marcelstoltz00%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email marcelstoltz00@gmail.com"></a>
       <br><br>
     </td>
   </tr>
@@ -611,21 +606,23 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <details>
         <summary>Quote</summary>
         <br>
-        <i>"Why do we even need a firewall, computers don't have fire"</i>
+        <i>"Why do we even need a firewall? Computers don't have fire."</i>
       </details>
       <br>
       <a href="https://www.linkedin.com/in/aidan-dawson-3514692ba"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/sdcreek240"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+      <a href="mailto:aidandwsn@gmail.com"><img src="https://img.shields.io/badge/Email-aidandwsn%40gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email aidandwsn@gmail.com"></a>
       <br><br>
     </td>
   </tr>
 </table>
 </div>
+
 <!-- ---
 
 <div align="center">
 
-## <img src="https://api.iconify.design/mdi/console-line.svg?color=%233B82F6" width="24" height="24" valign="middle"> Getting Started
+## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/console-line.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/console-line.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> Getting Started
 
 </div>
 
@@ -688,6 +685,26 @@ Adds Grafana, Prometheus, and Loki to the stack for local observability testing.
 </details>
 
 --- -->
+
+---
+
+<div align="center">
+
+## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/handshake-outline.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/handshake-outline.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> Partners
+
+</div>
+
+<div align="center">
+
+<img src="docs/assets/images/sponsors-marquee.svg" width="900" alt="Tyto Insights · DNS Business · University of Pretoria">
+
+<!-- Partners & Affiliation -->
+
+[![Tyto Insights](https://img.shields.io/badge/Tyto_Insights-tyto.africa-0f172a?style=for-the-badge)](https://tyto.africa/)
+[![DNS Business](https://img.shields.io/badge/DNS_Business-dns.africa-003366?style=for-the-badge)](https://dns.africa/c/)
+[![University of Pretoria](https://img.shields.io/badge/University_of_Pretoria-COS_301-003B5C?style=for-the-badge)](https://www.up.ac.za/)
+
+</div>
 
 ---
 
