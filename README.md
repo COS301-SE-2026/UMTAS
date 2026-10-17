@@ -54,28 +54,7 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 <br>
 
-[Project Day](#project-day-2026) · [Demo](#demo) · [Overview](#project-overview) · [Features](#features) · [Documentation](#documentation) · [Architecture](#system-architecture) · [Tech Stack](#technology-stack) · [Branching](#branching-strategy) · [Team](#team) · [Partners](#partners)
-
-</div>
-
----
-
-<div align="center">
-
-## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/calendar-star.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/calendar-star.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> Project Day 2026
-
-**Come see UMTAS live** · Friday, 30 October 2026 · 09:00–13:00 · Rautenbach Hall, UP Hatfield Campus
-
-</div>
-
-<p align="center">
-  <a href="docs/assets/readmeImg/project-day/UMTAS-Project-Day-2026.pdf"><img src="docs/assets/readmeImg/project-day/slide-01.png" width="48%" alt="Building a university timetable takes seconds"></a>
-  <a href="docs/assets/readmeImg/project-day/UMTAS-Project-Day-2026.pdf"><img src="docs/assets/readmeImg/project-day/slide-09.png" width="48%" alt="Come see UMTAS live: RSVP, try it now, star the repo"></a>
-</p>
-
-<div align="center">
-
-<sub>📄 [View the full Project Day slide deck (PDF)](docs/assets/readmeImg/project-day/UMTAS-Project-Day-2026.pdf)</sub>
+[Demo](#demo) · [Overview](#project-overview) · [Features](#features) · [Documentation](#documentation) · [Architecture](#system-architecture) · [Tech Stack](#technology-stack) · [Branching](#branching-strategy) · [Team](#team) · [Project Day](#project-day-2026) · [Partners](#partners)
 
 </div>
 
@@ -91,7 +70,18 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 ### UMTAS Trailer
 
+<a href="TRAILER_YOUTUBE_URL"><img src="docs/assets/readmeImg/trailer-thumbnail.png" width="720" alt="Watch the UMTAS trailer on YouTube"></a>
+
+<sub>▶ Click to watch the trailer on YouTube, <b>with sound</b> (recommended)</sub>
+
+<details>
+<summary>Or play the silent preview here</summary>
+
+<br>
+
 https://github.com/user-attachments/assets/aa66c09f-6299-445e-954f-a26540610dae
+
+</details>
 
 <br>
 
@@ -725,6 +715,38 @@ Adds Grafana, Prometheus, and Loki to the stack for local observability testing.
 </details>
 
 --- -->
+
+---
+
+<div align="center">
+
+## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/calendar-star.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/calendar-star.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> Project Day 2026
+
+</div>
+
+<details>
+<summary><strong>Come see UMTAS live</strong> · Friday, 30 October 2026 · Rautenbach Hall, UP Hatfield</summary>
+
+<br>
+
+<div align="center">
+
+**Friday, 30 October 2026 · 09:00–13:00** · Rautenbach Hall, UP Hatfield Campus
+
+</div>
+
+<p align="center">
+  <a href="docs/assets/readmeImg/project-day/UMTAS-Project-Day-2026.pdf"><img src="docs/assets/readmeImg/project-day/slide-01.png" width="48%" alt="Building a university timetable takes seconds"></a>
+  <a href="docs/assets/readmeImg/project-day/UMTAS-Project-Day-2026.pdf"><img src="docs/assets/readmeImg/project-day/slide-09.png" width="48%" alt="Come see UMTAS live: RSVP, try it now, star the repo"></a>
+</p>
+
+<div align="center">
+
+<sub>📄 [View the full Project Day slide deck (PDF)](docs/assets/readmeImg/project-day/UMTAS-Project-Day-2026.pdf)</sub>
+
+</div>
+
+</details>
 
 ---
 
