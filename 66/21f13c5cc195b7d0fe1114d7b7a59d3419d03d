@@ -1,0 +1,19 @@
+README.md
+  s_e2dc0c07a71644::t_ef76206f801f50 5-7,9-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6621f13c5cc195b7d0fe1114d7b7a59d3419d03d",
+  "prompts": {},
+  "sessions": {
+    "s_e2dc0c07a71644": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7c8bf65-03bd-43d1-81da-0845735d8ab2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
