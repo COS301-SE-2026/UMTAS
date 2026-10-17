@@ -1,0 +1,42 @@
+docs/assets/images/team/framed/Wilmar_smit_PFP_circle.svg
+  s_e2dc0c07a71644::t_74720953c87df8 7-8
+docs/assets/images/umtas-wordmark-light.svg
+  s_e2dc0c07a71644::t_4f4b73f371f3df 1-9
+docs/assets/images/team/framed/Michael_Tomlinson_PFP_circle.svg
+  s_e2dc0c07a71644::t_74720953c87df8 7-8
+docs/assets/images/team/framed/Aidan_Dawson_PFP_circle.svg
+  s_e2dc0c07a71644::t_74720953c87df8 7-8
+docs/assets/images/umtas-wordmark.svg
+  s_e2dc0c07a71644::t_4f4b73f371f3df 8
+README.md
+  s_e2dc0c07a71644::t_1a0cc4eb4a7681 67-68,73,75
+  s_e2dc0c07a71644::t_09e2af2029bae8 53
+  s_e2dc0c07a71644::t_4f4b73f371f3df 7-10,85,166-170,185,200,215,318,398,449,493,620
+  s_e2dc0c07a71644::t_378886ac4fddea 16-17,43,45-49,55-66,69,76-77,107,111-112,115-144,146-161,165,172,277-278,281,285-286,289-291,293,295,297,299,301,303-305,307-309,311-312,574,615,686-703,705
+  s_e2dc0c07a71644::t_82e9ccd6df2daa 175-176
+  s_e2dc0c07a71644::t_74720953c87df8 466
+  s_e2dc0c07a71644::t_392e12ff26d94b 162-164
+  s_e2dc0c07a71644::t_b329f92ded5226 704
+docs/assets/images/VigilLogoOwl-animated.svg
+  s_e2dc0c07a71644::t_daef494f1dabce 3-11,26
+docs/assets/images/team/framed/Johan_Coetzer_PFP_circle.svg
+  s_e2dc0c07a71644::t_74720953c87df8 7-8
+docs/assets/images/team/framed/Marcel_Stoltz_PFP_circle.svg
+  s_e2dc0c07a71644::t_74720953c87df8 7-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e89c26b6477a55210f413f00ff07193b0b6f1b18",
+  "prompts": {},
+  "sessions": {
+    "s_e2dc0c07a71644": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7c8bf65-03bd-43d1-81da-0845735d8ab2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
