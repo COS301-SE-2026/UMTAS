@@ -24,7 +24,7 @@
         ##### High Level
         ```
         Visit Landing Page (Actor: Visitor, System: Public Website)
-            TUCBW an unauthenticated visitor navigates to the Umtas website.
+            TUCBW an unauthenticated visitor navigates to the UMTAS website.
             TUCEW the visitor is shown the landing page and can navigate to the main site, login, or registration.
         ```
         ##### Expanded
@@ -32,8 +32,8 @@
         | :--- | :--- |
         | **Actor** | Visitor |
         | **Precondition** | Visitor is not authenticated |
-        | **Trigger** | Visitor navigates to the Umtas root URL |
-        | **Basic Flow** | 1. Visitor navigates to the site.<br>2. System displays the landing page.<br>3. System presents navigation options to the main site, login, and registration.<br>4. Visitor selects an option or continues browsing the landing page. |
+        | **Trigger** | Visitor navigates to the UMTAS root URL |
+        | **Basic Flow** | 1. Visitor navigates to the site.<br>2. System displays the landing page.<br>3. System presents supported source and role information, plus navigation to the main site, login and registration.<br>4. Visitor selects an option or continues browsing the landing page. |
         | **Alternate Flow** | **A1: Visitor is already authenticated**<br>System redirects the visitor to their dashboard instead of the landing page. |
         | **Postcondition** | Visitor has access to the landing page and its navigation options |
-        | **Requirements Covered** | R1.1.1 \| R1.1.1.1 |
+        | **Requirements Covered** | R1.1.1 \| R1.1.1.1 \| R1.1.1.2 |

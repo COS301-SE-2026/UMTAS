@@ -32,8 +32,8 @@ export function SiteFooter() {
           </li>
         </ul>
         <p className="text-[12px] leading-[1.5] text-[var(--text-secondary)]">
-          © {year} Team Vigil of the University of Pretoria · University Modular
-          Timetable & Analytics System
+          © {year} Team Vigil of the University of Pretoria · University
+          Management & Timetable Analytics System
         </p>
       </div>
     </footer>

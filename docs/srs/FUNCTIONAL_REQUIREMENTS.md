@@ -52,7 +52,7 @@ The Traceability Matrices for the functional requirements to use cases can be fo
     - **R2.1.3** The system shall allow users to delete timetables which will not effect related events and modules.
     - **R2.1.4** The system shall allow timetable customisation.
         - **R2.1.4.1** The system shall allow timetable customisation of name
-        - **R2.1.4.2** The system shall allow timetable customisation of colour
+        - **R2.1.4.2** The system shall allow user-specific module colours to be shown in timetables.
 
     ### R2.2 Timetable Creation – Builder
 
@@ -87,27 +87,27 @@ The Traceability Matrices for the functional requirements to use cases can be fo
     ### R2.5 Calendar Exporting
 
     - **R2.5.1** The system shall allow export of timetables as `.ics` files for calendar import.
-        - **R2.5.1.1** The system shall allow for details of the `.ics` file to be altered by a user such as its summary / name.
-        - **R2.5.1.2** The system shall allow users to modify the event description within the `.ics` file.
-        - **R2.5.1.3** The system shall allow users to update the event location stored in the `.ics` file.
-        - **R2.5.1.4** The system shall allow users to change the event start and end times in the `.ics` file.
-        - **R2.5.1.5** The system shall allow users to adjust the event status such as confirmed or cancelled.
-        - **R2.5.1.6** The system shall make use of a uuid such that duplicate events are accounted for.
+        - **R2.5.1.1** The system shall export the timetable name in the `.ics` file.
+        - **R2.5.1.2** The system shall export stored event descriptions in the `.ics` file.
+        - **R2.5.1.3** The system shall export stored event locations in the `.ics` file.
+        - **R2.5.1.4** The system shall export stored event start and end times in the `.ics` file.
+        - **R2.5.1.5** The system shall export events with confirmed status.
+        - **R2.5.1.6** The system shall use stable event identifiers in calendar exports.
     - **R2.5.2** The system shall allow direct export of timetables to Google Calendar.
-        - **R2.5.2.1** The system shall support creating a Google Calendar instance.
+        - **R2.5.2.1** The system shall create or reuse the Google Calendar named UMTAS.
 
     ### R2.6 Solver System
 
-    - **R2.6.1** The system shall automatically attempt to solve for a schedule using the CP-SAT solver once a finalised set of events is received, notifying the User once a valid timetable is produced.
+    - **R2.6.1** The system shall submit a solver job when the user requests timetable creation. Without enabled preferences, automatic mode shall try CP-SAT first.
         - **R2.6.1.1** The system shall enforce a selection rule as a hard constraint.
         - **R2.6.1.2** The system shall enforce an overlap rule as a hard constraint, preventing events from clashing.
-        - **R2.6.1.3** The system shall optimise the schedule to centralise events around a User-given target time.
-        - **R2.6.1.4** The system shall optimise the schedule to centralise events around smaller gaps between events if requested.
-        - **R2.6.1.5** The system shall optimise the schedule to centralise events around a user-given day to minimise events (skip day).
-    - **R2.6.2** The system shall automatically invoke the GA solver to generate a best-effort schedule when the CP-SAT solver cannot find a feasible solution, notifying the User once produced.
-        - **R2.6.2.1** The system shall optimise the schedule to centralise events around a User-given target time.
-        - **R2.6.2.2** The system shall optimise the schedule to centralise events around smaller gaps between events if requested.
-        - **R2.6.2.3** The system shall optimise the schedule to centralise events around a user-given day to minimise events (skip day).
+        - **R2.6.1.3** The system shall route target-time preferences to the GA solver.
+        - **R2.6.1.4** The system shall route smaller-gap preferences to the GA solver.
+        - **R2.6.1.5** The system shall route skip-day preferences to the GA solver.
+    - **R2.6.2** The system shall use GA directly when preferences are enabled and as a fallback when CP-SAT reports infeasibility in automatic mode.
+        - **R2.6.2.1** The system shall route target-time preferences to the GA solver.
+        - **R2.6.2.2** The system shall route smaller-gap preferences to the GA solver.
+        - **R2.6.2.3** The system shall route skip-day preferences to the GA solver.
         - **R2.6.2.4** The system shall apply selection, crossover, and mutation operators across generations to improve candidate schedules.
 
 ---

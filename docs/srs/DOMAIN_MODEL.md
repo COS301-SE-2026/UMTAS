@@ -1,5 +1,9 @@
 # Domain Model
 
+This is a conceptual model. Current persistence fields are defined in `apps/backend/src/entities`. Passwords belong to authentication accounts and sessions use separate records. Some conceptual attributes, such as user timetable notes and lecturer office details, are not persisted.
+
+Global roles are `user` and `sys_admin`. University roles are separate memberships. Session roles use `student`, `lecturer` and `uni_admin`. Database memberships use `STUDENT`, `LECTURER` and `UNIVERSITY_ADMIN`, with pending variants for lecturer and university admin applications.
+
 ## Diagram 
 
 <figure markdown="span">
@@ -89,21 +93,21 @@
 ### System Admin
 | Attribute | Type | Description |
 | :--- | :--- | :--- |
-| Role | "SystemAdmin" | The role of the user providing them system wide access |
+| Role | "sys_admin" | The role of the user providing them system wide access |
 
 ---
 
 ### University Admin
 | Attribute | Type | Description |
 | :--- | :--- | :--- |
-| Role | "UniversityAdmin" | The role of a user for a specific university providing them access to that universities information and permissions to alter details |
+| Role | "uni_admin" | The role of a user for a specific university providing them access to that universities information and permissions to alter details |
 
 ---
 
 ### Student
 | Attribute | Type | Description |
 | :--- | :--- | :--- |
-| Role | "Student" | The role of a student for a specific university allowing them to access information regarding courses and allowing them to make schedules |
+| Role | "student" | The role of a student for a specific university allowing them to access information regarding courses and allowing them to make schedules |
 | StudentDetails | String | Details such as a students student number that a student may want to display |
 
 ---
@@ -111,7 +115,7 @@
 ### Lecturer
 | Attribute | Type | Description |
 | :--- | :--- | :--- |
-| Role | "Lecturer" | The role of a user allowing them acces to the system in accordance to what the lecturer should be able to access and alter such as their specific module and events |
+| Role | "lecturer" | The role of a user allowing them acces to the system in accordance to what the lecturer should be able to access and alter such as their specific module and events |
 | Office | String | Optionally their office they could be found in |
 | LecturerDetails | String | Details the lecturer may want to display such as phone number or email |
 

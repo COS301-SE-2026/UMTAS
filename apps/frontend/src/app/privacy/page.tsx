@@ -23,7 +23,7 @@ export default function PrivacyPage() {
   return (
     <LegalPageTemplate
       title="Privacy Policy"
-      summary="This policy explains what information UMTAS (University Modular Timetable & Analytics System) collects, why we collect it and the choices you have. We have tried to describe it as accurately as we can."
+      summary="This policy explains what information UMTAS (University Management & Timetable Analytics System) collects, why we collect it and the choices you have. We have tried to describe it as accurately as we can."
     >
       <section id="who-we-are">
         <h2>1. Who we are</h2>

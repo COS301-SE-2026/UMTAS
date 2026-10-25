@@ -11,15 +11,14 @@ Distributing the system across subdomains routed by a single reverse proxy enabl
 
 | Environment | Service | Subdomain / URL Structure | Target Port (via Traefik) |
 | :--- | :--- | :--- | :--- |
-| **Production** | Frontend | `https://capstone-vigil.dns.net.za` | 80/443 -> 3001 |
-| **Production** | API Backend | `https://capstone-vigil.dns.net.za/api` | 80/443 -> 8000 |
-| **Production** | Storage (MinIO) | `https://storage.capstone-vigil.dns.net.za` | 80/443 -> 9001 |
+| **Production** | Frontend | `https://capstone-vigil.dns.net.za` | 80/443 -> `${FRONTEND_PORT}` |
+| **Production** | API Backend | `https://capstone-vigil.dns.net.za/api` | 80/443 -> `${BACKEND_PORT}` |
+| **Production** | Storage (MinIO) | `https://storage.capstone-vigil.dns.net.za` | 80/443 -> 9000 |
 | **Production** | Grafana | `https://grafana.capstone-vigil.dns.net.za` | 80/443 -> 3000 |
-| **Production** | Brand Style | `https://brand.capstone-vigil.dns.net.za` | 80/443 -> 6767 |
 | **Infrastructure** | Traefik Dashboard | `https://traefik.capstone-vigil.dns.net.za` | 80/443 -> `api@internal` |
-| **Staging** | Frontend | `https://staging.capstone-vigil.dns.net.za` | 80/443 -> 3003 |
-| **Staging** | API Backend | `https://staging.capstone-vigil.dns.net.za/api` | 80/443 -> 8008 |
-| **Staging** | Storage (MinIO) | `https://staging.storage.capstone-vigil.dns.net.za` | 80/443 -> 9001 |
+| **Staging** | Frontend | `https://staging.capstone-vigil.dns.net.za` | 80/443 -> `${FRONTEND_PORT}` |
+| **Staging** | API Backend | `https://staging.capstone-vigil.dns.net.za/api` | 80/443 -> `${BACKEND_PORT}` |
+| **Staging** | Storage (MinIO) | `https://staging.storage.capstone-vigil.dns.net.za` | 80/443 -> 9000 |
 
 
 ---

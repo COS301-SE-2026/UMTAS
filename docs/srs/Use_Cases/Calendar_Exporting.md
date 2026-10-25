@@ -33,8 +33,8 @@
         | **Actor** | Student |
         | **Precondition** | Student is authenticated and a timetable exists |
         | **Trigger** | Student selects “Export as .ics file” |
-        | **Basic Flow** | 1. Student selects timetable to export.<br>2. System retrieves timetable data.<br>3. System prompts user for optional .ics configuration (name, description, status, etc.).<br>4. System generates event entries including metadata (start time, end time, location, status).<br>5. System assigns unique identifiers (UUID) to events to prevent duplication.<br>6. System builds .ics file structure.<br>7. System downloads file to user device. |
-        | **Alternate Flow** | **A1: Missing timetable data**<br>System prevents export and notifies user.<br><br>**A2: Invalid event data**<br>System excludes invalid entries and flags them.<br><br>**A3: File generation failure**<br>System displays error and allows retry. |
+        | **Basic Flow** | 1. Student selects a timetable.<br>2. System generates its calendar payload.<br>3. System validates the payload and generates ICS entries with stable identifiers and `CONFIRMED` status.<br>4. The browser downloads `umtas-schedule.ics`. |
+        | **Alternate Flow** | **A1: Missing timetable data**<br>System prevents export and notifies user.<br><br>**A2: Invalid event data**<br>System rejects the export and displays an error.<br><br>**A3: File generation failure**<br>System displays error and allows retry. |
         | **Postcondition** | Valid .ics file is generated and downloaded |
         | **Requirements Covered** | R2.5.1 \| R2.5.1.1 \| R2.5.1.2 \| R2.5.1.3 \| R2.5.1.4 \| R2.5.1.5 \| R2.5.1.6 |
 
@@ -45,7 +45,7 @@
         ```
         Export Timetable to Google Calendar (Actor: Student, System: Google Calendar Integration)  
         TUCBW the student selects the option to export a timetable to Google Calendar and authorises access if required.  
-        TUCEW the system creates a Google Calendar instance and pushes the timetable events to the user's Google Calendar.
+        TUCEW the system creates or reuses the UMTAS Google Calendar and synchronises the timetable events.
         ```
         ##### Expanded
         | Field | Detail |
@@ -53,8 +53,8 @@
         | **Actor** | Student |
         | **Precondition** | Student is authenticated and a timetable exists |
         | **Trigger** | Student selects "Export to Google Calendar" |
-        | **Basic Flow** | 1. Student initiates Google Calendar export.<br>2. System requests Google OAuth authentication (if not already authorised).<br>3. Student grants calendar permissions.<br>4. System retrieves timetable events.<br>5. System creates a Google Calendar instance.<br>6. System maps timetable events to Google Calendar format.<br>7. System pushes events to Google Calendar API.<br>8. System confirms successful export. |
-        | **Alternate Flow** | **A1: OAuth not authorised**<br>System prompts user to authenticate before proceeding.<br><br>**A2: API failure**<br>System retries export and then reports failure.<br><br>**A3: Partial export failure**<br>System reports which events failed and which succeeded.<br><br>**A4: Duplicate event detection (UUID conflict)**<br>System skips or overwrites previously exported events instead of duplicating them. |
+        | **Basic Flow** | 1. Student initiates Google Calendar export.<br>2. System requests Google OAuth authentication (if not already authorised).<br>3. Student grants calendar permissions.<br>4. System retrieves timetable events.<br>5. System creates or reuses the calendar named UMTAS.<br>6. System maps timetable events to Google Calendar format.<br>7. System pushes events to Google Calendar API.<br>8. System confirms successful export. |
+        | **Alternate Flow** | **A1: OAuth not authorised**<br>System prompts user to authenticate before proceeding.<br><br>**A2: API failure**<br>System retries export and then reports failure.<br><br>**A3: Partial export failure**<br>System reports which events failed and which succeeded.<br><br>**A4: An exported event already exists.**<br>System skips or overwrites previously exported events instead of duplicating them. |
         | **Postcondition** | Timetable events are exported to Google Calendar |
         | **Requirements Covered** | R2.5.2 \| R2.5.2.1 |
 

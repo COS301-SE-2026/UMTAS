@@ -29,7 +29,7 @@
         ```
         Launch Simulation Batch (Actor: Tyto Administrator, System: Simulation Engine)
             TUCBW the administrator invokes the central runner script with a target adapter and population size.
-            TUCEW the system launches the configured Docker container and begins executing the simulation with live metrics exposed.
+            TUCEW the runner generates profiles and starts Locust inside the configured runtime. Docker Compose provides the container and live web UI.
         ```
         ##### Expanded
         | Field | Detail |
@@ -37,7 +37,7 @@
         | **Actor** | Tyto Administrator |
         | **Precondition** | The simulation service and its Docker container are available. The target adapter exists. |
         | **Trigger** | Administrator runs the central script with adapter and population arguments. |
-        | **Basic Flow** | 1. Administrator supplies the target adapter and population size to the runner script.<br>2. System launches the simulation as a Docker container with the given configuration.<br>3. System exposes live metrics ports for the running container.<br>4. Simulation batch executes until completion or manual stop. |
+        | **Basic Flow** | 1. Administrator supplies the target adapter and population size to the runner script.<br>2. The runner starts Locust with the given configuration. Use Docker Compose to run the service in a container.<br>3. System exposes live metrics ports for the running container.<br>4. Simulation batch executes until completion or manual stop. |
         | **Alternate Flow** | **A1: Adapter configuration missing**<br>System halts execution and logs an error that the specified adapter files were not found.<br><br>**A2: Container fails to start**<br>System reports the Docker startup failure and aborts the run. |
         | **Postcondition** | Simulation container is running with live metrics exposed. |
         | **Requirements Covered** | R5.1 \| R5.1.1 \| R5.1.2 |
@@ -98,7 +98,7 @@
         | **Precondition** | A valid OpenAPI specification file for the target system is available. |
         | **Trigger** | Administrator runs the adapter scaffolding tool against the OpenAPI spec. |
         | **Basic Flow** | 1. Administrator provides the OpenAPI specification file to the scaffolding tool.<br>2. System parses the specification to discover available API methods.<br>3. System generates endpoint configuration files, synthetic data schemas, and executable Python simulation scripts mapped to each discovered method.<br>4. System places the generated adapter alongside existing adapters, ready for use in a simulation batch. |
-        | **Alternate Flow** | **A1: Specification invalid**<br>System halts scaffolding and logs the parsing error.<br><br>**A2: Unsupported method type discovered**<br>System skips the unsupported method, logs a warning, and continues scaffolding the remaining methods. |
+        | **Alternate Flow** | **A1: Specification invalid**<br>System halts scaffolding and logs the parsing error.<br><br>**A2: Unsupported method type discovered**<br>System skips unsupported methods and continues scaffolding. The current generator supports GET, POST, PUT and DELETE. |
         | **Postcondition** | A new adapter is available for use in simulation batches. |
         | **Requirements Covered** | R5.4 \| R5.4.1 \| R5.4.2 |
 
@@ -118,6 +118,6 @@
         | **Precondition** | A simulation batch (UC-TY-01) is running against the UMTAS adapter with a generated population (UC-TY-02). |
         | **Trigger** | Simulated users are spawned and begin executing UMTAS domain tasks. |
         | **Basic Flow** | 1. System simulates mock account creation, secure login, and session token management for each user.<br>2. System simulates uploading timetable PDF files, polling for parser job status, and retrieving results.<br>3. System simulates users browsing their enrolled Modules, available Events, and existing timetables.<br>4. System simulates submitting custom scheduling jobs to the solver and polling for execution status. |
-        | **Alternate Flow** | **A1: Authentication failure**<br>Simulated users fail to retrieve valid bearer tokens; the engine logs the failure and halts further spawning to prevent spamming.<br><br>**A2: Core API overload**<br>The target API drops requests; the engine records the endpoint failure rate and continues or gracefully stops based on configuration. |
+        | **Alternate Flow** | **A1: Authentication failure**<br>The affected simulated user stops after authentication fails. Other users can continue.<br><br>**A2: Core API overload**<br>The target API drops requests. The engine records the endpoint failure rate and continues or gracefully stops based on configuration. |
         | **Postcondition** | Simulated users have exercised the full range of UMTAS domain behaviours, with results captured for reporting. |
         | **Requirements Covered** | R5.5 \| R5.5.1 \| R5.5.2 \| R5.5.3 \| R5.5.4 |

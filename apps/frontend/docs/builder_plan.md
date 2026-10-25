@@ -1,3 +1,7 @@
+# Historical Demo 1 Builder Plan
+
+This plan is retained for context. Current builder behaviour is documented in the [builder use cases](../../../docs/srs/Use_Cases/Timetable_Builder.md).
+
 **The general structure:**
 
 - We have event

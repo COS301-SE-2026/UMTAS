@@ -28,7 +28,7 @@
         ```
         Apply for Role (Actor: User, System: University Roles)
             TUCBW the user selects a university and applies for a role.
-            TUCEW the user's role application is recorded as pending for that university.
+            TUCEW the system grants student access immediately or records a pending lecturer or university admin application.
         ```
         ##### Expanded
         | Field | Detail |
@@ -36,9 +36,9 @@
         | **Actor** | User |
         | **Precondition** | User is authenticated |
         | **Trigger** | User selects a university and applies for a role |
-        | **Basic Flow** | 1. User selects a university.<br>2. User selects a role to apply for (student, lecturer, or uni_admin).<br>3. System records the application as pending, defaulting to student if none selected.<br>4. System notifies the relevant university admins of the pending application. |
-        | **Alternate Flow** | **A1: Existing Application Pending**<br>System informs the user that an application for that university already exists and is pending review. |
-        | **Postcondition** | A pending role application exists for the user at the selected university |
+        | **Basic Flow** | 1. User selects a university and role.<br>2. System defaults to student if no role is supplied.<br>3. System grants student access immediately or stores a pending lecturer or university admin role.<br>4. The result is returned to the user. |
+        | **Alternate Flow** | **A1: An existing role record exists.**<br>System reuses or updates that record. |
+        | **Postcondition** | Student access is granted or a privileged role application is pending. |
         | **Requirements Covered** | R4.4.1 |
 
     ---
@@ -56,7 +56,7 @@
         | **Actor** | University Admin |
         | **Precondition** | Actor is an approved uni_admin for the university |
         | **Trigger** | Uni_admin opens the role management screen |
-        | **Basic Flow** | 1. System displays all users and their role applications/status for the university.<br>2. Uni_admin selects a user's application.<br>3. Uni_admin approves or rejects the application.<br>4. System updates the user's role status accordingly.<br>5. System notifies the user of the outcome. |
+        | **Basic Flow** | 1. System displays all users and their role applications/status for the university.<br>2. Uni_admin selects a user's application.<br>3. Uni_admin approves or rejects the application.<br>4. System updates the user's role status accordingly.<br>5. System returns the updated status. |
         | **Alternate Flow** | **A1: Revoke Privileges**<br>Uni_admin selects an already-approved user and revokes their role, and the system removes the user's access for that university. |
         | **Postcondition** | The user's role application or existing role is approved, rejected, or revoked |
         | **Requirements Covered** | R4.4.2 \| R4.4.3 |

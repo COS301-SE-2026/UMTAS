@@ -21,7 +21,7 @@
 | Layer          | Technology                                                                                                             | Role                                  |
 | :------------- | :--------------------------------------------------------------------------------------------------------------------- | :------------------------------------ |
 | **Runtime**    | ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)           | Containerized service isolation       |
-| **Routing**    | ![Traefik](https://img.shields.io/badge/traefik-%2324A1C1.svg?style=for-the-badge&logo=traefik&logoColor=white)        | SSL, CORS, and Blue-Green routing     |
+| **Routing**    | ![Traefik](https://img.shields.io/badge/traefik-%2324A1C1.svg?style=for-the-badge&logo=traefik&logoColor=white)        | HTTPS termination and container routing.     |
 | **Storage**    | ![PostgreSQL](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) | Primary relational data               |
 | **Monitoring** | ![Grafana](https://img.shields.io/badge/grafana-%23F46800.svg?style=for-the-badge&logo=grafana&logoColor=white)        | PLG Stack (Prometheus, Loki, Grafana) |
 
@@ -41,7 +41,7 @@
 ## :material-monitor-eye: Monitoring & Logging
 
 === "Prometheus (Metrics)"
-    Collects numeric data (CPU, RAM, Request counts). Every new service must expose a `/metrics` endpoint.
+    Collects numeric data (CPU, RAM, Request counts). The backend exposes `/metrics`. Workers are observed through backend queue metrics and container exporters.
 
 === "Loki (Logs)"
     Aggregates all container logs. Use `docker logs` labels to ensure logs are correctly tagged in Grafana.

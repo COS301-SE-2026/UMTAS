@@ -13,7 +13,7 @@
   </picture>
 </p>
 
-### University Management & Timetables Analytics System
+### University Management & Timetable Analytics System
 
 Team Vigil - UMTAS - A university timetable platform for PDF ingestion, constraint solving and personalised schedules.
 
@@ -113,7 +113,7 @@ UMTAS turns a university's existing timetable into a clash-free personal timetab
 - **Zero manual entry:** upload the PDF the university already publishes, and UMTAS extracts, solves and exports everything.
 - **University-agnostic:** each institution plugs in through a small adapter. UP works through its PDFs and the University of Maryland through its API.
 - **For every role:** students, lecturers, university admins and system admins. Guests get a one-click demo account.
-- **Privacy-friendly:** attendance, heat maps and Lecture Watch use aggregate numbers, not personal footage or class lists.
+- **Privacy-friendly:** heat maps and Lecture Watch use aggregate numbers. Verified attendance records identify students.
 - **Built-in help:** interactive Joyride tours on most pages (Help section of the top nav bar), a user manual and an FAQ.
 
 <p align="center">
@@ -151,11 +151,11 @@ UMTAS turns a university's existing timetable into a clash-free personal timetab
     </td>
     <td width="33%" valign="top" align="center">
       <h3>Constraint Solving</h3>
-      <p>Google OR-Tools CP-SAT solver handles hard constraints (no double-booking, room capacity) and soft constraints (lecturer preferences, day-spread) with optimal solutions.</p>
+      <p>Google OR-Tools CP-SAT enforces selection counts and prevents time overlaps. Genetic search handles target-time, gap and skip-day preferences.</p>
     </td>
     <td width="33%" valign="top" align="center">
       <h3>Conflict Detection</h3>
-      <p>BullMQ-backed job queue processes re-solve requests asynchronously. Administrators receive conflict alerts and revised schedules without blocking the UI.</p>
+      <p>BullMQ-backed job queue processes re-solve requests asynchronously. Users poll for results and receive revised schedules without blocking the UI.</p>
     </td>
   </tr>
   <tr>
@@ -671,7 +671,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 pnpm run setup
 ```
 
-Verifies tool versions, copies `.env.example` to `.env`, installs all workspace dependencies, and prepares the Python solver container.
+Installs workspace dependencies and builds the parser and solver worker images.
 
 </details>
 
@@ -680,11 +680,11 @@ Verifies tool versions, copies `.env.example` to `.env`, installs all workspace 
 <br>
 
 ```bash
-# Terminal 1 - infrastructure (Postgres, Redis, RustFS, Solver)
-pnpm run dev:infra
+# Terminal 1 starts infrastructure and both workers.
+just dev-infra
 
 # Terminal 2 - application (Next.js + NestJS via Turborepo)
-pnpm run dev
+just both
 ```
 
 Runs infrastructure in Docker and the application natively for the fastest hot-reload performance.

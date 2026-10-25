@@ -26,11 +26,11 @@ Frontend devs never need to worry about Python dependencies, and backend devs do
 pnpm run setup
 ```
 
+Install Node.js 22, pnpm, Docker Compose, Just, Phase CLI, Rust, wasm-pack and cargo-watch before starting. Configure access to the development secrets in Phase.
+
 ??? note "What happens during setup?"
-    1. **Tool Check**: Verifies `docker`, `pnpm`, and `node` versions.
-    2. **Env Config**: Copies `.env.example` to `.env`.
-    3. **Install**: Runs `pnpm install` across all workspaces.
-    4. **Solver Prep**: Pulls or builds the Docker image for the Python solver.
+    1. The setup command runs `pnpm install` across all workspaces.
+    2. It builds the parser and solver worker images.
 
 ---
 
@@ -41,18 +41,18 @@ We use a split strategy for the fastest hot-reload performance.
 === "Terminal 1: Infrastructure"
 
     ```bash
-    pnpm run dev:infra # (1)
+    just dev-infra # (1)
     ```
 
-    1.  Starts **Postgres**, **Redis**, **MinIO**, and the **Python Solver** container.
+    1.  This command starts PostgreSQL, Redis, S3-compatible storage, MailHog and both BullMQ workers with Phase configuration.
 
 === "Terminal 2: Application"
 
     ```bash
-    pnpm run dev # (2)
+    just both # (2)
     ```
 
-    2.  Boots **Turborepo** to run the Next.js frontend and NestJS backend natively.
+    2.  This command builds shared types and WASM, then starts the Next.js frontend and NestJS backend with Phase configuration.
 
 ---
 
@@ -78,7 +78,7 @@ While local native dev is fastest, we maintain Docker profiles for full system t
 
 ## :material-flask: Quality Assurance
 
-1. **Unit & Integration**: Powered by **Jest**.
+1. **Unit & Integration**: Jest runs unit tests and full-stack integration tests. The integration runner manages Docker services.
 2. **E2E**: Powered by **Playwright**.
 3. **Pre-commit Hooks**: Managed by **Husky** + **Lint Staged**.
 4. **Local CI Simulation**: Run your GitHub Actions locally using `act`.

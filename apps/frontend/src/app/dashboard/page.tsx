@@ -187,7 +187,7 @@ function DashboardContent() {
               variant="outline"
               className="text-[var(--text-secondary)] border-[var(--text-secondary)] w-fit text-xs"
             >
-              University Modular Timetable &amp; Analytics System
+              University Management &amp; Timetable Analytics System
             </Badge>
 
             <div className="flex flex-col gap-2">

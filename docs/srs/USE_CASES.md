@@ -2,6 +2,7 @@
     - This page contains all the Use Cases for our main system.
     - The Use Cases are split up by system.
     - Each Use Case System drop down also contains the respective Use Case diagram as well as the traceability matrix.
+    - Text flows and requirement mappings describe current behaviour. Diagrams are historical references.
 
 ???+ info "Overview"
 
@@ -155,6 +156,7 @@
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-AR-01** | Indicate Attendance Intent for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-implemented">Implemented</span>|
     | **UC-AR-02** | Unrecord Attendance for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-implemented">Implemented</span>|
+    | **UC-AR-03** | Capture Verified Attendance | [Attendance Recording](#attendance-recording-id) | Student / Lecturer / University Admin |<span class="status-implemented">Implemented</span>|
 
     </div>
 
@@ -251,3 +253,13 @@
 ---
 
 
+??? "**Campus Routing and Lecture Watch Use Cases**"
+    <a id="campus-and-lecture-watch"></a>
+
+    ### UC-MAP-01: View Campus Routes
+    <a id="uc-map-01"></a>
+    The user opens the map, selects a destination and views a route and alternatives. The map can display building and route heat maps. Permitted operators can edit buildings and route diversions.
+
+    ### UC-VI-01: Analyse a Lecture Watch Session
+    <a id="uc-vi-01"></a>
+    A lecturer or university admin creates or selects a session and chooses an available camera or recorded video. The browser runs inference and saves session metrics. The user reviews the session and grouped statistics by event, module or date range.

@@ -2,7 +2,7 @@
 
 ## Adapter Pattern: University Format Isolation
 
-University-specific parsers implement a common interface and return canonical module and event candidates. The parser registry discovers every adapter in the adapters package that subclasses `BasePDFParser` and declares an `ADAPTER_KEY`, and currently resolves the University of Pretoria adapter and a synthetic test adapter.
+University-specific parsers implement a common interface and return canonical module and event candidates. The parser registry explicitly maps the `up` key to `UPPDFParser`. New adapters must be added to `PARSER_REGISTRY`.
 
 Source-specific table detection is outside the Core API. Adding another university format does not require a new queue or callback contract.
 
@@ -10,7 +10,7 @@ Source-specific table detection is outside the Core API. Adding another universi
 
 CP-SAT and genetic search are independent engines behind one command-line contract. The requested engine is selected at runtime.
 
-Automatic mode follows this sequence:
+The frontend requests GA directly when preferences are enabled. Without preferences it requests automatic mode, which follows this sequence:
 
 1. Run CP-SAT.
 2. Return its conflict-free result when feasible.

@@ -34,9 +34,9 @@
         | **Actor** | User |
         | **Precondition** | User is authenticated |
         | **Trigger** | User selects “Import Timetable” and uploads a PDF |
-        | **Basic Flow** | 1. User uploads a university timetable PDF.<br>2. System validates file format.<br>3. System parses PDF content.<br>4. System extracts module and event data.<br>5. System performs lookup against existing modules/events.<br>6. System maps existing entities or prepares new entries.<br>7. System generates an import preview structure.<br>8. System forwards data to review step. |
+        | **Basic Flow** | 1. User uploads a supported university timetable PDF.<br>2. System validates the file and queues parsing.<br>3. The worker returns extracted modules and events.<br>4. System imports or reuses records and completes the job.<br>5. The browser polls the job and displays the imported activities. |
         | **Alternate Flow** | **A1: Invalid file format**<br>System rejects upload and prompts correct format.<br><br>**A2: Parsing failure**<br>System notifies user and aborts import process.<br><br>**A3: Partial extraction**<br>System imports what is possible and flags missing data for review. |
-        | **Postcondition** | Parsed timetable data is staged for review |
+        | **Postcondition** | Modules and events are stored and available for review. |
         | **Requirements Covered** | R2.3.1 \| R2.3.1.1 \| R2.3.1.2 \| R2.3.1.3 \| R2.3.1.4 |
 
     ---
@@ -54,9 +54,9 @@
         | **Actor** | User |
         | **Precondition** | A successful PDF import has been completed |
         | **Trigger** | System displays imported timetable preview |
-        | **Basic Flow** | 1. System displays extracted modules and events.<br>2. User reviews imported data.<br>3. User selects which modules/events to include.<br>4. System validates selections.<br>5. User confirms import.<br>6. System creates timetable from selected data.<br>7. System stores timetable under user account.<br>8. System confirms successful creation. |
-        | **Alternate Flow** | **A1: User deselects all items**<br>System prevents empty timetable creation and prompts selection.<br><br>**A2: Conflicting event data detected**<br>System highlights conflicts for user decision.<br><br>**A3: User cancels import**<br>System discards staged data without saving. |
-        | **Postcondition** | Modules/Events and timetable is created and stored in system |
+        | **Basic Flow** | 1. System displays the imported modules and events.<br>2. User confirms the activities.<br>3. User names the timetable and chooses preferences.<br>4. System submits a solver job and polls its status.<br>5. System creates the timetable from the selected event IDs and opens My Schedules. |
+        | **Alternate Flow** | **A1: User leaves the flow.**<br>Imported modules and events remain stored.<br><br>**A2: Solving fails.**<br>System displays the failure and allows another attempt. |
+        | **Postcondition** | A timetable is created from the solver result. Imported records already exist before timetable creation. |
         | **Requirements Covered** | R2.3.1.5 \| R2.3.2 \| R2.3.2.1 \| R2.3.2.2 |
 
     ---
@@ -66,15 +66,15 @@
         ```
         Verify Imported Data (Actor: University Admin, System: PDF Parser)  
             TUCBW a university admin reviews module/event data imported from a PDF for their university.  
-            TUCEW the admin confirms the imported data is accurate before it is committed to the university's records.
+            TUCEW the admin reviews stored events and updates their validation status.
         ```
         ##### Expanded
         | Field | Detail |
         | :--- | :--- |
         | **Actor** | University Admin |
-        | **Precondition** | Actor is an approved uni_admin and a PDF import has been staged for the university |
-        | **Trigger** | Uni_admin opens the staged import for verification |
-        | **Basic Flow** | 1. System displays the staged modules and events imported from the PDF.<br>2. Uni_admin reviews the extracted data against the source document.<br>3. Uni_admin corrects or confirms flagged fields.<br>4. Uni_admin approves the verified data.<br>5. System commits the verified modules/events to the university's records.<br>6. System confirms successful verification. |
-        | **Alternate Flow** | **A1: Data Rejected**<br>Uni_admin rejects the staged import and system discards the data without committing it.<br><br>**A2: Partial Verification**<br>Uni_admin approves only a subset of the staged data, and system commits only the approved entries. |
-        | **Postcondition** | Verified modules/events are committed to the university's records, or the import is discarded |
+        | **Precondition** | Actor is an approved uni_admin and imported events exist for the university. |
+        | **Trigger** | Uni_admin opens an imported event for review. |
+        | **Basic Flow** | 1. System displays the imported event.<br>2. Uni_admin checks its details against the source document.<br>3. Uni_admin edits permitted fields and updates the validation flag.<br>4. System saves the event. |
+        | **Alternate Flow** | **A1: Data is not verified.**<br>The event remains stored with its validation flag unset. |
+        | **Postcondition** | The stored event has an updated validation status. |
         | **Requirements Covered** | R2.3.1.2 \| R2.3.1.4 \| R2.3.1.6 |

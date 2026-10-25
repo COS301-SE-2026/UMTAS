@@ -39,7 +39,7 @@
         | **Actor** | User |
         | **Precondition** | User does not have an existing account |
         | **Trigger** | User selects "Register" from the landing page |
-        | **Basic Flow** | 1. User initiates account registration.<br>2. User chooses a registration method.<br>3. System collects the required registration information.<br>4. System validates the submitted information.<br>5. System creates the user account.<br>6. System confirms successful registration.<br>7. User gains access to the system. |
+        | **Basic Flow** | 1. User initiates account registration.<br>2. User chooses a registration method.<br>3. System collects the required registration information.<br>4. System validates the submitted information.<br>5. System creates the user account.<br>6. System confirms successful registration.<br>7. In-house users verify their email before signing in. |
         | **Alternate Flow** | **A1: OAuth Registration**<br>User selects an OAuth provider and successfully authenticates with the provider. The system retrieves the required account information and creates the account.<br><br>**A2: In-House Registration**<br>User provides an email address and password. The system validates the submitted credentials and creates the account.<br><br>**A3: Account Already Exists**<br>System informs the user that an account already exists and suggests logging in or resetting their password. |
         | **Postcondition** | User account has been created and is available for authentication. |
         | **Requirements Covered** | R1.2.2 \| R1.2.2.1 \| R1.2.2.2 |
@@ -120,8 +120,8 @@
         | **Precondition** | User is currently authenticated |
         | **Trigger** | User selects "Delete Account" from account settings |
         | **Basic Flow** | 1. User initiates account deletion request.<br>2. System prompts user for confirmation and re-authentication (OAuth or password-based).<br>3. User confirms identity and proceeds with deletion.<br>4. System validates authentication and authorization.<br>5. System removes or anonymises user data from primary storage.<br>6. System revokes all active sessions and tokens.<br>7. System deletes or flags related account records across dependent services.<br>8. System confirms permanent deletion to the user.<br>9. User is logged out and redirected to the landing page. |
-        | **Alternate Flow** | **A1: Re-authentication Fails**<br>System denies deletion request and returns user to account settings.<br><br>**A2: Active Sessions Exist Elsewhere**<br>System invalidates all sessions except the current one, then completes deletion.<br><br>**A3: Scheduled Deletion (Grace Period)**<br>System schedules account deletion and notifies user via email, allowing cancellation within retention window.<br><br>**A4: Partial Deletion Failure**<br>System retries deletion of dependent data; if unresolved, account is marked for manual cleanup.<br><br>**A5: OAuth User Deletion Constraints**<br>System deletes local account data and revokes sessions; external identity provider account remains unaffected. |
-        | **Postcondition** | User account is permanently removed or scheduled for deletion, and no active session remains |
+        | **Alternate Flow** | **A1: Re-authentication Fails**<br>System denies deletion request and returns user to account settings.<br><br>**A2: Active Sessions Exist Elsewhere**<br>System invalidates all sessions except the current one, then completes deletion.<br><br>**A4: Partial Deletion Failure**<br>System reports failure and the user can retry.<br><br>**A5: OAuth User Deletion Constraints**<br>System deletes local account data and revokes sessions. The external identity provider account remains unaffected. |
+        | **Postcondition** | User account is permanently removed and no active session remains. |
         | **Requirements Covered** | R1.2.4.3 \| R1.2.3 |
 
     ---
