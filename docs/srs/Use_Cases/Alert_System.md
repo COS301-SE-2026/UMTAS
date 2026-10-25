@@ -1,3 +1,5 @@
+> This is a historical proposal. Event change notifications are not implemented and are not part of the current functional requirements.
+
 ??? "**Alert System Use Cases**"
     <a id="alert-system-id"></a>
     <div align="center">

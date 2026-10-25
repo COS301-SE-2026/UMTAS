@@ -76,6 +76,6 @@
         | **Precondition** | Actor is an approved uni_admin for the university and the event exists |
         | **Trigger** | Uni_admin selects "Edit" on an event |
         | **Basic Flow** | 1. Uni_admin selects an event to modify.<br>2. Uni_admin updates the event name, code, type, date, day of week, and/or times.<br>3. System validates the submitted changes.<br>4. System updates the event record.<br>5. System confirms successful update. |
-        | **Alternate Flow** | **A1: Conflicting Schedule**<br>System warns the uni_admin if the updated date, day of week, or times conflict with an existing event. |
+        | **Alternate Flow** | **A1: Invalid event details.**<br>System rejects invalid fields. Event editing does not enforce clash prevention. |
         | **Postcondition** | Event details are updated to reflect the new name, code, type, date, day of week, and/or times |
         | **Requirements Covered** | R4.3.3 \| R4.3.3.1 \| R4.3.3.2 \| R4.3.3.3 \| R4.3.3.4 \| R4.3.3.5 \| R4.3.3.6 |

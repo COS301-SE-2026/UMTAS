@@ -10,7 +10,7 @@
 1.  **Sync**: Pull latest from `dev` and create a feature branch.
 2.  **Service**: Identify the owner (NestJS Core, parser worker, solver worker, Python parser, or C++ solver).
 3.  **Red**: Write a failing unit/integration test in **Jest** or **pytest**.
-4.  **Green**: Implement the logic. Use **PGLite** for ephemeral DB tests.
+4.  **Green**: Implement the logic. Use the Docker integration runner for full-stack database tests.
 5.  **Refactor**: Clean up the code while keeping tests green.
 6.  **Swagger**: Update or create the required API definitions.
 7.  **PR**: Open a PR into `dev` once local checks pass.
@@ -53,9 +53,9 @@
     });
     ```
 
-=== "PGLite (Testing)"
-    Use PGLite for lightning-fast, isolated unit tests. No Docker required.
+=== "PostgreSQL (Integration Testing)"
+    The integration runner starts an isolated Docker stack with PostgreSQL and real workers.
 
     ```bash
-    pnpm run test:pglite
+    pnpm test:integration
     ```

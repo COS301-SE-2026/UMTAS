@@ -59,6 +59,8 @@
         | **Postcondition** | Matching calendar(s) are displayed to the admin |
         | **Requirements Covered** | R4.5.2 |
 
+    Supported restriction types are `SEMESTER_1_START`, `SEMESTER_1_END`, `SEMESTER_2_START`, `SEMESTER_2_END`, `HOLIDAY`, `PUBLIC_HOLIDAY`, `UNIVERSITY_CLOSURE`, `RECESS`, `TEST_WEEK`, `EXAM_PERIOD`, `SUPP_WEEK` and `DAY_SWAP`.
+
     ---
     ??? "UC-CAL-03: Create Calendar Restriction"
         <a id="uc-cal-03"></a>
@@ -66,7 +68,7 @@
         ```
         Create Calendar Restriction (Actor: Admin, System: Calendar Management)
             TUCBW the admin selects a University calendar and chooses to add a restriction.
-            TUCEW the system creates a single day, date range, or day swap restriction on the calendar, with a description, for use in scheduling.
+            TUCEW the system creates a restriction with a supported calendar type on the calendar, with a description, for use in scheduling.
         ```
         ##### Expanded
         | Field | Detail |
@@ -74,7 +76,7 @@
         | **Actor** | Admin |
         | **Precondition** | A calendar exists for the University and year (UC-CAL-01) |
         | **Trigger** | Admin selects "Add Restriction" on a University calendar |
-        | **Basic Flow** | 1. Admin selects the calendar to add a restriction to.<br>2. Admin chooses the restriction type: single day, date range, or day swap.<br>3. Admin enters the required details for the chosen type - a date and description for a single day restriction, a start date, end date and description for a date range restriction, or a start date, swapped day and description for a day swap restriction.<br>4. System validates the entered details.<br>5. System creates the restriction on the calendar.<br>6. System confirms successful creation to the admin. |
-        | **Alternate Flow** | **A1: Invalid or missing details**<br>System prevents creation until all required fields for the chosen restriction type are completed.<br><br>**A2: Overlapping restriction detected**<br>System warns the admin that the new restriction overlaps with an existing one and requests confirmation.<br><br>**A3: Creation failure**<br>System displays an error and allows retry. |
+        | **Basic Flow** | 1. Admin selects the calendar to add a restriction to.<br>2. Admin chooses a supported restriction type.<br>3. Admin enters the required details for the chosen type - a date and description for a single day restriction, a start date, end date and description for a date range restriction, or a start date, swapped day and description for a day swap restriction.<br>4. System validates the entered details.<br>5. System creates the restriction on the calendar.<br>6. System confirms successful creation to the admin. |
+        | **Alternate Flow** | **A1: Invalid or missing details**<br>System prevents creation until all required fields for the chosen restriction type are completed.<br><br>**A2: Invalid semester boundaries or duplicate day swap.**<br>System rejects the restriction.<br><br>**A3: Creation failure**<br>System displays an error and allows retry. |
         | **Postcondition** | A restriction is added to the calendar and available for use in scheduling |
         | **Requirements Covered** | R4.5.3 \| R4.5.3.1 \| R4.5.3.2 \| R4.5.3.3 |

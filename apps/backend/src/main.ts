@@ -138,7 +138,7 @@ async function bootstrap() {
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('UMTAS API')
-    .setDescription('University Management Timetable & Scheduling System API')
+    .setDescription('University Management & Timetable Analytics System API')
     .setVersion('1.0.0')
     .addCookieAuth('umtas-session', {
       type: 'apiKey',

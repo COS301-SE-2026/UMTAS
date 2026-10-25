@@ -56,7 +56,7 @@
         | **Precondition** | User is authenticated and a timetable exists |
         | **Trigger** | User selects “Edit Timetable” |
         | **Basic Flow** | 1. System loads selected timetable into edit mode.<br>2. User modifies module or event details.<br>3. System validates changes in real time.<br>4. User saves changes.<br>5. System persists updated timetable. |
-        | **Alternate Flow** | **A1: Invalid or conflicting update**<br>System highlights conflict and prevents save until resolved.<br><br>**A2: Save failure**<br>System notifies user and retains unsaved changes.<br><br>**A3: Insufficient permissions**<br>System does not allow user to modify component directly rather to let them create their own unique copy of the timetable/module/event |
+        | **Alternate Flow** | **A1: Invalid update.**<br>System rejects invalid fields. Timetable CRUD does not enforce clash prevention.<br><br>**A2: Save failure**<br>System notifies user and retains unsaved changes.<br><br>**A3: Insufficient permissions**<br>System does not allow user to modify component directly rather to let them create their own unique copy of the timetable/module/event |
         | **Postcondition** | Timetable is updated and stored |
         | **Requirements Covered** | R2.1.2 \| R2.1.2.1 \| R2.1.2.1.1 \| R2.1.2.1.2 \| R2.1.2.2 \| R2.1.2.2.1 \| R2.1.2.2.2 \| R2.1.2.2.3 |
 
@@ -87,7 +87,7 @@
         ```
         Customise Timetable (Actor: User, System: Timetable Management)
             TUCBW the user selects a timetable and opens customisation options.
-            TUCEW the system updates the timetable's name and/or colour according to the user's preferences.
+            TUCEW the system updates the timetable's name according to the user's preferences.
         ```
         ##### Expanded
         | Field | Detail |
@@ -95,7 +95,7 @@
         | **Actor** | User |
         | **Precondition** | User is authenticated and a timetable exists |
         | **Trigger** | User selects “Customise Timetable” |
-        | **Basic Flow** | 1. User selects a timetable to customise.<br>2. User updates the timetable name and/or colour.<br>3. System validates the submitted changes.<br>4. System saves the customised timetable.<br>5. System confirms successful update. |
+        | **Basic Flow** | 1. User selects a timetable to customise.<br>2. User updates the timetable name.<br>3. System validates the submitted changes.<br>4. System saves the customised timetable.<br>5. System confirms successful update. |
         | **Alternate Flow** | **A1: Invalid Name**<br>System rejects the name change and prompts the user for a valid name.<br><br>**A2: Save Failure**<br>System notifies user and retains unsaved changes. |
-        | **Postcondition** | Timetable's name and/or colour is updated and stored |
-        | **Requirements Covered** | R2.1.4 \| R2.1.4.1 \| R2.1.4.2 |
+        | **Postcondition** | Timetable's name is updated and stored |
+        | **Requirements Covered** | R2.1.4 \| R2.1.4.1 |

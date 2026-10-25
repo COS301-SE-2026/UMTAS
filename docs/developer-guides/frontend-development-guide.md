@@ -45,7 +45,7 @@
     Prefer extending `shadcn/ui` patterns over inventing one-off components. Keep components small and focused.
 
     ```tsx
-    import { Button } from "@/components/ui/button"
+    import { Button } from "@/components/atoms/baseShadcn/button"
 
     export function ActionButton() {
       return <Button variant="outline">Action</Button>

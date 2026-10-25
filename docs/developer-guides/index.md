@@ -44,7 +44,7 @@ Welcome to the UMTAS Developer Portal. Here you will find everything you need to
 
     ---
 
-    NestJS, DrizzleORM, and Python Solver integration.
+    NestJS, DrizzleORM, and C++ solver integration.
 
     [:octicons-arrow-right-24: Backend Guide](backend-development-guide.md)
 

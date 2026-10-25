@@ -11,7 +11,7 @@
 
 # UMTAS
 
-### University Management & Timetabling Automation System
+### University Management & Timetable Analytics System
 
 **A Strategic Partnership between [Tyto Insights](https://tyto.africa/), [DNS Business](https://dns.africa/c/), and Team Vigil**  
 _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan Dawson_

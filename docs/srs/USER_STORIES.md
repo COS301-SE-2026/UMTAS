@@ -9,8 +9,8 @@
     | **ID** | **User Story** | **Use Case** |
     |---|---|---|
     | US-1 | As a visitor, I want to view the landing page so that I can learn about the system before creating an account. | UC-LP-01 |
-    | US-2 | As a visitor, I want to view adapter capabilities so that I can see which universities and timetable sources are supported. | UC-LP-02 |
-    | US-3 | As a visitor, I want to view role capabilities so that I understand what actions each role (student, admin, etc.) can perform. | UC-LP-03 |
+    | US-2 | As a visitor, I want to view adapter capabilities so that I can see which universities and timetable sources are supported. | UC-LP-01 |
+    | US-3 | As a visitor, I want to view role capabilities so that I understand what actions each role (student, admin, etc.) can perform. | UC-LP-01 |
 
 ---
 ??? info "**Authentication**"
@@ -86,7 +86,7 @@
     | **ID** | **User Story** | **Use Case** |
     |---|---|---|
     | US-30 | As a user, I want to import a supported timetable PDF so that I do not have to manually re-enter my academic events. | UC-PDF-01 |
-    | US-31 | As a user, I want to review imported timetable data so that I can correct any parsing errors before it is saved. | UC-PDF-02 |
+    | US-31 | As a user, I want to review stored timetable data so that I can correct permitted fields before creating a schedule. | UC-PDF-02 |
     | US-32 | As a university administrator, I want to verify imported data so that unverified parser output becomes trusted academic data. | UC-PDF-03 |
 
 ---
@@ -110,7 +110,7 @@
 
     | **ID** | **User Story** | **Use Case** |
     |---|---|---|
-    | US-37 | As a student, I want the system to solve my timetable using CP-SAT, respecting hard constraints and my soft preferences (target time, minimal gaps, skip day), so that I receive a conflict-free schedule that fits how I like my week structured. | UC-SV-01 |
+    | US-37 | As a student, I want CP-SAT to respect selection counts and prevent time overlaps so that I receive a conflict-free schedule. | UC-SV-01 |
     | US-38 | As a student, I want the system to solve my timetable using a genetic algorithm guided by the same soft preferences so that I receive a clearly labelled best-effort schedule when no perfect solution is feasible. | UC-SV-02 |
 
 ---
@@ -127,7 +127,7 @@
 
     | **ID** | **User Story** | **Use Case** |
     |---|---|---|
-    | US-42 | As a student, I want to indicate my attendance intent for an event so that my participation is tracked by date. | UC-AR-01 |
+    | US-46 | As a student, I want to indicate my attendance intent for an event so that my participation is tracked by date. | UC-AR-01 |
     | US-43 | As a student, I want to unrecord my attendance for an event so that I can correct a mistaken entry. | UC-AR-02 |
     
 ---
@@ -135,8 +135,8 @@
 
     | **ID** | **User Story** | **Use Case** |
     |---|---|---|
-    | US-44 | As a lecturer or admin, I want to manage event details so that scheduling stays accurate from the teaching side. | UC-LA-01 |
-    | US-45 | As a lecturer or admin, I want to manage module details so that module information stays accurate from the teaching side. | UC-LA-02 |
+    | US-44 | As a lecturer or admin, I want to manage event details so that scheduling stays accurate from the teaching side. | UC-EM-03 |
+    | US-45 | As a lecturer or admin, I want to manage module details so that module information stays accurate from the teaching side. | UC-MM-03 |
 
 ---
 ??? info "**Tyto Simulation System**"
@@ -154,6 +154,15 @@
 
     | **ID** | **User Story** | **Use Case** |
     |---|---|---|
-    | US-53 | As an admin, I want to create a calendar for a University for a specific year so that scheduling has a calendar to work within. | UC-CM-01 |
-    | US-54 | As an admin, I want to search for a University's calendar by year so that I can find and manage the correct one. | UC-CM-02 |
-    | US-55 | As an admin, I want to add single day, date range, or day swap restrictions to a University calendar so that scheduling respects institution-specific exceptions. | UC-CM-03 |
+    | US-53 | As an admin, I want to create a calendar for a University for a specific year so that scheduling has a calendar to work within. | UC-CAL-01 |
+    | US-54 | As an admin, I want to search for a University's calendar by year so that I can find and manage the correct one. | UC-CAL-02 |
+    | US-55 | As an admin, I want to add supported calendar restrictions so that scheduling respects institution-specific exceptions. | UC-CAL-03 |
+
+
+??? info "**Verified Attendance, Campus Routing and Lecture Watch**"
+
+    | **ID** | **User Story** | **Use Case** |
+    |---|---|---|
+    | US-56 | As a lecturer, I want to capture verified attendance so that I can record who attended an event occurrence. | UC-AR-03 |
+    | US-57 | As a student, I want to view campus routes and heat maps so that I can plan my journey. | UC-MAP-01 |
+    | US-58 | As a lecturer, I want to analyse Lecture Watch sessions so that I can review aggregated lecture metrics. | UC-VI-01 |

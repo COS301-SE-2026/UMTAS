@@ -10,7 +10,7 @@ export default function TermsPage() {
   return (
     <LegalPageTemplate
       title="Terms of Service"
-      summary="These terms describe the rules for using UMTAS (University Modular Timetable & Analytics System). Please read them before you use the service."
+      summary="These terms describe the rules for using UMTAS (University Management & Timetable Analytics System). Please read them before you use the service."
     >
       <section id="acceptance">
         <h2>1. Acceptance</h2>

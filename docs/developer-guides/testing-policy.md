@@ -51,14 +51,14 @@
 
         ### Execution
 
-        Unit tests are executed locally by developers during development and automatically within the Continuous Integration (CI) pipeline with its own container to ensure proper isolation.
+        Unit tests are executed locally by developers during development and automatically on the CI runner. The CI unit step runs backend, shared-types and worker suites. Frontend Jest runs separately through `pnpm --filter frontend test`.
 
         ### Success Criteria
 
         * All unit tests must pass.
         * New business logic should be accompanied by appropriate unit tests.
         * Unit tests should provide meaningful verification and must not contain trivial or always-true assertions.
-        * A coverage standard of 80%+ will be upheld for unit tests, this applies to the logic where if each isolated module is working correctly, the system will work correctly.
+        * The unit coverage target is 80%. Jest does not currently enforce it as a merge gate.
         * The database service will have its own mocked out service that can be used across all unit tests.
         * All services that need to be mocked out will also happen in a central Testing directory so they can be reused across unit tests and ensure only one point of modification is required when something changes.
 
@@ -79,7 +79,7 @@
         ### Technology
 
         * Jest
-        * PGLite
+        * PostgreSQL in Docker
 
         ### Execution
 
@@ -190,7 +190,7 @@
         | Playwright | End-to-end testing |
         | ESLint | Static code analysis and linting |
         | TypeScript Compiler | Type checking and build verification |
-        | PGLite | Isolated database environment for backend integration testing |
+        | PostgreSQL in Docker | Isolated database environment for full-stack integration testing. |
         | Husky | Pre-commit quality gate enforcement |
         | GitHub Actions | Continuous Integration automation |
 
@@ -206,8 +206,8 @@
         ### TypeScript Compiler
         The TypeScript compiler is used to perform static type checking and ensure that the application compiles successfully before deployment.
 
-        ### PGLite
-        PGLite provides an isolated PostgreSQL-compatible testing environment for backend integration tests without requiring a dedicated database server.
+        ### PostgreSQL
+        The integration runner starts PostgreSQL and the other services in Docker. PGLite remains an optional backend database mode.
 
         ### Husky
         Husky is used to enforce local quality gates through Git pre-commit hooks. Commits are blocked if linting or type checking fails.
@@ -223,10 +223,10 @@
 
         ### Isolated Test Environments
         Automated tests execute within isolated environments to ensure consistency and repeatability. Test environments are separated from development and production environments and are configured specifically for automated validation.
-        Backend integration tests utilise isolated database instances through PGLite. Additional containerised environments may be used to support testing activities where required.
+        Full-stack integration tests use an isolated Compose stack with PostgreSQL, Redis, object storage, the backend and both workers.
 
         ### Continuous Integration Environment
-        The Continuous Integration environment is managed through GitHub Actions. Every pull request and repository event triggers an automated validation pipeline.
+        The Continuous Integration environment is managed through GitHub Actions. Pull requests and pushes to `main` or `dev`, plus `v*` tag pushes, trigger the CI pipeline.
 
         The CI environment executes:
         - ESLint validation
@@ -338,7 +338,7 @@
         - **Unit tests** must validate core logic in isolation  
         - **Integration tests** must confirm correct interaction between components  
         - **E2E tests** must validate critical user workflows and user stories  
-        - CI pipeline must pass all stages within isolated Docker-based environments  
+        - CI must pass its runner checks and isolated Docker integration and browser tests.
 
     ---
     ??? info "5.4 Functional Acceptance"

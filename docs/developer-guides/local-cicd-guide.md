@@ -1,7 +1,7 @@
 # Local CI/CD Guide
 
 !!! info "CI is confirmation, not discovery."
-    Catch everything locally first. If remote CI fails, a local check was skipped.
+    Run relevant checks locally before pushing. CI also validates the isolated integration and browser stacks.
 
 ---
 
@@ -22,12 +22,12 @@
 ```bash
 pnpm run lint        # ESLint across all apps
 pnpm run build       # Turborepo build (dependency order respected)
-pnpm run test:unit   # Jest unit + integration (no e2e)
+pnpm run test:unit   # Runs workspace unit tests without E2E.
 pnpm run act         # simulate the full CI job locally
 ```
 
 !!! warning "Always use `pnpm run act`, not plain `act`"
-    Plain `act` queues the `docker`, `deploy`, and `notify` jobs which require secrets and will fail or push images. `pnpm run act` scopes to `-j ci` only.
+    Plain `act` can queue image publication and deployment jobs that require secrets. `pnpm run act` scopes to `-j ci` only.
 
 ---
 
@@ -60,12 +60,13 @@ pnpm run act         # simulate the full CI job locally
 
 ??? warning "CI job order"
     ```
-    ci (lint → build → test)
-      └── docker   ← push events only, needs ci to pass
-            └── deploy   ← dev branch only
-                  └── notify (Discord)
+    ci (lint → build → unit → integration → E2E)
+      ├── docker-staging → image-scan → deploy-staging (dev pushes)
+      └── docker-release → image-scan (v* tag pushes)
     ```
-    Fix lint/build/test failures first - nothing else runs until `ci` passes.
+    Image publication requires `ci` to pass. PR image scans run independently. Production deployment uses the separate manual workflow.
+
+    CI runs backend and shared worker unit suites. Run frontend Jest locally with `pnpm --filter frontend test` because it is not included in the CI unit step.
 
 ---
 

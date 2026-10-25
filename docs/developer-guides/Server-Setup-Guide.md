@@ -29,12 +29,12 @@ We cloned the repo to a specific deployment home to keep it separated from user 
 
 ## Server Philosophy → GitOps / Infrastructure As Code
 
-As mentioned in our `RepoSetup.md` file, we follow the **"One command for them all"** philosophy.  
-Every config file is stored in the `/infra` folder. This ensures that there are **0 manual server steps**.
+As mentioned in our `Repo-Setup-Guide.md` file, we follow the **"One command for them all"** philosophy.
+Infrastructure configuration lives in `/infra` and the root Compose files. Host setup and Phase configuration still require manual steps.
 
 ### Networking & Routing
 
-- **Tech:** Traefik v3.0
+- **Tech:** Traefik v3.6
 - **Why:** Traefik is our reverse proxy of choice. It integrates natively with the Docker daemon. It discovers new containers on the go, reads their labels, and then creates routing rules for each container dynamically.
 - **SSL:** Traefik also handles SSL certificates through an HTTP challenge. _(What is an HTTP Challenge? It's just a check that Traefik uses to verify if we own the domain)._
 - **Security:** Traefik is the **only** service that exposes ports (`80` and `443`). Everything else is configured to live and communicate strictly on an internal network.
@@ -42,7 +42,7 @@ Every config file is stored in the `/infra` folder. This ensures that there are 
 ### Monitoring & Observability
 
 - **Tech:** We use the Prometheus, Loki, and Grafana (**PLG**) stack to monitor everything.
-- **Prometheus (Metrics):** Prometheus acts as a web scraper for our numeric data (CPU, memory, request counts) from Traefik, Backend, and Solver.
+- **Prometheus (Metrics):** Prometheus acts as a web scraper for our numeric data (CPU, memory, request counts) from Traefik, the backend and infrastructure exporters. Workers do not expose a scraped metrics endpoint.
 - **Loki & Promtail (Logs):**
   - **Why:** Managing all the logs from `docker logs` is completely unscalable.
   - **How:** We are using Promtail. _(What does Promtail do?)_ Promtail mounts the host's `/var/lib/docker/containers` directory. It then reads the raw JSON logs of every container, and sends them to the Loki Service through the internal network.
@@ -53,12 +53,8 @@ Every config file is stored in the `/infra` folder. This ensures that there are 
 
 ### Automated Maintenance
 
-- **Tech:** Watchtower
-- **Why:** Auto-updates our containers when new images are pushed to the registry.
-- **Config:** Watchtower runs every 30 seconds.
+Watchtower is disabled in the staging Compose file. GitHub Actions deploys staging images after CI and image scans pass.
 
 ### Mail Server
 
-- **Tools:** `infra/init.sh` for the root `.env`, then `infra/mail_setup.sh` for the mailserver
-- **Use:** Run `bash infra/init.sh` to generate the server env, then `bash infra/mail_setup.sh bootstrap` over SSH to create `/opt/mailserver`, write the compose/env files, and start `docker-mailserver`.
-- **Mailbox CLI:** Use `bash infra/mail_setup.sh add-user user@domain` and `bash infra/mail_setup.sh add-alias alias@domain target@domain` after bootstrap.
+Configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS` and `SMTP_FROM` in Phase for the deployed mail service. Local development uses MailHog. The repository does not provision a production mailserver.

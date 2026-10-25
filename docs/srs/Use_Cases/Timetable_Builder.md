@@ -57,7 +57,7 @@
         | **Precondition** | User is authenticated, a module is selected |
         | **Trigger** | User selects "Create Event” |
         | **Basic Flow** | 1. System opens event creation form.<br>2. User selects module for event.<br>3. User enters event details (day, time, venue).<br>4. System validates event against existing schedule.<br>5. System attaches event to module within timetable.<br>6. System confirms event creation. |
-        | **Alternate Flow** | **A1: Time conflict detected**<br>System warns user of overlap and requests adjustment.<br><br>**A2: Missing event details**<br>System prevents save until required fields are completed. |
+        | **Alternate Flow** | **A1: Overlapping events.**<br>Events can be stored with overlapping times. Solving selects a schedule separately.<br><br>**A2: Missing event details**<br>System prevents save until required fields are completed. |
         | **Postcondition** | Event is created and stored within selected module |
         | **Requirements Covered** | R2.2.1.2 |
 

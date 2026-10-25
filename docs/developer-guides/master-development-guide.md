@@ -20,7 +20,7 @@ Use the following specialized guides based on your current task:
 
 | Guide                                                            | Primary Focus                                    |
 | :--------------------------------------------------------------- | :----------------------------------------------- |
-| [:material-server: Backend Dev](./backend-development-guide.md)  | NestJS APIs, DrizzleORM, Python Solver, Swagger. |
+| [:material-server: Backend Dev](./backend-development-guide.md)  | NestJS APIs, DrizzleORM, C++ solver, Swagger. |
 | [:material-web: Frontend Dev](./frontend-development-guide.md)   | Next.js UI, Shadcn/UI, Radix state.              |
 | [:material-cog: Server & Infra](./server-guide.md)               | Docker, Traefik, MinIO, Monitoring (PLG).        |
 | [:material-test-tube: Unit Testing](./unit-testing-guide.md)     | Isolated logic, utilities, component behaviour.  |

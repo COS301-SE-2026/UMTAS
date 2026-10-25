@@ -13,7 +13,7 @@ export function BrandIdentity() {
           </h1>
           <p className="text-base leading-relaxed">
             <strong className="text-[var(--text-primary)]">
-              UMTAS (University Modular Timetable & Analytics System)
+              UMTAS (University Management & Timetable Analytics System)
             </strong>
             {" - "}Professional, precise and uncluttered. UMTAS is a tool for
             students and administrators at South African universities. The
