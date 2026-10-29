@@ -54,7 +54,7 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 <br>
 
-[Demo](#demo) · [Overview](#project-overview) · [Features](#features) · [Documentation](#documentation) · [Architecture](#system-architecture) · [Tech Stack](#technology-stack) · [Branching](#branching-strategy) · [Team](#team) · [Project Day](#project-day-2026) · [Partners](#partners)
+[Demo](#demo) · [Overview](#project-overview) · [Features](#features) · [Documentation](#documentation) · [Architecture](#system-architecture) · [Engineering](#engineering-notes) · [Tech Stack](#technology-stack) · [Branching](#branching-strategy) · [Team](#team) · [Project Day](#project-day-2026) · [Partners](#partners)
 
 </div>
 
@@ -302,6 +302,60 @@ UMTAS turns a university's existing timetable into a clash-free personal timetab
 </div>
 
 </details>
+
+</details>
+
+---
+
+<div align="center">
+
+## <picture><source media="(prefers-color-scheme: dark)" srcset="https://api.iconify.design/mdi/clipboard-check-outline.svg?color=%23FFFFFF"><img src="https://api.iconify.design/mdi/clipboard-check-outline.svg?color=%2318181B" width="24" height="24" valign="middle"></picture> Engineering Notes
+
+</div>
+
+<details>
+<summary><strong>Expand implementation notes &amp; local development</strong></summary>
+<br>
+
+### Design patterns
+
+| Pattern                      | Where it fits                                                                                                                                                                                                                                                     |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Adapter**                  | [University adapters](apps/backend/src/ApiService/Adapter/University_Adapter.ts) and [PDF parsers](apps/pdf_parser/parser/base_parser.py) convert institution-specific data into shared formats. New integrations implement the contract and register an adapter. |
+| **Decorator**                | [Preference decorators](apps/preference-solver/src/heuristic/Decorators/Decorators.h) share the `BaseHeuristic` interface and compose timetable scoring through delegation.                                                                                       |
+| **Chain of Responsibility**  | [Preference handlers](apps/preference-solver/src/heuristic/Handlers/getHeuristic.cpp) handle matching keys or pass them to the next handler.                                                                                                                      |
+| **Strategy-style selection** | The [solver worker](apps/solver-worker/src/solver.processor.ts) selects CP-SAT or GA through a shared CLI contract.                                                                                                                                               |
+| **Builder-style requests**   | [RequestBuilder](apps/frontend/utilities/request.ts) provides fluent, typed HTTP request configuration.                                                                                                                                                           |
+| **Simple factories**         | [Test factories](apps/backend/src/Testing/Factories/jobs.factory.ts) create fresh fixtures with defaults and optional overrides.                                                                                                                                  |
+
+[Shared schemas](packages/shared-types/src/) validate parser and solver payloads at runtime. See [design patterns](docs/sas/architecture/DESIGN_PATTERNS.md) and [service contracts](docs/sas/architecture/SERVICE_CONTRACTS.md) for details.
+
+### Code organisation
+
+- **`apps/`**: frontend, backend, parser, solver, workers and test applications.
+- **`packages/`**: shared types, validation schemas and worker utilities.
+- **`docs/`, `docker/`, `infra/`**: documentation, containers and infrastructure.
+
+Backend code groups controllers, services and DTOs by domain. Frontend components follow Atomic Design. Descriptive operations, typed contracts and adjacent tests keep responsibilities clear. Naming follows local ecosystem conventions. Prettier, ESLint and staged TypeScript checks support consistency. See [coding standards](docs/developer-guides/coding-standards.md).
+
+### Interface
+
+The [landing page](apps/frontend/src/app/dashboard/page.tsx) leads into **Build my timetable**, followed by **Modules → Events → Schedules**. Responsive layouts, shared controls, light/dark themes and [design tokens](apps/frontend/src/app/globals.css) keep the interface consistent. The [brand guide](apps/frontend/src/app/brand-style/page.tsx), Help tours and [user manual](docs/management/UserManual.md) cover styling and navigation.
+
+### Local development
+
+Follow the [setup guide](docs/developer-guides/Repo-Setup-Guide.md) for prerequisites and Phase configuration, then run:
+
+```bash
+pnpm run setup
+just dev-infra
+just migrate
+just both
+```
+
+Frontend: **http://localhost:3001** · Backend: **http://localhost:3000**
+
+Use `pnpm lint` and `pnpm test:unit` for local checks. See the [testing policy](docs/developer-guides/testing-policy.md) for integration, end-to-end and worker tests.
 
 </details>
 
