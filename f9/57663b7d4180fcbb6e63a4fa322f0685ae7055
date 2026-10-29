@@ -1,0 +1,23 @@
+README.md
+  s_a5e36c710a240c::t_0e88d2b01d02b6 320,322-329,331,341,343,347,356,358
+  s_a5e36c710a240c::t_89f5ffd55de2ac 333,335-337,339
+  s_a5e36c710a240c::t_daa4366be73009 57,312,317,345-346,348
+  s_a5e36c710a240c::t_fd00f704b16dcc 313-316,318-319,321,330,332,334,338,340,342,344,349-355,357
+  s_a5e36c710a240c::t_885216bc4b2942 359-365
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f957663b7d4180fcbb6e63a4fa322f0685ae7055",
+  "prompts": {},
+  "sessions": {
+    "s_a5e36c710a240c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1891d-22a9-7890-b94f-feab55681a4e",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
